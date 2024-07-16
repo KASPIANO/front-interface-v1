@@ -28,7 +28,7 @@ export const columns: GridColDef[] = [
         field: 'holders',
         headerName: 'Holders',
         width: 100,
-        valueGetter: (value, row) => row.holders.toLocaleString(),
+        // valueGetter: (value, row) => row.holders.toLocaleString(),
     },
     {
         field: 'pre',
@@ -40,7 +40,7 @@ export const columns: GridColDef[] = [
         field: 'max',
         headerName: 'Supply',
         width: 200,
-        valueGetter: (value, row) => row.max.toLocaleString(),
+        // valueGetter: (value, row) => row.max.toLocaleString(),
     },
     {
         field: 'state',
