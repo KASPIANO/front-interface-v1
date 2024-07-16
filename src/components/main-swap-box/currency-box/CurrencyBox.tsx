@@ -1,0 +1,55 @@
+import { StyledInputContainer, StyledAmountInput, TokensAutocomplete } from './CurrencyBox.s';
+import { FormControl, TextField } from '@mui/material';
+import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
+import { FC } from 'react';
+import { TokenResponse } from '../../../types/Types';
+
+interface CurrencyBoxProps {
+    active: boolean;
+    paying: string;
+    setPaying: (value: string) => void;
+    tokens: TokenResponse[];
+}
+
+const CurrencyBox: FC<CurrencyBoxProps> = (props) => {
+    const { active, paying, setPaying, tokens } = props;
+
+    const onGroupChange = (event: any) => {
+        setPaying(event.target.value);
+    };
+    return (
+        <StyledInputContainer active={active}>
+            <FormControl>
+                {/* <TokensAutocomplete
+                    id="token-autocomplete"
+                    options={tokens}
+                    getOptionLabel={(option: TokenResponse) => option.tick}
+                    renderOption={(option: TokenResponse) => (
+                        <img
+                            src={option.logo}
+                            alt={option.tick}
+                            style={{ width: 24, height: 24, marginRight: 10 }}
+                        />
+                    )}
+                    popupIcon={<KeyboardArrowDownRoundedIcon />}
+                    disableCloseOnSelect
+                    ListboxProps={{ style: { fontSize: '0.8vw' } }}
+                    autoSelect={false}
+                    value={'Kas'}
+                    onChange={onGroupChange}
+                /> */}
+            </FormControl>
+
+            <StyledAmountInput
+                type="text"
+                placeholder="0.00"
+                value={paying}
+                onFocus={() => setPaying('true')}
+                onBlur={() => setPaying('false')}
+                onChange={(e) => setPaying(e.target.value)}
+            />
+        </StyledInputContainer>
+    );
+};
+
+export default CurrencyBox;

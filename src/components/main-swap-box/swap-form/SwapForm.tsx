@@ -1,0 +1,87 @@
+import React from 'react';
+import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
+import { BalanceText, BalanceButtons } from '../../../pages/swap-page/SwapPage.s';
+import { SwapContainer, Label, BalanceInfo, SwitchButton, SwapButton } from './SwapForm.s';
+import CurrencyBox from '../currency-box/CurrencyBox';
+import { Token, TokenResponse } from '../../../types/Types';
+
+interface SwapFormProps {
+    isPayingActive: boolean;
+    paying: string;
+    setPaying: (value: string) => void;
+    payingCurrency: string;
+    payingCurrencyImage: string;
+    receiving: string;
+    setReceiving: (value: string) => void;
+    receivingCurrency: string;
+    receivingCurrencyImage: string | null;
+    walletAddress: string | null;
+    walletBalance: number;
+    receivingBalance: number;
+    isConnecting: boolean;
+    switchAssets: () => void;
+    connectWallet: () => void;
+    openTokenModal: (isPaying: boolean) => void;
+    tokens: TokenResponse[];
+}
+
+const kasToken: TokenResponse = {
+    tick: 'kas',
+    minted: '0',
+    state: 'deployed',
+    maxSupply: '1000000',
+    logo: '/kaspa.svg',
+};
+
+const SwapForm: React.FC<SwapFormProps> = (props) => {
+    const {
+        isPayingActive,
+        paying,
+        setPaying,
+        receiving,
+        setReceiving,
+        walletAddress,
+        walletBalance,
+        receivingBalance,
+        isConnecting,
+        switchAssets,
+        connectWallet,
+        openTokenModal,
+        receivingCurrency,
+        tokens,
+    } = props;
+
+    return (
+        <SwapContainer>
+            <Label>Sell</Label>
+            <CurrencyBox tokens={[kasToken]} active={isPayingActive} paying={paying} setPaying={setPaying} />
+            {walletAddress && (
+                <BalanceInfo>
+                    <BalanceText>
+                        <i className="fas fa-wallet" /> Balance: {walletBalance} KAS
+                    </BalanceText>
+                    <BalanceButtons>
+                        <button onClick={() => setPaying((walletBalance / 2).toString())}>HALF</button>
+                        <button onClick={() => setPaying(walletBalance.toString())}>MAX</button>
+                    </BalanceButtons>
+                </BalanceInfo>
+            )}
+            <SwitchButton onClick={switchAssets}>
+                <SwapHorizRoundedIcon />
+            </SwitchButton>
+            <Label>Buy</Label>
+            <CurrencyBox tokens={tokens} active={false} paying={receiving} setPaying={setReceiving} />
+            {walletAddress && receivingCurrency !== 'Select Token' && (
+                <BalanceInfo>
+                    <BalanceText>
+                        <i className="fas fa-wallet" /> Balance: {receivingBalance} {receivingCurrency}
+                    </BalanceText>
+                </BalanceInfo>
+            )}
+            <SwapButton onClick={connectWallet} disabled={isConnecting}>
+                {isConnecting ? 'Connecting...' : walletAddress ? 'Swap' : 'Connect Wallet'}
+            </SwapButton>
+        </SwapContainer>
+    );
+};
+export default SwapForm;
