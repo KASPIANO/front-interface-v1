@@ -1,11 +1,19 @@
 interface Kasware {
-    requestAccounts: () => Promise<void>;
-    _selectedAddress: string;
-    getBalance: () => Promise<{ total: number }>;
-    on: (event: string, handler: (...args: any[]) => void) => void;
-    removeListener: (event: string, handler: (...args: any[]) => void) => void;
-  }
-  
-  interface Window {
+    requestAccounts: () => Promise<string[]>;
+    getAccounts: () => Promise<string[]>;
+    getNetwork: () => Promise<string>;
+    switchNetwork: (network: string) => Promise<void>;
+    disconnect: (origin: string) => Promise<void>;
+    getPublicKey: () => Promise<string>;
+    getBalance: () => Promise<{ confirmed: number; unconfirmed: number; total: number }>;
+    sendKaspa: (toAddress: string, sompi: number, options?: { feeRate?: number }) => Promise<string>;
+    signMessage: (msg: string, type?: 'ecdsa' | 'bip322-simple') => Promise<string>;
+    pushTx: (options: { rawtx: string }) => Promise<string>;
+    signKRC20Transaction: (inscribeJsonString: string, type: number, destAddr?: string) => Promise<string>;
+    on: (event: 'accountsChanged' | 'networkChanged', handler: (data: any) => void) => void;
+    removeListener: (event: 'accountsChanged' | 'networkChanged', handler: (data: any) => void) => void;
+}
+
+interface Window {
     kasware?: Kasware;
-  }
+}
