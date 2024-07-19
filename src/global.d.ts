@@ -10,8 +10,11 @@ interface Kasware {
     signMessage: (msg: string, type?: 'ecdsa' | 'bip322-simple') => Promise<string>;
     pushTx: (options: { rawtx: string }) => Promise<string>;
     signKRC20Transaction: (inscribeJsonString: string, type: number, destAddr?: string) => Promise<string>;
-    on: (event: 'accountsChanged' | 'networkChanged', handler: (data: any) => void) => void;
-    removeListener: (event: 'accountsChanged' | 'networkChanged', handler: (data: any) => void) => void;
+    on: (event: 'accountsChanged' | 'networkChanged' | 'disconnect', handler: (data: any) => void) => void;
+    removeListener: (
+        event: 'accountsChanged' | 'networkChanged' | 'disconnect',
+        handler: (data: any) => void,
+    ) => void;
 }
 
 interface Window {

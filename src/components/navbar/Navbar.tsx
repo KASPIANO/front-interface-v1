@@ -10,7 +10,6 @@ import {
     NavCenter,
     SearchContainer,
 } from './NavBar.s';
-import TokenSearchModal from '../modals/token-search-modal/TokenSearchModal';
 import InputAdornment from '@mui/material/InputAdornment';
 import { TokenResponse } from '../../types/Types';
 
@@ -24,10 +23,12 @@ interface NavbarProps {
     walletAddress: string | null;
     connectWallet: () => void;
     tokens: TokenResponse[];
+    network: string;
+    onNetworkChange: (network: string) => void;
 }
 
 const Navbar: React.FC<NavbarProps> = (props) => {
-    const { walletAddress, connectWallet, tokens } = props;
+    const { walletAddress, connectWallet } = props;
     const [activePage, setActivePage] = useState('Swap');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchValue, setSearchValue] = useState('');

@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
 
 First, run the development server:
+npm start
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+This are the resources:
 
-## Learn More
+Kasplex protocol, the one developing the KRC20:
 
-To learn more about Next.js, take a look at the following resources:
+https://docs.kasplex.org/
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Kasware docs and integration which is the client wallet we are developing with, it has a extensive api we are using currently:
 
-## Deploy on Vercel
+https://docs.kasware.xyz/
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+KASPA API:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+https://api.kaspa.org/
+
+WASM:
+(currently not using in front)
+https://kaspa-mdbook.aspectron.com/integrating.html
+
+https://aspectron.org/en/projects/kaspa-wasm.html
+
+download sdk WASM for more developing indclduing Nodejs and Web developing with examples:
+https://kaspa.aspectron.org/nightly/downloads/
+
+
+refrence with code implement on kaspa with kasware:
+https://kastools.com/
+
+reference for a similar app, where I want to see this go:
+main page:
+https://magiceden.io/runes
+krc20 coin specicit page:
+https://magiceden.io/runes/Z%E2%80%A2Z%E2%80%A2Z%E2%80%A2Z%E2%80%A2Z%E2%80%A2FEHU%E2%80%A2Z%E2%80%A2Z%E2%80%A2Z%E2%80%A2Z%E2%80%A2Z
+
+
+Partially signed txn docs:
+
+https://github.com/kaspanet/rusty-kaspa/tree/master/wallet/pskt/src
+
+magiceden + explanation
+https://github.com/me-foundation/msigner

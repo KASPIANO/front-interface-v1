@@ -1,14 +1,10 @@
-import { useState, useEffect, FC } from 'react';
+import { useState, FC } from 'react';
 import SlippageModal from '../../components/modals/slippage-modal/SlippageModal';
-import TokenSelectModal from '../../components/modals/token-select-modal/TokenSelectModal';
 import WalletModal from '../../components/modals/wallet-modal/WalletModal';
 import { Heading, BlurOverlay, MainContent } from './SwapPage.s';
 import { Token, TokenResponse } from '../../types/Types';
 import NotificationComponent from '../../components/notification/Notification';
-import { fetchReceivingBalance, fetchTokens, fetchWalletBalance } from '../../DAL/KaspaApiDal';
-import { setWalletBalanceUtil } from '../../utils/Utils';
 import { SwapLayout } from './SwapPageLayout';
-import Navbar from '../../components/navbar/Navbar';
 import MiniNavbar from '../../components/mini-navbar/MiniNavbar';
 import MainSwapBox from '../../components/main-swap-box/MainSwapBox';
 import Footer from '../../components/footer/Footer';
@@ -63,56 +59,56 @@ const SwapPage: FC<SwapPageProps> = (props) => {
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [tokens, setTokens] = useState<TokenResponse[]>([]);
 
-    useEffect(() => {
-        const handleAccountsChanged = async (accounts: string[]) => {
-            if (accounts.length === 0) {
-                setWalletAddress(null);
-                setWalletBalance(0);
-                setReceivingBalance(0);
-                localStorage.removeItem('isWalletConnected');
-            } else {
-                setWalletAddress(accounts[0]);
-                const balance = await fetchWalletBalance(accounts[0]);
-                setWalletBalance(setWalletBalanceUtil(balance));
-            }
-        };
+    // useEffect(() => {
+    //     const handleAccountsChanged = async (accounts: string[]) => {
+    //         if (accounts.length === 0) {
+    //             setWalletAddress(null);
+    //             setWalletBalance(0);
+    //             setReceivingBalance(0);
+    //             localStorage.removeItem('isWalletConnected');
+    //         } else {
+    //             setWalletAddress(accounts[0]);
+    //             const balance = await fetchWalletBalance(accounts[0]);
+    //             setWalletBalance(setWalletBalanceUtil(balance));
+    //         }
+    //     };
 
-        const handleDisconnect = () => {
-            setWalletAddress(null);
-            setWalletBalance(0);
-            setReceivingBalance(0);
-            localStorage.removeItem('isWalletConnected');
-        };
+    //     const handleDisconnect = () => {
+    //         setWalletAddress(null);
+    //         setWalletBalance(0);
+    //         setReceivingBalance(0);
+    //         localStorage.removeItem('isWalletConnected');
+    //     };
 
-        const checkWalletConnection = async () => {
-            const isWalletConnected = localStorage.getItem('isWalletConnected');
-            if (isWalletConnected === 'true' && window.kasware) {
-                await window.kasware.requestAccounts();
-                const selectedAddress = window.kasware._selectedAddress;
-                if (selectedAddress) {
-                    setWalletAddress(selectedAddress);
-                    const balance = await fetchWalletBalance(selectedAddress);
-                    setWalletBalance(setWalletBalanceUtil(balance));
-                    setShowNotification(true);
-                    setTimeout(() => setShowNotification(false), 5000);
-                }
-            }
-        };
+    //     const checkWalletConnection = async () => {
+    //         const isWalletConnected = localStorage.getItem('isWalletConnected');
+    //         if (isWalletConnected === 'true' && window.kasware) {
+    //             await window.kasware.requestAccounts();
+    //             const selectedAddress = window.kasware._selectedAddress;
+    //             if (selectedAddress) {
+    //                 setWalletAddress(selectedAddress);
+    //                 const balance = await fetchWalletBalance(selectedAddress);
+    //                 setWalletBalance(setWalletBalanceUtil(balance));
+    //                 setShowNotification(true);
+    //                 setTimeout(() => setShowNotification(false), 5000);
+    //             }
+    //         }
+    //     };
 
-        if (window.kasware) {
-            window.kasware.on('accountsChanged', handleAccountsChanged);
-            window.kasware.on('disconnect', handleDisconnect);
-        }
+    //     if (window.kasware) {
+    //         window.kasware.on('accountsChanged', handleAccountsChanged);
+    //         window.kasware.on('disconnect', handleDisconnect);
+    //     }
 
-        checkWalletConnection();
+    //     checkWalletConnection();
 
-        return () => {
-            if (window.kasware && window.kasware.removeListener) {
-                window.kasware.removeListener('accountsChanged', handleAccountsChanged);
-                window.kasware.removeListener('disconnect', handleDisconnect);
-            }
-        };
-    }, [walletAddress, setShowNotification]);
+    //     return () => {
+    //         if (window.kasware && window.kasware.removeListener) {
+    //             window.kasware.removeListener('accountsChanged', handleAccountsChanged);
+    //             window.kasware.removeListener('disconnect', handleDisconnect);
+    //         }
+    //     };
+    // }, [walletAddress, setShowNotification]);
 
     const switchAssets = () => {
         const tempPaying = paying;
@@ -129,15 +125,15 @@ const SwapPage: FC<SwapPageProps> = (props) => {
         setReceivingCurrencyImage(tempPayingCurrencyImage);
     };
 
-    useEffect(() => {
-        const formatBalance = (balance: number) => (isNaN(balance) ? '0.00' : balance.toFixed(4));
+    // useEffect(() => {
+    //     const formatBalance = (balance: number) => (isNaN(balance) ? '0.00' : balance.toFixed(4));
 
-        if (walletAddress) {
-            fetchReceivingBalance(walletAddress, receivingCurrency).then((balanceInToken) => {
-                setReceivingBalance(parseFloat(formatBalance(balanceInToken)));
-            });
-        }
-    }, [walletAddress, receivingCurrency]);
+    //     if (walletAddress) {
+    //         fetchReceivingBalance(walletAddress, receivingCurrency).then((balanceInToken) => {
+    //             setReceivingBalance(parseFloat(formatBalance(balanceInToken)));
+    //         });
+    //     }
+    // }, [walletAddress, receivingCurrency]);
 
     // useEffect(() => {
     //     const fetchTokensList = async () => {
@@ -187,7 +183,7 @@ const SwapPage: FC<SwapPageProps> = (props) => {
 
     return (
         <SwapLayout>
-            <Navbar walletAddress={walletAddress} connectWallet={connectWallet} tokens={tokens} />
+            {/* <Navbar walletAddress={walletAddress} connectWallet={connectWallet} tokens={tokens} /> */}
             <MiniNavbar />
             <BackgroundEffect />
             <MainContent>
@@ -220,7 +216,6 @@ const SwapPage: FC<SwapPageProps> = (props) => {
             </MainContent>
             <Footer />
             {isModalOpen && <SlippageModal onClose={closeSlippageModal} onSave={handleSlippageSave} />}
-            {isTokenModalOpen && <TokenSelectModal onClose={closeTokenModal} onSelect={handleTokenSelect} />}
             {isBlurred && <BlurOverlay />}
             {showNotification && walletAddress && (
                 <NotificationComponent

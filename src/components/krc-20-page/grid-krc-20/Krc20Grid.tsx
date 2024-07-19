@@ -1,10 +1,16 @@
 import { GridPaginationModel } from '@mui/x-data-grid';
 import { columns } from './Krc20Grid.config';
 import { useEffect, useState } from 'react';
-import { fetchTokenInfo, fetchTokens } from '../../../DAL/KaspaApiDal';
 import { StyledDataGrid, StyledDataGridContainer } from './Krc20Grid.s';
+import { fetchTokenInfo, fetchTokens } from '../../../DAL/Krc20DAL';
+import { TokenResponse } from '../../../types/Types';
 
-const TokenDataGrid = () => {
+interface TokenDataGridProps {
+    tokens: TokenResponse[];
+}
+
+const TokenDataGrid = (props) => {
+    const { tokens } = props;
     const [tokensRows, setTokensRows] = useState([]);
     const [loading, setLoading] = useState(true);
     const [paginationModel, setPaginationModel] = useState({
@@ -16,9 +22,9 @@ const TokenDataGrid = () => {
         const loadTokens = async () => {
             try {
                 setLoading(true);
-                const tokenList = await fetchTokens(paginationModel.page);
+
                 const detailedTokens = await Promise.all(
-                    tokenList.map(async (token) => {
+                    tokens.map(async (token) => {
                         const tokenDetails = await fetchTokenInfo(token.tick);
                         return {
                             ...token,

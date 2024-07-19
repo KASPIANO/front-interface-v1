@@ -125,17 +125,40 @@ export const pushTx = async (options: { rawtx: string }): Promise<string> => {
 };
 
 // Method to sign KRC20 transaction
-export const signKRC20Transaction = async (
-    inscribeJsonString: string,
-    type: number,
-    destAddr?: string,
-): Promise<string> => {
+export const deployKRC20Token = async (inscribeJsonString: string): Promise<string> => {
+    if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, type, destAddr);
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2);
         console.log(txid);
         return txid;
     } catch (error) {
-        console.error(error);
+        console.error('Failed to deploy KRC20 token:', error);
+        throw error;
+    }
+};
+
+// Method to mint KRC20 token
+export const mintKRC20Token = async (inscribeJsonString: string): Promise<string> => {
+    if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
+    try {
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3);
+        console.log(txid);
+        return txid;
+    } catch (error) {
+        console.error('Failed to mint KRC20 token:', error);
+        throw error;
+    }
+};
+
+// Method to transfer KRC20 token
+export const transferKRC20Token = async (inscribeJsonString: string, destAddr: string): Promise<string> => {
+    if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
+    try {
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4, destAddr);
+        console.log(txid);
+        return txid;
+    } catch (error) {
+        console.error('Failed to transfer KRC20 token:', error);
         throw error;
     }
 };
