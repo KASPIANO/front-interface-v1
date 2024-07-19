@@ -48,7 +48,6 @@ export async function fetchMintHistory(ticker: string, urlParams = ''): Promise<
 export const fetchTokens = async (): Promise<TokenResponse[]> => {
     try {
         const response = await KRC20InfoService.get<any>(`krc20/tokenlist`);
-        debugger;
         return response.data.result || [];
     } catch (error) {
         console.error('Error fetching token list:', error);
