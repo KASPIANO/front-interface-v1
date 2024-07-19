@@ -25,6 +25,8 @@ https://api.kaspa.org/
 
 WASM:
 (currently not using in front)
+https://kaspa.aspectron.org/docs/
+
 https://kaspa-mdbook.aspectron.com/integrating.html
 
 https://aspectron.org/en/projects/kaspa-wasm.html
@@ -42,6 +44,8 @@ https://magiceden.io/runes
 krc20 coin specicit page:
 https://magiceden.io/runes/Z%E2%80%A2Z%E2%80%A2Z%E2%80%A2Z%E2%80%A2Z%E2%80%A2FEHU%E2%80%A2Z%E2%80%A2Z%E2%80%A2Z%E2%80%A2Z%E2%80%A2Z
 
+Token page :
+https://dexscreener.com/solana/9a6yyvgdm8bl2tg6jgdrqnbvibxttzc5koomkihr8wje
 
 Partially signed txn docs:
 
