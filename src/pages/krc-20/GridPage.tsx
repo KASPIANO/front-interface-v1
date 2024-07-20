@@ -18,7 +18,8 @@ import {
     requestAccounts,
     switchNetwork,
 } from '../../utils/KaswareUtils';
-import { fetchTokens } from '../../DAL/Krc20DAL';
+import { fetchTokens, fetchTotalTokensDeployed } from '../../DAL/Krc20DAL';
+import GridTitle from '../../components/krc-20-page/grid-title-sort/GridTitle';
 
 interface GridPageProps {
     darkMode: boolean;
@@ -70,15 +71,26 @@ const GridPage: FC<GridPageProps> = (props) => {
     const [isBlurred, setIsBlurred] = useState<boolean>(false);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [tokens, setTokens] = useState<TokenResponse[]>([]);
+    const [nextPage, setNextPage] = useState<number>(0);
+    const [nextPageParams, setNextPageParams] = useState<string>('');
+    const [totalTokensDeployed, setTotalTokensDeployed] = useState(0);
+
+    useEffect(() => {
+        fetchTotalTokensDeployed().then((result) => {
+            setTotalTokensDeployed(result);
+        });
+    }, []);
 
     useEffect(() => {
         const fetchTokensList = async () => {
-            const tokensList = await fetchTokens();
-            setTokens(tokensList);
+            const tokensList = await fetchTokens(nextPageParams);
+            setTokens(tokensList.result);
+            setNextPageParams(tokensList.next);
         };
 
         fetchTokensList();
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [nextPage]);
 
     useEffect(() => {
         const handleAccountsChanged = async (accounts: string[]) => {
@@ -158,12 +170,13 @@ const GridPage: FC<GridPageProps> = (props) => {
                 network={network}
                 onNetworkChange={handleNetworkChange}
             />
-            <MiniNavbar />
-            <BackgroundEffect />
-            <MainContent>
-                <Heading>Trade your favorite KRC-20 tokens</Heading>
-                <TokenDataGrid tokens={tokens} />
-            </MainContent>
+            <GridTitle />
+            <TokenDataGrid
+                totalTokensDeployed={totalTokensDeployed}
+                tokens={tokens}
+                setNextPage={setNextPage}
+                nextPageParams={nextPageParams}
+            />
             <Footer />
 
             {isBlurred && <BlurOverlay />}

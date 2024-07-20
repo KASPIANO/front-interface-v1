@@ -20,6 +20,11 @@ export interface TokenResponse {
     state: string;
     logo: string;
 }
+export interface TokenListResponse {
+    result: TokenResponse[];
+    next: string;
+    prev: string;
+}
 
 export interface InputContainerProps {
     active: boolean;

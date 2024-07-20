@@ -32,7 +32,7 @@ export const columns: GridColDef[] = [
     },
     {
         field: 'pre',
-        headerName: 'Pre-Minted%',
+        headerName: 'Pre-Minted %',
         width: 100,
         valueGetter: (value, row) => `${((row.pre / row.max) * 100).toFixed(2)}%`,
     },
@@ -41,12 +41,6 @@ export const columns: GridColDef[] = [
         headerName: 'Supply',
         width: 200,
         // valueGetter: (value, row) => row.max.toLocaleString(),
-    },
-    {
-        field: 'state',
-        headerName: 'State',
-        width: 100,
-        valueGetter: (value, row) => capitalizeFirstLetter(row.state),
     },
     {
         field: 'age',
