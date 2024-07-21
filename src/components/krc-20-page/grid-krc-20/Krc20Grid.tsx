@@ -1,79 +1,3 @@
-// import { GridPaginationModel } from '@mui/x-data-grid';
-// import { columns } from './Krc20Grid.config';
-// import { FC, useEffect, useState } from 'react';
-// import { StyledDataGrid, StyledDataGridContainer } from './Krc20Grid.s';
-// import { fetchTokenInfo, fetchTokens, fetchTotalTokensDeployed } from '../../../DAL/Krc20DAL';
-// import { TokenResponse } from '../../../types/Types';
-
-// interface TokenDataGridProps {
-//     tokens: TokenResponse[];
-//     setNextPage: (value: number) => void;
-//     nextPageParams: string;
-//     totalTokensDeployed: number;
-// }
-
-// const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
-//     const { tokens, setNextPage, totalTokensDeployed } = props;
-//     const [tokensRows, setTokensRows] = useState([]);
-//     const [loading, setLoading] = useState(true);
-//     const [paginationModel, setPaginationModel] = useState({
-//         pageSize: 50,
-//         page: 0,
-//     });
-
-//     useEffect(() => {
-//         const loadTokens = async () => {
-//             try {
-//                 setLoading(true);
-
-//                 const detailedTokens = await Promise.all(
-//                     tokens.map(async (token) => {
-//                         const tokenDetails = await fetchTokenInfo(token.tick);
-//                         return {
-//                             ...token,
-//                             ...tokenDetails[0],
-//                         };
-//                     }),
-//                 );
-//                 setTokensRows(detailedTokens);
-//             } catch (error) {
-//                 console.error('Error loading tokens:', error);
-//             } finally {
-//                 setLoading(false);
-//             }
-//         };
-
-//         loadTokens();
-//     }, [tokens]);
-
-//     const handlePaginationChange = (newPaginationModel: GridPaginationModel) => {
-//         setPaginationModel((prev) => ({
-//             ...prev,
-//             pageSize: 50,
-//             page: newPaginationModel.page,
-//         }));
-//         setNextPage(newPaginationModel.page);
-//     };
-
-//     return (
-//         <StyledDataGridContainer>
-//             <StyledDataGrid
-//                 getRowId={(row) => row.tick}
-//                 rows={tokensRows}
-//                 columns={columns}
-//                 loading={loading}
-//                 pagination
-//                 pageSizeOptions={[50, 100, 200]}
-//                 paginationModel={paginationModel}
-//                 rowCount={totalTokensDeployed}
-//                 onPaginationModelChange={handlePaginationChange}
-//             />
-//         </StyledDataGridContainer>
-//     );
-// };
-
-// export default TokenDataGrid;
-
 import { FC, useEffect, useState } from 'react';
 import {
     Button,
@@ -94,12 +18,42 @@ import moment from 'moment';
 import { fetchTokenInfo } from '../../../DAL/Krc20DAL';
 import { TokenResponse } from '../../../types/Types';
 import { NoDataContainer, StyledDataGridContainer, TableHeader } from './Krc20Grid.s';
+import { createGlobalStyle } from 'styled-components';
+import { formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
+import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
+import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
+
+const GlobalStyle = createGlobalStyle`
+  #scrollableList {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #111;
+
+    &::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #111;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #888;
+      border-radius: 10px;
+      border: 2px solid #111;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  }
+`;
 
 interface TokenDataGridProps {
-    tokens: TokenResponse[];
+    tokensList: TokenResponse[];
     setNextPage: (value: number) => void;
     nextPageParams: string;
     totalTokensDeployed: number;
+    nextPage: number;
 }
 
 const formatDate = (timestamp: string): string => moment(Number(timestamp)).format('DD/MM/YYYY');
@@ -109,7 +63,7 @@ const capitalizeFirstLetter = (string: string): string => {
 };
 
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
-    const { tokens, setNextPage, totalTokensDeployed } = props;
+    const { tokensList, setNextPage, totalTokensDeployed, nextPage } = props;
     const [tokensRows, setTokensRows] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -117,9 +71,10 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         const loadTokens = async () => {
             try {
                 setLoading(true);
-                console.log('tokens', tokens.length);
+                const offset = nextPage * 50;
+                const slicedTokensList = tokensList.slice(0, offset);
                 const detailedTokens = await Promise.all(
-                    tokens.map(async (token) => {
+                    slicedTokensList.map(async (token) => {
                         const tokenDetails = await fetchTokenInfo(token.tick);
                         return {
                             ...token,
@@ -127,7 +82,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                         };
                     }),
                 );
-                setTokensRows(detailedTokens);
+                setTokensRows((prevTokenRows) => [...prevTokenRows, ...detailedTokens]);
             } catch (error) {
                 console.error('Error loading tokens:', error);
             } finally {
@@ -136,7 +91,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         };
 
         loadTokens();
-    }, [tokens]);
+    }, [tokensList]);
 
     if (tokensRows.length === 0) {
         return (
@@ -151,21 +106,44 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
             <table style={{ width: '100%' }}>
                 <thead>
                     <tr>
-                        <TableHeader sx={{ width: '20%' }}>Ticker</TableHeader>
-                        <TableHeader sx={{ width: '10%' }}>Age</TableHeader>
-                        <TableHeader sx={{ width: '10%' }}>% Minted</TableHeader>
+                        <TableHeader sx={{ width: '15%', textAlign: 'left', paddingLeft: '1.4vw' }}>
+                            Ticker
+                        </TableHeader>
+                        <TableHeader sx={{ width: '7%' }}>Age</TableHeader>
+                        <TableHeader sx={{ width: '15%' }}>% Minted</TableHeader>
                         <TableHeader sx={{ width: '10%' }}>Supply</TableHeader>
-                        <TableHeader sx={{ width: '20%' }}>Trades</TableHeader>
-                        <TableHeader sx={{ width: '20%' }}>Holders</TableHeader>
-                        <TableHeader sx={{ width: '20%' }}>Fair Mint</TableHeader>
+                        <TableHeader sx={{ width: '14%' }}>Holders</TableHeader>
+                        <TableHeader sx={{ width: '8%' }}>Total Txns</TableHeader>
+                        <TableHeader sx={{}}>Fair Mint</TableHeader>
                     </tr>
                 </thead>
             </table>
         </Box>
     );
 
+    const preMintedIcons = (preMinted: string, totalSupply: string) => {
+        const preMintedNumber = parseFloat(preMinted);
+        const totalSupplyNumber = parseFloat(totalSupply);
+        const preMintPercentage = ((preMintedNumber / totalSupplyNumber) * 100).toFixed(2);
+
+        return (
+            <ListItemText
+                primary={
+                    <Tooltip title={`${preMintPercentage}% Pre Minted`}>
+                        {preMintedNumber === 0 ? (
+                            <CheckCircleOutlineRoundedIcon style={{ color: 'green', opacity: 0.5 }} />
+                        ) : (
+                            <ErrorOutlineRoundedIcon style={{ color: 'red', opacity: 0.5 }} />
+                        )}
+                    </Tooltip>
+                }
+            />
+        );
+    };
+
     return (
         <StyledDataGridContainer>
+            <GlobalStyle />
             {tableHeader}
             <List
                 id="scrollableList"
@@ -178,7 +156,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
             >
                 <InfiniteScroll
                     dataLength={tokensRows.length}
-                    next={() => setNextPage((prev) => prev + 1)}
+                    next={() => setNextPage(nextPage + 1)}
                     hasMore={tokensRows.length < totalTokensDeployed}
                     loader={<Skeleton width={'100%'} height={'10vh'} />}
                     style={{ overflow: 'initial' }}
@@ -189,9 +167,9 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                         </p>
                     }
                 >
-                    {tokensRows.map((token, index) => (
-                        <div key={index + token.tick}>
-                            <ListItem disablePadding sx={{ height: '9vh' }}>
+                    {tokensRows.map((token) => (
+                        <div key={token.tick}>
+                            <ListItem disablePadding sx={{ height: '12vh' }}>
                                 <ListItemButton>
                                     <ListItemAvatar>
                                         <Avatar
@@ -215,7 +193,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
 
                                     <ListItemText
                                         sx={{
-                                            width: 0,
+                                            maxWidth: '10vw',
                                         }}
                                         primary={
                                             <Tooltip title={token.tick}>
@@ -232,6 +210,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                                     />
 
                                     <ListItemText
+                                        sx={{ maxWidth: '10vw' }}
                                         primary={
                                             <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
                                                 {`${moment().diff(Number(token.mtsAdd), 'days')} days`}
@@ -240,45 +219,45 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                                     />
 
                                     <ListItemText
+                                        sx={{ maxWidth: '11vw' }}
                                         primary={
-                                            <Typography
-                                                variant="body2"
-                                                style={{ fontSize: '0.9vw', textAlign: 'left' }}
-                                            >
+                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
                                                 {((token.minted / token.max) * 100).toFixed(2)}%
                                             </Typography>
                                         }
                                     />
 
                                     <ListItemText
+                                        sx={{ maxWidth: '12vw' }}
                                         primary={
-                                            <Typography
-                                                variant="body2"
-                                                style={{ fontSize: '0.9vw', textAlign: 'left' }}
-                                            >
-                                                {token.max}
+                                            <Tooltip title={formatNumberWithCommas(token.max)}>
+                                                <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
+                                                    {simplifyNumber(token.max)}
+                                                </Typography>
+                                            </Tooltip>
+                                        }
+                                    />
+
+                                    <ListItemText
+                                        primary={
+                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
+                                                {token.holder ? token.holder.length : 0}
                                             </Typography>
                                         }
                                     />
 
                                     <ListItemText
                                         primary={
-                                            <Typography
-                                                variant="body2"
-                                                style={{ fontSize: '0.9vw', textAlign: 'left' }}
-                                            >
-                                                66
+                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
+                                                {token.transferTotal ? token.transferTotal : 0}
                                             </Typography>
                                         }
                                     />
 
                                     <ListItemText
                                         primary={
-                                            <Typography
-                                                variant="body2"
-                                                style={{ fontSize: '0.9vw', textAlign: 'left' }}
-                                            >
-                                                {token.holders}
+                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
+                                                {preMintedIcons(token.pre, token.max)}
                                             </Typography>
                                         }
                                     />

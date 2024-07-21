@@ -48,10 +48,9 @@ export const StyledDataGridContainer = styled(Box)({
     margin: 'auto', // Center the grid horizontally
     marginTop: '2vh', // Add some top margin for better spacing
     borderRadius: '8px',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
     flexDirection: 'column',
     marginLeft: '2vw',
-    borderColor: '#1e1e2f',
+    boxShadow: '0 4px 12px rgba(111, 199, 186, 0.3)',
 });
 
 export const NoDataContainer = styled(Box)({

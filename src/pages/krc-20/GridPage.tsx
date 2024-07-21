@@ -70,8 +70,8 @@ const GridPage: FC<GridPageProps> = (props) => {
 
     const [isBlurred, setIsBlurred] = useState<boolean>(false);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-    const [tokens, setTokens] = useState<TokenResponse[]>([]);
-    const [nextPage, setNextPage] = useState<number>(0);
+    const [tokensList, setTokensList] = useState<TokenResponse[]>([]);
+    const [nextPage, setNextPage] = useState<number>(1);
     const [nextPageParams, setNextPageParams] = useState<string>('');
     const [totalTokensDeployed, setTotalTokensDeployed] = useState(0);
 
@@ -84,7 +84,7 @@ const GridPage: FC<GridPageProps> = (props) => {
     useEffect(() => {
         const fetchTokensList = async () => {
             const tokensList = await fetchTokens(nextPageParams);
-            setTokens(tokensList.result);
+            setTokensList((prevTokensList) => [...prevTokensList, ...tokensList.result]);
             setNextPageParams(tokensList.next);
         };
 
@@ -138,17 +138,7 @@ const GridPage: FC<GridPageProps> = (props) => {
                 window.kasware.removeListener('disconnect', handleDisconnect);
             }
         };
-    }, [walletAddress, setShowNotification]);
-
-    // useEffect(() => {
-    //     const formatBalance = (balance: number) => (isNaN(balance) ? '0.00' : balance.toFixed(4));
-
-    //     if (walletAddress) {
-    //         fetchReceivingBalance(walletAddress, receivingCurrency).then((balanceInToken) => {
-    //             setReceivingBalance(parseFloat(formatBalance(balanceInToken)));
-    //         });
-    //     }
-    // }, [walletAddress, receivingCurrency]);
+    }, [walletAddress]);
 
     const handleNetworkChange = async (newNetwork: string) => {
         if (network !== newNetwork) {
@@ -166,14 +156,15 @@ const GridPage: FC<GridPageProps> = (props) => {
             <Navbar
                 walletAddress={walletAddress}
                 connectWallet={connectWallet}
-                tokens={tokens}
+                tokensList={tokensList}
                 network={network}
                 onNetworkChange={handleNetworkChange}
             />
             <GridTitle />
             <TokenDataGrid
+                nextPage={nextPage}
                 totalTokensDeployed={totalTokensDeployed}
-                tokens={tokens}
+                tokensList={tokensList}
                 setNextPage={setNextPage}
                 nextPageParams={nextPageParams}
             />
