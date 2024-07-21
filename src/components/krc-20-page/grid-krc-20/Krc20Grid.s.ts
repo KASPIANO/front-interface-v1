@@ -43,13 +43,15 @@ export const TableHeader = styled('th')({
 
 export const StyledDataGridContainer = styled(Box)({
     height: '80vh',
-    width: '95vw',
+    width: '90vw',
     display: 'flex',
     margin: 'auto', // Center the grid horizontally
     marginTop: '2vh', // Add some top margin for better spacing
     borderRadius: '8px',
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
     flexDirection: 'column',
+    marginLeft: '2vw',
+    borderColor: '#1e1e2f',
 });
 
 export const NoDataContainer = styled(Box)({

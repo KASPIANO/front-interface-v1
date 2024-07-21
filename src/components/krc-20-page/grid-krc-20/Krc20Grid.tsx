@@ -84,7 +84,6 @@ import {
     Avatar,
     Typography,
     Divider,
-    Checkbox,
     Box,
     ListItemText,
 } from '@mui/material';
@@ -92,10 +91,9 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import Skeleton from '@mui/material/Skeleton';
 import Tooltip from '@mui/material/Tooltip';
 import moment from 'moment';
-import { fetchTokenInfo, fetchTokens } from '../../../DAL/Krc20DAL';
+import { fetchTokenInfo } from '../../../DAL/Krc20DAL';
 import { TokenResponse } from '../../../types/Types';
 import { NoDataContainer, StyledDataGridContainer, TableHeader } from './Krc20Grid.s';
-import GridTitle from '../grid-title-sort/GridTitle';
 
 interface TokenDataGridProps {
     tokens: TokenResponse[];
@@ -119,7 +117,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         const loadTokens = async () => {
             try {
                 setLoading(true);
-
+                console.log('tokens', tokens.length);
                 const detailedTokens = await Promise.all(
                     tokens.map(async (token) => {
                         const tokenDetails = await fetchTokenInfo(token.tick);
@@ -174,7 +172,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                 dense
                 sx={{
                     width: '100%',
-                    overflow: 'scroll',
+                    overflowX: 'hidden',
                     height: '70vh',
                 }}
             >
