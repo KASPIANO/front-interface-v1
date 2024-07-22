@@ -1,4 +1,4 @@
-import { Box, Typography, ButtonGroup, Button } from '@mui/material';
+import { Box, ButtonGroup, Button } from '@mui/material';
 import styled from 'styled-components';
 
 export const HeaderContainer = styled(Box)({

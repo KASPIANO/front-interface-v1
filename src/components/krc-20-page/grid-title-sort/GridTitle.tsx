@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HeaderContainer, Title, SortButtonGroup, SortButton } from './GridTitle.s';
+import { HeaderContainer, SortButtonGroup, SortButton } from './GridTitle.s';
 import { Typography } from '@mui/material';
 
 const GridTitle: React.FC = () => {
