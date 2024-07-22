@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { HeaderContainer, Title, SortButtonGroup, SortButton } from './GridTitle.s';
+import { Typography } from '@mui/material';
 
 const GridTitle: React.FC = () => {
     const [selectedSort, setSelectedSort] = useState<string>('10m');
@@ -10,7 +11,7 @@ const GridTitle: React.FC = () => {
 
     return (
         <HeaderContainer>
-            <Title>Top KRC-20</Title>
+            <Typography sx={{ fontWeight: 'bold', fontSize: '1.5vw' }}>Top KRC-20</Typography>
             <SortButtonGroup variant="contained">
                 <SortButton
                     sx={{

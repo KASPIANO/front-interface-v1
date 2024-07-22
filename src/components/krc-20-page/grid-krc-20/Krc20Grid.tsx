@@ -22,6 +22,7 @@ import { createGlobalStyle } from 'styled-components';
 import { formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
 import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
+import UnfoldMoreRoundedIcon from '@mui/icons-material/UnfoldMoreRounded';
 
 const GlobalStyle = createGlobalStyle`
   #scrollableList {
@@ -91,6 +92,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         };
 
         loadTokens();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tokensList]);
 
     if (tokensRows.length === 0) {
@@ -102,19 +104,36 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     }
 
     const tableHeader = (
-        <Box sx={{ padding: '5px 0' }}>
+        <Box
+            sx={{
+                padding: '5px 0',
+                height: '8vh',
+                alignContent: 'center',
+                borderBottom: '0.1px solid  rgba(111, 199, 186, 0.3)',
+            }}
+        >
             <table style={{ width: '100%' }}>
                 <thead>
                     <tr>
-                        <TableHeader sx={{ width: '15%', textAlign: 'left', paddingLeft: '1.4vw' }}>
+                        <TableHeader sx={{ minWidth: '12vw', textAlign: 'left', paddingLeft: '1.4vw' }}>
                             Ticker
                         </TableHeader>
-                        <TableHeader sx={{ width: '7%' }}>Age</TableHeader>
-                        <TableHeader sx={{ width: '15%' }}>% Minted</TableHeader>
-                        <TableHeader sx={{ width: '10%' }}>Supply</TableHeader>
-                        <TableHeader sx={{ width: '14%' }}>Holders</TableHeader>
-                        <TableHeader sx={{ width: '8%' }}>Total Txns</TableHeader>
-                        <TableHeader sx={{}}>Fair Mint</TableHeader>
+                        <TableHeader sx={{ minWidth: '9vw', display: 'inline-flex' }}>
+                            Age {<UnfoldMoreRoundedIcon fontSize="small" />}
+                        </TableHeader>
+                        <TableHeader sx={{ minWidth: '11vw', display: 'inline-flex' }}>
+                            Minted {<UnfoldMoreRoundedIcon fontSize="small" />}
+                        </TableHeader>
+                        <TableHeader sx={{ minWidth: '10.5vw', display: 'inline-flex' }}>
+                            Supply {<UnfoldMoreRoundedIcon fontSize="small" />}
+                        </TableHeader>
+                        <TableHeader sx={{ display: 'inline-flex', minWidth: '9.5vw' }}>
+                            Holders {<UnfoldMoreRoundedIcon fontSize="small" />}
+                        </TableHeader>
+                        <TableHeader sx={{ display: 'inline-flex', minWidth: '11vw' }}>
+                            Total Txns {<UnfoldMoreRoundedIcon fontSize="small" />}
+                        </TableHeader>
+                        <TableHeader sx={{ textAlign: 'left', display: 'inline-flex' }}>Fair Mint</TableHeader>
                     </tr>
                 </thead>
             </table>
@@ -128,6 +147,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
 
         return (
             <ListItemText
+                sx={{ marginLeft: '1vw' }}
                 primary={
                     <Tooltip title={`${preMintPercentage}% Pre Minted`}>
                         {preMintedNumber === 0 ? (
@@ -228,7 +248,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                                     />
 
                                     <ListItemText
-                                        sx={{ maxWidth: '12vw' }}
+                                        sx={{ maxWidth: '11.5vw' }}
                                         primary={
                                             <Tooltip title={formatNumberWithCommas(token.max)}>
                                                 <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
@@ -239,6 +259,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                                     />
 
                                     <ListItemText
+                                        sx={{ maxWidth: '9.5vw' }}
                                         primary={
                                             <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
                                                 {token.holder ? token.holder.length : 0}
@@ -247,6 +268,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                                     />
 
                                     <ListItemText
+                                        sx={{ maxWidth: '9.5vw' }}
                                         primary={
                                             <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
                                                 {token.transferTotal ? token.transferTotal : 0}
@@ -255,21 +277,28 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                                     />
 
                                     <ListItemText
+                                        sx={{ maxWidth: '12vw' }}
                                         primary={
                                             <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
                                                 {preMintedIcons(token.pre, token.max)}
                                             </Typography>
                                         }
                                     />
-
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        style={{ marginRight: '1vw', minWidth: '2vw', width: '3vw' }}
-                                        disabled={token.minted >= token.max}
-                                    >
-                                        Mint
-                                    </Button>
+                                    {token.minted < token.max && (
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            style={{
+                                                marginRight: '1vw',
+                                                minWidth: '2vw',
+                                                width: '3vw',
+                                                fontSize: '0.8vw',
+                                            }}
+                                            disabled={token.minted >= token.max}
+                                        >
+                                            Mint
+                                        </Button>
+                                    )}
                                 </ListItemButton>
                             </ListItem>
                             <Divider />

@@ -9,11 +9,9 @@ export const HeaderContainer = styled(Box)({
     padding: '10px',
     borderRadius: '8px 8px 0 0',
     marginLeft: '1vw',
-});
-
-export const Title = styled(Typography)({
-    fontSize: '1.2rem',
-    fontWeight: 'bold',
+    // '&.MuiBox-root': {
+    //     padding: '0',
+    // },
 });
 
 export const SortButtonGroup = styled(ButtonGroup)({
