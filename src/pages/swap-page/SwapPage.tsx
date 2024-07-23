@@ -14,7 +14,7 @@ interface SwapPageProps {
     darkMode: boolean;
     toggleDarkMode: () => void;
     walletAddress: string | null;
-    connectWallet: () => void;
+    connectWallet?: () => void;
     walletBalance: number;
     isConnecting: boolean;
     showNotification: boolean;
@@ -29,18 +29,8 @@ interface SwapPageProps {
 // ];
 
 const SwapPage: FC<SwapPageProps> = (props) => {
-    const {
-        darkMode,
-        toggleDarkMode,
-        walletAddress,
-        connectWallet,
-        walletBalance,
-        isConnecting,
-        showNotification,
-        setShowNotification,
-        setWalletAddress,
-        setWalletBalance,
-    } = props;
+    const { walletAddress, connectWallet, walletBalance, isConnecting, showNotification, setShowNotification } =
+        props;
 
     const [paying, setPaying] = useState<string>('');
     const [receiving, setReceiving] = useState<string>('');

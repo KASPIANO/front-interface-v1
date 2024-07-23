@@ -18,21 +18,21 @@ export const GridLayout = ({ children }) => (
                 {children[0]}
             </Grid>
 
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+                {children[1]}
+            </Grid>
             <Grid
-                // sx={{
-                //     '&.MuiGrid-item': {
-                //         paddingBottom: 0,
-                //     },
-                // }}
+                sx={{
+                    '&.MuiGrid-item': {
+                        paddingTop: 0,
+                    },
+                }}
                 item
                 xs={12}
                 sm={12}
                 md={12}
                 lg={12}
             >
-                {children[1]}
-            </Grid>
-            <Grid item xs={12} sm={12} md={12} lg={12}>
                 {children[2]}
             </Grid>
 

@@ -9,6 +9,13 @@ import SwapPage from './pages/swap-page/SwapPage';
 import LimitOrderPage from './pages/limit-order/LimitOrder';
 import { fetchWalletBalance } from './DAL/KaspaApiDal';
 import GridPage from './pages/krc-20/GridPage';
+import {
+    isKasWareInstalled,
+    requestAccounts,
+    onAccountsChanged,
+    removeAccountsChangedListener,
+    switchNetwork,
+} from './utils/KaswareUtils';
 
 const App = () => {
     const [darkMode, setDarkMode] = useState(getLocalDarkMode());
@@ -16,6 +23,7 @@ const App = () => {
     const [walletBalance, setWalletBalance] = useState<number>(0);
     const [isConnecting, setIsConnecting] = useState<boolean>(false);
     const [showNotification, setShowNotification] = useState<boolean>(false);
+    const [network, setNetwork] = useState<string>('mainnet'); // New state for network
 
     const toggleDarkMode = () => {
         const modeString = !darkMode ? 'true' : 'false';
@@ -24,52 +32,61 @@ const App = () => {
     };
 
     useEffect(() => {
-        reconnectWallet();
-    }, []);
+        const handleAccountsChanged = async (accounts: string[]) => {
+            if (accounts.length === 0) {
+                setWalletAddress(null);
+                setWalletBalance(0);
+                localStorage.removeItem('isWalletConnected');
+            } else {
+                setWalletAddress(accounts[0]);
+                const balance = await fetchWalletBalance(accounts[0]);
+                setWalletBalance(setWalletBalanceUtil(balance));
+            }
+        };
 
-    const connectWallet = async () => {
-        setIsConnecting(true);
-        try {
-            if (window.kasware) {
-                await window.kasware.requestAccounts();
-                const selectedAddress = window.kasware._selectedAddress;
+        const handleDisconnect = () => {
+            setWalletAddress(null);
+            setWalletBalance(0);
+            localStorage.removeItem('isWalletConnected');
+        };
 
-                if (selectedAddress) {
-                    setWalletAddress(selectedAddress);
+        const checkWalletConnection = async () => {
+            const isWalletConnected = localStorage.getItem('isWalletConnected');
+            if (isWalletConnected === 'true' && isKasWareInstalled()) {
+                const accounts = await requestAccounts();
+                if (accounts.length > 0) {
+                    setWalletAddress(accounts[0]);
+                    const balance = await fetchWalletBalance(accounts[0]);
+                    setWalletBalance(setWalletBalanceUtil(balance));
                     setShowNotification(true);
                     setTimeout(() => setShowNotification(false), 5000);
-                    // await verifyWallet(selectedAddress);
-                    localStorage.setItem('isWalletConnected', 'true');
-                    const balance = await fetchWalletBalance(selectedAddress);
-                    setWalletBalance(setWalletBalanceUtil(balance));
-                } else {
-                    console.log('No account found');
-                    localStorage.setItem('isWalletConnected', 'false');
                 }
-            } else {
-                console.log('KasWare extension not detected');
-                localStorage.setItem('isWalletConnected', 'false');
             }
-        } catch (error) {
-            console.error('Error connecting to wallet:', error);
-            localStorage.setItem('isWalletConnected', 'false');
-        } finally {
-            setIsConnecting(false);
-        }
-    };
+        };
 
-    const reconnectWallet = async () => {
-        try {
-            if (window.kasware && localStorage.getItem('isWalletConnected') === 'true') {
-                const selectedAddress = window.kasware._selectedAddress;
-                if (selectedAddress) {
-                    setWalletAddress(selectedAddress);
-                    const balance = await fetchWalletBalance(selectedAddress);
-                    setWalletBalance(setWalletBalanceUtil(balance));
-                }
+        if (isKasWareInstalled()) {
+            onAccountsChanged(handleAccountsChanged);
+            window.kasware.on('disconnect', handleDisconnect);
+        }
+
+        checkWalletConnection();
+
+        return () => {
+            if (isKasWareInstalled()) {
+                removeAccountsChangedListener(handleAccountsChanged);
+                window.kasware.removeListener('disconnect', handleDisconnect);
             }
-        } catch (error) {
-            console.error('Error reconnecting to wallet:', error);
+        };
+    }, [walletAddress]);
+
+    const handleNetworkChange = async (newNetwork: string) => {
+        if (network !== newNetwork) {
+            try {
+                await switchNetwork(newNetwork);
+                setNetwork(newNetwork);
+            } catch (error) {
+                console.error('Error switching network:', error);
+            }
         }
     };
 
@@ -85,7 +102,6 @@ const App = () => {
                                 darkMode={darkMode}
                                 toggleDarkMode={toggleDarkMode}
                                 walletAddress={walletAddress}
-                                connectWallet={connectWallet}
                                 walletBalance={walletBalance}
                                 isConnecting={isConnecting}
                                 showNotification={showNotification}
@@ -102,7 +118,6 @@ const App = () => {
                                 darkMode={darkMode}
                                 toggleDarkMode={toggleDarkMode}
                                 walletAddress={walletAddress}
-                                connectWallet={connectWallet}
                                 walletBalance={walletBalance}
                             />
                         }
@@ -111,10 +126,29 @@ const App = () => {
                         path="/"
                         element={
                             <GridPage
+                                network={network}
+                                handleNetworkChange={handleNetworkChange}
                                 darkMode={darkMode}
                                 toggleDarkMode={toggleDarkMode}
                                 walletAddress={walletAddress}
-                                connectWallet={connectWallet}
+                                walletBalance={walletBalance}
+                                isConnecting={isConnecting}
+                                showNotification={showNotification}
+                                setShowNotification={setShowNotification}
+                                setWalletAddress={setWalletAddress}
+                                setWalletBalance={setWalletBalance}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/token/:ticker"
+                        element={
+                            <GridPage
+                                network={network}
+                                handleNetworkChange={handleNetworkChange}
+                                darkMode={darkMode}
+                                toggleDarkMode={toggleDarkMode}
+                                walletAddress={walletAddress}
                                 walletBalance={walletBalance}
                                 isConnecting={isConnecting}
                                 showNotification={showNotification}
