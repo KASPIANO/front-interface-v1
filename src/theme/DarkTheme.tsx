@@ -47,24 +47,24 @@ export const darkTheme = createTheme({
         // Customize other palette colors as needed
     } as PaletteOptions,
     typography: {
-        fontFamily: 'Lato, sans-serif',
+        fontFamily: 'Inter, sans-serif',
         h1: {
-            fontFamily: 'Rubik, sans-serif',
+            fontFamily: 'Inter, sans-serif',
         },
         h2: {
-            fontFamily: 'Rubik, sans-serif',
+            fontFamily: 'Inter, sans-serif',
         },
         h3: {
-            fontFamily: 'Rubik, sans-serif',
+            fontFamily: 'Inter, sans-serif',
         },
         h4: {
-            fontFamily: 'Rubik, sans-serif',
+            fontFamily: 'Inter, sans-serif',
         },
         h5: {
-            fontFamily: 'Rubik, sans-serif',
+            fontFamily: 'Inter, sans-serif',
         },
         h6: {
-            fontFamily: 'Rubik, sans-serif',
+            fontFamily: 'Inter, sans-serif',
         },
         subtitle1: {
             fontFamily: 'Oswald, sans-serif',

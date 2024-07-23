@@ -1,4 +1,4 @@
-import { TokenResponse, Token } from '../types/Types';
+import { TokenResponse, Token, TokenListResponse } from '../types/Types';
 import { KRC20InfoService } from './AxiosInstaces';
 
 export const fetchReceivingBalance = async (address: string, tokenSymbol: string): Promise<number> => {
@@ -45,13 +45,24 @@ export async function fetchMintHistory(ticker: string, urlParams = ''): Promise<
     }
 }
 
-export const fetchTokens = async (): Promise<TokenResponse[]> => {
+export const fetchTokens = async (next?: string): Promise<TokenListResponse> => {
     try {
-        const response = await KRC20InfoService.get<any>(`krc20/tokenlist`);
-        return response.data.result || [];
+        const nextString = next ? `?next=${next}` : '';
+        const response = await KRC20InfoService.get<any>(`krc20/tokenlist${nextString}`);
+        return response.data
+            ? { result: response.data.result, next: response.data.next, prev: response.data.prev }
+            : {
+                  result: [],
+                  next: '',
+                  prev: '',
+              };
     } catch (error) {
         console.error('Error fetching token list:', error);
-        return [];
+        return {
+            result: [],
+            next: '',
+            prev: '',
+        };
     }
 };
 
@@ -81,6 +92,15 @@ export async function fetchTransactionCount(ticker: string): Promise<number> {
         return response.data.result.length;
     } catch (error) {
         console.error('Error fetching transaction count:', error);
+        return 0;
+    }
+}
+export async function fetchTotalTokensDeployed(): Promise<number> {
+    try {
+        const response = await KRC20InfoService.get<any>(`info/`);
+        return response.data.result.tokenTotal;
+    } catch (error) {
+        console.error('Error fetching token count:', error);
         return 0;
     }
 }

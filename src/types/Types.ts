@@ -8,9 +8,11 @@ export interface Token {
     state: string;
     max: string;
     minted: string;
-    pre?: string;
+    pre: string;
     mtsAdd: string;
+    lim: string;
     holder?: any[];
+    transferTotal?: string;
 }
 
 export interface TokenResponse {
@@ -19,6 +21,11 @@ export interface TokenResponse {
     minted: string;
     state: string;
     logo: string;
+}
+export interface TokenListResponse {
+    result: TokenResponse[];
+    next: string;
+    prev: string;
 }
 
 export interface InputContainerProps {

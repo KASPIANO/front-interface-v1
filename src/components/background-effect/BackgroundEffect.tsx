@@ -14,7 +14,6 @@ const BackgroundEffect: React.FC = () => {
 
     return (
         <BackgroundContainer>
-            <GlobalStyle />
             <Token className="token" style={{ backgroundImage: "url('/kasper.svg')", top: '45%', left: '5%' }} />
             <Token className="token" style={{ backgroundImage: "url('/kaspa.svg')", top: '20%', left: '75%' }} />
             <Token className="token" style={{ backgroundImage: "url('/nacho.svg')", top: '30%', left: '30%' }} />
