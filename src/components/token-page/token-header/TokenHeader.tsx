@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
-import { HeaderContainer, Title, Subtitle } from './TokenHeader.s';
+import { FC } from 'react';
+import { HeaderContainer, Title } from './TokenHeader.s';
 import { Avatar } from '@mui/material';
+import { Token } from '../../../types/Types';
 
 interface TokenHeaderProps {
-    tokenInfo: any;
+    tokenInfo: Token;
 }
 
 const TokenHeader: FC<TokenHeaderProps> = (props) => {
@@ -11,9 +12,8 @@ const TokenHeader: FC<TokenHeaderProps> = (props) => {
 
     return (
         <HeaderContainer>
-            <Avatar src={tokenInfo.logoURI} alt="Token Logo" />
-            <Title>{tokenInfo.name}</Title>
-            <Subtitle>{tokenInfo.subtitle}</Subtitle>
+            {/* {/* <Avatar alt={tokenInfo.tick} src="/path/to/logo" /> */}
+            {/* <Title>{tokenInfo.tick}</Title> */}
         </HeaderContainer>
     );
 };

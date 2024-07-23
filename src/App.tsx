@@ -16,6 +16,7 @@ import {
     removeAccountsChangedListener,
     switchNetwork,
 } from './utils/KaswareUtils';
+import TokenPage from './pages/token-page/TokenPage';
 
 const App = () => {
     const [darkMode, setDarkMode] = useState(getLocalDarkMode());
@@ -143,18 +144,15 @@ const App = () => {
                     <Route
                         path="/token/:ticker"
                         element={
-                            <GridPage
+                            <TokenPage
                                 network={network}
-                                handleNetworkChange={handleNetworkChange}
                                 darkMode={darkMode}
                                 toggleDarkMode={toggleDarkMode}
-                                walletAddress={walletAddress}
-                                walletBalance={walletBalance}
-                                isConnecting={isConnecting}
                                 showNotification={showNotification}
                                 setShowNotification={setShowNotification}
-                                setWalletAddress={setWalletAddress}
-                                setWalletBalance={setWalletBalance}
+                                walletAddress={walletAddress}
+                                connectWallet={requestAccounts}
+                                handleNetworkChange={handleNetworkChange}
                             />
                         }
                     />

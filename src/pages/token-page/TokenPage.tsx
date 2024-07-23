@@ -1,17 +1,14 @@
 import { useState, useEffect, FC } from 'react';
-import WalletModal from '../../components/modals/wallet-modal/WalletModal';
-import { BlurOverlay } from './TokenPage.s';
-import { TokenResponse } from '../../types/Types';
 import NotificationComponent from '../../components/notification/Notification';
 import Navbar from '../../components/navbar/Navbar';
 import Footer from '../../components/footer/Footer';
-import TokenDataGrid from '../../components/krc-20-page/grid-krc-20/Krc20Grid';
-
-import { fetchTokenInfo, fetchTokens, fetchTotalTokensDeployed } from '../../DAL/Krc20DAL';
-import GridTitle from '../../components/krc-20-page/grid-title-sort/GridTitle';
-import { TokenPageLayout } from './TokenPageLAyout';
+import { fetchTokenInfo } from '../../DAL/Krc20DAL';
+import { TokenPageLayout } from './TokenPageLayout';
 import { useParams } from 'react-router-dom';
 import TokenHeader from '../../components/token-page/token-header/TokenHeader';
+import TokenGraph from '../../components/token-page/token-header/token-graph/TokenGraph';
+import { Token } from '../../types/Types';
+import { Skeleton } from '@mui/material';
 
 interface TokenPageProps {
     darkMode: boolean;
@@ -36,23 +33,25 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         network,
     } = props;
 
-    const { ticker } = useParams<{ ticker: string }>();
-    const [tokenInfo, setTokenInfo] = useState(null);
+    const { ticker } = useParams();
+
+    const [tokenInfo, setTokenInfo] = useState<Token>(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const data = await fetchTokenInfo(ticker);
-                setTokenInfo(data);
+                setTokenInfo(data[0]);
             } catch (error) {
                 console.error('Error fetching token info:', error);
             }
         };
 
-        if (ticker) {
-            fetchData();
-        }
+        fetchData();
     }, [ticker]);
+
+    const getComponentToShow = (component: JSX.Element, size: string, width?: string) =>
+        tokenInfo ? component : <Skeleton height={size} width={width} />;
 
     return (
         <TokenPageLayout>
@@ -62,15 +61,9 @@ const TokenPage: FC<TokenPageProps> = (props) => {
                 network={network}
                 onNetworkChange={handleNetworkChange}
             />
-            <TokenHeader tokenInfo={tokenInfo} />
-            <TokenGraph />
-            <TokenDataGrid
-                nextPage={nextPage}
-                totalTokensDeployed={totalTokensDeployed}
-                tokensList={tokensList}
-                setNextPage={setNextPage}
-                nextPageParams={nextPageParams}
-            />
+            {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '10vh')}
+            {getComponentToShow(<TokenGraph />, '30vh')}
+
             <Footer />
 
             {showNotification && walletAddress && (

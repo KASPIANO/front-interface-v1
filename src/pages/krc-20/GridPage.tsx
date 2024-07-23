@@ -65,7 +65,6 @@ const GridPage: FC<GridPageProps> = (props) => {
             <Navbar
                 walletAddress={walletAddress}
                 connectWallet={connectWallet}
-                tokensList={tokensList}
                 network={network}
                 onNetworkChange={handleNetworkChange}
             />
