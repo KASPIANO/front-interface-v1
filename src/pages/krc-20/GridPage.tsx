@@ -32,18 +32,12 @@ const GridPage: FC<GridPageProps> = (props) => {
         toggleDarkMode,
         walletAddress,
         connectWallet,
-        walletBalance,
-        isConnecting,
         showNotification,
         setShowNotification,
-        setWalletAddress,
-        setWalletBalance,
         handleNetworkChange,
         network,
     } = props;
 
-    const [isBlurred, setIsBlurred] = useState<boolean>(false);
-    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [tokensList, setTokensList] = useState<TokenResponse[]>([]);
     const [nextPage, setNextPage] = useState<number>(1);
     const [nextPageParams, setNextPageParams] = useState<string>('');
@@ -85,14 +79,13 @@ const GridPage: FC<GridPageProps> = (props) => {
             />
             <Footer />
 
-            {isBlurred && <BlurOverlay />}
             {showNotification && walletAddress && (
                 <NotificationComponent
                     message={`Connected to wallet ${walletAddress.substring(0, 4)}...${walletAddress.substring(walletAddress.length - 4)}`}
                     onClose={() => setShowNotification(false)}
                 />
             )}
-            {isModalVisible && <WalletModal onClose={() => setIsModalVisible(false)} />}
+            {/* {isModalVisible && <WalletModal onClose={() => setIsModalVisible(false)} />} */}
         </GridLayout>
     );
 };

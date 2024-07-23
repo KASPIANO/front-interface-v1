@@ -22,7 +22,6 @@ interface Token {
 interface NavbarProps {
     walletAddress: string | null;
     connectWallet: () => void;
-    tokensList: TokenResponse[];
     network: string;
     onNetworkChange: (network: string) => void;
 }
