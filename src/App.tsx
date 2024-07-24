@@ -1,14 +1,15 @@
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { fetchWalletBalance } from './DAL/KaspaApiDal';
+import GridPage from './pages/krc-20/GridPage';
+import LimitOrderPage from './pages/limit-order/LimitOrder';
+import SwapPage from './pages/swap-page/SwapPage';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
 import { getLocalDarkMode, setWalletBalanceUtil } from './utils/Utils';
-import { useEffect, useState } from 'react';
-import SwapPage from './pages/swap-page/SwapPage';
-import LimitOrderPage from './pages/limit-order/LimitOrder';
-import { fetchWalletBalance } from './DAL/KaspaApiDal';
-import GridPage from './pages/krc-20/GridPage';
+import TokenPage from './pages/token-page/TokenPage';
 import {
     isKasWareInstalled,
     requestAccounts,
@@ -16,7 +17,6 @@ import {
     removeAccountsChangedListener,
     switchNetwork,
 } from './utils/KaswareUtils';
-import TokenPage from './pages/token-page/TokenPage';
 
 const App = () => {
     const [darkMode, setDarkMode] = useState(getLocalDarkMode());

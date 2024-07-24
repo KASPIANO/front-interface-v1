@@ -1,53 +1,28 @@
-{
-  "root": true,
-  "extends": [
+module.exports = {
+  root: true,
+  env: { browser: true, es2020: true },
+  extends: [
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
-    "prettier"
-  ],
-  "plugins": [
     "prettier",
-    "import",
-    "react-refresh"
   ],
-  "parser": "@typescript-eslint/parser",
-  "ignorePatterns": [],
-  "parserOptions": {
-    "ecmaVersion": 2020,
-    "sourceType": "module",
-    "ecmaFeatures": {
-      "jsx": true
-    }
-  },
-  "settings": {
-    "import/resolver": {
-      "node": {
-        "extensions": [
-          ".js",
-          ".jsx",
-          ".ts",
-          ".tsx"
-        ]
-      }
-    },
-    "react": {
-      "version": "detect"
-    }
-  },
-  "rules": {
+  ignorePatterns: ["dist", ".eslintrc.cjs"],
+  parser: "@typescript-eslint/parser",
+  plugins: ["react-refresh", "prettier", "import"],
+  rules: {
     "react-refresh/only-export-components": [
       "warn",
-      { "allowConstantExport": true }
+      { allowConstantExport: true },
     ],
     "prettier/prettier": [
       1,
       {
-        "printWidth": 115,
-        "tabWidth": 4,
-        "singleQuote": true,
-        "endOfLine": "auto"
-      }
+        printWidth: 115,
+        tabWidth: 4,
+        singleQuote: true,
+        endOfLine: "auto",
+      },
     ],
     "prefer-const": 2,
     "import/newline-after-import": 2,
@@ -65,7 +40,7 @@
     "@typescript-eslint/ban-types": 2,
     "no-return-await": 2,
     "no-var": 0,
-    "quotes": 0,
+    quotes: 0,
     "@typescript-eslint/no-unused-vars": 1,
     "no-unused-vars": 0,
     "@typescript-eslint/class-name-casing": 0,
@@ -81,8 +56,8 @@
     "@typescript-eslint/no-use-before-define": [
       "error",
       {
-        "variables": false
-      }
+        variables: false,
+      },
     ],
     "no-useless-constructor": 0,
     "no-restricted-globals": 0,
@@ -110,15 +85,12 @@
     "@typescript-eslint/no-empty-interface": 2,
     "@typescript-eslint/no-namespace": 0,
     "no-param-reassign": 0,
-    "eqeqeq": 2,
+    eqeqeq: 2,
     "no-shadow": 0,
     "import/first": 0,
     "no-else-return": 0,
     "@typescript-eslint/no-var-requires": 0,
-    "arrow-body-style": [
-      1,
-      "as-needed"
-    ],
+    "arrow-body-style": [1, "as-needed"],
     "import/no-unresolved": 0,
     "import/no-duplicates": 0,
     "no-useless-return": 0,
@@ -138,11 +110,9 @@
     "@typescript-eslint/naming-convention": [
       "error",
       {
-        "selector": "interface",
-        "format": [
-          "PascalCase"
-        ]
-      }
-    ]
-  }
-}
+        selector: "interface",
+        format: ["PascalCase"],
+      },
+    ],
+  },
+};
