@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import {
     ConnectButton,
@@ -8,38 +8,53 @@ import {
     NavButton,
     NavButtons,
     NavCenter,
+    NetworkSelect,
     SearchContainer,
+    WalletBalance,
 } from './NavBar.s';
 import InputAdornment from '@mui/material/InputAdornment';
-import { TokenResponse } from '../../types/Types';
-
-interface Token {
-    symbol: string;
-    name: string;
-    logoURI: string;
-}
+import { FormControl, IconButton, MenuItem, Tooltip, Typography } from '@mui/material';
+import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
+import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
 
 interface NavbarProps {
     walletAddress: string | null;
     connectWallet: () => void;
-    tokensList: TokenResponse[];
+    disconnectWallet: () => void;
     network: string;
     onNetworkChange: (network: string) => void;
+    walletBalance: number;
+    walletConnected: boolean;
+    toggleDarkMode: () => void;
+    darkMode: boolean;
 }
 
 const Navbar: React.FC<NavbarProps> = (props) => {
-    const { walletAddress, connectWallet } = props;
-    const [activePage, setActivePage] = useState('Swap');
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const {
+        walletBalance,
+        walletConnected,
+        darkMode,
+        toggleDarkMode,
+        network,
+        onNetworkChange,
+        disconnectWallet,
+        connectWallet,
+    } = props;
+    const [activePage, setActivePage] = useState('/');
     const [searchValue, setSearchValue] = useState('');
+    const navigate = useNavigate();
 
-    const handleTokenSelect = (token: Token) => {
-        console.log('Selected token:', token);
-        setIsModalOpen(false);
-    };
+    const networkLogo = !darkMode
+        ? 'https://kaspa.org/wp-content/uploads/2023/08/Kaspa-LDSP-Dark-Full-Color.svg'
+        : 'https://kaspa.org/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Reverse.svg';
 
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchValue(event.target.value);
+    };
+
+    const handleNavButtonClick = (page: string) => {
+        setActivePage(page);
+        navigate(page);
     };
 
     return (
@@ -51,17 +66,17 @@ const Navbar: React.FC<NavbarProps> = (props) => {
             </Logo>
             <NavCenter>
                 <NavButtons>
-                    <NavButton isActive={activePage === 'Swap'} onClick={() => setActivePage('Swap')}>
-                        Trade
+                    <NavButton isActive={activePage === '/'} onClick={() => handleNavButtonClick('/')}>
+                        KRC-20
+                    </NavButton>
+                    <NavButton isActive={activePage === 'deploy'} onClick={() => handleNavButtonClick('deploy')}>
+                        Deploy
                     </NavButton>
                     <NavButton
-                        isActive={activePage === 'Limit Order'}
-                        onClick={() => setActivePage('Limit Order')}
+                        isActive={activePage === 'portfolio'}
+                        onClick={() => handleNavButtonClick('portfolio')}
                     >
-                        Resources
-                    </NavButton>
-                    <NavButton isActive={activePage === 'positions'} onClick={() => setActivePage('positions')}>
-                        Positions
+                        Portfolio
                     </NavButton>
                 </NavButtons>
             </NavCenter>
@@ -91,9 +106,44 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                         },
                     }}
                 />
-                <ConnectButton onClick={connectWallet}>
-                    {walletAddress ? `${walletAddress.slice(0, 10)}...${walletAddress.slice(-4)}` : 'Connect'}
+                <WalletBalance>
+                    <Typography variant="body1" style={{ fontSize: '1vw', marginRight: '1vw' }}>
+                        {walletBalance} KAS
+                    </Typography>
+                </WalletBalance>
+                <ConnectButton onClick={walletConnected ? disconnectWallet : connectWallet}>
+                    {walletConnected ? 'Disconnect' : 'Connect'}
                 </ConnectButton>
+                <FormControl variant="outlined" size="small" sx={{ marginLeft: '1vw' }}>
+                    <NetworkSelect
+                        value={network}
+                        onChange={(event) => onNetworkChange(event.target.value as string)}
+                        displayEmpty
+                        inputProps={{ 'aria-label': 'Without label' }}
+                    >
+                        <MenuItem value="mainnet">
+                            <img src={networkLogo} alt="Mainnet" style={{ width: '20px', marginRight: '8px' }} />
+                            Mainnet
+                        </MenuItem>
+                        <MenuItem value="testnet">
+                            <img src={networkLogo} alt="Testnet" style={{ width: '20px', marginRight: '8px' }} />
+                            Testnet
+                        </MenuItem>
+                    </NetworkSelect>
+                </FormControl>
+                {darkMode ? (
+                    <Tooltip title={'Light Mode'} placement="bottom">
+                        <IconButton sx={{ padding: '4px' }} onClick={toggleDarkMode}>
+                            <LightModeRoundedIcon />
+                        </IconButton>
+                    </Tooltip>
+                ) : (
+                    <Tooltip title={'Dark Mode'} placement="bottom">
+                        <IconButton sx={{ padding: '4px' }} onClick={toggleDarkMode}>
+                            <NightlightRoundIcon />
+                        </IconButton>
+                    </Tooltip>
+                )}
             </div>
             {/* {isModalOpen && (
                 <TokenSearchModal

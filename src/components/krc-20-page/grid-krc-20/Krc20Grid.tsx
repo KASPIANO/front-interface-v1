@@ -23,6 +23,7 @@ import { formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
 import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
 import UnfoldMoreRoundedIcon from '@mui/icons-material/UnfoldMoreRounded';
+import { useNavigate } from 'react-router-dom';
 
 const GlobalStyle = createGlobalStyle`
   #scrollableList {
@@ -67,6 +68,11 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     const { tokensList, setNextPage, totalTokensDeployed, nextPage } = props;
     const [tokensRows, setTokensRows] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+
+    const handleItemClick = (token) => {
+        navigate(`/token/${token.tick}`);
+    };
 
     useEffect(() => {
         const loadTokens = async () => {
@@ -189,7 +195,11 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                 >
                     {tokensRows.map((token) => (
                         <div key={token.tick}>
-                            <ListItem disablePadding sx={{ height: '12vh' }}>
+                            <ListItem
+                                onClick={() => handleItemClick(token)}
+                                disablePadding
+                                sx={{ height: '12vh' }}
+                            >
                                 <ListItemButton>
                                     <ListItemAvatar>
                                         <Avatar

@@ -1,6 +1,6 @@
 import { Grid } from '@mui/material';
 
-export const GridLayout = ({ children }) => (
+export const TokenPageLayout = ({ children }) => (
     <div style={{ display: 'flex' }}>
         <Grid container spacing={1} padding={2} maxWidth={'97%'}>
             <Grid

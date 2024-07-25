@@ -1,4 +1,4 @@
-import { Button, styled, TextField } from '@mui/material';
+import { Button, Select, styled, TextField } from '@mui/material';
 import { NavButtonProps } from '../../types/Types';
 
 export const NavbarContainer = styled('div')({
@@ -6,7 +6,8 @@ export const NavbarContainer = styled('div')({
     justifyContent: 'space-between',
     borderBottom: '0.5px solid #2b2b3b',
     width: '100%',
-    height: '6.6vh',
+    height: '8.5vh',
+    padding: '8px 8px',
 });
 
 export const NavButtons = styled('div')(() => ({
@@ -40,17 +41,17 @@ export const NavButton = styled(Button)<NavButtonProps>(({ isActive }) => ({
     }),
 }));
 
-export const ConnectButton = styled(Button)({
-    backgroundColor: '#2b2b3b',
-    color: 'white',
-    cursor: 'pointer',
-    borderRadius: '15px',
-    fontSize: '1.1vw',
-    height: '3.5vh',
-    '&:hover': {
-        color: 'black',
-    },
-});
+// export const ConnectButton = styled(Button)({
+//     backgroundColor: '#2b2b3b',
+//     color: 'white',
+//     cursor: 'pointer',
+//     borderRadius: '15px',
+//     fontSize: '1.1vw',
+//     height: '3.5vh',
+//     '&:hover': {
+//         color: 'black',
+//     },
+// });
 
 export const Logo = styled('div')({
     display: 'flex',
@@ -71,5 +72,37 @@ export const SearchContainer = styled(TextField)({
     marginRight: '3vw',
     '& .MuiInputBase-root': {
         color: 'white',
+    },
+});
+
+export const WalletBalance = styled('div')({
+    display: 'flex',
+    alignItems: 'center',
+});
+
+export const ConnectButton = styled(Button)({
+    backgroundColor: '#70C7BA',
+    color: '#fff',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '1vw',
+    padding: '1vh 2vw',
+    borderRadius: '8px',
+    '&:hover': {
+        backgroundColor: '#49EACB',
+    },
+});
+
+export const NetworkSelect = styled(Select)({
+    backgroundColor: '#2b2b3b',
+    color: '#fff',
+    '& .MuiSelect-icon': {
+        color: '#fff',
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#888',
+    },
+    '&:hover .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#70C7BA',
     },
 });
