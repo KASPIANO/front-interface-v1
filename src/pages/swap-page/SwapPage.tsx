@@ -26,15 +26,7 @@ interface SwapPageProps {
 // ];
 
 const SwapPage: FC<SwapPageProps> = (props) => {
-    const {
-        walletAddress,
-        connectWallet,
-        walletBalance,
-        showNotification,
-        setShowNotification,
-        setWalletAddress,
-        setWalletBalance,
-    } = props;
+    const { walletAddress, connectWallet, walletBalance, showNotification, setShowNotification } = props;
 
     const [paying, setPaying] = useState<string>('');
     const [receiving, setReceiving] = useState<string>('');
@@ -42,16 +34,16 @@ const SwapPage: FC<SwapPageProps> = (props) => {
     const [payingCurrencyImage, setPayingCurrencyImage] = useState<string>('/kas.svg');
     const [receivingCurrency, setReceivingCurrency] = useState<string>('Select Token');
     const [receivingCurrencyImage, setReceivingCurrencyImage] = useState<string | null>(null);
-    const [receivingBalance, setReceivingBalance] = useState<number>(0);
-    const [isPayingActive, setIsPayingActive] = useState<boolean>(false);
+    const [receivingBalance] = useState<number>(0);
+    const [isPayingActive] = useState<boolean>(false);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [isTokenModalOpen, setIsTokenModalOpen] = useState<boolean>(false);
+    const [, setIsTokenModalOpen] = useState<boolean>(false);
     const [isPayingTokenModal, setIsPayingTokenModal] = useState<boolean>(true);
     const [isBlurred, setIsBlurred] = useState<boolean>(false);
     const [slippageMode, setSlippageMode] = useState<string>('Auto');
     const [slippageValue, setSlippageValue] = useState<string>('1%');
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-    const [tokens, setTokens] = useState<TokenResponse[]>([]);
+    const [tokens] = useState<TokenResponse[]>([]);
 
     // useEffect(() => {
     //     const handleAccountsChanged = async (accounts: string[]) => {

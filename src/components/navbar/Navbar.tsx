@@ -33,7 +33,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
     const { walletBalance, walletConnected, network, onNetworkChange, disconnectWallet, connectWallet } = props;
     const [activePage, setActivePage] = useState('/');
     const themeContext = useContext(ThemeContext);
-    const [searchValue, setSearchValue] = useState('');
+    const [, setSearchValue] = useState('');
     const navigate = useNavigate();
     const darkmode = themeContext.themeMode === ThemeModes.DARK;
     const networkLogo = !darkmode
@@ -77,7 +77,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                     type="search"
                     placeholder={'Search KRC-20 Tokens'}
                     value={''}
-                    onChange={(event) => setSearchValue(event.target.value)}
+                    onChange={(event) => handleSearch(event as React.ChangeEvent<HTMLInputElement>)}
                     sx={{
                         '& input': {
                             fontSize: '1.1vw',
