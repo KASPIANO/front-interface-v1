@@ -53,12 +53,6 @@ module.exports = {
     "react/jsx-no-bind": 0,
     "react/react-in-jsx-scope": "off",
     "no-use-before-define": "off",
-    "@typescript-eslint/no-use-before-define": [
-      "error",
-      {
-        variables: false,
-      },
-    ],
     "no-useless-constructor": 0,
     "no-restricted-globals": 0,
     "@typescript-eslint/explicit-function-return-type": 0,

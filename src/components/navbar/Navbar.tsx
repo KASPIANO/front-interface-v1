@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
+import { Button } from '@mui/material';
+import InputAdornment from '@mui/material/InputAdornment';
+import React, { useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ThemeContext } from '../../main';
+import { TokenResponse } from '../../types/Types';
 import {
     ConnectButton,
     Logo,
@@ -10,8 +14,6 @@ import {
     NavCenter,
     SearchContainer,
 } from './NavBar.s';
-import InputAdornment from '@mui/material/InputAdornment';
-import { TokenResponse } from '../../types/Types';
 
 interface Token {
     symbol: string;
@@ -30,6 +32,8 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = (props) => {
     const { walletAddress, connectWallet } = props;
     const [activePage, setActivePage] = useState('Swap');
+    const themeContext = useContext(ThemeContext);
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchValue, setSearchValue] = useState('');
 
@@ -51,6 +55,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
             </Logo>
             <NavCenter>
                 <NavButtons>
+                    <Button onClick={themeContext.toggleThemeMode}>darkmode</Button>
                     <NavButton isActive={activePage === 'Swap'} onClick={() => setActivePage('Swap')}>
                         Trade
                     </NavButton>

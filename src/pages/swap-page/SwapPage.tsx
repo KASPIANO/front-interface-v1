@@ -1,18 +1,16 @@
-import { useState, FC } from 'react';
+import { FC, useState } from 'react';
+import BackgroundEffect from '../../components/background-effect/BackgroundEffect';
+import Footer from '../../components/footer/Footer';
+import MainSwapBox from '../../components/main-swap-box/MainSwapBox';
+import MiniNavbar from '../../components/mini-navbar/MiniNavbar';
 import SlippageModal from '../../components/modals/slippage-modal/SlippageModal';
 import WalletModal from '../../components/modals/wallet-modal/WalletModal';
-import { Heading, BlurOverlay, MainContent } from './SwapPage.s';
-import { Token, TokenResponse } from '../../types/Types';
 import NotificationComponent from '../../components/notification/Notification';
+import { Token, TokenResponse } from '../../types/Types';
+import { BlurOverlay, Heading, MainContent } from './SwapPage.s';
 import { SwapLayout } from './SwapPageLayout';
-import MiniNavbar from '../../components/mini-navbar/MiniNavbar';
-import MainSwapBox from '../../components/main-swap-box/MainSwapBox';
-import Footer from '../../components/footer/Footer';
-import BackgroundEffect from '../../components/background-effect/BackgroundEffect';
 
 interface SwapPageProps {
-    darkMode: boolean;
-    toggleDarkMode: () => void;
     walletAddress: string | null;
     connectWallet: () => void;
     walletBalance: number;
@@ -30,8 +28,6 @@ interface SwapPageProps {
 
 const SwapPage: FC<SwapPageProps> = (props) => {
     const {
-        darkMode,
-        toggleDarkMode,
         walletAddress,
         connectWallet,
         walletBalance,

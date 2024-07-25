@@ -1,16 +1,13 @@
-import { useState, useEffect, FC } from 'react';
+import { FC, useEffect, useState } from 'react';
+import Footer from '../../components/footer/Footer';
+import TokenDataGrid from '../../components/krc-20-page/grid-krc-20/Krc20Grid';
+import GridTitle from '../../components/krc-20-page/grid-title-sort/GridTitle';
 import WalletModal from '../../components/modals/wallet-modal/WalletModal';
-import { Heading, BlurOverlay, MainContent } from './GridPage.s';
-import { TokenResponse } from '../../types/Types';
+import Navbar from '../../components/navbar/Navbar';
 import NotificationComponent from '../../components/notification/Notification';
 import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
-import { setWalletBalanceUtil } from '../../utils/Utils';
-import { GridLayout } from './GridPageLayout';
-import Navbar from '../../components/navbar/Navbar';
-import MiniNavbar from '../../components/mini-navbar/MiniNavbar';
-import Footer from '../../components/footer/Footer';
-import BackgroundEffect from '../../components/background-effect/BackgroundEffect';
-import TokenDataGrid from '../../components/krc-20-page/grid-krc-20/Krc20Grid';
+import { fetchTokens, fetchTotalTokensDeployed } from '../../DAL/Krc20DAL';
+import { TokenResponse } from '../../types/Types';
 import {
     isKasWareInstalled,
     onAccountsChanged,
@@ -18,12 +15,11 @@ import {
     requestAccounts,
     switchNetwork,
 } from '../../utils/KaswareUtils';
-import { fetchTokens, fetchTotalTokensDeployed } from '../../DAL/Krc20DAL';
-import GridTitle from '../../components/krc-20-page/grid-title-sort/GridTitle';
+import { setWalletBalanceUtil } from '../../utils/Utils';
+import { BlurOverlay } from './GridPage.s';
+import { GridLayout } from './GridPageLayout';
 
 interface GridPageProps {
-    darkMode: boolean;
-    toggleDarkMode: () => void;
     walletAddress: string | null;
     connectWallet: () => void;
     walletBalance: number;
@@ -39,23 +35,8 @@ interface GridPageProps {
 //     { name: 'TokenA', symbol: 'TKA', logoURI: '/tokenA.svg' },
 // ];
 
-interface GridPageProps {
-    darkMode: boolean;
-    toggleDarkMode: () => void;
-    walletAddress: string | null;
-    connectWallet: () => void;
-    walletBalance: number;
-    isConnecting: boolean;
-    showNotification: boolean;
-    setShowNotification: (value: boolean) => void;
-    setWalletAddress: (value: string | null) => void;
-    setWalletBalance: (value: number) => void;
-}
-
 const GridPage: FC<GridPageProps> = (props) => {
     const {
-        darkMode,
-        toggleDarkMode,
         walletAddress,
         connectWallet,
         walletBalance,
