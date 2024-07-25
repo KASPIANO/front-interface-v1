@@ -23,8 +23,8 @@ import { createGlobalStyle } from 'styled-components';
 import { fetchTokenInfo } from '../../../DAL/Krc20DAL';
 import { TokenResponse } from '../../../types/Types';
 import { formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
-import { FilterButton } from '../filter-button/FilterButton';
-import { NoDataContainer, StyledDataGridContainer, TableHeader } from './Krc20Grid.s';
+import { GridHeader } from '../grid-header/GridHeader';
+import { NoDataContainer, StyledDataGridContainer } from './Krc20Grid.s';
 
 const GlobalStyle = createGlobalStyle`
   #scrollableList {
@@ -143,18 +143,11 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                 <thead>
                     <tr style={{ display: 'flex' }}>
                         {Object.keys(GridHeaders).map((header: GridHeaders) => (
-                            <TableHeader
+                            <GridHeader
                                 key={header}
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    minWidth: '11vw',
-                                }}
-                            >
-                                <Typography variant="body1">{headersMapper[header].name}</Typography>
-                                {<FilterButton onFilterClick={headersMapper[header].headerFunction} />}
-                            </TableHeader>
+                                name={headersMapper[header].name}
+                                headerFunction={headersMapper[header].headerFunction}
+                            />
                         ))}
                     </tr>
                 </thead>
