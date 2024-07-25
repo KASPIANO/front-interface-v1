@@ -1,6 +1,5 @@
 import { useState, useEffect, FC } from 'react';
 import NotificationComponent from '../../components/notification/Notification';
-import Navbar from '../../components/navbar/Navbar';
 import Footer from '../../components/footer/Footer';
 import { fetchTokenInfo } from '../../DAL/Krc20DAL';
 import { TokenPageLayout } from './TokenPageLayout';
@@ -22,16 +21,7 @@ interface TokenPageProps {
 }
 
 const TokenPage: FC<TokenPageProps> = (props) => {
-    const {
-        darkMode,
-        toggleDarkMode,
-        walletAddress,
-        connectWallet,
-        showNotification,
-        setShowNotification,
-        handleNetworkChange,
-        network,
-    } = props;
+    const { darkMode, toggleDarkMode, walletAddress, showNotification, setShowNotification } = props;
 
     const { ticker } = useParams();
 
@@ -55,16 +45,8 @@ const TokenPage: FC<TokenPageProps> = (props) => {
 
     return (
         <TokenPageLayout>
-            <Navbar
-                walletAddress={walletAddress}
-                connectWallet={connectWallet}
-                network={network}
-                onNetworkChange={handleNetworkChange}
-            />
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '10vh')}
             {getComponentToShow(<TokenGraph />, '30vh')}
-
-            <Footer />
 
             {showNotification && walletAddress && (
                 <NotificationComponent

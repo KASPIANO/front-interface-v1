@@ -1,10 +1,7 @@
 import { useState, useEffect, FC } from 'react';
-import WalletModal from '../../components/modals/wallet-modal/WalletModal';
-import { BlurOverlay } from './GridPage.s';
 import { TokenResponse } from '../../types/Types';
 import NotificationComponent from '../../components/notification/Notification';
 import { GridLayout } from './GridPageLayout';
-import Navbar from '../../components/navbar/Navbar';
 import Footer from '../../components/footer/Footer';
 import TokenDataGrid from '../../components/krc-20-page/grid-krc-20/Krc20Grid';
 
@@ -17,26 +14,13 @@ interface GridPageProps {
     walletAddress: string | null;
     connectWallet?: () => void;
     walletBalance: number;
-    isConnecting: boolean;
+    walletConnected: boolean;
     showNotification: boolean;
     setShowNotification: (value: boolean) => void;
-    setWalletAddress: (value: string | null) => void;
-    setWalletBalance: (value: number) => void;
-    handleNetworkChange: (network: string) => void;
-    network: string;
 }
 
 const GridPage: FC<GridPageProps> = (props) => {
-    const {
-        darkMode,
-        toggleDarkMode,
-        walletAddress,
-        connectWallet,
-        showNotification,
-        setShowNotification,
-        handleNetworkChange,
-        network,
-    } = props;
+    const { darkMode, toggleDarkMode, walletAddress, showNotification, setShowNotification } = props;
 
     const [tokensList, setTokensList] = useState<TokenResponse[]>([]);
     const [nextPage, setNextPage] = useState<number>(1);
@@ -62,12 +46,6 @@ const GridPage: FC<GridPageProps> = (props) => {
 
     return (
         <GridLayout>
-            <Navbar
-                walletAddress={walletAddress}
-                connectWallet={connectWallet}
-                network={network}
-                onNetworkChange={handleNetworkChange}
-            />
             <GridTitle />
             <TokenDataGrid
                 nextPage={nextPage}
@@ -76,7 +54,6 @@ const GridPage: FC<GridPageProps> = (props) => {
                 setNextPage={setNextPage}
                 nextPageParams={nextPageParams}
             />
-            <Footer />
 
             {showNotification && walletAddress && (
                 <NotificationComponent
