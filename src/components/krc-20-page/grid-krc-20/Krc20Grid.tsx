@@ -1,29 +1,30 @@
-import { FC, useEffect, useState } from 'react';
+/* eslint-disable @typescript-eslint/no-empty-function */
+import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
+import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
 import {
+    Avatar,
+    Box,
     Button,
+    Divider,
     List,
     ListItem,
     ListItemAvatar,
     ListItemButton,
-    Avatar,
-    Typography,
-    Divider,
-    Box,
     ListItemText,
+    Typography,
 } from '@mui/material';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import Skeleton from '@mui/material/Skeleton';
 import Tooltip from '@mui/material/Tooltip';
 import moment from 'moment';
+import { FC, useEffect, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { useNavigate } from 'react-router-dom';
+import { createGlobalStyle } from 'styled-components';
 import { fetchTokenInfo } from '../../../DAL/Krc20DAL';
 import { TokenResponse } from '../../../types/Types';
-import { NoDataContainer, StyledDataGridContainer, TableHeader } from './Krc20Grid.s';
-import { createGlobalStyle } from 'styled-components';
 import { formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
-import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
-import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
-import UnfoldMoreRoundedIcon from '@mui/icons-material/UnfoldMoreRounded';
-import { useNavigate } from 'react-router-dom';
+import { GridHeader } from '../grid-header/GridHeader';
+import { NoDataContainer, StyledDataGridContainer } from './Krc20Grid.s';
 
 const GlobalStyle = createGlobalStyle`
   #scrollableList {
@@ -62,6 +63,26 @@ const formatDate = (timestamp: string): string => moment(Number(timestamp)).form
 const capitalizeFirstLetter = (string: string): string => {
     if (!string) return string;
     return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+enum GridHeaders {
+    TICKER = 'TICKER',
+    AGE = 'AGE',
+    MINTED = 'MINTED',
+    SUPPLY = 'SUPPLY',
+    HOLDERS = 'HOLDERS',
+    TOTAL_TXNS = 'TOTAL_TXNS',
+    FAIR_MINT = 'FAIR_MINT',
+}
+
+const headersMapper: Record<GridHeaders, { name: string; headerFunction: () => void }> = {
+    [GridHeaders.TICKER]: { name: 'Ticker', headerFunction: () => {} },
+    [GridHeaders.AGE]: { name: 'Age', headerFunction: () => {} },
+    [GridHeaders.MINTED]: { name: 'Minted', headerFunction: () => {} },
+    [GridHeaders.SUPPLY]: { name: 'Supply', headerFunction: () => {} },
+    [GridHeaders.HOLDERS]: { name: 'Holders', headerFunction: () => {} },
+    [GridHeaders.TOTAL_TXNS]: { name: 'Total Txns', headerFunction: () => {} },
+    [GridHeaders.FAIR_MINT]: { name: 'Fair Mint', headerFunction: () => {} },
 };
 
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
@@ -120,26 +141,14 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         >
             <table style={{ width: '100%' }}>
                 <thead>
-                    <tr>
-                        <TableHeader sx={{ minWidth: '12vw', textAlign: 'left', paddingLeft: '1.4vw' }}>
-                            Ticker
-                        </TableHeader>
-                        <TableHeader sx={{ minWidth: '9vw', display: 'inline-flex' }}>
-                            Age {<UnfoldMoreRoundedIcon fontSize="small" />}
-                        </TableHeader>
-                        <TableHeader sx={{ minWidth: '11vw', display: 'inline-flex' }}>
-                            Minted {<UnfoldMoreRoundedIcon fontSize="small" />}
-                        </TableHeader>
-                        <TableHeader sx={{ minWidth: '10.5vw', display: 'inline-flex' }}>
-                            Supply {<UnfoldMoreRoundedIcon fontSize="small" />}
-                        </TableHeader>
-                        <TableHeader sx={{ display: 'inline-flex', minWidth: '9.5vw' }}>
-                            Holders {<UnfoldMoreRoundedIcon fontSize="small" />}
-                        </TableHeader>
-                        <TableHeader sx={{ display: 'inline-flex', minWidth: '11vw' }}>
-                            Total Txns {<UnfoldMoreRoundedIcon fontSize="small" />}
-                        </TableHeader>
-                        <TableHeader sx={{ textAlign: 'left', display: 'inline-flex' }}>Fair Mint</TableHeader>
+                    <tr style={{ display: 'flex' }}>
+                        {Object.keys(GridHeaders).map((header: GridHeaders) => (
+                            <GridHeader
+                                key={header}
+                                name={headersMapper[header].name}
+                                headerFunction={headersMapper[header].headerFunction}
+                            />
+                        ))}
                     </tr>
                 </thead>
             </table>
