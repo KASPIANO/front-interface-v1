@@ -9,7 +9,6 @@ import SwapPage from './pages/swap-page/SwapPage';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
 import { getLocalDarkMode, setWalletBalanceUtil } from './utils/Utils';
-import TokenPage from './pages/token-page/TokenPage';
 import {
     isKasWareInstalled,
     requestAccounts,
@@ -17,6 +16,7 @@ import {
     removeAccountsChangedListener,
     switchNetwork,
 } from './utils/KaswareUtils';
+import TokenPage from './pages/token-page/TokenPage';
 
 const App = () => {
     const [darkMode, setDarkMode] = useState(getLocalDarkMode());
