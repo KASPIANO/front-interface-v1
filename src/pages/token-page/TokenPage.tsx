@@ -1,17 +1,14 @@
-import { useState, useEffect, FC } from 'react';
-import NotificationComponent from '../../components/notification/Notification';
-import Footer from '../../components/footer/Footer';
-import { fetchTokenInfo } from '../../DAL/Krc20DAL';
-import { TokenPageLayout } from './TokenPageLayout';
-import { useParams } from 'react-router-dom';
-import TokenHeader from '../../components/token-page/token-header/TokenHeader';
-import TokenGraph from '../../components/token-page/token-header/token-graph/TokenGraph';
-import { Token } from '../../types/Types';
 import { Skeleton } from '@mui/material';
+import { FC, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import NotificationComponent from '../../components/notification/Notification';
+import TokenGraph from '../../components/token-page/token-header/token-graph/TokenGraph';
+import TokenHeader from '../../components/token-page/token-header/TokenHeader';
+import { fetchTokenInfo } from '../../DAL/Krc20DAL';
+import { Token } from '../../types/Types';
+import { TokenPageLayout } from './TokenPageLayout';
 
 interface TokenPageProps {
-    darkMode: boolean;
-    toggleDarkMode: () => void;
     walletAddress: string | null;
     connectWallet?: () => void;
     showNotification: boolean;
@@ -21,7 +18,7 @@ interface TokenPageProps {
 }
 
 const TokenPage: FC<TokenPageProps> = (props) => {
-    const { darkMode, toggleDarkMode, walletAddress, showNotification, setShowNotification } = props;
+    const { walletAddress, showNotification, setShowNotification } = props;
 
     const { ticker } = useParams();
 
