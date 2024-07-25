@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
+import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
+import { FormControl, IconButton, MenuItem, Tooltip, Typography } from '@mui/material';
+import InputAdornment from '@mui/material/InputAdornment';
+import React, { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ThemeContext } from '../../main';
+import { ThemeModes } from '../../utils/Utils';
 import {
     ConnectButton,
     Logo,
@@ -12,10 +18,6 @@ import {
     SearchContainer,
     WalletBalance,
 } from './NavBar.s';
-import InputAdornment from '@mui/material/InputAdornment';
-import { FormControl, IconButton, MenuItem, Tooltip, Typography } from '@mui/material';
-import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
-import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
 
 interface NavbarProps {
     walletAddress: string | null;
@@ -25,26 +27,16 @@ interface NavbarProps {
     onNetworkChange: (network: string) => void;
     walletBalance: number;
     walletConnected: boolean;
-    toggleDarkMode: () => void;
-    darkMode: boolean;
 }
 
 const Navbar: React.FC<NavbarProps> = (props) => {
-    const {
-        walletBalance,
-        walletConnected,
-        darkMode,
-        toggleDarkMode,
-        network,
-        onNetworkChange,
-        disconnectWallet,
-        connectWallet,
-    } = props;
+    const { walletBalance, walletConnected, network, onNetworkChange, disconnectWallet, connectWallet } = props;
     const [activePage, setActivePage] = useState('/');
+    const themeContext = useContext(ThemeContext);
     const [searchValue, setSearchValue] = useState('');
     const navigate = useNavigate();
-
-    const networkLogo = !darkMode
+    const darkmode = themeContext.themeMode === ThemeModes.DARK;
+    const networkLogo = !darkmode
         ? 'https://kaspa.org/wp-content/uploads/2023/08/Kaspa-LDSP-Dark-Full-Color.svg'
         : 'https://kaspa.org/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Reverse.svg';
 
@@ -131,15 +123,15 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                         </MenuItem>
                     </NetworkSelect>
                 </FormControl>
-                {darkMode ? (
+                {darkmode ? (
                     <Tooltip title={'Light Mode'} placement="bottom">
-                        <IconButton sx={{ padding: '4px' }} onClick={toggleDarkMode}>
+                        <IconButton sx={{ padding: '4px' }} onClick={themeContext.toggleThemeMode}>
                             <LightModeRoundedIcon />
                         </IconButton>
                     </Tooltip>
                 ) : (
                     <Tooltip title={'Dark Mode'} placement="bottom">
-                        <IconButton sx={{ padding: '4px' }} onClick={toggleDarkMode}>
+                        <IconButton sx={{ padding: '4px' }} onClick={themeContext.toggleThemeMode}>
                             <NightlightRoundIcon />
                         </IconButton>
                     </Tooltip>

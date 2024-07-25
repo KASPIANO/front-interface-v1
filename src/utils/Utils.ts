@@ -1,12 +1,10 @@
-export const getLocalDarkMode = () => {
-    if (localStorage.getItem('dark_mode') !== null && localStorage.getItem('dark_mode') === 'true') {
-        return true;
-    }
-    if (localStorage.getItem('dark_mode') !== null && localStorage.getItem('dark_mode') === 'false') {
-        return false;
-    }
-    return true;
-};
+export enum ThemeModes {
+    DARK = 'dark',
+    LIGHT = 'light',
+}
+
+export const getLocalThemeMode = () =>
+    localStorage.getItem('theme_mode') ? (localStorage.getItem('theme_mode') as ThemeModes) : ThemeModes.DARK;
 
 export const setWalletBalanceUtil = (balanceInKaspa: number) =>
     isNaN(balanceInKaspa) ? 0 : parseFloat(balanceInKaspa.toFixed(4));

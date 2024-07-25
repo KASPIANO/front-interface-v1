@@ -1,26 +1,37 @@
-import { useState, useEffect, FC } from 'react';
-import { TokenResponse } from '../../types/Types';
-import NotificationComponent from '../../components/notification/Notification';
-import { GridLayout } from './GridPageLayout';
-import Footer from '../../components/footer/Footer';
+import { FC, useEffect, useState } from 'react';
 import TokenDataGrid from '../../components/krc-20-page/grid-krc-20/Krc20Grid';
-
-import { fetchTokens, fetchTotalTokensDeployed } from '../../DAL/Krc20DAL';
 import GridTitle from '../../components/krc-20-page/grid-title-sort/GridTitle';
+import NotificationComponent from '../../components/notification/Notification';
+import { fetchTokens, fetchTotalTokensDeployed } from '../../DAL/Krc20DAL';
+import { TokenResponse } from '../../types/Types';
+import { GridLayout } from './GridPageLayout';
 
 interface GridPageProps {
-    darkMode: boolean;
-    toggleDarkMode: () => void;
     walletAddress: string | null;
     connectWallet?: () => void;
     walletBalance: number;
     walletConnected: boolean;
     showNotification: boolean;
     setShowNotification: (value: boolean) => void;
+    setWalletAddress: (value: string | null) => void;
+    setWalletBalance: (value: number) => void;
 }
 
+// const tokens = [
+//     { name: 'Kaspa', symbol: 'KAS', logoURI: '/kaspa.svg' },
+//     { name: 'TokenA', symbol: 'TKA', logoURI: '/tokenA.svg' },
+// ];
+
 const GridPage: FC<GridPageProps> = (props) => {
-    const { darkMode, toggleDarkMode, walletAddress, showNotification, setShowNotification } = props;
+    const {
+        walletAddress,
+        connectWallet,
+        walletBalance,
+        showNotification,
+        setShowNotification,
+        setWalletAddress,
+        setWalletBalance,
+    } = props;
 
     const [tokensList, setTokensList] = useState<TokenResponse[]>([]);
     const [nextPage, setNextPage] = useState<number>(1);
