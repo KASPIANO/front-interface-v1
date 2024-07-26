@@ -1,28 +1,16 @@
-import { FC, useEffect, useState } from 'react';
-import {
-    Button,
-    List,
-    ListItem,
-    ListItemAvatar,
-    ListItemButton,
-    Avatar,
-    Typography,
-    Divider,
-    Box,
-    ListItemText,
-} from '@mui/material';
-import InfiniteScroll from 'react-infinite-scroll-component';
+/* eslint-disable @typescript-eslint/no-empty-function */
+import { Box, List, Typography } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import Tooltip from '@mui/material/Tooltip';
 import moment from 'moment';
+import { FC, useEffect, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { useNavigate } from 'react-router-dom';
+import { createGlobalStyle } from 'styled-components';
 import { fetchTokenInfo } from '../../../DAL/Krc20DAL';
 import { TokenResponse } from '../../../types/Types';
-import { NoDataContainer, StyledDataGridContainer, TableHeader } from './Krc20Grid.s';
-import { createGlobalStyle } from 'styled-components';
-import { formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
-import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
-import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
-import UnfoldMoreRoundedIcon from '@mui/icons-material/UnfoldMoreRounded';
+import { GridHeader } from '../grid-header/GridHeader';
+import { TokenRow } from '../token-row/TokenRow';
+import { NoDataContainer, StyledDataGridContainer } from './Krc20Grid.s';
 
 const GlobalStyle = createGlobalStyle`
   #scrollableList {
@@ -63,10 +51,35 @@ const capitalizeFirstLetter = (string: string): string => {
     return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
+enum GridHeaders {
+    TICKER = 'TICKER',
+    AGE = 'AGE',
+    MINTED = 'MINTED',
+    SUPPLY = 'SUPPLY',
+    HOLDERS = 'HOLDERS',
+    TOTAL_TXNS = 'TOTAL_TXNS',
+    FAIR_MINT = 'FAIR_MINT',
+}
+
+const headersMapper: Record<GridHeaders, { name: string; headerFunction: () => void }> = {
+    [GridHeaders.TICKER]: { name: 'Ticker', headerFunction: () => {} },
+    [GridHeaders.AGE]: { name: 'Age', headerFunction: () => {} },
+    [GridHeaders.MINTED]: { name: 'Minted', headerFunction: () => {} },
+    [GridHeaders.SUPPLY]: { name: 'Supply', headerFunction: () => {} },
+    [GridHeaders.HOLDERS]: { name: 'Holders', headerFunction: () => {} },
+    [GridHeaders.TOTAL_TXNS]: { name: 'Total Txns', headerFunction: () => {} },
+    [GridHeaders.FAIR_MINT]: { name: 'Fair Mint', headerFunction: () => {} },
+};
+
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     const { tokensList, setNextPage, totalTokensDeployed, nextPage } = props;
     const [tokensRows, setTokensRows] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+
+    const handleItemClick = (token) => {
+        navigate(`/token/${token.tick}`);
+    };
 
     useEffect(() => {
         const loadTokens = async () => {
@@ -114,52 +127,19 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         >
             <table style={{ width: '100%' }}>
                 <thead>
-                    <tr>
-                        <TableHeader sx={{ minWidth: '12vw', textAlign: 'left', paddingLeft: '1.4vw' }}>
-                            Ticker
-                        </TableHeader>
-                        <TableHeader sx={{ minWidth: '9vw', display: 'inline-flex' }}>
-                            Age {<UnfoldMoreRoundedIcon fontSize="small" />}
-                        </TableHeader>
-                        <TableHeader sx={{ minWidth: '11vw', display: 'inline-flex' }}>
-                            Minted {<UnfoldMoreRoundedIcon fontSize="small" />}
-                        </TableHeader>
-                        <TableHeader sx={{ minWidth: '10.5vw', display: 'inline-flex' }}>
-                            Supply {<UnfoldMoreRoundedIcon fontSize="small" />}
-                        </TableHeader>
-                        <TableHeader sx={{ display: 'inline-flex', minWidth: '9.5vw' }}>
-                            Holders {<UnfoldMoreRoundedIcon fontSize="small" />}
-                        </TableHeader>
-                        <TableHeader sx={{ display: 'inline-flex', minWidth: '11vw' }}>
-                            Total Txns {<UnfoldMoreRoundedIcon fontSize="small" />}
-                        </TableHeader>
-                        <TableHeader sx={{ textAlign: 'left', display: 'inline-flex' }}>Fair Mint</TableHeader>
+                    <tr style={{ display: 'flex' }}>
+                        {Object.keys(GridHeaders).map((header: GridHeaders) => (
+                            <GridHeader
+                                key={header}
+                                name={headersMapper[header].name}
+                                headerFunction={headersMapper[header].headerFunction}
+                            />
+                        ))}
                     </tr>
                 </thead>
             </table>
         </Box>
     );
-
-    const preMintedIcons = (preMinted: string, totalSupply: string) => {
-        const preMintedNumber = parseFloat(preMinted);
-        const totalSupplyNumber = parseFloat(totalSupply);
-        const preMintPercentage = ((preMintedNumber / totalSupplyNumber) * 100).toFixed(2);
-
-        return (
-            <ListItemText
-                sx={{ marginLeft: '1vw' }}
-                primary={
-                    <Tooltip title={`${preMintPercentage}% Pre Minted`}>
-                        {preMintedNumber === 0 ? (
-                            <CheckCircleOutlineRoundedIcon style={{ color: 'green', opacity: 0.5 }} />
-                        ) : (
-                            <ErrorOutlineRoundedIcon style={{ color: 'red', opacity: 0.5 }} />
-                        )}
-                    </Tooltip>
-                }
-            />
-        );
-    };
 
     return (
         <StyledDataGridContainer>
@@ -188,121 +168,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                     }
                 >
                     {tokensRows.map((token) => (
-                        <div key={token.tick}>
-                            <ListItem disablePadding sx={{ height: '12vh' }}>
-                                <ListItemButton>
-                                    <ListItemAvatar>
-                                        <Avatar
-                                            style={{
-                                                marginLeft: '0.1vw',
-                                                borderRadius: 5,
-                                            }}
-                                            imgProps={{
-                                                sx: {
-                                                    width: 'auto',
-                                                    height: 'auto',
-                                                    maxWidth: '2vw',
-                                                    maxHeight: '2vw',
-                                                },
-                                            }}
-                                            variant="square"
-                                            alt={token.tick}
-                                            src="/path/to/logo" // Update with actual logo source
-                                        />
-                                    </ListItemAvatar>
-
-                                    <ListItemText
-                                        sx={{
-                                            maxWidth: '10vw',
-                                        }}
-                                        primary={
-                                            <Tooltip title={token.tick}>
-                                                <Typography variant="body1" style={{ fontSize: '1.2vw' }}>
-                                                    {capitalizeFirstLetter(token.tick)}
-                                                </Typography>
-                                            </Tooltip>
-                                        }
-                                        secondary={
-                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                                {formatDate(token.mtsAdd)}
-                                            </Typography>
-                                        }
-                                    />
-
-                                    <ListItemText
-                                        sx={{ maxWidth: '10vw' }}
-                                        primary={
-                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                                {`${moment().diff(Number(token.mtsAdd), 'days')} days`}
-                                            </Typography>
-                                        }
-                                    />
-
-                                    <ListItemText
-                                        sx={{ maxWidth: '11vw' }}
-                                        primary={
-                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                                {((token.minted / token.max) * 100).toFixed(2)}%
-                                            </Typography>
-                                        }
-                                    />
-
-                                    <ListItemText
-                                        sx={{ maxWidth: '11.5vw' }}
-                                        primary={
-                                            <Tooltip title={formatNumberWithCommas(token.max)}>
-                                                <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                                    {simplifyNumber(token.max)}
-                                                </Typography>
-                                            </Tooltip>
-                                        }
-                                    />
-
-                                    <ListItemText
-                                        sx={{ maxWidth: '9.5vw' }}
-                                        primary={
-                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                                {token.holder ? token.holder.length : 0}
-                                            </Typography>
-                                        }
-                                    />
-
-                                    <ListItemText
-                                        sx={{ maxWidth: '9.5vw' }}
-                                        primary={
-                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                                {token.transferTotal ? token.transferTotal : 0}
-                                            </Typography>
-                                        }
-                                    />
-
-                                    <ListItemText
-                                        sx={{ maxWidth: '12vw' }}
-                                        primary={
-                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                                {preMintedIcons(token.pre, token.max)}
-                                            </Typography>
-                                        }
-                                    />
-                                    {token.minted < token.max && (
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            style={{
-                                                marginRight: '1vw',
-                                                minWidth: '2vw',
-                                                width: '3vw',
-                                                fontSize: '0.8vw',
-                                            }}
-                                            disabled={token.minted >= token.max}
-                                        >
-                                            Mint
-                                        </Button>
-                                    )}
-                                </ListItemButton>
-                            </ListItem>
-                            <Divider />
-                        </div>
+                        <TokenRow key={token.tick} handleItemClick={handleItemClick} token={token} />
                     ))}
                 </InfiniteScroll>
             </List>

@@ -1,4 +1,4 @@
-import { TokenResponse, Token, TokenListResponse } from '../types/Types';
+import { Token, TokenListResponse } from '../types/Types';
 import { KRC20InfoService } from './AxiosInstaces';
 
 export const fetchReceivingBalance = async (address: string, tokenSymbol: string): Promise<number> => {
