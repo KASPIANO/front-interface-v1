@@ -1,6 +1,5 @@
 interface Kasware {
     requestAccounts: () => Promise<string[]>;
-    _selectedAddress: string;
     getAccounts: () => Promise<string[]>;
     getNetwork: () => Promise<string>;
     switchNetwork: (network: string) => Promise<void>;

@@ -1,12 +1,10 @@
-import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
-import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import { FormControl, IconButton, MenuItem, Tooltip, Typography } from '@mui/material';
+import { Button } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import React, { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ThemeContext } from '../../main';
-import { ThemeModes } from '../../utils/Utils';
+import { TokenResponse } from '../../types/Types';
 import {
     ConnectButton,
     Logo,
@@ -14,39 +12,38 @@ import {
     NavButton,
     NavButtons,
     NavCenter,
-    NetworkSelect,
     SearchContainer,
-    WalletBalance,
 } from './NavBar.s';
+
+interface Token {
+    symbol: string;
+    name: string;
+    logoURI: string;
+}
 
 interface NavbarProps {
     walletAddress: string | null;
     connectWallet: () => void;
-    disconnectWallet: () => void;
+    tokensList: TokenResponse[];
     network: string;
     onNetworkChange: (network: string) => void;
-    walletBalance: number;
-    walletConnected: boolean;
 }
 
 const Navbar: React.FC<NavbarProps> = (props) => {
-    const { walletBalance, walletConnected, network, onNetworkChange, disconnectWallet, connectWallet } = props;
-    const [activePage, setActivePage] = useState('/');
+    const { walletAddress, connectWallet } = props;
+    const [activePage, setActivePage] = useState('Swap');
     const themeContext = useContext(ThemeContext);
-    const [, setSearchValue] = useState('');
-    const navigate = useNavigate();
-    const darkmode = themeContext.themeMode === ThemeModes.DARK;
-    const networkLogo = !darkmode
-        ? 'https://kaspa.org/wp-content/uploads/2023/08/Kaspa-LDSP-Dark-Full-Color.svg'
-        : 'https://kaspa.org/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Reverse.svg';
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [searchValue, setSearchValue] = useState('');
+
+    const handleTokenSelect = (token: Token) => {
+        console.log('Selected token:', token);
+        setIsModalOpen(false);
+    };
 
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchValue(event.target.value);
-    };
-
-    const handleNavButtonClick = (page: string) => {
-        setActivePage(page);
-        navigate(page);
     };
 
     return (
@@ -58,17 +55,18 @@ const Navbar: React.FC<NavbarProps> = (props) => {
             </Logo>
             <NavCenter>
                 <NavButtons>
-                    <NavButton isActive={activePage === '/'} onClick={() => handleNavButtonClick('/')}>
-                        KRC-20
-                    </NavButton>
-                    <NavButton isActive={activePage === 'deploy'} onClick={() => handleNavButtonClick('deploy')}>
-                        Deploy
+                    <Button onClick={themeContext.toggleThemeMode}>darkmode</Button>
+                    <NavButton isActive={activePage === 'Swap'} onClick={() => setActivePage('Swap')}>
+                        Trade
                     </NavButton>
                     <NavButton
-                        isActive={activePage === 'portfolio'}
-                        onClick={() => handleNavButtonClick('portfolio')}
+                        isActive={activePage === 'Limit Order'}
+                        onClick={() => setActivePage('Limit Order')}
                     >
-                        Portfolio
+                        Resources
+                    </NavButton>
+                    <NavButton isActive={activePage === 'positions'} onClick={() => setActivePage('positions')}>
+                        Positions
                     </NavButton>
                 </NavButtons>
             </NavCenter>
@@ -77,7 +75,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                     type="search"
                     placeholder={'Search KRC-20 Tokens'}
                     value={''}
-                    onChange={(event) => handleSearch(event as React.ChangeEvent<HTMLInputElement>)}
+                    onChange={(event) => setSearchValue(event.target.value)}
                     sx={{
                         '& input': {
                             fontSize: '1.1vw',
@@ -98,44 +96,9 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                         },
                     }}
                 />
-                <WalletBalance>
-                    <Typography variant="body1" style={{ fontSize: '1vw', marginRight: '1vw' }}>
-                        {walletBalance} KAS
-                    </Typography>
-                </WalletBalance>
-                <ConnectButton onClick={walletConnected ? disconnectWallet : connectWallet}>
-                    {walletConnected ? 'Disconnect' : 'Connect'}
+                <ConnectButton onClick={connectWallet}>
+                    {walletAddress ? `${walletAddress.slice(0, 10)}...${walletAddress.slice(-4)}` : 'Connect'}
                 </ConnectButton>
-                <FormControl variant="outlined" size="small" sx={{ marginLeft: '1vw' }}>
-                    <NetworkSelect
-                        value={network}
-                        onChange={(event) => onNetworkChange(event.target.value as string)}
-                        displayEmpty
-                        inputProps={{ 'aria-label': 'Without label' }}
-                    >
-                        <MenuItem value="mainnet">
-                            <img src={networkLogo} alt="Mainnet" style={{ width: '20px', marginRight: '8px' }} />
-                            Mainnet
-                        </MenuItem>
-                        <MenuItem value="testnet">
-                            <img src={networkLogo} alt="Testnet" style={{ width: '20px', marginRight: '8px' }} />
-                            Testnet
-                        </MenuItem>
-                    </NetworkSelect>
-                </FormControl>
-                {darkmode ? (
-                    <Tooltip title={'Light Mode'} placement="bottom">
-                        <IconButton sx={{ padding: '4px' }} onClick={themeContext.toggleThemeMode}>
-                            <LightModeRoundedIcon />
-                        </IconButton>
-                    </Tooltip>
-                ) : (
-                    <Tooltip title={'Dark Mode'} placement="bottom">
-                        <IconButton sx={{ padding: '4px' }} onClick={themeContext.toggleThemeMode}>
-                            <NightlightRoundIcon />
-                        </IconButton>
-                    </Tooltip>
-                )}
             </div>
             {/* {isModalOpen && (
                 <TokenSearchModal
