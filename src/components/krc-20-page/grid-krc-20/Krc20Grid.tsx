@@ -1,20 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
-import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
-import {
-    Avatar,
-    Box,
-    Button,
-    Divider,
-    List,
-    ListItem,
-    ListItemAvatar,
-    ListItemButton,
-    ListItemText,
-    Typography,
-} from '@mui/material';
+import { Box, List, Typography } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import Tooltip from '@mui/material/Tooltip';
 import moment from 'moment';
 import { FC, useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -22,8 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components';
 import { fetchTokenInfo } from '../../../DAL/Krc20DAL';
 import { TokenResponse } from '../../../types/Types';
-import { formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
 import { GridHeader } from '../grid-header/GridHeader';
+import { TokenRow } from '../token-row/TokenRow';
 import { NoDataContainer, StyledDataGridContainer } from './Krc20Grid.s';
 
 const GlobalStyle = createGlobalStyle`
@@ -155,27 +141,6 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         </Box>
     );
 
-    const preMintedIcons = (preMinted: string, totalSupply: string) => {
-        const preMintedNumber = parseFloat(preMinted);
-        const totalSupplyNumber = parseFloat(totalSupply);
-        const preMintPercentage = ((preMintedNumber / totalSupplyNumber) * 100).toFixed(2);
-
-        return (
-            <ListItemText
-                sx={{ marginLeft: '1vw' }}
-                primary={
-                    <Tooltip title={`${preMintPercentage}% Pre Minted`}>
-                        {preMintedNumber === 0 ? (
-                            <CheckCircleOutlineRoundedIcon style={{ color: 'green', opacity: 0.5 }} />
-                        ) : (
-                            <ErrorOutlineRoundedIcon style={{ color: 'red', opacity: 0.5 }} />
-                        )}
-                    </Tooltip>
-                }
-            />
-        );
-    };
-
     return (
         <StyledDataGridContainer>
             <GlobalStyle />
@@ -203,125 +168,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                     }
                 >
                     {tokensRows.map((token) => (
-                        <div key={token.tick}>
-                            <ListItem
-                                onClick={() => handleItemClick(token)}
-                                disablePadding
-                                sx={{ height: '12vh' }}
-                            >
-                                <ListItemButton>
-                                    <ListItemAvatar>
-                                        <Avatar
-                                            style={{
-                                                marginLeft: '0.1vw',
-                                                borderRadius: 5,
-                                            }}
-                                            imgProps={{
-                                                sx: {
-                                                    width: 'auto',
-                                                    height: 'auto',
-                                                    maxWidth: '2vw',
-                                                    maxHeight: '2vw',
-                                                },
-                                            }}
-                                            variant="square"
-                                            alt={token.tick}
-                                            src="/path/to/logo" // Update with actual logo source
-                                        />
-                                    </ListItemAvatar>
-
-                                    <ListItemText
-                                        sx={{
-                                            maxWidth: '10vw',
-                                        }}
-                                        primary={
-                                            <Tooltip title={token.tick}>
-                                                <Typography variant="body1" style={{ fontSize: '1.2vw' }}>
-                                                    {capitalizeFirstLetter(token.tick)}
-                                                </Typography>
-                                            </Tooltip>
-                                        }
-                                        secondary={
-                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                                {formatDate(token.mtsAdd)}
-                                            </Typography>
-                                        }
-                                    />
-
-                                    <ListItemText
-                                        sx={{ maxWidth: '10vw' }}
-                                        primary={
-                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                                {`${moment().diff(Number(token.mtsAdd), 'days')} days`}
-                                            </Typography>
-                                        }
-                                    />
-
-                                    <ListItemText
-                                        sx={{ maxWidth: '11vw' }}
-                                        primary={
-                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                                {((token.minted / token.max) * 100).toFixed(2)}%
-                                            </Typography>
-                                        }
-                                    />
-
-                                    <ListItemText
-                                        sx={{ maxWidth: '11.5vw' }}
-                                        primary={
-                                            <Tooltip title={formatNumberWithCommas(token.max)}>
-                                                <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                                    {simplifyNumber(token.max)}
-                                                </Typography>
-                                            </Tooltip>
-                                        }
-                                    />
-
-                                    <ListItemText
-                                        sx={{ maxWidth: '9.5vw' }}
-                                        primary={
-                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                                {token.holder ? token.holder.length : 0}
-                                            </Typography>
-                                        }
-                                    />
-
-                                    <ListItemText
-                                        sx={{ maxWidth: '9.5vw' }}
-                                        primary={
-                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                                {token.transferTotal ? token.transferTotal : 0}
-                                            </Typography>
-                                        }
-                                    />
-
-                                    <ListItemText
-                                        sx={{ maxWidth: '12vw' }}
-                                        primary={
-                                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                                {preMintedIcons(token.pre, token.max)}
-                                            </Typography>
-                                        }
-                                    />
-                                    {token.minted < token.max && (
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            style={{
-                                                marginRight: '1vw',
-                                                minWidth: '2vw',
-                                                width: '3vw',
-                                                fontSize: '0.8vw',
-                                            }}
-                                            disabled={token.minted >= token.max}
-                                        >
-                                            Mint
-                                        </Button>
-                                    )}
-                                </ListItemButton>
-                            </ListItem>
-                            <Divider />
-                        </div>
+                        <TokenRow key={token.tick} handleItemClick={handleItemClick} token={token} />
                     ))}
                 </InfiniteScroll>
             </List>
