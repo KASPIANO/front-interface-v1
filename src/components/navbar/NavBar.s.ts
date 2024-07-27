@@ -85,8 +85,8 @@ export const ConnectButton = styled(Button)({
     color: '#fff',
     border: 'none',
     cursor: 'pointer',
-    fontSize: '1vw',
-    padding: '1vh 2vw',
+    fontSize: '0.8vw',
+    padding: '0.8vh 0.8vw',
     borderRadius: '8px',
     '&:hover': {
         backgroundColor: '#49EACB',

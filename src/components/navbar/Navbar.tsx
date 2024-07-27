@@ -6,7 +6,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../../main';
-import { ThemeModes } from '../../utils/Utils';
+import { formatNumberWithCommas, ThemeModes } from '../../utils/Utils';
 import {
     ConnectButton,
     Logo,
@@ -100,7 +100,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                 />
                 <WalletBalance>
                     <Typography variant="body1" style={{ fontSize: '1vw', marginRight: '1vw' }}>
-                        {walletBalance} KAS
+                        {formatNumberWithCommas(walletBalance)} KAS
                     </Typography>
                 </WalletBalance>
                 <ConnectButton onClick={walletConnected ? disconnectWallet : connectWallet}>

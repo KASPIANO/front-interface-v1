@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Box, List, Typography } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import moment from 'moment';
 import { FC, useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from 'react-router-dom';
@@ -45,12 +44,6 @@ interface TokenDataGridProps {
     nextPage: number;
 }
 
-const formatDate = (timestamp: string): string => moment(Number(timestamp)).format('DD/MM/YYYY');
-const capitalizeFirstLetter = (string: string): string => {
-    if (!string) return string;
-    return string.charAt(0).toUpperCase() + string.slice(1);
-};
-
 enum GridHeaders {
     TICKER = 'TICKER',
     AGE = 'AGE',
@@ -74,7 +67,7 @@ const headersMapper: Record<GridHeaders, { name: string; headerFunction: () => v
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     const { tokensList, setNextPage, totalTokensDeployed, nextPage } = props;
     const [tokensRows, setTokensRows] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [, setLoading] = useState(true);
     const navigate = useNavigate();
 
     const handleItemClick = (token) => {
