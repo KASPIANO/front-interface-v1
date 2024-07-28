@@ -14,7 +14,6 @@ export const NavButtons = styled('div')(() => ({
     display: 'flex',
     flexDirection: 'row',
     position: 'absolute',
-    width: '100%',
     columnGap: '2vh',
     justifyContent: 'center',
 }));
@@ -25,6 +24,7 @@ export const NavButton = styled(Button)<NavButtonProps>(({ isActive }) => ({
     cursor: 'pointer',
     fontSize: '1.4vw',
     position: 'relative',
+    maxWidth: '7vw',
 
     '&:hover': {
         color: '#39ddbe',
@@ -64,6 +64,7 @@ export const NavCenter = styled('div')({
     alignItems: 'center',
     flex: 1,
     position: 'relative',
+    width: '20vw',
 });
 
 export const SearchContainer = styled(TextField)({
@@ -97,9 +98,10 @@ export const NetworkSelect = styled(Select)({
     backgroundColor: '#2b2b3b',
     fontSize: '0.8vw',
     color: '#fff',
-    width: '5vw',
+    width: '4vw',
     '& .MuiSelect-icon': {
         color: '#fff',
+        display: 'none',
     },
     '& .MuiOutlinedInput-notchedOutline': {
         borderColor: '#888',
@@ -111,7 +113,7 @@ export const NetworkSelect = styled(Select)({
 
 export const NetworkSelectItem = styled(MenuItem)({
     backgroundColor: '#2b2b3b',
-    width: '2vw',
+    width: '4vw',
     fontSize: '0.8vw',
     color: '#fff',
     '&:hover': {

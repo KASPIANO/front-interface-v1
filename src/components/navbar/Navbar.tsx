@@ -65,20 +65,15 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                 </Link>
             </Logo>
             <NavCenter>
-                <NavButtons>
-                    <NavButton isActive={activePage === '/'} onClick={() => handleNavButtonClick('/')}>
-                        KRC-20
-                    </NavButton>
-                    <NavButton isActive={activePage === 'deploy'} onClick={() => handleNavButtonClick('deploy')}>
-                        Deploys
-                    </NavButton>
-                    <NavButton
-                        isActive={activePage === 'portfolio'}
-                        onClick={() => handleNavButtonClick('portfolio')}
-                    >
-                        Portfolio
-                    </NavButton>
-                </NavButtons>
+                <NavButton isActive={activePage === '/'} onClick={() => handleNavButtonClick('/')}>
+                    KRC-20
+                </NavButton>
+                <NavButton isActive={activePage === 'deploy'} onClick={() => handleNavButtonClick('deploy')}>
+                    Deploys
+                </NavButton>
+                <NavButton isActive={activePage === 'portfolio'} onClick={() => handleNavButtonClick('portfolio')}>
+                    Portfolio
+                </NavButton>
             </NavCenter>
             <div style={{ display: 'flex', alignItems: 'center' }}>
                 <SearchContainer

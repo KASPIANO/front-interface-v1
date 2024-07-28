@@ -124,7 +124,6 @@ const App = () => {
                                 <GridPage
                                     walletAddress={walletAddress}
                                     walletBalance={walletBalance}
-                                    walletConnected={walletConnected}
                                     showNotification={showNotification}
                                     setShowNotification={setShowNotification}
                                 />

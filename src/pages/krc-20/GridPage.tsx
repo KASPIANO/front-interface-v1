@@ -9,9 +9,7 @@ import GridTitle from '../../components/krc-20-page/grid-title-sort/GridTitle';
 
 interface GridPageProps {
     walletAddress: string | null;
-    connectWallet?: () => void;
     walletBalance: number;
-    walletConnected: boolean;
     showNotification: boolean;
     setShowNotification: (value: boolean) => void;
 }
