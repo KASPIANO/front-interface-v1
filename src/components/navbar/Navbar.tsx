@@ -12,7 +12,6 @@ import {
     Logo,
     NavbarContainer,
     NavButton,
-    NavButtons,
     NavCenter,
     NetworkSelect,
     NetworkSelectItem,
@@ -31,7 +30,7 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = (props) => {
-    const { walletBalance, walletConnected, network, onNetworkChange, disconnectWallet, connectWallet } = props;
+    const { walletBalance, walletConnected, disconnectWallet, connectWallet } = props;
     const [activePage, setActivePage] = useState('/');
     // const themeContext = useContext(ThemeContext);
     const [, setSearchValue] = useState('');
@@ -75,7 +74,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                     Portfolio
                 </NavButton>
             </NavCenter>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}>
                 <SearchContainer
                     type="search"
                     placeholder={'Search KRC-20 Tokens'}
@@ -109,8 +108,13 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                 <ConnectButton onClick={() => handleConnectButton()}>
                     {walletConnected ? 'Disconnect' : 'Connect'}
                 </ConnectButton>
-                <FormControl variant="outlined" size="small" sx={{ marginLeft: '1vw' }}>
+                {/* <FormControl variant="outlined" size="small" sx={{ marginLeft: '1vw' }}>
                     <NetworkSelect
+                        SelectDisplayProps={{
+                            style: {
+                                padding: '0.5vh 0.5vw',
+                            },
+                        }}
                         value={network}
                         onChange={(event) => onNetworkChange(event.target.value as string)}
                         displayEmpty
@@ -119,7 +123,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                         <NetworkSelectItem value="mainnet">Mainnet</NetworkSelectItem>
                         <NetworkSelectItem value="testnet">Testnet</NetworkSelectItem>
                     </NetworkSelect>
-                </FormControl>
+                </FormControl> */}
                 {/* {darkmode ? (
                     <Tooltip title={'Light Mode'} placement="bottom">
                         <IconButton sx={{ padding: '2px' }} onClick={themeContext.toggleThemeMode}>

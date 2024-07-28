@@ -10,14 +10,6 @@ export const NavbarContainer = styled('div')({
     padding: '8px 8px',
 });
 
-export const NavButtons = styled('div')(() => ({
-    display: 'flex',
-    flexDirection: 'row',
-    position: 'absolute',
-    columnGap: '2vh',
-    justifyContent: 'center',
-}));
-
 export const NavButton = styled(Button)<NavButtonProps>(({ isActive }) => ({
     color: 'white',
     fontWeight: 500,
@@ -41,18 +33,6 @@ export const NavButton = styled(Button)<NavButtonProps>(({ isActive }) => ({
     }),
 }));
 
-// export const ConnectButton = styled(Button)({
-//     backgroundColor: '#2b2b3b',
-//     color: 'white',
-//     cursor: 'pointer',
-//     borderRadius: '15px',
-//     fontSize: '1.1vw',
-//     height: '3.5vh',
-//     '&:hover': {
-//         color: 'black',
-//     },
-// });
-
 export const Logo = styled('div')({
     display: 'flex',
     alignItems: 'center',
@@ -64,7 +44,7 @@ export const NavCenter = styled('div')({
     alignItems: 'center',
     flex: 1,
     position: 'relative',
-    width: '20vw',
+    width: 'auto',
 });
 
 export const SearchContainer = styled(TextField)({
@@ -87,8 +67,9 @@ export const ConnectButton = styled(Button)({
     border: 'none',
     cursor: 'pointer',
     fontSize: '0.8vw',
-    padding: '1vh 0.8vw',
-    borderRadius: '8px',
+    padding: '0.5vh 0.5vw',
+    marginRight: '3vw',
+    borderRadius: '14px',
     '&:hover': {
         backgroundColor: '#49EACB',
     },
@@ -96,13 +77,16 @@ export const ConnectButton = styled(Button)({
 
 export const NetworkSelect = styled(Select)({
     backgroundColor: '#2b2b3b',
-    fontSize: '0.8vw',
+    fontSize: '0.6vw',
     color: '#fff',
-    width: '4vw',
+    marginRight: '3vw',
+    alignItems: 'center',
+
     '& .MuiSelect-icon': {
         color: '#fff',
         display: 'none',
     },
+
     '& .MuiOutlinedInput-notchedOutline': {
         borderColor: '#888',
     },
@@ -113,8 +97,8 @@ export const NetworkSelect = styled(Select)({
 
 export const NetworkSelectItem = styled(MenuItem)({
     backgroundColor: '#2b2b3b',
-    width: '4vw',
-    fontSize: '0.8vw',
+    fontSize: '0.6vw',
+    padding: '0.5vh 0.5vw',
     color: '#fff',
     '&:hover': {
         backgroundColor: '#70C7BA',

@@ -15,14 +15,31 @@ import moment from 'moment';
 import { FC } from 'react';
 import { formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
 import { capitalizeFirstLetter, formatDate } from '../grid-krc-20/Krc20Grid.config';
+import { mintKRC20Token } from '../../../utils/KaswareUtils';
 
 interface TokenRowProps {
     token: any;
     handleItemClick: (token: any) => void;
     key: string;
+    walletBalance: number;
 }
 
-export const TokenRow: FC<TokenRowProps> = ({ handleItemClick, token, key }) => {
+export const TokenRow: FC<TokenRowProps> = (props) => {
+    const { token, handleItemClick, key, walletBalance } = props;
+    const handleMint = async (event, ticker: string) => {
+        event.stopPropagation();
+        if (walletBalance < 1) {
+            console.log('Insufficient funds');
+            return;
+        }
+        const inscribeJsonString = JSON.stringify({
+            p: 'KRC-20',
+            op: 'mint',
+            tick: ticker,
+        });
+        const mint = await mintKRC20Token(inscribeJsonString);
+    };
+
     const preMintedIcons = (preMinted: string, totalSupply: string) => {
         const preMintedNumber = parseFloat(preMinted);
         const totalSupplyNumber = parseFloat(totalSupply);
@@ -135,6 +152,7 @@ export const TokenRow: FC<TokenRowProps> = ({ handleItemClick, token, key }) => 
                     />
                     {token.minted < token.max && (
                         <Button
+                            onClick={(event) => handleMint(event, token.tick)}
                             variant="contained"
                             color="primary"
                             style={{
