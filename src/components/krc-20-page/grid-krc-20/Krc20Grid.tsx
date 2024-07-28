@@ -10,6 +10,7 @@ import { TokenResponse } from '../../../types/Types';
 import { GridHeader } from '../grid-header/GridHeader';
 import { TokenRow } from '../token-row/TokenRow';
 import { NoDataContainer, StyledDataGridContainer } from './Krc20Grid.s';
+import { v4 as uuidv4 } from 'uuid';
 
 const GlobalStyle = createGlobalStyle`
   #scrollableList {
@@ -161,7 +162,11 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                     }
                 >
                     {tokensRows.map((token) => (
-                        <TokenRow key={token.tick} handleItemClick={handleItemClick} token={token} />
+                        <TokenRow
+                            key={`${token.tick}-${uuidv4()}`}
+                            handleItemClick={handleItemClick}
+                            token={token}
+                        />
                     ))}
                 </InfiniteScroll>
             </List>

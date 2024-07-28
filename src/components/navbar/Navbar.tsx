@@ -1,7 +1,7 @@
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import { FormControl, IconButton, MenuItem, Tooltip, Typography } from '@mui/material';
+import { FormControl, IconButton, Tooltip, Typography } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -15,6 +15,7 @@ import {
     NavButtons,
     NavCenter,
     NetworkSelect,
+    NetworkSelectItem,
     SearchContainer,
     WalletBalance,
 } from './NavBar.s';
@@ -36,9 +37,6 @@ const Navbar: React.FC<NavbarProps> = (props) => {
     const [, setSearchValue] = useState('');
     const navigate = useNavigate();
     const darkmode = themeContext.themeMode === ThemeModes.DARK;
-    const networkLogo = !darkmode
-        ? 'https://kaspa.org/wp-content/uploads/2023/08/Kaspa-LDSP-Dark-Full-Color.svg'
-        : 'https://kaspa.org/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Reverse.svg';
 
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchValue(event.target.value);
@@ -62,7 +60,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                         KRC-20
                     </NavButton>
                     <NavButton isActive={activePage === 'deploy'} onClick={() => handleNavButtonClick('deploy')}>
-                        Deploy
+                        Deploys
                     </NavButton>
                     <NavButton
                         isActive={activePage === 'portfolio'}
@@ -113,25 +111,19 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                         displayEmpty
                         inputProps={{ 'aria-label': 'Without label' }}
                     >
-                        <MenuItem value="mainnet">
-                            <img src={networkLogo} alt="Mainnet" style={{ width: '20px', marginRight: '8px' }} />
-                            Mainnet
-                        </MenuItem>
-                        <MenuItem value="testnet">
-                            <img src={networkLogo} alt="Testnet" style={{ width: '20px', marginRight: '8px' }} />
-                            Testnet
-                        </MenuItem>
+                        <NetworkSelectItem value="mainnet">Mainnet</NetworkSelectItem>
+                        <NetworkSelectItem value="testnet">Testnet</NetworkSelectItem>
                     </NetworkSelect>
                 </FormControl>
                 {darkmode ? (
                     <Tooltip title={'Light Mode'} placement="bottom">
-                        <IconButton sx={{ padding: '4px' }} onClick={themeContext.toggleThemeMode}>
+                        <IconButton sx={{ padding: '2px' }} onClick={themeContext.toggleThemeMode}>
                             <LightModeRoundedIcon />
                         </IconButton>
                     </Tooltip>
                 ) : (
                     <Tooltip title={'Dark Mode'} placement="bottom">
-                        <IconButton sx={{ padding: '4px' }} onClick={themeContext.toggleThemeMode}>
+                        <IconButton sx={{ padding: '2px' }} onClick={themeContext.toggleThemeMode}>
                             <NightlightRoundIcon />
                         </IconButton>
                     </Tooltip>

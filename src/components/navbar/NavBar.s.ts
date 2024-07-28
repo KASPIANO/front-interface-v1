@@ -1,4 +1,4 @@
-import { Button, Select, styled, TextField } from '@mui/material';
+import { Button, MenuItem, Select, styled, TextField } from '@mui/material';
 import { NavButtonProps } from '../../types/Types';
 
 export const NavbarContainer = styled('div')({
@@ -86,7 +86,7 @@ export const ConnectButton = styled(Button)({
     border: 'none',
     cursor: 'pointer',
     fontSize: '0.8vw',
-    padding: '0.8vh 0.8vw',
+    padding: '1vh 0.8vw',
     borderRadius: '8px',
     '&:hover': {
         backgroundColor: '#49EACB',
@@ -95,7 +95,9 @@ export const ConnectButton = styled(Button)({
 
 export const NetworkSelect = styled(Select)({
     backgroundColor: '#2b2b3b',
+    fontSize: '0.8vw',
     color: '#fff',
+    width: '5vw',
     '& .MuiSelect-icon': {
         color: '#fff',
     },
@@ -104,5 +106,15 @@ export const NetworkSelect = styled(Select)({
     },
     '&:hover .MuiOutlinedInput-notchedOutline': {
         borderColor: '#70C7BA',
+    },
+});
+
+export const NetworkSelectItem = styled(MenuItem)({
+    backgroundColor: '#2b2b3b',
+    width: '2vw',
+    fontSize: '0.8vw',
+    color: '#fff',
+    '&:hover': {
+        backgroundColor: '#70C7BA',
     },
 });
