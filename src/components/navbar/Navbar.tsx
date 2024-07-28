@@ -1,12 +1,12 @@
-import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
-import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
+// import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
+// import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import { FormControl, IconButton, Tooltip, Typography } from '@mui/material';
+import { FormControl, Typography } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ThemeContext } from '../../main';
-import { formatNumberWithCommas, ThemeModes } from '../../utils/Utils';
+// import { ThemeContext } from '../../main';
+// import { formatNumberWithCommas, ThemeModes } from '../../utils/Utils';
 import {
     ConnectButton,
     Logo,
@@ -33,10 +33,10 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = (props) => {
     const { walletBalance, walletConnected, network, onNetworkChange, disconnectWallet, connectWallet } = props;
     const [activePage, setActivePage] = useState('/');
-    const themeContext = useContext(ThemeContext);
+    // const themeContext = useContext(ThemeContext);
     const [, setSearchValue] = useState('');
     const navigate = useNavigate();
-    const darkmode = themeContext.themeMode === ThemeModes.DARK;
+    // const darkmode = themeContext.themeMode === ThemeModes.DARK;
 
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchValue(event.target.value);
@@ -45,6 +45,16 @@ const Navbar: React.FC<NavbarProps> = (props) => {
     const handleNavButtonClick = (page: string) => {
         setActivePage(page);
         navigate(page);
+    };
+
+    const formatNumberWithCommas = (value: number) => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+    const handleConnectButton = () => {
+        if (walletConnected) {
+            disconnectWallet();
+        } else {
+            connectWallet();
+        }
     };
 
     return (
@@ -101,7 +111,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                         {formatNumberWithCommas(walletBalance)} KAS
                     </Typography>
                 </WalletBalance>
-                <ConnectButton onClick={walletConnected ? disconnectWallet : connectWallet}>
+                <ConnectButton onClick={() => handleConnectButton()}>
                     {walletConnected ? 'Disconnect' : 'Connect'}
                 </ConnectButton>
                 <FormControl variant="outlined" size="small" sx={{ marginLeft: '1vw' }}>
@@ -115,7 +125,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                         <NetworkSelectItem value="testnet">Testnet</NetworkSelectItem>
                     </NetworkSelect>
                 </FormControl>
-                {darkmode ? (
+                {/* {darkmode ? (
                     <Tooltip title={'Light Mode'} placement="bottom">
                         <IconButton sx={{ padding: '2px' }} onClick={themeContext.toggleThemeMode}>
                             <LightModeRoundedIcon />
@@ -127,7 +137,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                             <NightlightRoundIcon />
                         </IconButton>
                     </Tooltip>
-                )}
+                )} */}
             </div>
             {/* {isModalOpen && (
                 <TokenSearchModal

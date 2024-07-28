@@ -19,9 +19,10 @@ import { capitalizeFirstLetter, formatDate } from '../grid-krc-20/Krc20Grid.conf
 interface TokenRowProps {
     token: any;
     handleItemClick: (token: any) => void;
+    key: string;
 }
 
-export const TokenRow: FC<TokenRowProps> = ({ handleItemClick, token }) => {
+export const TokenRow: FC<TokenRowProps> = ({ handleItemClick, token, key }) => {
     const preMintedIcons = (preMinted: string, totalSupply: string) => {
         const preMintedNumber = parseFloat(preMinted);
         const totalSupplyNumber = parseFloat(totalSupply);
@@ -44,7 +45,7 @@ export const TokenRow: FC<TokenRowProps> = ({ handleItemClick, token }) => {
     };
 
     return (
-        <>
+        <div key={key}>
             <ListItem onClick={() => handleItemClick(token)} disablePadding sx={{ height: '12vh' }}>
                 <ListItemButton>
                     <ListItemAvatar>
@@ -150,6 +151,6 @@ export const TokenRow: FC<TokenRowProps> = ({ handleItemClick, token }) => {
                 </ListItemButton>
             </ListItem>
             <Divider />
-        </>
+        </div>
     );
 };
