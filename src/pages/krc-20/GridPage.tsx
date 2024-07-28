@@ -15,7 +15,7 @@ interface GridPageProps {
 }
 
 const GridPage: FC<GridPageProps> = (props) => {
-    const { walletAddress, showNotification, setShowNotification } = props;
+    const { walletAddress, showNotification, setShowNotification, walletBalance } = props;
 
     const [tokensList, setTokensList] = useState<TokenResponse[]>([]);
     const [nextPage, setNextPage] = useState<number>(1);
@@ -43,6 +43,7 @@ const GridPage: FC<GridPageProps> = (props) => {
         <GridLayout>
             <GridTitle />
             <TokenDataGrid
+                walletBalance={walletBalance}
                 nextPage={nextPage}
                 totalTokensDeployed={totalTokensDeployed}
                 tokensList={tokensList}
