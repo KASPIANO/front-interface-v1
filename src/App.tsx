@@ -18,6 +18,7 @@ import {
     switchNetwork,
 } from './utils/KaswareUtils';
 import { getLocalThemeMode, setWalletBalanceUtil, ThemeModes } from './utils/Utils';
+import DeployPage from './pages/deploy-page/DeployPage';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -142,6 +143,7 @@ const App = () => {
                                 />
                             }
                         />
+                        <Route path="/deploy" element={<DeployPage />} />
                         {/* Handle 404 - Not Found */}
                         <Route path="*" element={<div>404 - Not Found</div>} />
                     </Routes>

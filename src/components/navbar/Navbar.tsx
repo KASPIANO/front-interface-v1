@@ -1,9 +1,9 @@
 // import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 // import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import { FormControl, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 // import { ThemeContext } from '../../main';
 // import { formatNumberWithCommas, ThemeModes } from '../../utils/Utils';
@@ -13,8 +13,6 @@ import {
     NavbarContainer,
     NavButton,
     NavCenter,
-    NetworkSelect,
-    NetworkSelectItem,
     SearchContainer,
     WalletBalance,
 } from './NavBar.s';
@@ -36,6 +34,9 @@ const Navbar: React.FC<NavbarProps> = (props) => {
     const [, setSearchValue] = useState('');
     const navigate = useNavigate();
     // const darkmode = themeContext.themeMode === ThemeModes.DARK;
+    useEffect(() => {
+        setActivePage(window.location.pathname);
+    }, []);
 
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchValue(event.target.value);
@@ -67,10 +68,13 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                 <NavButton isActive={activePage === '/'} onClick={() => handleNavButtonClick('/')}>
                     KRC-20
                 </NavButton>
-                <NavButton isActive={activePage === 'deploy'} onClick={() => handleNavButtonClick('deploy')}>
-                    Deploys
+                <NavButton isActive={activePage === '/deploy'} onClick={() => handleNavButtonClick('deploy')}>
+                    Deploy
                 </NavButton>
-                <NavButton isActive={activePage === 'portfolio'} onClick={() => handleNavButtonClick('portfolio')}>
+                <NavButton
+                    isActive={activePage === '/portfolio'}
+                    onClick={() => handleNavButtonClick('portfolio')}
+                >
                     Portfolio
                 </NavButton>
             </NavCenter>
