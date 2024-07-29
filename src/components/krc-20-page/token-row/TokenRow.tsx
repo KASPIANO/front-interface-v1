@@ -20,12 +20,12 @@ import { mintKRC20Token } from '../../../utils/KaswareUtils';
 interface TokenRowProps {
     token: any;
     handleItemClick: (token: any) => void;
-    key: string;
+    tokenKey: string;
     walletBalance: number;
 }
 
 export const TokenRow: FC<TokenRowProps> = (props) => {
-    const { token, handleItemClick, key, walletBalance } = props;
+    const { token, handleItemClick, tokenKey, walletBalance } = props;
     const handleMint = async (event, ticker: string) => {
         event.stopPropagation();
         if (walletBalance < 1) {
@@ -62,7 +62,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
     };
 
     return (
-        <div key={key}>
+        <div key={tokenKey}>
             <ListItem onClick={() => handleItemClick(token)} disablePadding sx={{ height: '12vh' }}>
                 <ListItemButton>
                     <ListItemAvatar>

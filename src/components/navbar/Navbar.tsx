@@ -1,12 +1,10 @@
-// import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
-// import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
+import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
+import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import { Typography } from '@mui/material';
+import { IconButton, Tooltip, Typography } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// import { ThemeContext } from '../../main';
-// import { formatNumberWithCommas, ThemeModes } from '../../utils/Utils';
 import {
     ConnectButton,
     Logo,
@@ -16,6 +14,7 @@ import {
     SearchContainer,
     WalletBalance,
 } from './NavBar.s';
+// import { ThemeContext } from '../../main';
 
 interface NavbarProps {
     walletAddress: string | null;
@@ -86,21 +85,20 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                     onChange={(event) => handleSearch(event as React.ChangeEvent<HTMLInputElement>)}
                     sx={{
                         '& input': {
-                            fontSize: '1.1vw',
+                            fontSize: '1vw',
                         },
                         '& input::placeholder': {
-                            fontSize: '1.1vw',
+                            fontSize: '1vw',
                         },
                     }}
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <SearchRoundedIcon sx={{ fontSize: '3vh', color: 'white' }} />
+                                <SearchRoundedIcon sx={{ fontSize: '1vw', color: 'white' }} />
                             </InputAdornment>
                         ),
                         style: {
                             height: '3.5vh',
-                            width: '20vw',
                         },
                     }}
                 />
@@ -128,27 +126,20 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                         <NetworkSelectItem value="testnet">Testnet</NetworkSelectItem>
                     </NetworkSelect>
                 </FormControl> */}
-                {/* {darkmode ? (
+                {true ? (
                     <Tooltip title={'Light Mode'} placement="bottom">
-                        <IconButton sx={{ padding: '2px' }} onClick={themeContext.toggleThemeMode}>
+                        <IconButton>
                             <LightModeRoundedIcon />
                         </IconButton>
                     </Tooltip>
                 ) : (
                     <Tooltip title={'Dark Mode'} placement="bottom">
-                        <IconButton sx={{ padding: '2px' }} onClick={themeContext.toggleThemeMode}>
+                        <IconButton>
                             <NightlightRoundIcon />
                         </IconButton>
                     </Tooltip>
-                )} */}
+                )}
             </div>
-            {/* {isModalOpen && (
-                <TokenSearchModal
-                    tokens={tokens}
-                    onClose={() => setIsModalOpen(false)}
-                    onSelect={handleTokenSelect}
-                />
-            )} */}
         </NavbarContainer>
     );
 };

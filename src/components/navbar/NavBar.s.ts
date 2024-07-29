@@ -14,7 +14,7 @@ export const NavButton = styled(Button)<NavButtonProps>(({ isActive }) => ({
     color: 'white',
     fontWeight: 500,
     cursor: 'pointer',
-    fontSize: '1.4vw',
+    fontSize: '1vw',
     position: 'relative',
     maxWidth: '7vw',
 
@@ -49,8 +49,8 @@ export const NavCenter = styled('div')({
 
 export const SearchContainer = styled(TextField)({
     backgroundColor: '#2b2b3b',
-    borderRadius: '15px',
-    marginRight: '3vw',
+    marginRight: '2vw',
+    borderRadius: '6px',
     '& .MuiInputBase-root': {
         color: 'white',
     },
@@ -66,9 +66,9 @@ export const ConnectButton = styled(Button)({
     color: '#fff',
     border: 'none',
     cursor: 'pointer',
-    fontSize: '0.8vw',
+    fontSize: '0.7vw',
     padding: '0.5vh 0.5vw',
-    marginRight: '3vw',
+    marginRight: '0.7vw',
     borderRadius: '14px',
     '&:hover': {
         backgroundColor: '#49EACB',

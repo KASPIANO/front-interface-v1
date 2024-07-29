@@ -162,14 +162,18 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                         </p>
                     }
                 >
-                    {tokensRows.map((token) => (
-                        <TokenRow
-                            walletBalance={walletBalance}
-                            key={`${token.tick}-${uuidv4()}`}
-                            handleItemClick={handleItemClick}
-                            token={token}
-                        />
-                    ))}
+                    {tokensRows.map((token) => {
+                        const tokenKey = `${token.tick}-${uuidv4()}`;
+                        return (
+                            <TokenRow
+                                key={tokenKey}
+                                walletBalance={walletBalance}
+                                tokenKey={tokenKey}
+                                handleItemClick={handleItemClick}
+                                token={token}
+                            />
+                        );
+                    })}
                 </InfiniteScroll>
             </List>
         </StyledDataGridContainer>
