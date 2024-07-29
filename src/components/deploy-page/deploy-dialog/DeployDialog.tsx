@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box } from '@mui/material';
 import { TokenDeploy } from '../../../types/Types';
 
 interface DeployDialogProps {
@@ -15,15 +15,17 @@ const DeployDialog: React.FC<DeployDialogProps> = ({ open, onClose, onDeploy, to
         <DialogContent>
             {Object.entries(tokenData).map(([key, value]) => (
                 <Typography key={key} variant="body1">
-                    <strong>{key.replace(/([A-Z])/g, ' $1')}: </strong>
-                    {value}
+                    <span>{key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}: </span>
+                    <strong>{value}</strong>
                 </Typography>
             ))}
         </DialogContent>
         <DialogActions>
-            <Button onClick={onClose} color="secondary">
-                Cancel
-            </Button>
+            <Box sx={{ flexGrow: 1 }}>
+                <Button onClick={onClose} color="secondary">
+                    Cancel
+                </Button>
+            </Box>
             <Button onClick={onDeploy} color="primary">
                 Deploy
             </Button>

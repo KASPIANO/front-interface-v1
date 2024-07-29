@@ -67,13 +67,17 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                 <ListItemButton>
                     <ListItemAvatar>
                         <Avatar
+                            sx={{
+                                width: '6vh',
+                                height: '6vh',
+                            }}
                             style={{
                                 marginLeft: '0.1vw',
                                 borderRadius: 5,
                             }}
                             variant="square"
                             alt={token.tick}
-                            src="/path/to/logo" // Update with actual logo source
+                            src="/kaspa.svg"
                         />
                     </ListItemAvatar>
 

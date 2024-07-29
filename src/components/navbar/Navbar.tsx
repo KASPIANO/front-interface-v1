@@ -1,7 +1,7 @@
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import { IconButton, Tooltip, Typography } from '@mui/material';
+import { Avatar, IconButton, Tooltip, Typography } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -14,7 +14,6 @@ import {
     SearchContainer,
     WalletBalance,
 } from './NavBar.s';
-// import { ThemeContext } from '../../main';
 
 interface NavbarProps {
     walletAddress: string | null;
@@ -32,6 +31,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
     // const themeContext = useContext(ThemeContext);
     const [, setSearchValue] = useState('');
     const navigate = useNavigate();
+
     // const darkmode = themeContext.themeMode === ThemeModes.DARK;
     useEffect(() => {
         setActivePage(window.location.pathname);
@@ -46,7 +46,10 @@ const Navbar: React.FC<NavbarProps> = (props) => {
         navigate(page);
     };
 
-    const formatNumberWithCommas = (value: number) => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const formatNumberWithCommas = (value: number) => {
+        const [integerPart] = value.toString().split('.');
+        return integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
 
     const handleConnectButton = () => {
         if (walletConnected) {
@@ -58,10 +61,16 @@ const Navbar: React.FC<NavbarProps> = (props) => {
 
     return (
         <NavbarContainer>
-            <Logo>
-                <Link to="/">
-                    <img src="/logo.svg" alt="Logo" width={150} height={60} />
-                </Link>
+            <Logo onClick={() => handleNavButtonClick('/')}>
+                <Avatar
+                    src="/kaspa.svg"
+                    sx={{
+                        width: '4vw',
+                        height: '4vw',
+                        padding: 0,
+                    }}
+                />
+                GreenEye
             </Logo>
             <NavCenter>
                 <NavButton isActive={activePage === '/'} onClick={() => handleNavButtonClick('/')}>

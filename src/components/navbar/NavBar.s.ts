@@ -1,12 +1,13 @@
 import { Button, MenuItem, Select, styled, TextField } from '@mui/material';
 import { NavButtonProps } from '../../types/Types';
+import { BackgroundContainer } from '../background-effect/BackgroundEffect.s';
 
 export const NavbarContainer = styled('div')({
     display: 'flex',
     justifyContent: 'space-between',
     borderBottom: '0.5px solid #2b2b3b',
     width: '100%',
-    height: '8.5vh',
+    height: '7vh',
     padding: '8px 8px',
 });
 
@@ -33,9 +34,15 @@ export const NavButton = styled(Button)<NavButtonProps>(({ isActive }) => ({
     }),
 }));
 
-export const Logo = styled('div')({
-    display: 'flex',
-    alignItems: 'center',
+export const Logo = styled(Button)({
+    color: 'white',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    fontSize: '1.5vw',
+    position: 'relative',
+    '&:hover': {
+        backgroundColor: 'transparent',
+    },
 });
 
 export const NavCenter = styled('div')({
