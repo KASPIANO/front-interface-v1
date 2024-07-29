@@ -13,7 +13,7 @@ const TokenHeader: FC<TokenHeaderProps> = (props) => {
     return (
         <HeaderContainer>
             {/* {/* <Avatar alt={tokenInfo.tick} src="/path/to/logo" /> */}
-            {/* <Title>{tokenInfo.tick}</Title> */}
+            <Title>{tokenInfo.tick}</Title>
         </HeaderContainer>
     );
 };

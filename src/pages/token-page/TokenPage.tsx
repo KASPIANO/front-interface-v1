@@ -7,6 +7,9 @@ import TokenHeader from '../../components/token-page/token-header/TokenHeader';
 import { fetchTokenInfo } from '../../DAL/Krc20DAL';
 import { Token } from '../../types/Types';
 import { TokenPageLayout } from './TokenPageLayout';
+import TokenSideBar from '../../components/token-page/token-sidebar/TokenSideBar';
+import TokenHolders from '../../components/token-page/token-holders/TokenHolders';
+import TokenRugScore from '../../components/token-page/token-rug-score/TokenRugScore';
 
 interface TokenPageProps {
     walletAddress: string | null;
@@ -26,6 +29,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
 
     useEffect(() => {
         const fetchData = async () => {
+            // await new Promise(resolve => setTimeout(resolve, 15000));
             try {
                 const data = await fetchTokenInfo(ticker);
                 setTokenInfo(data[0]);
@@ -37,13 +41,16 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         fetchData();
     }, [ticker]);
 
-    const getComponentToShow = (component: JSX.Element, size: string, width?: string) =>
-        tokenInfo ? component : <Skeleton height={size} width={width} />;
+    const getComponentToShow = (component: JSX.Element, height?: string, width?: string) =>
+        tokenInfo ? component : <Skeleton height={height} width={width} />;
 
     return (
         <TokenPageLayout>
-            {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '10vh')}
-            {getComponentToShow(<TokenGraph />, '30vh')}
+            {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '100px')}
+            {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} />)}
+            {getComponentToShow(<TokenGraph />, '400px')}
+            {getComponentToShow(<TokenRugScore tokenInfo={tokenInfo} />)}
+            {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)}
 
             {showNotification && walletAddress && (
                 <NotificationComponent
