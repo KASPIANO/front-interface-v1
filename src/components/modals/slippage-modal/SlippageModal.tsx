@@ -1,18 +1,18 @@
-import React, { useState, ChangeEvent } from 'react';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import React, { ChangeEvent, useState } from 'react';
 import {
-    ModalOverlay,
+    CloseButton,
+    CustomInputContainer,
+    ModalBody,
     ModalContent,
     ModalHeader,
+    ModalOverlay,
     ModalTitle,
-    CloseButton,
-    ModalBody,
     ModeButton,
-    SlippageButton,
-    CustomInputContainer,
     PercentInput,
     PercentSign,
     SaveButton,
+    SlippageButton,
 } from './SlippageModal.s';
 
 interface SlippageModalProps {
