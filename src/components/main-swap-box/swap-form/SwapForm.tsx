@@ -1,9 +1,9 @@
-import React from 'react';
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
-import { BalanceText, BalanceButtons } from '../../../pages/swap-page/SwapPage.s';
-import { SwapContainer, Label, BalanceInfo, SwitchButton, SwapButton } from './SwapForm.s';
+import React from 'react';
+import { BalanceButtons, BalanceText } from '../../../pages/swap-page/SwapPage.s';
+import { TokenResponse } from '../../../types/Types';
 import CurrencyBox from '../currency-box/CurrencyBox';
-import { Token, TokenResponse } from '../../../types/Types';
+import { BalanceInfo, Label, SwapButton, SwapContainer, SwitchButton } from './SwapForm.s';
 
 interface SwapFormProps {
     isPayingActive: boolean;

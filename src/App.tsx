@@ -104,53 +104,56 @@ const App = () => {
         }
     };
 
-    return (
-        <ThemeContext.Provider value={{ themeMode, toggleThemeMode }}>
-            <ThemeProvider theme={themeMode === ThemeModes.DARK ? darkTheme : lightTheme}>
-                <CssBaseline />
-                <BrowserRouter>
-                    <Navbar
-                        walletConnected={walletConnected}
-                        walletAddress={walletAddress}
-                        network={network}
-                        onNetworkChange={handleNetworkChange}
-                        walletBalance={walletBalance}
-                        connectWallet={handleConnectWallet}
-                        disconnectWallet={handleDisconnect}
-                    />
-                    <Routes>
-                        <Route
-                            path="/"
-                            element={
-                                <GridPage
-                                    walletAddress={walletAddress}
-                                    walletBalance={walletBalance}
-                                    showNotification={showNotification}
-                                    setShowNotification={setShowNotification}
-                                />
-                            }
+    if (!themeMode) {
+        return null;
+    } else {
+        return (
+            <ThemeContext.Provider value={{ themeMode, toggleThemeMode }}>
+                <ThemeProvider theme={themeMode === ThemeModes.DARK ? darkTheme : lightTheme}>
+                    <CssBaseline />
+                    <BrowserRouter>
+                        <Navbar
+                            walletConnected={walletConnected}
+                            walletAddress={walletAddress}
+                            network={network}
+                            onNetworkChange={handleNetworkChange}
+                            walletBalance={walletBalance}
+                            connectWallet={requestAccounts}
+                            disconnectWallet={handleDisconnect}
                         />
-                        <Route
-                            path="/token/:ticker"
-                            element={
-                                <TokenPage
-                                    network={network}
-                                    showNotification={showNotification}
-                                    setShowNotification={setShowNotification}
-                                    walletAddress={walletAddress}
-                                    connectWallet={requestAccounts}
-                                    handleNetworkChange={handleNetworkChange}
-                                />
-                            }
-                        />
-                        <Route path="/deploy" element={<DeployPage />} />
-                        {/* Handle 404 - Not Found */}
-                        <Route path="*" element={<div>404 - Not Found</div>} />
-                    </Routes>
-                </BrowserRouter>
-            </ThemeProvider>
-        </ThemeContext.Provider>
-    );
+                        <Routes>
+                            <Route
+                                path="/"
+                                element={
+                                    <GridPage
+                                        walletAddress={walletAddress}
+                                        walletBalance={walletBalance}
+                                        showNotification={showNotification}
+                                        setShowNotification={setShowNotification}
+                                    />
+                                }
+                            />
+                            <Route
+                                path="/token/:ticker"
+                                element={
+                                    <TokenPage
+                                        network={network}
+                                        showNotification={showNotification}
+                                        setShowNotification={setShowNotification}
+                                        walletAddress={walletAddress}
+                                        connectWallet={requestAccounts}
+                                        handleNetworkChange={handleNetworkChange}
+                                    />
+                                }
+                            />
+                            {/* Handle 404 - Not Found */}
+                            <Route path="*" element={<div>404 - Not Found</div>} />
+                        </Routes>
+                    </BrowserRouter>
+                </ThemeProvider>
+            </ThemeContext.Provider>
+        );
+    }
 };
 
 export default App;

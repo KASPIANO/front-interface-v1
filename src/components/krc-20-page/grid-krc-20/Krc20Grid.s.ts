@@ -1,6 +1,6 @@
+import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
-import { Box } from '@mui/material';
 
 // export const StyledDataGridContainer = styled(Box)({
 //     height: '80vh',

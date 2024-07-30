@@ -1,3 +1,4 @@
+import { Typography } from '@mui/material';
 import React, { useState } from 'react';
 import {
     HeaderContainer,
@@ -6,7 +7,6 @@ import {
     SortLastButton,
     SortMiddleButton,
 } from './GridTitle.s';
-import { Typography } from '@mui/material';
 
 const GridTitle: React.FC = () => {
     const [selectedSort, setSelectedSort] = useState<string>('10m');
