@@ -1,8 +1,8 @@
 // SlippageControl.tsx
-import React from 'react';
-import { IconButton, Tooltip } from '@mui/material';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
+import { IconButton, Tooltip } from '@mui/material';
+import React from 'react';
 import { ButtonGroup, SlippageSetting, SlippageText } from './BoxSettings.s';
 
 interface SlippageControlProps {

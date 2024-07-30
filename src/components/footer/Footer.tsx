@@ -1,9 +1,9 @@
-import React from 'react';
-import GitHubIcon from '@mui/icons-material/GitHub';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import { FooterContainer, FooterContent, SocialMediaContainer } from './Footer.s';
-import Avatar from '@mui/material/Avatar';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import { BottomNavigationAction, Typography } from '@mui/material';
+import Avatar from '@mui/material/Avatar';
+import React from 'react';
+import { FooterContainer, FooterContent, SocialMediaContainer } from './Footer.s';
 
 const Footer: React.FC = () => (
     <FooterContainer>

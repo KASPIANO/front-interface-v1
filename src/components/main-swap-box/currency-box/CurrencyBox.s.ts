@@ -1,6 +1,6 @@
+import { Autocomplete, Box, InputBase, Select, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { InputContainerProps } from '../../../types/Types';
-import { Box, InputBase, Typography, Select, Autocomplete } from '@mui/material';
 
 export const StyledInputContainer = styled(Box)<InputContainerProps>({
     display: 'flex',
