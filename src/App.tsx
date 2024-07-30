@@ -146,6 +146,7 @@ const App = () => {
                                     />
                                 }
                             />
+                            <Route path="/deploy" element={<DeployPage />} />
                             {/* Handle 404 - Not Found */}
                             <Route path="*" element={<div>404 - Not Found</div>} />
                         </Routes>
