@@ -6,6 +6,7 @@ import { TokenDeploy } from '../../types/Types';
 import DeployDialog from '../../components/deploy-page/deploy-dialog/DeployDialog';
 import debounce from 'lodash/debounce';
 import { fetchTokenInfo } from '../../DAL/Krc20DAL';
+import { deployKRC20Token } from '../../utils/KaswareUtils';
 
 const DeployPage: React.FC = () => {
     const [tokenName, setTokenName] = useState('');
@@ -13,6 +14,7 @@ const DeployPage: React.FC = () => {
     const [totalSupply, setTotalSupply] = useState('');
     const [mintLimit, setMintLimit] = useState('');
     const [preAllocation, setPreAllocation] = useState('');
+    const [preAllocationPercentage, setPreAllocationPercentage] = useState('');
     const [description, setDescription] = useState('');
     const [website, setWebsite] = useState('');
     const [twitter, setTwitter] = useState('');
@@ -25,21 +27,36 @@ const DeployPage: React.FC = () => {
     const [statusClass, setStatusClass] = useState('');
     const [totalSupplyError, setTotalSupplyError] = useState(false);
     const [mintLimitError, setMintLimitError] = useState(false);
+    const [limitSupplyError, setLimitSupplyError] = useState(false);
+    const [preAllocationError, setPreAllocationError] = useState(false);
+    const [reviewTokenData, setReviewTokenData] = useState<TokenDeploy>(null);
 
-    const validateTokenName = (name: string) => {
+    const validateTokenFullName = (name: string) => {
         const regex = /^[A-Za-z]{4,6}$/;
         return regex.test(name);
     };
 
+    const validateNumbersOnly = (value: string) => {
+        const regex = /^[0-9]*$/;
+        return regex.test(value);
+    };
+
+    const validateTokenName = (name: string) => {
+        const regex = /^[A-Za-z]*$/;
+        return regex.test(name);
+    };
+
     const handleTokenNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTokenName(event.target.value);
-        debouncedValidateTokenName(event.target.value);
+        if (validateTokenName(event.target.value)) {
+            setTokenName(event.target.value);
+            debouncedValidateTokenName(event.target.value);
+        }
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const debouncedValidateTokenName = useCallback(
         debounce(async (name: string) => {
-            if (!validateTokenName(name)) {
+            if (!validateTokenFullName(name)) {
                 setTickerMessage('Token name must be 4-6 letters.');
                 setStatusClass('error');
                 return;
@@ -74,6 +91,17 @@ const DeployPage: React.FC = () => {
         }
     };
 
+    const handleMintLimitChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        if (validateNumbersOnly(event.target.value)) {
+            setMintLimit(event.target.value);
+            if (parseInt(event.target.value) > parseInt(totalSupply)) {
+                setLimitSupplyError(true);
+            } else {
+                setLimitSupplyError(false);
+            }
+        }
+    };
+
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         if (!validatedTokenName) {
@@ -104,8 +132,84 @@ const DeployPage: React.FC = () => {
             picture,
         };
 
+        const reviewTokenData: TokenDeploy = {
+            tokenName: validatedTokenName,
+            totalSupply,
+            mintLimit,
+            preAllocation: `${preAllocation} (${preAllocationPercentage}%)`,
+        };
+
+        setReviewTokenData(reviewTokenData);
         setTokenDetails(tokenData);
         setShowDeployDialog(true);
+    };
+
+    const mintLimiErrorText = () => {
+        if (mintLimitError) {
+            return 'Mint limit is required';
+        } else if (limitSupplyError) {
+            return 'Mint limit cannot be greater than total supply';
+        } else {
+            return '';
+        }
+    };
+
+    const handlePreAllocation = (value: string) => {
+        if (validateNumbersOnly(value)) {
+            if (value !== '') {
+                setPreAllocationPercentage(value);
+                if (parseInt(value) < 0) {
+                    setPreAllocationError(true);
+                    setPreAllocationPercentage('0');
+                } else if (parseInt(value) > 100) {
+                    setPreAllocationError(true);
+                    setPreAllocationPercentage('100');
+                } else {
+                    setPreAllocationError(false);
+                    const preAllocationTokens = (parseInt(totalSupply) * parseInt(value)) / 100;
+                    setPreAllocation(preAllocationTokens.toString());
+                }
+            } else {
+                setPreAllocationPercentage('');
+                setPreAllocation('');
+            }
+        }
+    };
+
+    const handleTotalSupplyChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        if (validateNumbersOnly(event.target.value)) {
+            setTotalSupply(event.target.value);
+            if (parseInt(preAllocationPercentage) > 0) {
+                const preAllocationTokens =
+                    (parseInt(event.target.value) * parseInt(preAllocationPercentage)) / 100;
+                setPreAllocation(preAllocationTokens.toString());
+            }
+        }
+    };
+
+    const handleDeploy = async () => {
+        if (!tokenDetails) return;
+
+        const inscribeJsonString = JSON.stringify({
+            p: 'KRC-20',
+            op: 'deploy',
+            tick: tokenDetails.tokenName,
+            max: tokenDetails.totalSupply,
+            lim: tokenDetails.mintLimit,
+            pre: tokenDetails.preAllocation,
+        });
+
+        try {
+            const txid = await deployKRC20Token(inscribeJsonString);
+            console.log(inscribeJsonString);
+            console.log('Deployment successful, txid:', txid);
+            setShowDeployDialog(false);
+            // Handle successful deployment (e.g., show a success message, navigate to a different page, etc.)
+        } catch (error) {
+            console.error('Failed to deploy KRC20 token:', error);
+            setShowDeployDialog(false);
+            // Handle error (e.g., show an error message)
+        }
     };
 
     return (
@@ -123,7 +227,6 @@ const DeployPage: React.FC = () => {
                         value={tokenName}
                         onChange={handleTokenNameChange}
                         placeholder="e.g. KASP"
-                        required
                         InputProps={{
                             endAdornment: (
                                 <Tooltip placement="left" title="Token name must be 4-6 letters.">
@@ -137,18 +240,17 @@ const DeployPage: React.FC = () => {
                     <Status className={statusClass}>{tickerMessage}</Status>
 
                     <TextInfo
-                        required
                         error={totalSupplyError}
                         helperText={totalSupplyError ? 'Total supply is required' : ''}
                         sx={{ marginTop: '1vh' }}
                         label="Total Supply"
                         variant="outlined"
                         fullWidth
-                        type="number"
                         value={totalSupply}
-                        onChange={(e) => setTotalSupply(e.target.value)}
+                        onChange={(e) => handleTotalSupplyChange(e)}
                         placeholder="Enter total supply"
                         InputProps={{
+                            inputProps: { min: 0, step: 'any', pattern: '[0-9]*' },
                             endAdornment: (
                                 <Tooltip
                                     placement="left"
@@ -163,15 +265,15 @@ const DeployPage: React.FC = () => {
                     />
 
                     <TextInfo
-                        required
-                        error={mintLimitError}
-                        helperText={mintLimitError ? 'Mint limit is required' : ''}
+                        error={mintLimitError || limitSupplyError}
+                        helperText={mintLimiErrorText()}
                         label="Mint Limit"
                         variant="outlined"
                         fullWidth
-                        type="number"
                         value={mintLimit}
-                        onChange={(e) => setMintLimit(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+                            handleMintLimitChange(e)
+                        }
                         placeholder="Enter mint limit"
                         InputProps={{
                             endAdornment: (
@@ -191,15 +293,16 @@ const DeployPage: React.FC = () => {
                         label="Pre-allocation %"
                         variant="outlined"
                         fullWidth
-                        type="number"
-                        value={preAllocation}
-                        onChange={(e) => setPreAllocation(e.target.value)}
-                        placeholder="e.g. 300000"
+                        error={preAllocationError}
+                        helperText={preAllocationError ? 'Pre-allocation must be % between 0 and 100' : ''}
+                        value={preAllocationPercentage}
+                        onChange={(e) => handlePreAllocation(e.target.value)}
+                        placeholder="e.g. 15"
                         InputProps={{
                             endAdornment: (
                                 <Tooltip
                                     placement="left"
-                                    title="The amount of tokens allocated to the deployer's address after deployment, including fractional values."
+                                    title="The percentage of tokens allocated to the deployer's address after deployment."
                                 >
                                     <IconButton>
                                         <InfoOutlinedIcon fontSize="small" />
@@ -285,8 +388,8 @@ const DeployPage: React.FC = () => {
                 <DeployDialog
                     open={showDeployDialog}
                     onClose={() => setShowDeployDialog(false)}
-                    onDeploy={() => {}}
-                    tokenData={tokenDetails}
+                    onDeploy={() => handleDeploy()}
+                    tokenData={reviewTokenData}
                 />
             )}
         </Container>

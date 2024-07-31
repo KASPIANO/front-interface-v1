@@ -1,6 +1,5 @@
 import { Button, MenuItem, Select, styled, TextField } from '@mui/material';
 import { NavButtonProps } from '../../types/Types';
-import { BackgroundContainer } from '../background-effect/BackgroundEffect.s';
 
 export const NavbarContainer = styled('div')({
     display: 'flex',

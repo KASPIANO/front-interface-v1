@@ -26,7 +26,7 @@ const DeployDialog: React.FC<DeployDialogProps> = ({ open, onClose, onDeploy, to
                     Cancel
                 </Button>
             </Box>
-            <Button onClick={onDeploy} color="primary">
+            <Button onClick={onDeploy} color="secondary">
                 Deploy
             </Button>
         </DialogActions>
