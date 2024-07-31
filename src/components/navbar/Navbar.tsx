@@ -3,8 +3,8 @@ import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import { Avatar, IconButton, Tooltip, Typography } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     ConnectButton,
     Logo,
@@ -14,6 +14,8 @@ import {
     SearchContainer,
     WalletBalance,
 } from './NavBar.s';
+import { ThemeContext } from '../../main';
+import { ThemeModes } from '../../utils/Utils';
 
 interface NavbarProps {
     walletAddress: string | null;
@@ -28,11 +30,11 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = (props) => {
     const { walletBalance, walletConnected, disconnectWallet, connectWallet } = props;
     const [activePage, setActivePage] = useState('/');
-    // const themeContext = useContext(ThemeContext);
+    const themeContext = useContext(ThemeContext);
     const [, setSearchValue] = useState('');
     const navigate = useNavigate();
 
-    // const darkmode = themeContext.themeMode === ThemeModes.DARK;
+    const darkmode = themeContext.themeMode === ThemeModes.DARK;
     useEffect(() => {
         setActivePage(window.location.pathname);
     }, []);
@@ -135,15 +137,15 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                         <NetworkSelectItem value="testnet">Testnet</NetworkSelectItem>
                     </NetworkSelect>
                 </FormControl> */}
-                {true ? (
+                {darkmode ? (
                     <Tooltip title={'Light Mode'} placement="bottom">
-                        <IconButton>
+                        <IconButton onClick={themeContext.toggleThemeMode}>
                             <LightModeRoundedIcon />
                         </IconButton>
                     </Tooltip>
                 ) : (
                     <Tooltip title={'Dark Mode'} placement="bottom">
-                        <IconButton>
+                        <IconButton onClick={themeContext.toggleThemeMode}>
                             <NightlightRoundIcon />
                         </IconButton>
                     </Tooltip>

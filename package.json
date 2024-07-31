@@ -1,5 +1,5 @@
 {
-  "name": "aaaaa",
+  "name": "green-eye-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -13,8 +13,10 @@
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^5.16.4",
+    "@mui/lab": "^5.0.0-alpha.173",
     "@mui/material": "^5.16.4",
     "@mui/x-data-grid": "^7.11.0",
+    "add": "^2.0.6",
     "axios": "^1.7.2",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",
@@ -23,7 +25,8 @@
     "react-infinite-scroll-component": "^6.1.0",
     "react-router-dom": "^6.25.1",
     "styled-components": "^6.1.12",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "yarn": "^1.22.22"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
