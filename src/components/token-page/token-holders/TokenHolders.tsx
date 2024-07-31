@@ -16,7 +16,7 @@ const TokenHolders: FC<TokenHoldersProps> = (props) => {
     return (
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant='h5' sx={{ fontWeight: '600' }}>
+                <Typography variant='h6' sx={{ fontWeight: '600' }}>
                     Token Top Holders
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>

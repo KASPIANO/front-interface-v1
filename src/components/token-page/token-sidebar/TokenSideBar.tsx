@@ -4,6 +4,7 @@ import TabContext from '@mui/lab/TabContext';
 import { FC, useState, SyntheticEvent } from "react";
 import { Token } from "../../../types/Types";
 import { SideBarContainer } from "./TokenSideBar.s";
+import TokenSideBarInfo from "./token-side-bar-info/TokenSideBarInfo";
 
 interface TokenSideBarProps {
     tokenInfo: Token;
@@ -41,7 +42,9 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
             <Tab label="Buy" value="2" />
             <Tab label="Sell" value="3" />
           </Tabs>
-          <TabPanel value="1">Item One</TabPanel>
+          <TabPanel value="1">
+            <TokenSideBarInfo tokenInfo={props.tokenInfo} priceInfo={{}} />
+          </TabPanel>
           <TabPanel value="2">Buy The Token</TabPanel>
           <TabPanel value="3">Sell The Token</TabPanel>
         </TabContext>

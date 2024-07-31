@@ -2,7 +2,7 @@ import { Grid } from '@mui/material';
 
 export const TokenPageLayout = ({ children }) => (
     <div style={{ display: 'flex' }}>
-        <Grid container spacing={1} padding={2}>
+        <Grid container padding={2}>
             <Grid
                 item
                 xs={12}
@@ -18,7 +18,7 @@ export const TokenPageLayout = ({ children }) => (
                 {children[0]}
             </Grid>
 
-            <Grid container spacing={1} padding={2}>
+            <Grid container spacing={1} pt={2}>
                 <Grid item xs={12} md={8}>
                     {children[2]}
                     {children[3]}

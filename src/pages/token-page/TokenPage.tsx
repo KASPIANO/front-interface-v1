@@ -29,7 +29,6 @@ const TokenPage: FC<TokenPageProps> = (props) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            // await new Promise(resolve => setTimeout(resolve, 15000));
             try {
                 const data = await fetchTokenInfo(ticker);
                 setTokenInfo(data[0]);
@@ -42,12 +41,12 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     }, [ticker]);
 
     const getComponentToShow = (component: JSX.Element, height?: string, width?: string) =>
-        tokenInfo ? component : <Skeleton height={height} width={width} />;
+        tokenInfo ? component : <Skeleton variant="rectangular" height={height} width={width} />;
 
     return (
         <TokenPageLayout>
-            {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '100px')}
-            {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} />)}
+            {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '58px')}
+            {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} />, '300px')}
             {getComponentToShow(<TokenGraph />, '400px')}
             {getComponentToShow(<TokenRugScore tokenInfo={tokenInfo} />)}
             {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)}

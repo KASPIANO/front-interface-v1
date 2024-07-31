@@ -26,7 +26,7 @@ const TokenRugScore: FC<TokenRugScoreProps> = props => {
 
     return (
         <Box sx={{mb: 2}}>
-                <Typography variant='h5' sx={{ fontWeight: '600', mb: 2 }}>
+                <Typography variant='h6' sx={{ fontWeight: '600', mb: 2 }}>
                     Rug Score:
                 </Typography>
                 { score !== null ? <ScoreLine value={score} config={scoreLineRanges} /> : null }
