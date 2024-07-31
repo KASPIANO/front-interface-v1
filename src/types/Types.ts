@@ -48,3 +48,16 @@ export interface NavButtonProps {
 export interface NavItemProps {
     isActive: boolean;
 }
+
+export interface TokenDeploy {
+    tokenName: string;
+    totalSupply: string;
+    mintLimit: string;
+    preAllocation?: string;
+    description?: string;
+    website?: string;
+    twitter?: string;
+    discord?: string;
+    telegram?: string;
+    picture?: string;
+}

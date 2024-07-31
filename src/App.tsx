@@ -18,6 +18,7 @@ import {
     switchNetwork,
 } from './utils/KaswareUtils';
 import { getLocalThemeMode, setWalletBalanceUtil, ThemeModes } from './utils/Utils';
+import DeployPage from './pages/deploy-page/DeployPage';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -26,6 +27,7 @@ const App = () => {
     const [walletConnected, setWalletConnected] = useState<boolean>(false);
     const [showNotification, setShowNotification] = useState<boolean>(false);
     const [network, setNetwork] = useState<string>('mainnet'); // New state for network
+    const [, setIsConnecting] = useState<boolean>(false);
 
     const toggleThemeMode = () => {
         const newMode = themeMode === ThemeModes.DARK ? ThemeModes.LIGHT : ThemeModes.DARK;
@@ -38,15 +40,32 @@ const App = () => {
             if (accounts.length === 0) {
                 setWalletAddress(null);
                 setWalletBalance(0);
+                setWalletConnected(false);
                 localStorage.removeItem('isWalletConnected');
             } else {
                 setWalletAddress(accounts[0]);
                 const balance = await fetchWalletBalance(accounts[0]);
                 setWalletBalance(setWalletBalanceUtil(balance));
+                setWalletConnected(true);
             }
         };
 
-        const checkWalletConnection = async () => {
+        if (isKasWareInstalled()) {
+            onAccountsChanged(handleAccountsChanged);
+            window.kasware.on('disconnect', handleDisconnect);
+        }
+
+        return () => {
+            if (isKasWareInstalled()) {
+                removeAccountsChangedListener(handleAccountsChanged);
+                window.kasware.removeListener('disconnect', handleDisconnect);
+            }
+        };
+    }, []);
+
+    const handleConnectWallet = async () => {
+        setIsConnecting(true);
+        try {
             if (isKasWareInstalled()) {
                 const accounts = await requestAccounts();
                 if (accounts.length > 0) {
@@ -58,27 +77,18 @@ const App = () => {
                     setTimeout(() => setShowNotification(false), 5000);
                 }
             }
-        };
-
-        if (isKasWareInstalled()) {
-            onAccountsChanged(handleAccountsChanged);
-            window.kasware.on('disconnect', handleDisconnect);
+        } catch (error) {
+            console.error('Error connecting to wallet:', error);
+        } finally {
+            setIsConnecting(false);
         }
-
-        checkWalletConnection();
-
-        return () => {
-            if (isKasWareInstalled()) {
-                removeAccountsChangedListener(handleAccountsChanged);
-                window.kasware.removeListener('disconnect', handleDisconnect);
-            }
-        };
-    }, [walletAddress]);
+    };
 
     const handleDisconnect = async () => {
         const { origin } = window.location;
         await disconnect(origin);
         setWalletAddress(null);
+        setWalletConnected(false);
         setWalletBalance(0);
         localStorage.removeItem('isWalletConnected');
     };
@@ -118,7 +128,6 @@ const App = () => {
                                     <GridPage
                                         walletAddress={walletAddress}
                                         walletBalance={walletBalance}
-                                        walletConnected={walletConnected}
                                         showNotification={showNotification}
                                         setShowNotification={setShowNotification}
                                     />
@@ -137,6 +146,7 @@ const App = () => {
                                     />
                                 }
                             />
+                            <Route path="/deploy" element={<DeployPage />} />
                             {/* Handle 404 - Not Found */}
                             <Route path="*" element={<div>404 - Not Found</div>} />
                         </Routes>

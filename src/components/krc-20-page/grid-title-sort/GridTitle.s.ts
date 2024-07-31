@@ -31,7 +31,7 @@ export const SortMiddleButton = styled(Button)<{ selected: boolean }>(({ selecte
     },
     '&.MuiButton-root': {
         padding: '5px 5px',
-        fontSize: '1vw',
+        fontSize: '0.8vw',
     },
 
     '&:hover': {
@@ -44,7 +44,7 @@ export const SortFirstButton = styled(Button)<{ selected: boolean }>(({ selected
     '&.MuiButton-root': {
         borderRadius: '4px',
         padding: '4px 4px',
-        fontSize: '1vw',
+        fontSize: '0.8vw',
     },
     '&.MuiButtonGroup-firstButton': {
         backgroundColor: selected ? 'rgba(111, 199, 186, 0.8)' : 'rgba(111, 199, 186, 0.25)',
@@ -62,7 +62,7 @@ export const SortLastButton = styled(Button)<{ selected: boolean }>(({ selected 
     },
     '&.MuiButton-root': {
         padding: '4px 4px',
-        fontSize: '1vw',
+        fontSize: '0.8vw',
 
         borderRadius: '4px',
     },
