@@ -1,6 +1,6 @@
-import React from 'react';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
+import React from 'react';
 import {
     AmountInput,
     BalanceInfo,

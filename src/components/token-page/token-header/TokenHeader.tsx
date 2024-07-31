@@ -1,7 +1,7 @@
-import { FC } from 'react';
-import { HeaderContainer, Title } from './TokenHeader.s';
 import { Avatar } from '@mui/material';
+import { FC } from 'react';
 import { Token } from '../../../types/Types';
+import { HeaderContainer, Title } from './TokenHeader.s';
 
 interface TokenHeaderProps {
     tokenInfo: Token;

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BackgroundContainer, GlobalStyle, Token } from './BackgroundEffect.s';
+import { BackgroundContainer, Token } from './BackgroundEffect.s';
 
 const BackgroundEffect: React.FC = () => {
     useEffect(() => {

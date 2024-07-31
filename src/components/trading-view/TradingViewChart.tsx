@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ChartWrapper, ChartContainer } from './TradingView.s';
+import { ChartContainer, ChartWrapper } from './TradingView.s';
 
 declare global {
     interface Window {
@@ -7,7 +7,7 @@ declare global {
     }
 }
 
-const TradingViewChart: React.FC = () => {
+const TradingViewChart: React.FC = () => (
     // useEffect(() => {
     //     const script = document.createElement('script');
     //     script.src = 'https://s3.tradingview.com/tv.js';
@@ -36,13 +36,10 @@ const TradingViewChart: React.FC = () => {
     //     document.body.appendChild(script);
     // }, []);
 
-    return (
-        <ChartWrapper>
-            <ChartContainer>
-                <div id="tradingview_widget" />
-            </ChartContainer>
-        </ChartWrapper>
-    );
-};
-
+    <ChartWrapper>
+        <ChartContainer>
+            <div id="tradingview_widget" />
+        </ChartContainer>
+    </ChartWrapper>
+);
 export default TradingViewChart;
