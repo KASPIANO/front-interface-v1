@@ -22,6 +22,4 @@ export function simplifyNumber(value) {
         return value.toString();
     }
 }
-export function formatNumberWithCommas(value) {
-    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-}
+export const formatNumberWithCommas = (value) => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');

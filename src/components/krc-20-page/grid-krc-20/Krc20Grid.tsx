@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Box, List, Typography } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import moment from 'moment';
 import { FC, useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +10,7 @@ import { TokenResponse } from '../../../types/Types';
 import { GridHeader } from '../grid-header/GridHeader';
 import { TokenRow } from '../token-row/TokenRow';
 import { NoDataContainer, StyledDataGridContainer } from './Krc20Grid.s';
+import { v4 as uuidv4 } from 'uuid';
 
 const GlobalStyle = createGlobalStyle`
   #scrollableList {
@@ -43,13 +43,8 @@ interface TokenDataGridProps {
     nextPageParams: string;
     totalTokensDeployed: number;
     nextPage: number;
+    walletBalance: number;
 }
-
-const formatDate = (timestamp: string): string => moment(Number(timestamp)).format('DD/MM/YYYY');
-const capitalizeFirstLetter = (string: string): string => {
-    if (!string) return string;
-    return string.charAt(0).toUpperCase() + string.slice(1);
-};
 
 enum GridHeaders {
     TICKER = 'TICKER',
@@ -72,9 +67,9 @@ const headersMapper: Record<GridHeaders, { name: string; headerFunction: () => v
 };
 
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
-    const { tokensList, setNextPage, totalTokensDeployed, nextPage } = props;
+    const { tokensList, setNextPage, totalTokensDeployed, nextPage, walletBalance } = props;
     const [tokensRows, setTokensRows] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [, setLoading] = useState(true);
     const navigate = useNavigate();
 
     const handleItemClick = (token) => {
@@ -167,9 +162,18 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                         </p>
                     }
                 >
-                    {tokensRows.map((token) => (
-                        <TokenRow key={token.tick} handleItemClick={handleItemClick} token={token} />
-                    ))}
+                    {tokensRows.map((token) => {
+                        const tokenKey = `${token.tick}-${uuidv4()}`;
+                        return (
+                            <TokenRow
+                                key={tokenKey}
+                                walletBalance={walletBalance}
+                                tokenKey={tokenKey}
+                                handleItemClick={handleItemClick}
+                                token={token}
+                            />
+                        );
+                    })}
                 </InfiniteScroll>
             </List>
         </StyledDataGridContainer>
