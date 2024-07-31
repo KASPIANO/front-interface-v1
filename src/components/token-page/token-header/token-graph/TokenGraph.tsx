@@ -10,7 +10,7 @@ const TokenGraph: React.FC<TokenGraphProps> = (props) => {
     const { tokenInfo } = props;
     return (
         <GraphContainer>
-            <TradingViewChart symbol={'KASUSDT'} />
+            <TradingViewChart />
         </GraphContainer>
     );
 };

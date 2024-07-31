@@ -4,10 +4,10 @@ import { Token } from '../../../types/Types';
 import ScoreLine, { ScoreLineConfig } from '../../score-line/ScoreLine';
 
 interface TokenRugScoreProps {
-    tokenInfo: Token
+    tokenInfo: Token;
 }
 
-const TokenRugScore: FC<TokenRugScoreProps> = props => {
+const TokenRugScore: FC<TokenRugScoreProps> = (props) => {
     const [score, setScore] = useState(null);
 
     const theme = useTheme();
@@ -25,13 +25,13 @@ const TokenRugScore: FC<TokenRugScoreProps> = props => {
     };
 
     return (
-        <Box sx={{mb: 2}}>
-                <Typography variant='h6' sx={{ fontWeight: '600', mb: 2 }}>
-                    Rug Score:
-                </Typography>
-                { score !== null ? <ScoreLine value={score} config={scoreLineRanges} /> : null }
+        <Box sx={{ height: '10vh' }}>
+            <Typography variant="h6" sx={{ fontWeight: '600', mb: 2 }}>
+                Rug Score:
+            </Typography>
+            {score !== null ? <ScoreLine value={score} config={scoreLineRanges} /> : null}
         </Box>
     );
 };
 
-export default TokenRugScore
+export default TokenRugScore;

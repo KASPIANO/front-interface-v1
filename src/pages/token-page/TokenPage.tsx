@@ -46,10 +46,10 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     return (
         <TokenPageLayout>
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '58px')}
-            {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} />, '300px')}
             {getComponentToShow(<TokenGraph />, '400px')}
             {getComponentToShow(<TokenRugScore tokenInfo={tokenInfo} />)}
             {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)}
+            {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} />, '300px')}
 
             {showNotification && walletAddress && (
                 <NotificationComponent
