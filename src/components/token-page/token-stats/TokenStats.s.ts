@@ -1,4 +1,4 @@
-import { styled, Box, Paper } from '@mui/material';
+import { styled, Box, Paper, Typography } from '@mui/material';
 
 export const DataRowContainer = styled(Box)({
     display: 'flex',
@@ -10,7 +10,17 @@ export const DataPaper = styled(Paper)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'space-between',
     padding: theme.spacing(1),
-    height: '18vh',
+    height: '110px',
+}));
+
+export const TitleTypography = styled(Typography)(({ theme }) => ({
+    color: theme.palette.text.secondary,
+    marginBottom: theme.spacing(1),
+}));
+
+export const ValueTypography = styled(Typography)(({ theme }) => ({
+    color: theme.palette.text.primary,
+    fontWeight: 'bold',
+    fontSize: theme.typography.h4.fontSize,
 }));

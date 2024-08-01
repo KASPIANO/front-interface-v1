@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { Box, Typography, useTheme } from '@mui/material';
 import { Token } from '../../../types/Types';
 import ScoreLine, { ScoreLineConfig } from '../../score-line/ScoreLine';
-import { DataPaper, DataRowContainer } from './TokenStats.s';
+import { DataPaper, DataRowContainer, TitleTypography, ValueTypography } from './TokenStats.s';
 import OptionSelection from '../option-selection/OptionSelection';
 import _ from 'lodash';
 
@@ -12,14 +12,26 @@ interface TokenStatsProps {
 
 const TokenStats: FC<TokenStatsProps> = (props) => {
     const numberOfHoldersToSelect = [10, 20, 30, 40, 50];
+    const tradingDataTimeFramesToSelect = ['All', '1m', '1w', '1d'];
+
     const [score, setScore] = useState(null);
     const [tokenHolders, setTokenHolders] = useState(props.tokenInfo?.holder || []);
     const [tokenHoldersToShow, setTokenHoldersToShow] = useState(numberOfHoldersToSelect[0]);
     const [topHoldersPercantage, setTopHoldersPercantage] = useState('---');
+    const [tradingDataTimeFrame, setTradingDataTimeFrame] = useState(tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 1]);
     const theme = useTheme();
+    const scoreLineRanges: ScoreLineConfig = {
+        [theme.palette.error.main]: { start: 0, end: 45 },
+        [theme.palette.warning.main]: { start: 45, end: 55 },
+        [theme.palette.success.main]: { start: 55, end: 100 },
+    };
 
     const updateTokenHoldersToShow = (value: number) => {
         setTokenHoldersToShow(value);
+    };
+
+    const updateTradingDataTimeFrame = (value: string) => {
+        setTradingDataTimeFrame(value);
     };
 
     useEffect(() => {
@@ -43,24 +55,20 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         }
     }, [tokenHoldersToShow, tokenHolders, props.tokenInfo?.minted]);
 
-    const scoreLineRanges: ScoreLineConfig = {
-        [theme.palette.error.main]: { start: 0, end: 45 },
-        [theme.palette.warning.main]: { start: 45, end: 55 },
-        [theme.palette.success.main]: { start: 55, end: 100 },
-    };
+
 
     return (
         <Box>
             <DataRowContainer gap={1}>
                 <DataPaper elevation={1} sx={{ justifyContent: 'space-between' }}>
                     <Typography variant="body2" align="center" color="text.secondary">
-                        Rug Score
+                        RUG SCORE
                     </Typography>
                     {score !== null ? <ScoreLine value={score} config={scoreLineRanges} /> : null}
                 </DataPaper>
-                <DataPaper elevation={1}>
-                    <Typography variant="body2" sx={{ mr: 1 }}>
-                        Top Holders
+                <DataPaper elevation={1} sx={{ justifyContent: 'space-between' }}>
+                    <Typography variant="body2" sx={{ mr: 1 }} color="text.secondary">
+                        TOP HOLDERS
                     </Typography>
                     <OptionSelection
                         options={numberOfHoldersToSelect}
@@ -72,30 +80,37 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     </Typography>
                 </DataPaper>
             </DataRowContainer>
+            <Box mt={1}>
+            <OptionSelection
+                        options={tradingDataTimeFramesToSelect}
+                        value={tradingDataTimeFrame}
+                        onChange={updateTradingDataTimeFrame}
+                    />
+            </Box>
             <DataRowContainer mt={1} gap={1}>
                 <DataPaper elevation={1}>
-                    <Typography variant="body2" align="center" color="text.secondary">
-                        LIQUIDITY
-                    </Typography>
-                    <Typography variant="body2" align="center">
-                        ---
-                    </Typography>
+                    <TitleTypography variant="body2" align="center">
+                        TRADES ({tradingDataTimeFrame})
+                    </TitleTypography>
+                    <ValueTypography variant="body2" align="center">
+                        -
+                    </ValueTypography>
                 </DataPaper>
                 <DataPaper elevation={1}>
-                    <Typography variant="body2" align="center" color="text.secondary">
-                        FDV
-                    </Typography>
-                    <Typography variant="body2" align="center">
-                        ---
-                    </Typography>
+                    <TitleTypography variant="body2" align="center">
+                        VOLUME ({tradingDataTimeFrame})
+                    </TitleTypography>
+                    <ValueTypography variant="body2" align="center">
+                        -
+                    </ValueTypography>
                 </DataPaper>
                 <DataPaper elevation={1}>
-                    <Typography variant="body2" align="center" color="text.secondary">
-                        MKT CAP
-                    </Typography>
-                    <Typography variant="body2" align="center">
-                        ---
-                    </Typography>
+                    <TitleTypography variant="body2" align="center">
+                        PENDING BUYS
+                    </TitleTypography>
+                    <ValueTypography variant="body2" align="center">
+                        -
+                    </ValueTypography>
                 </DataPaper>
             </DataRowContainer>
         </Box>
