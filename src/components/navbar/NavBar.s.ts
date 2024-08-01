@@ -1,6 +1,5 @@
 import { Button, MenuItem, Select, styled, TextField } from '@mui/material';
 import { NavButtonProps } from '../../types/Types';
-import { BackgroundContainer } from '../background-effect/BackgroundEffect.s';
 
 export const NavbarContainer = styled('div')({
     display: 'flex',
@@ -12,7 +11,6 @@ export const NavbarContainer = styled('div')({
 });
 
 export const NavButton = styled(Button)<NavButtonProps>(({ isActive }) => ({
-    color: 'white',
     fontWeight: 500,
     cursor: 'pointer',
     fontSize: '1vw',
@@ -35,7 +33,6 @@ export const NavButton = styled(Button)<NavButtonProps>(({ isActive }) => ({
 }));
 
 export const Logo = styled(Button)({
-    color: 'white',
     fontWeight: 'bold',
     cursor: 'pointer',
     fontSize: '1.5vw',
@@ -58,9 +55,6 @@ export const SearchContainer = styled(TextField)({
     backgroundColor: '#2b2b3b',
     marginRight: '2vw',
     borderRadius: '6px',
-    '& .MuiInputBase-root': {
-        color: 'white',
-    },
 });
 
 export const WalletBalance = styled('div')({
@@ -70,7 +64,7 @@ export const WalletBalance = styled('div')({
 
 export const ConnectButton = styled(Button)({
     backgroundColor: '#70C7BA',
-    color: '#fff',
+
     border: 'none',
     cursor: 'pointer',
     fontSize: '0.7vw',
@@ -85,12 +79,11 @@ export const ConnectButton = styled(Button)({
 export const NetworkSelect = styled(Select)({
     backgroundColor: '#2b2b3b',
     fontSize: '0.6vw',
-    color: '#fff',
+
     marginRight: '3vw',
     alignItems: 'center',
 
     '& .MuiSelect-icon': {
-        color: '#fff',
         display: 'none',
     },
 
@@ -106,7 +99,7 @@ export const NetworkSelectItem = styled(MenuItem)({
     backgroundColor: '#2b2b3b',
     fontSize: '0.6vw',
     padding: '0.5vh 0.5vw',
-    color: '#fff',
+
     '&:hover': {
         backgroundColor: '#70C7BA',
     },

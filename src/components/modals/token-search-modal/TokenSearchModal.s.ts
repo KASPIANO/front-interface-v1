@@ -20,7 +20,6 @@ export const ModalContent = styled('div')({
     width: '400px',
     maxHeight: '80%',
     overflowY: 'auto',
-    color: '#fff',
 
     '@media (max-width: 550px)': {
         maxWidth: '96vw',
@@ -42,7 +41,6 @@ export const ModalTitle = styled('h2')({
 export const CloseButton = styled('button')({
     background: 'none',
     border: 'none',
-    color: 'white',
     fontSize: '20px',
     cursor: 'pointer',
 });
@@ -54,7 +52,6 @@ export const SearchInput = styled('input')({
     border: 'none',
     outline: 'none',
     backgroundColor: '#1e1e2f',
-    color: 'white',
     marginBottom: '20px',
     fontSize: '16px',
 });

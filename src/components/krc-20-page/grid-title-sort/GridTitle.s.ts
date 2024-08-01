@@ -19,13 +19,11 @@ export const SortButtonGroup = styled(ButtonGroup)({
     borderRadius: '2px',
     marginRight: '1vw',
     '& .MuiButton-root': {
-        color: '#fff',
         backgroundColor: 'rgba(111, 199, 186, 0.25)', // Primary color with less opacity
     },
 });
 
 export const SortMiddleButton = styled(Button)<{ selected: boolean }>(({ selected }) => ({
-    color: '#fff',
     '&.MuiButtonGroup-middleButton': {
         backgroundColor: selected ? 'rgba(111, 199, 186, 0.8)' : 'rgba(111, 199, 186, 0.25)',
     },
@@ -40,7 +38,6 @@ export const SortMiddleButton = styled(Button)<{ selected: boolean }>(({ selecte
 }));
 
 export const SortFirstButton = styled(Button)<{ selected: boolean }>(({ selected }) => ({
-    color: '#fff',
     '&.MuiButton-root': {
         borderRadius: '4px',
         padding: '4px 4px',
@@ -56,7 +53,6 @@ export const SortFirstButton = styled(Button)<{ selected: boolean }>(({ selected
 }));
 
 export const SortLastButton = styled(Button)<{ selected: boolean }>(({ selected }) => ({
-    color: '#fff',
     '&.MuiButtonGroup-lastButton': {
         backgroundColor: selected ? 'rgba(111, 199, 186, 0.8)' : 'rgba(111, 199, 186, 0.25)',
     },

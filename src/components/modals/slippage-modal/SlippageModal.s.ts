@@ -30,20 +30,17 @@ export const ModalHeader = styled('div')({
 });
 
 export const ModalTitle = styled('h2')({
-    color: '#fff',
     margin: 0,
 });
 
 export const CloseButton = styled('button')({
     background: 'none',
     border: 'none',
-    color: '#fff',
+
     cursor: 'pointer',
 });
 
-export const ModalBody = styled('div')({
-    color: '#fff',
-});
+export const ModalBody = styled('div')({});
 
 export const SaveButton = styled('button')({
     width: '100%',
@@ -52,7 +49,7 @@ export const SaveButton = styled('button')({
     borderRadius: '8px',
     backgroundColor: '#6ec7ba',
     fontWeight: 600,
-    color: '#fff',
+
     fontSize: '16px',
     cursor: 'pointer',
     marginTop: '20px',
@@ -68,7 +65,7 @@ export const ModeButton = styled('button')<{ active: boolean }>(({ active }) => 
     borderRadius: '8px',
     border: 'none',
     backgroundColor: active ? '#6ec7ba' : '#353545',
-    color: '#fff',
+
     cursor: 'pointer',
     '&:hover': {
         backgroundColor: '#39ddbe',
@@ -86,7 +83,7 @@ export const SlippageButton = styled('button')<{ active: boolean }>(({ active })
     borderRadius: '8px',
     border: 'none',
     backgroundColor: active ? '#6ec7ba' : '#353545',
-    color: '#fff',
+
     cursor: 'pointer',
     display: 'flex',
     justifyContent: 'space-between',
@@ -111,13 +108,12 @@ export const PercentInput = styled('input')({
     background: 'none',
     border: 'none',
     outline: 'none',
-    color: '#fff',
+
     fontSize: '13px',
     textAlign: 'right',
 });
 
 export const PercentSign = styled('span')({
-    color: '#fff',
     fontSize: '13px',
     marginLeft: '2px',
 });

@@ -10,7 +10,6 @@ export const SwapBoxContainer = styled('div')({
 });
 
 export const Heading = styled('h2')({
-    color: '#fff',
     fontSize: '20px',
     marginBottom: '20px',
 });
@@ -21,7 +20,7 @@ export const Section = styled('div')({
 
 export const Label = styled('label')({
     display: 'block',
-    color: '#fff',
+
     fontSize: '14px',
     marginBottom: '8px',
 });
@@ -52,7 +51,6 @@ export const CurrencyImage = styled('img')({
 });
 
 export const CurrencyText = styled('span')({
-    color: '#fff',
     fontSize: '14px',
 });
 
@@ -61,14 +59,14 @@ export const AmountInput = styled('input')({
     background: 'none',
     border: 'none',
     outline: 'none',
-    color: '#fff',
+
     fontSize: '18px',
     textAlign: 'right',
 });
 
 export const SwitchButton = styled('button')({
     backgroundColor: '#6ec7ba',
-    color: '#fff',
+
     border: 'none',
     borderRadius: '50%',
     width: '40px',
@@ -86,7 +84,7 @@ export const SwitchButton = styled('button')({
 export const BalanceInfo = styled('div')({
     display: 'flex',
     justifyContent: 'space-between',
-    color: '#fff',
+
     fontSize: '14px',
 });
 
@@ -97,7 +95,7 @@ export const SwapButton = styled('button')({
     borderRadius: '8px',
     backgroundColor: '#6ec7ba',
     fontWeight: 600,
-    color: '#fff',
+
     fontSize: '16px',
     cursor: 'pointer',
     '&:hover': {

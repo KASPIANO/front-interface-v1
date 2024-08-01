@@ -77,9 +77,7 @@ export const darkTheme = createTheme({
     components: {
         MuiListItemText: {
             styleOverrides: {
-                primary: {
-                    color: '#fff',
-                },
+                primary: {},
             },
         },
         MuiInputBase: {
@@ -107,6 +105,7 @@ export const darkTheme = createTheme({
             styleOverrides: {
                 root: {
                     textTransform: 'none',
+                    color: 'white',
                 },
             },
         },
@@ -135,7 +134,13 @@ export const darkTheme = createTheme({
                 },
             },
         },
-
+        MuiTypography: {
+            styleOverrides: {
+                root: {
+                    color: 'white',
+                },
+            },
+        },
         MuiDrawer: {
             styleOverrides: {
                 paper: { backgroundColor: '#1e1e1e', backgroundImage: 'none' },

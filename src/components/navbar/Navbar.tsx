@@ -5,6 +5,8 @@ import { Avatar, IconButton, Tooltip, Typography } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ThemeContext } from '../../main';
+import { ThemeModes } from '../../utils/Utils';
 import {
     ConnectButton,
     Logo,
@@ -14,8 +16,6 @@ import {
     SearchContainer,
     WalletBalance,
 } from './NavBar.s';
-import { ThemeContext } from '../../main';
-import { ThemeModes } from '../../utils/Utils';
 
 interface NavbarProps {
     walletAddress: string | null;
@@ -105,7 +105,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <SearchRoundedIcon sx={{ fontSize: '1vw', color: 'white' }} />
+                                <SearchRoundedIcon sx={{ fontSize: '1vw' }} />
                             </InputAdornment>
                         ),
                         style: {

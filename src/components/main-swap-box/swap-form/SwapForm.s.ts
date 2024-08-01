@@ -37,7 +37,6 @@ export const CurrencySelector = styled('div')({
 });
 
 export const Label = styled('label')({
-    color: '#fff',
     fontSize: '1.2vw',
     marginBottom: '1.5vh',
     marginLeft: '0.7vw',
@@ -50,7 +49,6 @@ export const CurrencyImage = styled('img')({
 });
 
 export const CurrencyText = styled('span')({
-    color: '#fff',
     fontSize: '14px',
 });
 
@@ -59,7 +57,7 @@ export const AmountInput = styled('input')({
     background: 'none',
     border: 'none',
     outline: 'none',
-    color: '#fff',
+
     fontSize: '14px',
     textAlign: 'right',
 
@@ -70,7 +68,7 @@ export const AmountInput = styled('input')({
 
 export const SwitchButton = styled('button')({
     backgroundColor: '#6ec7ba',
-    color: '#fff',
+
     border: 'none',
     borderRadius: '50%',
     width: '40px',
@@ -88,7 +86,7 @@ export const SwapButton = styled('button')({
     borderRadius: '8px',
     backgroundColor: '#6ec7ba',
     fontWeight: 600,
-    color: '#fff',
+
     fontSize: '16px',
     cursor: 'pointer',
 
@@ -105,7 +103,7 @@ export const SwapButton = styled('button')({
 export const BalanceInfo = styled('div')({
     display: 'flex',
     justifyContent: 'space-between',
-    color: '#fff',
+
     fontSize: '14px',
 });
 
@@ -130,7 +128,7 @@ export const ButtonGroup = styled('div')({
 
 export const IconButton = styled('button')({
     backgroundColor: '#2b2b3b',
-    color: '#fff',
+
     border: 'none',
     borderRadius: '50%',
     width: '40px',

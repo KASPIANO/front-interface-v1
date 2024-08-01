@@ -31,14 +31,13 @@ export const ModalHeader = styled('div')({
 });
 
 export const ModalTitle = styled('h2')({
-    color: '#fff',
     margin: 0,
 });
 
 export const CloseButton = styled('button')({
     background: 'none',
     border: 'none',
-    color: '#fff',
+
     cursor: 'pointer',
 });
 
@@ -57,7 +56,6 @@ export const SearchInput = styled('input')({
     border: 'none',
     outline: 'none',
     background: 'none',
-    color: '#fff',
 });
 
 export const TokenList = styled('div')({
@@ -82,7 +80,6 @@ export const TokenTextContainer = styled('div')({
 });
 
 export const TokenText = styled('span')({
-    color: '#fff',
     fontSize: '14px',
 });
 

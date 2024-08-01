@@ -85,6 +85,7 @@ export const lightTheme = createTheme({
             styleOverrides: {
                 sizeSmall: {
                     paddingTop: '3px',
+                    color: 'white',
                 },
             },
         },
@@ -92,6 +93,7 @@ export const lightTheme = createTheme({
             styleOverrides: {
                 root: {
                     textTransform: 'none',
+                    color: 'black',
                 },
             },
         },
@@ -123,6 +125,13 @@ export const lightTheme = createTheme({
             styleOverrides: {
                 root: {
                     backgroundColor: 'white',
+                },
+            },
+        },
+        MuiTypography: {
+            styleOverrides: {
+                root: {
+                    color: 'black',
                 },
             },
         },
