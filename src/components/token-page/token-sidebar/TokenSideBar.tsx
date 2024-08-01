@@ -1,9 +1,9 @@
-import { Box, Card, Tab, Tabs } from '@mui/material';
+import { Tab, Tabs } from '@mui/material';
 import TabPanel from '@mui/lab/TabPanel';
 import TabContext from '@mui/lab/TabContext';
 import { FC, useState, SyntheticEvent } from 'react';
 import { Token } from '../../../types/Types';
-import { SideBarContainer } from './TokenSideBar.s';
+import { SideBarCard, SideBarContainer } from './TokenSideBar.s';
 import TokenSideBarInfo from './token-side-bar-info/TokenSideBarInfo';
 
 interface TokenSideBarProps {
@@ -13,13 +13,13 @@ interface TokenSideBarProps {
 const TokenSideBar: FC<TokenSideBarProps> = (props) => {
     const [selectedSideActionTab, setSelectedSideActionTab] = useState('1');
 
-    const handleTabChage = (event: SyntheticEvent, newValue: string) => {
+    const handleTabChage = (_event: SyntheticEvent, newValue: string) => {
         setSelectedSideActionTab(newValue);
     };
 
     return (
         <SideBarContainer>
-            <Card>
+            <SideBarCard>
                 <TabContext value={selectedSideActionTab}>
                     <Tabs
                         value={selectedSideActionTab}
@@ -44,7 +44,7 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                     <TabPanel value="2">Buy The Token</TabPanel>
                     <TabPanel value="3">Sell The Token</TabPanel>
                 </TabContext>
-            </Card>
+            </SideBarCard>
         </SideBarContainer>
     );
 };

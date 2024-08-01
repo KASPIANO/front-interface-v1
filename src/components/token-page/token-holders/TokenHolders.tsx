@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Token, TokenHolder } from '../../../types/Types';
 import {
     Box,
@@ -21,7 +21,19 @@ interface TokenHoldersProps {
 
 const TokenHolders: FC<TokenHoldersProps> = (props) => {
     const [limit, setLimit] = useState(10);
-    const tokenHolders: TokenHolder[] = props.tokenInfo?.holder || [];
+    const [tokenHolders, setTokenHolders] = useState<TokenHolder[]>([]);
+
+    useEffect(() => {
+        setTokenHolders(props.tokenInfo?.holder || []);
+
+        // const tokenHoldersDuplicated = [...props.tokenInfo?.holder || []].flatMap((holder) =>
+        //     Array(20).fill(holder)
+        // );
+        // setTokenHolders(tokenHoldersDuplicated);
+
+    }, [props.tokenInfo?.holder]);
+
+
     const handleLimitChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setLimit(Number(event.target.value));
     };

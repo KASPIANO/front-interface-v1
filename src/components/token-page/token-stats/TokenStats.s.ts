@@ -10,6 +10,7 @@ export const DataPaper = styled(Paper)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     padding: theme.spacing(1),
+    height: '18vh',
 }));

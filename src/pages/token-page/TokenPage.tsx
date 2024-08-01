@@ -9,7 +9,7 @@ import { Token } from '../../types/Types';
 import { TokenPageLayout } from './TokenPageLayout';
 import TokenSideBar from '../../components/token-page/token-sidebar/TokenSideBar';
 import TokenHolders from '../../components/token-page/token-holders/TokenHolders';
-import TokenRugScore from '../../components/token-page/token-rug-score/TokenRugScore';
+import TokenStats from '../../components/token-page/token-stats/TokenStats';
 
 interface TokenPageProps {
     walletAddress: string | null;
@@ -45,9 +45,9 @@ const TokenPage: FC<TokenPageProps> = (props) => {
 
     return (
         <TokenPageLayout>
-            {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '58px')}
+            {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '42px')}
             {getComponentToShow(<TokenGraph />, '400px')}
-            {getComponentToShow(<TokenRugScore tokenInfo={tokenInfo} />)}
+            {getComponentToShow(<TokenStats tokenInfo={tokenInfo} />)}
             {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)}
             {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} />, '300px')}
 
