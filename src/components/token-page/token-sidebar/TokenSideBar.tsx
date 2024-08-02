@@ -4,7 +4,7 @@ import TabContext from '@mui/lab/TabContext';
 import { FC, useState, SyntheticEvent } from 'react';
 import { Token } from '../../../types/Types';
 import { SideBarCard, SideBarContainer } from './TokenSideBar.s';
-import TokenSideBarInfo from './token-side-bar-info/TokenSideBarInfo';
+import TokenSideBarInfo from './token-sidebar-info/TokenSideBarInfo';
 
 interface TokenSideBarProps {
     tokenInfo: Token;

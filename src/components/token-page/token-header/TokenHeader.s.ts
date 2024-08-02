@@ -4,9 +4,8 @@ export const HeaderContainer = styled(Box)({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: '1vw 0',
+    padding: '0 1vw',
     borderBottom: '1px solid rgba(111, 199, 186, 0.3)',
-    height: '7vh',
 });
 
 export const Title = styled(Typography)({

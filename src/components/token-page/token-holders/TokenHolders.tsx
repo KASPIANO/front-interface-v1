@@ -30,16 +30,14 @@ const TokenHolders: FC<TokenHoldersProps> = (props) => {
         //     Array(20).fill(holder)
         // );
         // setTokenHolders(tokenHoldersDuplicated);
-
     }, [props.tokenInfo?.holder]);
-
 
     const handleLimitChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setLimit(Number(event.target.value));
     };
 
     return (
-        <Box sx={{ height: '5vh' }}>
+        <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h6" sx={{ fontWeight: '600' }}>
                     Token Top Holders
