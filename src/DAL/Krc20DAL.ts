@@ -104,3 +104,32 @@ export async function fetchTotalTokensDeployed(): Promise<number> {
         return 0;
     }
 }
+// This iterates through the 50 items from the api and fecthes the token info for each token, in the data base the token details and al together in the ticker, no need for 2 requests
+// the only thing is that you need to do pagination, 50 tokes per request, make it so that you can implement sort by relevant headers in the table, and also by the relevant time frame,
+// theres a filter of time there also, look at the possible options in the grid
+//    useEffect(() => {
+//     const loadTokens = async () => {
+//         try {
+//             setLoading(true);
+//             const offset = nextPage * 50;
+//             const slicedTokensList = tokensList.slice(0, offset);
+//             const detailedTokens = await Promise.all(
+//                 slicedTokensList.map(async (token) => {
+//                     const tokenDetails = await fetchTokenInfo(token.tick);
+//                     return {
+//                         ...token,
+//                         ...tokenDetails[0],
+//                     };
+//                 }),
+//             );
+//             setTokensRows((prevTokenRows) => [...prevTokenRows, ...detailedTokens]);
+//         } catch (error) {
+//             console.error('Error loading tokens:', error);
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     loadTokens();
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+// }, [tokensList]);

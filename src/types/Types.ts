@@ -51,7 +51,7 @@ export interface TokenDeploy {
     preAllocation?: string;
     description?: string;
     website?: string;
-    twitter?: string;
+    x?: string;
     discord?: string;
     telegram?: string;
     logo?: string;

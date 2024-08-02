@@ -17,7 +17,7 @@ const DeployPage: React.FC = () => {
     const [preAllocationPercentage, setPreAllocationPercentage] = useState('');
     const [description, setDescription] = useState('');
     const [website, setWebsite] = useState('');
-    const [twitter, setTwitter] = useState('');
+    const [x, setX] = useState('');
     const [discord, setDiscord] = useState('');
     const [telegram, setTelegram] = useState('');
     const [logo, setLogo] = useState<File | null>(null);
@@ -127,7 +127,7 @@ const DeployPage: React.FC = () => {
             preAllocation,
             description,
             website,
-            twitter,
+            x,
             discord,
             telegram,
             logo: logo ? URL.createObjectURL(logo) : '',
@@ -353,12 +353,12 @@ const DeployPage: React.FC = () => {
                     />
 
                     <TextInfo
-                        label="Twitter"
+                        label="X"
                         variant="outlined"
                         fullWidth
-                        value={twitter}
-                        onChange={(e) => setTwitter(e.target.value)}
-                        placeholder="Twitter handle"
+                        value={x}
+                        onChange={(e) => setX(e.target.value)}
+                        placeholder="X handle"
                     />
 
                     <TextInfo

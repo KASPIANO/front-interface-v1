@@ -118,7 +118,7 @@ const App = () => {
                             network={network}
                             onNetworkChange={handleNetworkChange}
                             walletBalance={walletBalance}
-                            connectWallet={requestAccounts}
+                            connectWallet={handleConnectWallet}
                             disconnectWallet={handleDisconnect}
                         />
                         <Routes>
