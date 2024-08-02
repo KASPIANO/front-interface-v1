@@ -63,6 +63,12 @@ const App = () => {
         };
     }, []);
 
+    useEffect(() => {
+        if (walletAddress && walletBalance === 0) {
+            fetchWalletBalance(walletAddress).then((balance) => setWalletBalance(setWalletBalanceUtil(balance)));
+        }
+    }, [walletAddress, walletBalance]);
+
     const handleConnectWallet = async () => {
         setIsConnecting(true);
         try {
@@ -118,7 +124,7 @@ const App = () => {
                             network={network}
                             onNetworkChange={handleNetworkChange}
                             walletBalance={walletBalance}
-                            connectWallet={requestAccounts}
+                            connectWallet={handleConnectWallet}
                             disconnectWallet={handleDisconnect}
                         />
                         <Routes>

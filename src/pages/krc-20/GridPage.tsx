@@ -57,46 +57,8 @@ const GridPage: FC<GridPageProps> = (props) => {
                     onClose={() => setShowNotification(false)}
                 />
             )}
-            {/* {isModalVisible && <WalletModal onClose={() => setIsModalVisible(false)} />} */}
         </GridLayout>
     );
 };
 
 export default GridPage;
-
-// const openSlippageModal = () => {
-//     setIsModalOpen(true);
-//     setIsBlurred(true);
-// };
-
-// const closeSlippageModal = () => {
-//     setIsModalOpen(false);
-//     setIsBlurred(false);
-// };
-
-// const openTokenModal = (isPaying: boolean) => {
-//     setIsPayingTokenModal(isPaying);
-//     setIsTokenModalOpen(true);
-//     setIsBlurred(true);
-// };
-
-// const closeTokenModal = () => {
-//     setIsTokenModalOpen(false);
-//     setIsBlurred(false);
-// };
-
-// const handleTokenSelect = (token: Token) => {
-//     if (isPayingTokenModal) {
-//         setPayingCurrency(token.symbol);
-//         setPayingCurrencyImage(token.logo);
-//     } else {
-//         setReceivingCurrency(token.symbol);
-//         setReceivingCurrencyImage(token.logo);
-//     }
-//     closeTokenModal();
-// };
-
-// const handleSlippageSave = (mode: string, value: string) => {
-//     setSlippageMode(mode);
-//     setSlippageValue(value);
-// };

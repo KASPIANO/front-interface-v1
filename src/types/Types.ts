@@ -45,14 +45,15 @@ export interface NavItemProps {
 }
 
 export interface TokenDeploy {
-    tokenName: string;
+    ticker: string;
     totalSupply: string;
     mintLimit: string;
     preAllocation?: string;
     description?: string;
     website?: string;
-    twitter?: string;
+    x?: string;
     discord?: string;
     telegram?: string;
-    picture?: string;
+    logo?: string;
+    banner?: string;
 }

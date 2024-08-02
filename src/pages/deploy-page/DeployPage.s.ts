@@ -29,3 +29,24 @@ export const Status = styled('div')({
         color: 'green',
     },
 });
+
+export const UploadContainer = styled('div')({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem',
+    marginBottom: '1rem',
+});
+
+export const Input = styled('input')({
+    display: 'none',
+});
+
+export const ImagePreview = styled('img')({
+    width: '100px',
+    height: '100px',
+    objectFit: 'cover',
+});
+
+export const UploadButton = styled('label')({
+    cursor: 'pointer',
+});
