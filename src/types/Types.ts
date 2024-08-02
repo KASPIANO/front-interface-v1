@@ -54,5 +54,6 @@ export interface TokenDeploy {
     twitter?: string;
     discord?: string;
     telegram?: string;
-    picture?: string;
+    logo?: string;
+    banner?: string;
 }

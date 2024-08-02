@@ -20,7 +20,8 @@ const DeployPage: React.FC = () => {
     const [twitter, setTwitter] = useState('');
     const [discord, setDiscord] = useState('');
     const [telegram, setTelegram] = useState('');
-    const [picture, setPicture] = useState('');
+    const [logo, setLogo] = useState<File | null>(null);
+    const [banner, setBanner] = useState<File | null>(null);
     const [showDeployDialog, setShowDeployDialog] = useState(false);
     const [tokenDetails, setTokenDetails] = useState<TokenDeploy | null>(null);
     const [tickerMessage, setTickerMessage] = useState('');
@@ -129,7 +130,8 @@ const DeployPage: React.FC = () => {
             twitter,
             discord,
             telegram,
-            picture,
+            logo: logo ? URL.createObjectURL(logo) : '',
+            banner: banner ? URL.createObjectURL(banner) : '',
         };
 
         const reviewTokenData: TokenDeploy = {
@@ -209,6 +211,26 @@ const DeployPage: React.FC = () => {
             console.error('Failed to deploy KRC20 token:', error);
             setShowDeployDialog(false);
             // Handle error (e.g., show an error message)
+        }
+    };
+
+    const handleFileChange = (
+        event: React.ChangeEvent<HTMLInputElement>,
+        setter: React.Dispatch<React.SetStateAction<File | null>>,
+    ) => {
+        if (event.target.files && event.target.files.length > 0) {
+            setter(event.target.files[0]);
+        }
+    };
+
+    const handleDrop = (
+        event: React.DragEvent<HTMLElement>,
+        setter: React.Dispatch<React.SetStateAction<File | null>>,
+    ) => {
+        event.preventDefault();
+        if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+            setter(event.dataTransfer.files[0]);
+            event.dataTransfer.clearData();
         }
     };
 
@@ -361,9 +383,43 @@ const DeployPage: React.FC = () => {
                         label="Token's Picture"
                         variant="outlined"
                         fullWidth
-                        value={picture}
-                        onChange={(e) => setPicture(e.target.value)}
+                        value={logo ? logo.name : ''}
+                        onChange={(e) => handleFileChange(e, setLogo)}
                         placeholder="Link to the ticker's image"
+                        InputProps={{
+                            endAdornment: (
+                                <Tooltip
+                                    placement="left"
+                                    title="Upload the token's image by dragging it here or by clicking to upload."
+                                >
+                                    <IconButton>
+                                        <InfoOutlinedIcon fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+                            ),
+                        }}
+                        onDrop={(e) => handleDrop(e, setLogo)}
+                    />
+                    <TextInfo
+                        label="Token's Banner"
+                        variant="outlined"
+                        fullWidth
+                        value={banner ? banner.name : ''}
+                        onChange={(e) => handleFileChange(e, setBanner)}
+                        placeholder="Link to the project's banner for token page"
+                        InputProps={{
+                            endAdornment: (
+                                <Tooltip
+                                    placement="left"
+                                    title="Upload the project's banner by dragging it here or by clicking to upload."
+                                >
+                                    <IconButton>
+                                        <InfoOutlinedIcon fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+                            ),
+                        }}
+                        onDrop={(e) => handleDrop(e, setBanner)}
                     />
 
                     <Button
