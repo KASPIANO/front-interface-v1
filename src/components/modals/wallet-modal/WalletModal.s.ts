@@ -18,7 +18,7 @@ export const ModalContent = styled('div')({
     padding: '20px',
     borderRadius: '8px',
     width: '400px',
-    color: '#fff',
+
     textAlign: 'center',
 
     '@media (max-width: 550px)': {
@@ -67,7 +67,7 @@ export const ModalButton = styled('button')({
     border: 'none',
     borderRadius: '4px',
     padding: '10px 10px',
-    color: '#fff',
+
     cursor: 'pointer',
     fontSize: '16px',
     marginTop: '10px',
@@ -87,7 +87,7 @@ export const LinkButton = styled('a')({
     border: 'none',
     borderRadius: '4px',
     padding: '10px 20px',
-    color: '#fff',
+
     cursor: 'pointer',
     fontSize: '16px',
     marginTop: '10px',

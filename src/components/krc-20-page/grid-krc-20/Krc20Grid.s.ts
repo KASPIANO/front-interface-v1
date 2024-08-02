@@ -3,7 +3,6 @@ import { styled } from '@mui/material/styles';
 
 export const TableHeader = styled('th')({
     fontSize: '1vw',
-    color: '#fff',
     fontWeight: 'bold',
 });
 

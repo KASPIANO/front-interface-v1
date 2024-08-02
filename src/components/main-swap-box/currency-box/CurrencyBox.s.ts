@@ -27,7 +27,6 @@ export const StyledCurrencyImage = styled('img')({
 });
 
 export const StyledCurrencyText = styled(Typography)({
-    color: '#fff',
     fontSize: '14px',
 });
 
@@ -36,7 +35,7 @@ export const StyledAmountInput = styled(InputBase)({
     background: 'none',
     border: 'none',
     outline: 'none',
-    color: '#fff',
+
     fontSize: '14px',
     textAlign: 'right',
 });

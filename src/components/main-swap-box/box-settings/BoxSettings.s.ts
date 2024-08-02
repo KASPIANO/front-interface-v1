@@ -10,7 +10,7 @@ export const SlippageSetting = styled(Box)({
     backgroundColor: '#353545',
     padding: '8px 8px',
     borderRadius: '20px',
-    color: '#fff',
+
     marginLeft: '270px',
 });
 

@@ -25,7 +25,7 @@ const SwapBox: React.FC = () => (
                 <CurrencySelector>
                     <CurrencyImage src="/kaspa.svg" alt="KAS" />
                     <CurrencyText>KAS</CurrencyText>
-                    <KeyboardArrowDownRoundedIcon style={{ color: 'white', marginLeft: '8px' }} />
+                    <KeyboardArrowDownRoundedIcon style={{ marginLeft: '8px' }} />
                 </CurrencySelector>
                 <AmountInput type="text" placeholder="0.00" />
             </InputContainer>
@@ -42,7 +42,7 @@ const SwapBox: React.FC = () => (
                 <CurrencySelector>
                     <CurrencyImage src="/token.svg" alt="TOKEN" />
                     <CurrencyText>Token</CurrencyText>
-                    <KeyboardArrowDownRoundedIcon style={{ color: 'white', marginLeft: '8px' }} />
+                    <KeyboardArrowDownRoundedIcon style={{ marginLeft: '8px' }} />
                 </CurrencySelector>
                 <AmountInput type="text" placeholder="0.00" />
             </InputContainer>

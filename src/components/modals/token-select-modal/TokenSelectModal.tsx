@@ -77,7 +77,7 @@
 //                     </CloseButton>
 //                 </ModalHeader>
 //                 <SearchContainer>
-//                     <SearchRoundedIcon style={{ color: 'white', marginRight: '8px' }} />
+//                     <SearchRoundedIcon style={{ marginRight: '8px' }} />
 //                     <SearchInput
 //                         type="text"
 //                         placeholder="Search by KRC-20 ticker"

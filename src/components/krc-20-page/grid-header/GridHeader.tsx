@@ -17,7 +17,7 @@ export const GridHeader: FC<GridHeaderProps> = ({ name, headerFunction }) => (
             minWidth: '11vw',
         }}
     >
-        <Typography>{name}</Typography>
+        <Typography variant="body1">{name}</Typography>
         {<FilterButton onFilterClick={headerFunction} />}
     </TableHeader>
 );

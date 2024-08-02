@@ -13,7 +13,7 @@ export const NavbarContainer = styled(Box)({
 
 export const NavItem = styled(Typography)(() => ({
     fontSize: '1.2vw',
-    color: '#fff',
+
     cursor: 'pointer',
     fontWeight: 700,
     '&:hover': {
