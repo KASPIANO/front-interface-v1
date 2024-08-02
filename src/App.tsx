@@ -63,6 +63,12 @@ const App = () => {
         };
     }, []);
 
+    useEffect(() => {
+        if (walletAddress && walletBalance === 0) {
+            fetchWalletBalance(walletAddress).then((balance) => setWalletBalance(setWalletBalanceUtil(balance)));
+        }
+    }, [walletAddress, walletBalance]);
+
     const handleConnectWallet = async () => {
         setIsConnecting(true);
         try {
