@@ -109,11 +109,11 @@ const DeployPage: React.FC = () => {
             setTickerMessage('Token name must be 4-6 letters.');
             setStatusClass('error');
             return;
-        } else if (!totalSupply) {
+        } else if (!totalSupply || /^0+$/.test(totalSupply)) {
             setTotalSupplyError(true);
             return;
-        } else if (!mintLimit) {
-            setMintLimitError(false);
+        } else if (!mintLimit || /^0+$/.test(mintLimit)) {
+            setMintLimitError(true);
             return;
         }
 
@@ -133,6 +133,7 @@ const DeployPage: React.FC = () => {
             logo: logo || '',
             banner: banner || '',
         };
+        console.log('Token Data:', tokenData);
 
         const reviewTokenData: TokenDeploy = {
             ticker: validatedTokenName,
@@ -148,7 +149,7 @@ const DeployPage: React.FC = () => {
 
     const mintLimiErrorText = () => {
         if (mintLimitError) {
-            return 'Mint limit is required';
+            return 'Mint limit is required, it has to be more than 0.';
         } else if (limitSupplyError) {
             return 'Mint limit cannot be greater than total supply';
         } else {
@@ -217,7 +218,7 @@ const DeployPage: React.FC = () => {
     return (
         <Container sx={{ width: '90%' }}>
             <DeployForm>
-                <Typography variant="h4" gutterBottom>
+                <Typography sx={{ fontSize: '2.2vw', fontWeight: '500' }} variant="h4" gutterBottom>
                     KRC-20 Token Information
                 </Typography>
                 <form id="tokenForm" onSubmit={handleSubmit}>
@@ -243,7 +244,7 @@ const DeployPage: React.FC = () => {
 
                     <TextInfo
                         error={totalSupplyError}
-                        helperText={totalSupplyError ? 'Total supply is required' : ''}
+                        helperText={totalSupplyError ? 'Total supply is required it has to be more than 0.' : ''}
                         sx={{ marginTop: '1vh' }}
                         label="Total Supply"
                         variant="outlined"
@@ -380,6 +381,17 @@ const DeployPage: React.FC = () => {
                                 Choose File or Drag
                             </Button>
                         </UploadButton>
+                        <Button
+                            sx={{ width: '1vw', height: '2vw' }}
+                            onClick={() => {
+                                setLogo(null);
+                            }}
+                            disabled={!logo}
+                            color="primary"
+                            variant="contained"
+                        >
+                            Clear
+                        </Button>
                     </UploadContainer>
 
                     <UploadContainer>
@@ -401,6 +413,17 @@ const DeployPage: React.FC = () => {
                             />
                             <Button variant="text" color="primary" component="span">
                                 Choose File or Drag
+                            </Button>
+                            <Button
+                                sx={{ width: '1vw', height: '2vw' }}
+                                onClick={() => {
+                                    setBanner(null);
+                                }}
+                                disabled={!banner}
+                                color="primary"
+                                variant="contained"
+                            >
+                                Clear
                             </Button>
                         </UploadButton>
                     </UploadContainer>
