@@ -45,7 +45,7 @@ export interface NavItemProps {
 }
 
 export interface TokenDeploy {
-    tokenName: string;
+    ticker: string;
     totalSupply: string;
     mintLimit: string;
     preAllocation?: string;

@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
-import { Button, Container, Typography, Tooltip, IconButton } from '@mui/material';
+import { Button, Container, Typography, Tooltip, IconButton, Input } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { DeployForm, Info, Status, TextInfo } from './DeployPage.s';
+import { DeployForm, ImagePreview, Info, Status, TextInfo, UploadButton, UploadContainer } from './DeployPage.s';
 import { TokenDeploy } from '../../types/Types';
 import DeployDialog from '../../components/deploy-page/deploy-dialog/DeployDialog';
 import debounce from 'lodash/debounce';
@@ -20,8 +20,8 @@ const DeployPage: React.FC = () => {
     const [x, setX] = useState('');
     const [discord, setDiscord] = useState('');
     const [telegram, setTelegram] = useState('');
-    const [logo, setLogo] = useState<File | null>(null);
-    const [banner, setBanner] = useState<File | null>(null);
+    const [logo, setLogo] = useState<string | null>(null);
+    const [banner, setBanner] = useState<string | null>(null);
     const [showDeployDialog, setShowDeployDialog] = useState(false);
     const [tokenDetails, setTokenDetails] = useState<TokenDeploy | null>(null);
     const [tickerMessage, setTickerMessage] = useState('');
@@ -121,7 +121,7 @@ const DeployPage: React.FC = () => {
         setStatusClass('');
 
         const tokenData: TokenDeploy = {
-            tokenName: validatedTokenName,
+            ticker: validatedTokenName,
             totalSupply,
             mintLimit,
             preAllocation,
@@ -130,12 +130,12 @@ const DeployPage: React.FC = () => {
             x,
             discord,
             telegram,
-            logo: logo ? URL.createObjectURL(logo) : '',
-            banner: banner ? URL.createObjectURL(banner) : '',
+            logo: logo || '',
+            banner: banner || '',
         };
 
         const reviewTokenData: TokenDeploy = {
-            tokenName: validatedTokenName,
+            ticker: validatedTokenName,
             totalSupply,
             mintLimit,
             preAllocation: `${preAllocation} (${preAllocationPercentage}%)`,
@@ -195,7 +195,7 @@ const DeployPage: React.FC = () => {
         const inscribeJsonString = JSON.stringify({
             p: 'KRC-20',
             op: 'deploy',
-            tick: tokenDetails.tokenName,
+            tick: tokenDetails.ticker,
             max: tokenDetails.totalSupply,
             lim: tokenDetails.mintLimit,
             pre: tokenDetails.preAllocation,
@@ -211,26 +211,6 @@ const DeployPage: React.FC = () => {
             console.error('Failed to deploy KRC20 token:', error);
             setShowDeployDialog(false);
             // Handle error (e.g., show an error message)
-        }
-    };
-
-    const handleFileChange = (
-        event: React.ChangeEvent<HTMLInputElement>,
-        setter: React.Dispatch<React.SetStateAction<File | null>>,
-    ) => {
-        if (event.target.files && event.target.files.length > 0) {
-            setter(event.target.files[0]);
-        }
-    };
-
-    const handleDrop = (
-        event: React.DragEvent<HTMLElement>,
-        setter: React.Dispatch<React.SetStateAction<File | null>>,
-    ) => {
-        event.preventDefault();
-        if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
-            setter(event.dataTransfer.files[0]);
-            event.dataTransfer.clearData();
         }
     };
 
@@ -379,48 +359,51 @@ const DeployPage: React.FC = () => {
                         placeholder="Telegram link"
                     />
 
-                    <TextInfo
-                        label="Token's Picture"
-                        variant="outlined"
-                        fullWidth
-                        value={logo ? logo.name : ''}
-                        onChange={(e) => handleFileChange(e, setLogo)}
-                        placeholder="Link to the ticker's image"
-                        InputProps={{
-                            endAdornment: (
-                                <Tooltip
-                                    placement="left"
-                                    title="Upload the token's image by dragging it here or by clicking to upload."
-                                >
-                                    <IconButton>
-                                        <InfoOutlinedIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
-                            ),
-                        }}
-                        onDrop={(e) => handleDrop(e, setLogo)}
-                    />
-                    <TextInfo
-                        label="Token's Banner"
-                        variant="outlined"
-                        fullWidth
-                        value={banner ? banner.name : ''}
-                        onChange={(e) => handleFileChange(e, setBanner)}
-                        placeholder="Link to the project's banner for token page"
-                        InputProps={{
-                            endAdornment: (
-                                <Tooltip
-                                    placement="left"
-                                    title="Upload the project's banner by dragging it here or by clicking to upload."
-                                >
-                                    <IconButton>
-                                        <InfoOutlinedIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
-                            ),
-                        }}
-                        onDrop={(e) => handleDrop(e, setBanner)}
-                    />
+                    <UploadContainer>
+                        {logo ? (
+                            <ImagePreview src={logo} alt="Token Logo" />
+                        ) : (
+                            <Typography>Upload Token's Logo</Typography>
+                        )}
+                        <UploadButton htmlFor="logo-upload">
+                            <Input
+                                inputProps={{ accept: 'image/*' }}
+                                sx={{ display: 'none' }}
+                                id="logo-upload"
+                                type="file"
+                                onChange={(event) => {
+                                    const inputElement = event.target as HTMLInputElement;
+                                    setLogo(URL.createObjectURL(inputElement.files[0]));
+                                }}
+                            />
+                            <Button variant="text" color="primary" component="span">
+                                Choose File or Drag
+                            </Button>
+                        </UploadButton>
+                    </UploadContainer>
+
+                    <UploadContainer>
+                        {banner ? (
+                            <ImagePreview src={banner} alt="Token Banner" />
+                        ) : (
+                            <Typography>Upload Token's Banner</Typography>
+                        )}
+                        <UploadButton htmlFor="banner-upload">
+                            <Input
+                                sx={{ display: 'none' }}
+                                inputProps={{ accept: 'image/*' }}
+                                id="banner-upload"
+                                type="file"
+                                onChange={(event) => {
+                                    const inputElement = event.target as HTMLInputElement;
+                                    setBanner(URL.createObjectURL(inputElement.files[0]));
+                                }}
+                            />
+                            <Button variant="text" color="primary" component="span">
+                                Choose File or Drag
+                            </Button>
+                        </UploadButton>
+                    </UploadContainer>
 
                     <Button
                         sx={{
