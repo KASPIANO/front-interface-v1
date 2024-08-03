@@ -1,7 +1,9 @@
 import { Slider, styled } from '@mui/material';
 
-export const ScoreLineSlider = styled(Slider)(({ theme }) => ({
-    height: '1.4vh',
+export const ScoreLineSlider = styled(Slider)({
+    height: '2vh',
+    width: '25vw',
+
     '& .MuiSlider-track': {
         height: '1vh',
     },
@@ -13,17 +15,11 @@ export const ScoreLineSlider = styled(Slider)(({ theme }) => ({
         },
     },
     '& .MuiSlider-valueLabel': {
-        fontSize: theme.typography.body1,
-        fontWeight: 'normal',
         top: -6,
         borderRadius: 10,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
         lineHeight: 1,
-        padding: theme.spacing(1),
         '&::before': {
             display: 'none',
         },
     },
-}));
+});

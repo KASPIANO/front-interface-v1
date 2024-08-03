@@ -1,5 +1,5 @@
 import React from 'react';
-import TradingViewChart from '../../../trading-view/TradingViewChart';
+import TradingViewChart from '../../trading-view/TradingViewChart';
 import { GraphContainer } from './TokenGraph.s';
 
 interface TokenGraphProps {

@@ -7,10 +7,10 @@ export const TokenPageLayout = ({ children }) => (
                 item
                 container
                 rowSpacing={1}
-                xs={8}
-                sm={8}
-                md={8}
-                lg={8}
+                xs={9}
+                sm={9}
+                md={9}
+                lg={9}
                 sx={{
                     '&.MuiGrid-item': {
                         paddingTop: 0,
@@ -23,26 +23,32 @@ export const TokenPageLayout = ({ children }) => (
                 <Grid item xs={12} sm={12} md={12} lg={12}>
                     {children[1]}
                 </Grid>
+
                 <Grid item xs={12} sm={12} md={12} lg={12}>
                     {children[2]}
                 </Grid>
-                <Grid item xs={12} sm={12} md={12} lg={12}>
-                    {children[3]}
+                <Grid container item xs={12} sm={12} md={12} lg={12} spacing={0.5}>
+                    <Grid item xs={6} sm={6} md={6} lg={6}>
+                        {children[3]}
+                    </Grid>
+                    <Grid item xs={6} sm={6} md={6} lg={6}>
+                        {children[4]}
+                    </Grid>
                 </Grid>
             </Grid>
             <Grid
                 item
-                xs={4}
-                sm={4}
-                md={4}
-                lg={4}
+                xs={3}
+                sm={3}
+                md={3}
+                lg={3}
                 sx={{
                     '&.MuiGrid-item': {
                         paddingTop: 0,
                     },
                 }}
             >
-                {children[4]}
+                {children[5]}
             </Grid>
         </Grid>
     </div>

@@ -2,13 +2,14 @@ import { Skeleton } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import NotificationComponent from '../../components/notification/Notification';
-import TokenGraph from '../../components/token-page/token-header/token-graph/TokenGraph';
+import TokenGraph from '../../components/token-page/token-graph/TokenGraph';
 import TokenHeader from '../../components/token-page/token-header/TokenHeader';
 import { fetchTokenInfo } from '../../DAL/Krc20DAL';
 import { Token } from '../../types/Types';
 import { TokenPageLayout } from './TokenPageLayout';
 import TokenSideBar from '../../components/token-page/token-sidebar/TokenSideBar';
-import TokenHolders from '../../components/token-page/token-holders/TokenHolders';
+import RugScore from '../../components/token-page/rug-score/RugScore';
+import TopHolders from '../../components/token-page/top-holders/TopHolders';
 import TokenStats from '../../components/token-page/token-stats/TokenStats';
 
 interface TokenPageProps {
@@ -45,11 +46,13 @@ const TokenPage: FC<TokenPageProps> = (props) => {
 
     return (
         <TokenPageLayout>
-            {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '42px')}
-            {getComponentToShow(<TokenGraph />, '400px')}
-            {getComponentToShow(<TokenStats tokenInfo={tokenInfo} />)}
-            {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)}
-            {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} />, '300px')}
+            {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '11.5vh')}
+            {getComponentToShow(<TokenGraph />, '30vh')}
+            {getComponentToShow(<TokenStats />)}
+            {getComponentToShow(<RugScore score={66} />, '19vh')}
+            {getComponentToShow(<TopHolders tokenInfo={tokenInfo} />, '19vh')}
+            {/* {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)} */}
+            {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} />, '91vh')}
 
             {showNotification && walletAddress && (
                 <NotificationComponent
