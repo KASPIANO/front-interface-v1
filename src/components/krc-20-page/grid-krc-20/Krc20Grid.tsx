@@ -5,12 +5,12 @@ import { FC, useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components';
+import { v4 as uuidv4 } from 'uuid';
 import { fetchTokenInfo } from '../../../DAL/Krc20DAL';
 import { TokenResponse } from '../../../types/Types';
 import { GridHeader } from '../grid-header/GridHeader';
 import { TokenRow } from '../token-row/TokenRow';
 import { NoDataContainer, StyledDataGridContainer } from './Krc20Grid.s';
-import { v4 as uuidv4 } from 'uuid';
 
 const GlobalStyle = createGlobalStyle`
   #scrollableList {

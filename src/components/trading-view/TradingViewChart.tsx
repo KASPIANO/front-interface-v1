@@ -1,5 +1,9 @@
-import React, { useEffect } from 'react';
+import * as echarts from 'echarts';
+import React, { useEffect, useRef } from 'react';
+import { option } from './TradingView.config';
 import { ChartContainer, ChartWrapper } from './TradingView.s';
+
+type EChartsOption = echarts.EChartsOption;
 
 declare global {
     interface Window {
@@ -7,39 +11,22 @@ declare global {
     }
 }
 
-const TradingViewChart: React.FC = () => (
-    // useEffect(() => {
-    //     const script = document.createElement('script');
-    //     script.src = 'https://s3.tradingview.com/tv.js';
-    //     script.async = true;
-    //     script.onload = () => {
-    //         new window.TradingView.widget({
-    //             container_id: 'tradingview_widget',
-    //             width: '100%',
-    //             height: '100%',
-    //             symbol: 'KASUSDT',
-    //             interval: '1',
-    //             timezone: 'Etc/UTC',
-    //             theme: 'dark',
-    //             style: '1',
-    //             locale: 'en',
-    //             toolbar_bg: '#f1f3f6',
-    //             enable_publishing: false,
-    //             allow_symbol_change: true,
-    //             hide_top_toolbar: false,
-    //             save_image: false,
-    //             details: false,
-    //             hide_side_toolbar: true,
-    //             withdateranges: false,
-    //         });
-    //     };
-    //     document.body.appendChild(script);
-    // }, []);
+const TradingViewChart: React.FC = () => {
+    const graph = useRef();
+    useEffect(() => {
+        if (graph.current) {
+            var myChart = echarts.init(graph.current);
 
-    <ChartWrapper>
-        <ChartContainer>
-            <div id="tradingview_widget" />
-        </ChartContainer>
-    </ChartWrapper>
-);
+            myChart.setOption(option);
+        }
+    }, [graph]);
+
+    return (
+        <ChartWrapper>
+            <ChartContainer>
+                <div ref={graph} style={{ height: '40vh', width: '30vw' }} />
+            </ChartContainer>
+        </ChartWrapper>
+    );
+};
 export default TradingViewChart;
