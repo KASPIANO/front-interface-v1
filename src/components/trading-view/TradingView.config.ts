@@ -1,6 +1,56 @@
 type DataItem = (number | string)[];
 
-const rawData = [
+const getNextDate = (inputDate) => {
+    // Split the input date string into components
+    const [year, month, day] = inputDate.split('/').map(Number);
+
+    // Create a new Date object from the input date
+    const date = new Date(year, month - 1, day); // month is zero-based in JavaScript Date
+
+    // Add one day to the date
+    date.setDate(date.getDate() + 1);
+
+    // Format the new date back to YYYY/MM/DD
+    const nextYear = date.getFullYear();
+    const nextMonth = String(date.getMonth() + 1).padStart(2, '0');
+    const nextDay = String(date.getDate()).padStart(2, '0');
+
+    return `${nextYear}/${nextMonth}/${nextDay}`;
+};
+export const generateNewData = (existingData) => {
+    // const newData = [];
+
+    // Convert date strings to Date objects and find the latest date
+
+    // for (let i = 1; i <= numNewEntries; i++) {
+    const formattedDate = getNextDate(existingData[existingData.length - 1][0]);
+
+    const open = (Math.random() * (3700 - 3500) + 3500).toFixed(2);
+    const close = (Math.random() * (3700 - 3500) + 3500).toFixed(2);
+    const change = (Number(close) - Number(open)).toFixed(2);
+    const changePercent = `${((Number(change) / Number(open)) * 100).toFixed(2)}%`;
+    const low = Math.min(Number(open), Number(close)).toFixed(2);
+    const high = Math.max(Number(open), Number(close)).toFixed(2);
+    const volume = Math.floor(Math.random() * (400000000 - 100000000) + 100000000);
+    const amount = Math.floor(volume * (Math.random() * (50 - 20) + 20));
+
+    // newData.push([formattedDate, open, close, change, changePercent, low, high, volume, amount, '-']);
+    // }
+    return [
+        formattedDate,
+        open,
+        close,
+        change,
+        changePercent,
+        low,
+        high,
+        volume.toString(),
+        amount.toString(),
+        '-',
+    ];
+};
+
+export const rawData = [
     ['2015/12/31', '3570.47', '3539.18', '-33.69', '-0.94%', '3538.35', '3580.6', '176963664', '25403106', '-'],
     ['2015/12/30', '3566.73', '3572.88', '9.14', '0.26%', '3538.11', '3573.68', '187889600', '26778766', '-'],
     ['2015/12/29', '3528.4', '3563.74', '29.96', '0.85%', '3515.52', '3564.17', '182551920', '25093890', '-'],
@@ -249,7 +299,7 @@ const rawData = [
     ['', '', '', '', '', '', '', '', '', ''],
 ].reverse();
 
-function calculateMA(dayCount: number, data: DataItem[]) {
+export const calculateMA = (dayCount: number, data: DataItem[]) => {
     var result = [];
     for (var i = 0, len = data.length; i < len; i++) {
         if (i < dayCount) {
@@ -263,7 +313,7 @@ function calculateMA(dayCount: number, data: DataItem[]) {
         result.push(sum / dayCount);
     }
     return result;
-}
+};
 
 const dates = rawData.map(function (item) {
     return item[0];
