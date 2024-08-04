@@ -1,24 +1,19 @@
-import { styled, Box, Paper, Button } from '@mui/material';
+import { styled, Box, Button } from '@mui/material';
 
-export const DataRowContainer = styled(Box)({
+export const DataRow = styled(Box)({
     display: 'flex',
+    flexDirection: 'row',
     justifyContent: 'space-between',
-});
-
-export const DataPaper = styled(Paper)(({ theme }) => ({
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: theme.spacing(1),
-}));
+    gap: '1vw',
+});
 
 export const SentimentsContainerBox = styled(Box)({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: '1vw',
+    marginTop: '1vh',
 });
 
 export const SentimentButton = styled(Button)(({ theme }) => ({
@@ -38,12 +33,7 @@ export const SentimentButton = styled(Button)(({ theme }) => ({
     },
 }));
 
-export const ImageAndSocialsBarContainer = styled(Box)({
+export const TokenProfileContainer = styled(Box)({
+    width: '100%',
     position: 'relative',
-    '& .SocialsBar': {
-        position: 'absolute',
-        bottom: '-2px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-    },
 });

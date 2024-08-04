@@ -14,6 +14,8 @@ export const TokenSidebarSocialsBarGroup = styled(ButtonGroup)(({ theme }) => ({
 
 export const TokenSidebarSocialsBarButton = styled(Button)(({ theme }) => ({
     fontWeight: 'bold',
+    fontSize: '0.8vw',
+
     '&:hover': {
         backgroundColor: alpha(theme.palette.primary.main, 0.8),
         border: `none`,

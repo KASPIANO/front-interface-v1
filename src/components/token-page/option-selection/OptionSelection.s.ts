@@ -1,6 +1,5 @@
-import { Button, ButtonGroup, styled } from "@mui/material";
+import { Button, ButtonGroup, styled } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-
 
 export const OptionSelectionGroup = styled(ButtonGroup)(({ theme }) => ({
     height: '3.5vh',
@@ -24,7 +23,7 @@ export const OptionSelectionButton = styled(Button)(({ theme }) => ({
         backgroundColor: alpha(theme.palette.primary.main, 0.25),
     },
     '&.MuiButton-root': {
-        padding: theme.spacing(1,1),
+        padding: theme.spacing(1, 1),
         fontSize: theme.typography.fontSize,
     },
 
@@ -35,5 +34,5 @@ export const OptionSelectionButton = styled(Button)(({ theme }) => ({
 
     '&.selected': {
         backgroundColor: alpha(theme.palette.primary.main, 0.8),
-    }
+    },
 }));

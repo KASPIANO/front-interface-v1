@@ -5,5 +5,4 @@ export const SideBarContainer = styled(Card)({
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
     height: '90vh',
     position: 'sticky',
-    top: '1vh',
 });
