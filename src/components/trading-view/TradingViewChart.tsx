@@ -1,7 +1,7 @@
 import * as echarts from 'echarts';
 import React, { useEffect, useRef } from 'react';
 import { option } from './TradingView.config';
-import { ChartContainer, ChartWrapper } from './TradingView.s';
+import { ChartWrapper } from './TradingView.s';
 
 type EChartsOption = echarts.EChartsOption;
 
@@ -11,7 +11,7 @@ declare global {
     }
 }
 
-const TradingViewChart: React.FC = () => {
+export const TradingViewChart: React.FC = () => {
     const graph = useRef();
     useEffect(() => {
         if (graph.current) {
@@ -22,11 +22,8 @@ const TradingViewChart: React.FC = () => {
     }, [graph]);
 
     return (
-        <ChartWrapper>
-            <ChartContainer>
-                <div ref={graph} style={{ height: '40vh', width: '30vw' }} />
-            </ChartContainer>
+        <ChartWrapper style={{ width: 'inherit', height: 'inherit' }}>
+            <div ref={graph} style={{ height: '100%', width: '100%' }} />
         </ChartWrapper>
     );
 };
-export default TradingViewChart;
