@@ -52,18 +52,17 @@ enum GridHeaders {
     MINTED = 'MINTED',
     SUPPLY = 'SUPPLY',
     HOLDERS = 'HOLDERS',
-    TOTAL_TXNS = 'TOTAL_TXNS',
     FAIR_MINT = 'FAIR_MINT',
 }
 
-const headersMapper: Record<GridHeaders, { name: string; headerFunction: () => void }> = {
+const headersMapper: Record<GridHeaders, { name: string; headerFunction?: () => void }> = {
     [GridHeaders.TICKER]: { name: 'Ticker', headerFunction: () => {} },
     [GridHeaders.AGE]: { name: 'Age', headerFunction: () => {} },
     [GridHeaders.MINTED]: { name: 'Minted', headerFunction: () => {} },
-    [GridHeaders.SUPPLY]: { name: 'Supply', headerFunction: () => {} },
+    [GridHeaders.SUPPLY]: { name: 'Supply' },
     [GridHeaders.HOLDERS]: { name: 'Holders', headerFunction: () => {} },
-    [GridHeaders.TOTAL_TXNS]: { name: 'Total Txns', headerFunction: () => {} },
-    [GridHeaders.FAIR_MINT]: { name: 'Fair Mint', headerFunction: () => {} },
+    // [GridHeaders.TOTAL_TXNS]: { name: 'Market Cap', headerFunction: () => {} },
+    [GridHeaders.FAIR_MINT]: { name: 'Fair Mint' },
 };
 
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {

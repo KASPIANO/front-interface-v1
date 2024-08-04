@@ -16,6 +16,8 @@ import { FC } from 'react';
 import { formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
 import { capitalizeFirstLetter, formatDate } from '../grid-krc-20/Krc20Grid.config';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
+import { Stat, StatLabel, StatNumber, StatHelpText, StatArrow } from '@chakra-ui/react';
+import { List } from 'echarts';
 
 interface TokenRowProps {
     token: any;
@@ -47,7 +49,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
 
         return (
             <ListItemText
-                sx={{ marginLeft: '1vw' }}
+                sx={{ display: 'flex', justifyContent: 'center' }}
                 primary={
                     <Tooltip title={`${preMintPercentage}% Pre Minted`}>
                         {preMintedNumber === 0 ? (
@@ -83,7 +85,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
 
                     <ListItemText
                         sx={{
-                            maxWidth: '10vw',
+                            maxWidth: '11vw',
                         }}
                         primary={
                             <Tooltip title={token.tick}>
@@ -93,17 +95,8 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             </Tooltip>
                         }
                         secondary={
-                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
+                            <Typography variant="body2" style={{ fontSize: '1.1vw' }}>
                                 {formatDate(token.mtsAdd)}
-                            </Typography>
-                        }
-                    />
-
-                    <ListItemText
-                        sx={{ maxWidth: '10vw' }}
-                        primary={
-                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                {`${moment().diff(Number(token.mtsAdd), 'days')} days`}
                             </Typography>
                         }
                     />
@@ -111,64 +104,99 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemText
                         sx={{ maxWidth: '11vw' }}
                         primary={
-                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                {((token.minted / token.max) * 100).toFixed(2)}%
+                            <Typography
+                                variant="body2"
+                                style={{ fontSize: '1.1vw', display: 'flex', justifyContent: 'center' }}
+                            >
+                                {`${moment().diff(Number(token.mtsAdd), 'days')} days`}
                             </Typography>
                         }
                     />
+                    <Stat sx={{ maxWidth: '11vw' }}>
+                        <StatNumber style={{ fontSize: '1.1vw' }}>
+                            {((token.minted / token.max) * 100).toFixed(2)}%
+                        </StatNumber>
+                        <StatHelpText style={{ fontSize: '0.8vw' }}>
+                            <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
+                            23.36%
+                        </StatHelpText>
+                    </Stat>
+                    {/* <ListItemText
+                        sx={{ maxWidth: '11vw' }}
+                        primary={
+                            <Typography variant="body2" style={{ fontSize: '1.1vw' }}>
+                                {((token.minted / token.max) * 100).toFixed(2)}%
+                            </Typography>
+                        }
+                    /> */}
 
                     <ListItemText
-                        sx={{ maxWidth: '11.5vw' }}
+                        sx={{ maxWidth: '11vw' }}
                         primary={
                             <Tooltip title={formatNumberWithCommas(token.max)}>
-                                <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
+                                <Typography
+                                    variant="body2"
+                                    style={{ fontSize: '1.1vw', display: 'flex', justifyContent: 'center' }}
+                                >
                                     {simplifyNumber(token.max)}
                                 </Typography>
                             </Tooltip>
                         }
                     />
-
-                    <ListItemText
+                    <Stat sx={{ maxWidth: '11vw' }}>
+                        <StatNumber style={{ fontSize: '1.1vw' }}>
+                            {token.holder ? token.holder.length : 0}
+                        </StatNumber>
+                        <StatHelpText style={{ fontSize: '0.8vw' }}>
+                            <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
+                            10.36%
+                        </StatHelpText>
+                    </Stat>
+                    {/* <ListItemText
                         sx={{ maxWidth: '9.5vw' }}
                         primary={
-                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
+                            <Typography variant="body2" style={{ fontSize: '1.1vw' }}>
                                 {token.holder ? token.holder.length : 0}
                             </Typography>
                         }
-                    />
+                    /> */}
 
-                    <ListItemText
+                    {/* <ListItemText
                         sx={{ maxWidth: '9.5vw' }}
                         primary={
-                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
+                            <Typography variant="body2" style={{ fontSize: '1.1vw' }}>
                                 {token.transferTotal ? token.transferTotal : 0}
                             </Typography>
                         }
-                    />
+                    /> */}
 
                     <ListItemText
-                        sx={{ maxWidth: '12vw' }}
+                        sx={{ maxWidth: '11vw' }}
                         primary={
-                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
+                            <Typography variant="body2" style={{ fontSize: '1.1vw' }}>
                                 {preMintedIcons(token.pre, token.max)}
                             </Typography>
                         }
                     />
                     {token.minted < token.max && (
-                        <Button
-                            onClick={(event) => handleMint(event, token.tick)}
-                            variant="contained"
-                            color="primary"
-                            style={{
-                                marginRight: '1vw',
-                                minWidth: '2vw',
-                                width: '3vw',
-                                fontSize: '0.8vw',
-                            }}
-                            disabled={token.minted >= token.max}
-                        >
-                            Mint
-                        </Button>
+                        <ListItemText
+                            sx={{ maxWidth: '11vw', display: 'flex', justifyContent: 'center' }}
+                            primary={
+                                <Button
+                                    onClick={(event) => handleMint(event, token.tick)}
+                                    variant="contained"
+                                    color="primary"
+                                    style={{
+                                        minWidth: '2vw',
+                                        width: '3vw',
+                                        fontSize: '0.8vw',
+                                    }}
+                                    disabled={token.minted >= token.max}
+                                >
+                                    Mint
+                                </Button>
+                            }
+                        />
                     )}
                 </ListItemButton>
             </ListItem>
