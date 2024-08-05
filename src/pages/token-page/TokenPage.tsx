@@ -2,15 +2,15 @@ import { Skeleton } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import NotificationComponent from '../../components/notification/Notification';
-import TokenGraph from '../../components/token-page/token-graph/TokenGraph';
+import RugScore from '../../components/token-page/rug-score/RugScore';
+import { TokenGraph } from '../../components/token-page/token-graph/TokenGraph';
 import TokenHeader from '../../components/token-page/token-header/TokenHeader';
+import TokenSideBar from '../../components/token-page/token-sidebar/TokenSideBar';
+import TokenStats from '../../components/token-page/token-stats/TokenStats';
+import TopHolders from '../../components/token-page/top-holders/TopHolders';
 import { fetchTokenInfo } from '../../DAL/Krc20DAL';
 import { Token } from '../../types/Types';
 import { TokenPageLayout } from './TokenPageLayout';
-import TokenSideBar from '../../components/token-page/token-sidebar/TokenSideBar';
-import RugScore from '../../components/token-page/rug-score/RugScore';
-import TopHolders from '../../components/token-page/top-holders/TopHolders';
-import TokenStats from '../../components/token-page/token-stats/TokenStats';
 
 interface TokenPageProps {
     walletAddress: string | null;
