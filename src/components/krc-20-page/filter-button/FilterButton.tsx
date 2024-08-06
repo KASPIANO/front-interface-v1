@@ -1,8 +1,11 @@
-import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { IconButton } from '@mui/material';
+import { Box } from '@mui/material';
 import { FC, useState } from 'react';
+import {
+    DisabledIconButton,
+    ActiveIconButton,
+    StyledExpandMoreRoundedIcon,
+    StyledExpandLessRoundedIcon,
+} from './FilterButton.s';
 
 enum FilterState {
     UP = 'UP',
@@ -13,6 +16,7 @@ enum FilterState {
 interface FilterButtonProps {
     onFilterClick: () => void;
 }
+
 export const FilterButton: FC<FilterButtonProps> = (props) => {
     const { onFilterClick } = props;
     const [filterState, setFilterState] = useState(FilterState.NONE);
@@ -31,11 +35,27 @@ export const FilterButton: FC<FilterButtonProps> = (props) => {
         toggleFilterIcon();
         onFilterClick();
     };
+
     return (
-        <IconButton onClick={handleOnFilterClick}>
-            {filterState === FilterState.UP && <KeyboardArrowUpIcon />}
-            {filterState === FilterState.DOWN && <KeyboardArrowDownIcon />}
-            {filterState === FilterState.NONE && <HorizontalRuleIcon />}
-        </IconButton>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {filterState === FilterState.UP || filterState === FilterState.NONE ? (
+                <DisabledIconButton size="small" onClick={handleOnFilterClick}>
+                    <StyledExpandLessRoundedIcon />
+                </DisabledIconButton>
+            ) : (
+                <ActiveIconButton size="small" onClick={handleOnFilterClick}>
+                    <StyledExpandLessRoundedIcon />
+                </ActiveIconButton>
+            )}
+            {filterState === FilterState.DOWN || filterState === FilterState.NONE ? (
+                <DisabledIconButton size="small" onClick={handleOnFilterClick}>
+                    <StyledExpandMoreRoundedIcon />
+                </DisabledIconButton>
+            ) : (
+                <ActiveIconButton size="small" onClick={handleOnFilterClick}>
+                    <StyledExpandMoreRoundedIcon />
+                </ActiveIconButton>
+            )}
+        </Box>
     );
 };

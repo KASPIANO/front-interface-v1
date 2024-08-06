@@ -102,7 +102,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     />
 
                     <ListItemText
-                        sx={{ maxWidth: '11vw' }}
+                        sx={{ maxWidth: '8vw' }}
                         primary={
                             <Typography
                                 variant="body2"
@@ -110,6 +110,19 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             >
                                 {`${moment().diff(Number(token.mtsAdd), 'days')} days`}
                             </Typography>
+                        }
+                    />
+                    <ListItemText
+                        sx={{ maxWidth: '11vw' }}
+                        primary={
+                            <Tooltip title={formatNumberWithCommas(token.max)}>
+                                <Typography
+                                    variant="body2"
+                                    style={{ fontSize: '1.1vw', display: 'flex', justifyContent: 'center' }}
+                                >
+                                    {simplifyNumber(token.max)}
+                                </Typography>
+                            </Tooltip>
                         }
                     />
                     <Stat sx={{ maxWidth: '11vw' }}>
@@ -130,19 +143,6 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }
                     /> */}
 
-                    <ListItemText
-                        sx={{ maxWidth: '11vw' }}
-                        primary={
-                            <Tooltip title={formatNumberWithCommas(token.max)}>
-                                <Typography
-                                    variant="body2"
-                                    style={{ fontSize: '1.1vw', display: 'flex', justifyContent: 'center' }}
-                                >
-                                    {simplifyNumber(token.max)}
-                                </Typography>
-                            </Tooltip>
-                        }
-                    />
                     <Stat sx={{ maxWidth: '11vw' }}>
                         <StatNumber style={{ fontSize: '1.1vw' }}>
                             {token.holder ? token.holder.length : 0}

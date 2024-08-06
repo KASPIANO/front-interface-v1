@@ -49,8 +49,8 @@ interface TokenDataGridProps {
 enum GridHeaders {
     TICKER = 'TICKER',
     AGE = 'AGE',
-    MINTED = 'MINTED',
     SUPPLY = 'SUPPLY',
+    MINTED = 'MINTED',
     HOLDERS = 'HOLDERS',
     FAIR_MINT = 'FAIR_MINT',
 }
@@ -58,9 +58,9 @@ enum GridHeaders {
 const headersMapper: Record<GridHeaders, { name: string; headerFunction?: () => void }> = {
     [GridHeaders.TICKER]: { name: 'Ticker', headerFunction: () => {} },
     [GridHeaders.AGE]: { name: 'Age', headerFunction: () => {} },
-    [GridHeaders.MINTED]: { name: 'Minted', headerFunction: () => {} },
     [GridHeaders.SUPPLY]: { name: 'Supply' },
     [GridHeaders.HOLDERS]: { name: 'Holders', headerFunction: () => {} },
+    [GridHeaders.MINTED]: { name: 'Minted', headerFunction: () => {} },
     // [GridHeaders.TOTAL_TXNS]: { name: 'Market Cap', headerFunction: () => {} },
     [GridHeaders.FAIR_MINT]: { name: 'Fair Mint' },
 };
@@ -105,7 +105,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     if (tokensRows.length === 0) {
         return (
             <NoDataContainer>
-                <Typography variant="subtitle1">No Tokens found</Typography>
+                <Typography variant="subtitle1">LOADING TOKENS KASPANIO</Typography>
             </NoDataContainer>
         );
     }
@@ -113,13 +113,12 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     const tableHeader = (
         <Box
             sx={{
-                padding: '5px 0',
                 height: '8vh',
                 alignContent: 'center',
                 borderBottom: '0.1px solid  rgba(111, 199, 186, 0.3)',
             }}
         >
-            <table style={{ width: '100%' }}>
+            <table style={{ width: '90%' }}>
                 <thead>
                     <tr style={{ display: 'flex' }}>
                         {Object.keys(GridHeaders).map((header: GridHeaders) => (
