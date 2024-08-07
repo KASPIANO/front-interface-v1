@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, FC } from 'react';
 import { Button, Container, Typography, Tooltip, IconButton, Input } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { DeployForm, ImagePreview, Info, Status, TextInfo, UploadButton, UploadContainer } from './DeployPage.s';
@@ -8,7 +8,12 @@ import debounce from 'lodash/debounce';
 import { fetchTokenInfo } from '../../DAL/Krc20DAL';
 import { deployKRC20Token } from '../../utils/KaswareUtils';
 
-const DeployPage: React.FC = () => {
+interface DeployPageProps {
+    walletBalance: number;
+}
+
+const DeployPage: FC<DeployPageProps> = (props) => {
+    const { walletBalance } = props;
     const [tokenName, setTokenName] = useState('');
     const [validatedTokenName, setValidatedTokenName] = useState('');
     const [totalSupply, setTotalSupply] = useState('');
@@ -203,10 +208,14 @@ const DeployPage: React.FC = () => {
         });
 
         try {
-            const txid = await deployKRC20Token(inscribeJsonString);
-            console.log(inscribeJsonString);
-            console.log('Deployment successful, txid:', txid);
-            setShowDeployDialog(false);
+            if (walletBalance >= 1000) {
+                const txid = await deployKRC20Token(inscribeJsonString);
+                console.log(inscribeJsonString);
+                console.log('Deployment successful, txid:', txid);
+                setShowDeployDialog(false);
+            } else {
+                console.error('Insufficient funds to deploy KRC20 token');
+            }
             // Handle successful deployment (e.g., show a success message, navigate to a different page, etc.)
         } catch (error) {
             console.error('Failed to deploy KRC20 token:', error);

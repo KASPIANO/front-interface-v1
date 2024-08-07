@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
     DisabledIconButton,
     ActiveIconButton,
@@ -15,24 +15,36 @@ enum FilterState {
 
 interface FilterButtonProps {
     onFilterClick: () => void;
+    isActive: boolean;
+    setActiveHeader: () => void;
 }
 
 export const FilterButton: FC<FilterButtonProps> = (props) => {
-    const { onFilterClick } = props;
+    const { onFilterClick, isActive, setActiveHeader } = props;
     const [filterState, setFilterState] = useState(FilterState.NONE);
+
+    useEffect(() => {
+        if (!isActive) {
+            setFilterState(FilterState.NONE);
+        }
+    }, [isActive]);
 
     const toggleFilterIcon = () => {
         if (filterState === FilterState.UP) {
             setFilterState(FilterState.DOWN);
+            return FilterState.DOWN;
         } else if (filterState === FilterState.DOWN) {
             setFilterState(FilterState.NONE);
+            return FilterState.NONE;
         } else {
             setFilterState(FilterState.UP);
+            return FilterState.UP;
         }
     };
 
     const handleOnFilterClick = () => {
         toggleFilterIcon();
+        setActiveHeader();
         onFilterClick();
     };
 

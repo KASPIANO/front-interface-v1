@@ -16,22 +16,29 @@ import { FC } from 'react';
 import { formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
 import { capitalizeFirstLetter, formatDate } from '../grid-krc-20/Krc20Grid.config';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
-import { Stat, StatLabel, StatNumber, StatHelpText, StatArrow } from '@chakra-ui/react';
-import { List } from 'echarts';
+import { Stat, StatNumber, StatHelpText, StatArrow } from '@chakra-ui/react';
+import { useAlert } from '../../../utils/UseAlert';
 
 interface TokenRowProps {
     token: any;
     handleItemClick: (token: any) => void;
     tokenKey: string;
     walletBalance: number;
+    walletConnected: boolean;
 }
 
 export const TokenRow: FC<TokenRowProps> = (props) => {
-    const { token, handleItemClick, tokenKey, walletBalance } = props;
+    const { token, handleItemClick, tokenKey, walletBalance, walletConnected } = props;
+    const { showAlert } = useAlert();
+
     const handleMint = async (event, ticker: string) => {
         event.stopPropagation();
+        if (!walletConnected) {
+            showAlert('Please connect your wallet to mint a token', 'error');
+            return;
+        }
         if (walletBalance < 1) {
-            console.log('Insufficient funds');
+            showAlert('You need at least 1 KAS to mint a token', 'error');
             return;
         }
         const inscribeJsonString = JSON.stringify({
@@ -39,7 +46,16 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
             op: 'mint',
             tick: ticker,
         });
-        const mint = await mintKRC20Token(inscribeJsonString);
+        try {
+            const mint = await mintKRC20Token(inscribeJsonString);
+            if (mint) {
+                const { commit, reveal } = JSON.parse(mint);
+                showAlert('Token minted successfully', 'success', null, commit, reveal);
+                console.log(mint);
+            }
+        } catch (error) {
+            showAlert('Token minting failed', 'error', error.message);
+        }
     };
 
     const preMintedIcons = (preMinted: string, totalSupply: string) => {

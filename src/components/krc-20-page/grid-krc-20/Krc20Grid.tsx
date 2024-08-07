@@ -44,6 +44,7 @@ interface TokenDataGridProps {
     totalTokensDeployed: number;
     nextPage: number;
     walletBalance: number;
+    walletConnected: boolean;
 }
 
 enum GridHeaders {
@@ -66,9 +67,10 @@ const headersMapper: Record<GridHeaders, { name: string; headerFunction?: () => 
 };
 
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
-    const { tokensList, setNextPage, totalTokensDeployed, nextPage, walletBalance } = props;
+    const { tokensList, setNextPage, totalTokensDeployed, nextPage, walletBalance, walletConnected } = props;
     const [tokensRows, setTokensRows] = useState([]);
     const [, setLoading] = useState(true);
+    const [activeHeader, setActiveHeader] = useState<string>('');
     const navigate = useNavigate();
 
     const handleItemClick = (token) => {
@@ -126,6 +128,8 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                                 key={header}
                                 name={headersMapper[header].name}
                                 headerFunction={headersMapper[header].headerFunction}
+                                activeHeader={activeHeader}
+                                setActiveHeader={setActiveHeader}
                             />
                         ))}
                     </tr>
@@ -164,6 +168,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                         const tokenKey = `${token.tick}-${uuidv4()}`;
                         return (
                             <TokenRow
+                                walletConnected={walletConnected}
                                 key={tokenKey}
                                 walletBalance={walletBalance}
                                 tokenKey={tokenKey}

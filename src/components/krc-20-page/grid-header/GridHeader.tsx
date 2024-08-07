@@ -5,6 +5,8 @@ import { FilterButton } from '../filter-button/FilterButton';
 interface GridHeaderProps {
     name: string;
     headerFunction: () => void;
+    activeHeader: string;
+    setActiveHeader: (value: string) => void;
 }
 
 const marginMapperByHeader = {
@@ -18,7 +20,7 @@ const marginMapperByHeader = {
 
 const disableSort = (name) => name === 'Ticker' || name === 'Age' || name === 'Minted' || name === 'Holders';
 
-export const GridHeader: FC<GridHeaderProps> = ({ name, headerFunction }) => (
+export const GridHeader: FC<GridHeaderProps> = ({ name, headerFunction, activeHeader, setActiveHeader }) => (
     <th
         style={{
             display: 'flex',
@@ -28,6 +30,12 @@ export const GridHeader: FC<GridHeaderProps> = ({ name, headerFunction }) => (
         }}
     >
         <Typography sx={{ fontWeight: 600, fontSize: '2.8vh' }}>{name}</Typography>
-        {disableSort(name) && <FilterButton onFilterClick={headerFunction} />}
+        {disableSort(name) && (
+            <FilterButton
+                onFilterClick={headerFunction}
+                isActive={activeHeader === name}
+                setActiveHeader={() => setActiveHeader(name)}
+            />
+        )}
     </th>
 );

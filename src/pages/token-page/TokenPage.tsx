@@ -1,7 +1,6 @@
 import { Skeleton } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import NotificationComponent from '../../components/notification/Notification';
 import RugScore from '../../components/token-page/rug-score/RugScore';
 import { TokenGraph } from '../../components/token-page/token-graph/TokenGraph';
 import TokenHeader from '../../components/token-page/token-header/TokenHeader';
@@ -15,15 +14,11 @@ import { TokenPageLayout } from './TokenPageLayout';
 interface TokenPageProps {
     walletAddress: string | null;
     connectWallet?: () => void;
-    showNotification: boolean;
-    setShowNotification: (value: boolean) => void;
     handleNetworkChange: (network: string) => void;
     network: string;
 }
 
-const TokenPage: FC<TokenPageProps> = (props) => {
-    const { walletAddress, showNotification, setShowNotification } = props;
-
+const TokenPage: FC<TokenPageProps> = () => {
     const { ticker } = useParams();
 
     const [tokenInfo, setTokenInfo] = useState<Token>(null);
@@ -54,12 +49,12 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             {/* {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)} */}
             {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} />, '91vh')}
 
-            {showNotification && walletAddress && (
+            {/* {showNotification && walletAddress && (
                 <NotificationComponent
                     message={`Connected to wallet ${walletAddress.substring(0, 4)}...${walletAddress.substring(walletAddress.length - 4)}`}
                     onClose={() => setShowNotification(false)}
                 />
-            )}
+            )} */}
             {/* {isModalVisible && <WalletModal onClose={() => setIsModalVisible(false)} />} */}
         </TokenPageLayout>
     );
