@@ -1,23 +1,41 @@
 import { Typography } from '@mui/material';
 import { FC } from 'react';
 import { FilterButton } from '../filter-button/FilterButton';
-import { TableHeader } from '../grid-krc-20/Krc20Grid.s';
 
 interface GridHeaderProps {
     name: string;
     headerFunction: () => void;
+    activeHeader: string;
+    setActiveHeader: (value: string) => void;
 }
 
-export const GridHeader: FC<GridHeaderProps> = ({ name, headerFunction }) => (
-    <TableHeader
-        sx={{
+const marginMapperByHeader = {
+    Ticker: '21.5%',
+    Age: '13%',
+    Supply: '13.7%',
+    Minted: '14%',
+    Holders: '15%',
+    'Fair Mint': '16%',
+};
+
+const disableSort = (name) => name === 'Ticker' || name === 'Age' || name === 'Minted' || name === 'Holders';
+
+export const GridHeader: FC<GridHeaderProps> = ({ name, headerFunction, activeHeader, setActiveHeader }) => (
+    <th
+        style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            minWidth: '11vw',
+            minWidth: marginMapperByHeader[name],
         }}
     >
-        <Typography variant="body1">{name}</Typography>
-        {<FilterButton onFilterClick={headerFunction} />}
-    </TableHeader>
+        <Typography sx={{ fontWeight: 600, fontSize: '2.8vh' }}>{name}</Typography>
+        {disableSort(name) && (
+            <FilterButton
+                onFilterClick={headerFunction}
+                isActive={activeHeader === name}
+                setActiveHeader={() => setActiveHeader(name)}
+            />
+        )}
+    </th>
 );

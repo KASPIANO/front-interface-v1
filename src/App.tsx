@@ -1,6 +1,6 @@
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Navbar from './components/navbar/Navbar';
 import { fetchWalletBalance } from './DAL/KaspaApiDal';
@@ -9,23 +9,17 @@ import GridPage from './pages/krc-20/GridPage';
 import TokenPage from './pages/token-page/TokenPage';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
-import {
-    disconnect,
-    isKasWareInstalled,
-    onAccountsChanged,
-    removeAccountsChangedListener,
-    requestAccounts,
-    switchNetwork,
-} from './utils/KaswareUtils';
+import { disconnect, isKasWareInstalled, requestAccounts, switchNetwork } from './utils/KaswareUtils';
 import { getLocalThemeMode, setWalletBalanceUtil, ThemeModes } from './utils/Utils';
 import DeployPage from './pages/deploy-page/DeployPage';
+import { useAlert } from './utils/UseAlert';
 
 const App = () => {
+    const { showAlert } = useAlert();
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
     const [walletAddress, setWalletAddress] = useState<string | null>(null);
     const [walletBalance, setWalletBalance] = useState<number>(0);
     const [walletConnected, setWalletConnected] = useState<boolean>(false);
-    const [showNotification, setShowNotification] = useState<boolean>(false);
     const [network, setNetwork] = useState<string>('mainnet'); // New state for network
     const [, setIsConnecting] = useState<boolean>(false);
 
@@ -35,33 +29,54 @@ const App = () => {
         setThemeMode(newMode);
     };
 
-    useEffect(() => {
-        const handleAccountsChanged = async (accounts: string[]) => {
-            if (accounts.length === 0) {
-                setWalletAddress(null);
-                setWalletBalance(0);
-                setWalletConnected(false);
-                localStorage.removeItem('isWalletConnected');
-            } else {
-                setWalletAddress(accounts[0]);
-                const balance = await fetchWalletBalance(accounts[0]);
-                setWalletBalance(setWalletBalanceUtil(balance));
-                setWalletConnected(true);
-            }
-        };
-
-        if (isKasWareInstalled()) {
-            onAccountsChanged(handleAccountsChanged);
-            window.kasware.on('disconnect', handleDisconnect);
-        }
-
-        return () => {
-            if (isKasWareInstalled()) {
-                removeAccountsChangedListener(handleAccountsChanged);
-                window.kasware.removeListener('disconnect', handleDisconnect);
-            }
-        };
+    const updateWalletState = useCallback(async (address) => {
+        setWalletAddress(address);
+        setWalletConnected(true);
+        const balance = await fetchWalletBalance(address);
+        setWalletBalance(setWalletBalanceUtil(balance));
     }, []);
+
+    const resetWalletState = useCallback(() => {
+        setWalletAddress(null);
+        setWalletBalance(0);
+        setWalletConnected(false);
+    }, []);
+
+    const handleAccountsChanged = useCallback(
+        async (accounts) => {
+            if (accounts.length === 0) {
+                resetWalletState();
+            } else {
+                await updateWalletState(accounts[0]);
+            }
+        },
+        [updateWalletState, resetWalletState],
+    );
+
+    const handleNetworkChanged = useCallback((newNetwork) => {
+        setNetwork(newNetwork);
+    }, []);
+
+    const handleDisconnect = useCallback(async () => {
+        const { origin } = window.location;
+        await disconnect(origin);
+        resetWalletState();
+        showAlert('Wallet disconnected successfully', 'success');
+    }, [resetWalletState, showAlert]);
+
+    useEffect(() => {
+        if (isKasWareInstalled()) {
+            window.kasware.on('accountsChanged', handleAccountsChanged);
+            window.kasware.on('networkChanged', handleNetworkChanged);
+            window.kasware.on('disconnect', handleDisconnect);
+
+            return () => {
+                window.kasware.removeListener('accountsChanged', handleAccountsChanged);
+                window.kasware.removeListener('networkChanged', handleNetworkChanged);
+                window.kasware.removeListener('disconnect', handleDisconnect);
+            };
+        }
+    }, [handleAccountsChanged, handleNetworkChanged, handleDisconnect]);
 
     useEffect(() => {
         if (walletAddress && walletBalance === 0) {
@@ -75,37 +90,30 @@ const App = () => {
             if (isKasWareInstalled()) {
                 const accounts = await requestAccounts();
                 if (accounts.length > 0) {
-                    setWalletAddress(accounts[0]);
-                    setWalletConnected(true);
-                    const balance = await fetchWalletBalance(accounts[0]);
-                    setWalletBalance(setWalletBalanceUtil(balance));
-                    setShowNotification(true);
-                    setTimeout(() => setShowNotification(false), 5000);
+                    await updateWalletState(accounts[0]);
+                    showAlert(
+                        'Wallet connected successfully',
+                        'success',
+                        `Connected to wallet ${accounts[0].substring(0, 9)}....${accounts[0].substring(accounts[0].length - 4)}`,
+                    );
                 }
             }
         } catch (error) {
             console.error('Error connecting to wallet:', error);
+            showAlert('Failed to connect wallet', 'error', error.message);
         } finally {
             setIsConnecting(false);
         }
     };
 
-    const handleDisconnect = async () => {
-        const { origin } = window.location;
-        await disconnect(origin);
-        setWalletAddress(null);
-        setWalletConnected(false);
-        setWalletBalance(0);
-        localStorage.removeItem('isWalletConnected');
-    };
-
-    const handleNetworkChange = async (newNetwork: string) => {
+    const handleNetworkChange = async (newNetwork) => {
         if (network !== newNetwork) {
             try {
                 await switchNetwork(newNetwork);
                 setNetwork(newNetwork);
             } catch (error) {
                 console.error('Error switching network:', error);
+                showAlert('Failed to switch network', 'error', error.message);
             }
         }
     };
@@ -132,10 +140,9 @@ const App = () => {
                                 path="/"
                                 element={
                                     <GridPage
+                                        walletConnected={walletConnected}
                                         walletAddress={walletAddress}
                                         walletBalance={walletBalance}
-                                        showNotification={showNotification}
-                                        setShowNotification={setShowNotification}
                                     />
                                 }
                             />
@@ -144,15 +151,13 @@ const App = () => {
                                 element={
                                     <TokenPage
                                         network={network}
-                                        showNotification={showNotification}
-                                        setShowNotification={setShowNotification}
                                         walletAddress={walletAddress}
                                         connectWallet={requestAccounts}
                                         handleNetworkChange={handleNetworkChange}
                                     />
                                 }
                             />
-                            <Route path="/deploy" element={<DeployPage />} />
+                            <Route path="/deploy" element={<DeployPage walletBalance={walletBalance} />} />
                             {/* Handle 404 - Not Found */}
                             <Route path="*" element={<div>404 - Not Found</div>} />
                         </Routes>

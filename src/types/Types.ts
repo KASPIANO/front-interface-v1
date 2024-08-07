@@ -11,8 +11,13 @@ export interface Token {
     pre: string;
     mtsAdd: string;
     lim: string;
-    holder?: any[];
+    holder?: TokenHolder[];
     transferTotal?: string;
+}
+
+export interface TokenHolder {
+    address: string;
+    amount: string;
 }
 
 export interface TokenResponse {

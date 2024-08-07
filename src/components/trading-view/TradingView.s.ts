@@ -3,14 +3,6 @@ import { styled } from '@mui/material';
 export const ChartWrapper = styled('div')({
     display: 'flex',
     justifyContent: 'flex-start',
-    width: '70vw',
-    height: '600px',
-
-    '@media (max-width: 768px)': {
-        height: '300px',
-        width: '100vw',
-        justifyContent: 'center',
-    },
 });
 
 export const ChartContainer = styled('div')({
@@ -20,14 +12,9 @@ export const ChartContainer = styled('div')({
     width: '100%',
     height: '100%',
 
-    '.tradingview-widget-container__widget': {
-        borderRadius: '10px',
-        height: '100%',
-    },
-
-    '@media (max-width: 768px)': {
-        padding: '10px',
-        margin: 0,
-        width: '96vw',
-    },
+    // '@media (max-width: 768px)': {
+    //   padding: '10px',
+    //   margin: 0,
+    //   width: '96vw',
+    // },
 });

@@ -1,27 +1,22 @@
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-export const TableHeader = styled('th')({
-    fontSize: '1vw',
-    fontWeight: 'bold',
-});
+export const TableHeader = styled('th')({});
 
 export const StyledDataGridContainer = styled(Box)({
     height: '80vh',
-    width: '90vw',
+    width: '83vw',
     display: 'flex',
-    margin: 'auto', // Center the grid horizontally
-    marginTop: '2vh', // Add some top margin for better spacing
     borderRadius: '8px',
     flexDirection: 'column',
-    marginLeft: '2vw',
     boxShadow: '0 4px 12px rgba(111, 199, 186, 0.3)',
     border: '2px solid  rgba(111, 199, 186, 0.3)',
+    margin: 'auto', // Center the grid horizontally
 });
 
 export const NoDataContainer = styled(Box)({
     height: '80vh',
-    width: '95vw',
+    width: '83vw',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',

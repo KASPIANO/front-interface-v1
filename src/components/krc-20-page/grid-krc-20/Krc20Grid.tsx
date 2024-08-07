@@ -5,12 +5,12 @@ import { FC, useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components';
+import { v4 as uuidv4 } from 'uuid';
 import { fetchTokenInfo } from '../../../DAL/Krc20DAL';
 import { TokenResponse } from '../../../types/Types';
 import { GridHeader } from '../grid-header/GridHeader';
 import { TokenRow } from '../token-row/TokenRow';
 import { NoDataContainer, StyledDataGridContainer } from './Krc20Grid.s';
-import { v4 as uuidv4 } from 'uuid';
 
 const GlobalStyle = createGlobalStyle`
   #scrollableList {
@@ -44,32 +44,33 @@ interface TokenDataGridProps {
     totalTokensDeployed: number;
     nextPage: number;
     walletBalance: number;
+    walletConnected: boolean;
 }
 
 enum GridHeaders {
     TICKER = 'TICKER',
     AGE = 'AGE',
-    MINTED = 'MINTED',
     SUPPLY = 'SUPPLY',
+    MINTED = 'MINTED',
     HOLDERS = 'HOLDERS',
-    TOTAL_TXNS = 'TOTAL_TXNS',
     FAIR_MINT = 'FAIR_MINT',
 }
 
-const headersMapper: Record<GridHeaders, { name: string; headerFunction: () => void }> = {
+const headersMapper: Record<GridHeaders, { name: string; headerFunction?: () => void }> = {
     [GridHeaders.TICKER]: { name: 'Ticker', headerFunction: () => {} },
     [GridHeaders.AGE]: { name: 'Age', headerFunction: () => {} },
-    [GridHeaders.MINTED]: { name: 'Minted', headerFunction: () => {} },
-    [GridHeaders.SUPPLY]: { name: 'Supply', headerFunction: () => {} },
+    [GridHeaders.SUPPLY]: { name: 'Supply' },
     [GridHeaders.HOLDERS]: { name: 'Holders', headerFunction: () => {} },
-    [GridHeaders.TOTAL_TXNS]: { name: 'Total Txns', headerFunction: () => {} },
-    [GridHeaders.FAIR_MINT]: { name: 'Fair Mint', headerFunction: () => {} },
+    [GridHeaders.MINTED]: { name: 'Minted', headerFunction: () => {} },
+    // [GridHeaders.TOTAL_TXNS]: { name: 'Market Cap', headerFunction: () => {} },
+    [GridHeaders.FAIR_MINT]: { name: 'Fair Mint' },
 };
 
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
-    const { tokensList, setNextPage, totalTokensDeployed, nextPage, walletBalance } = props;
+    const { tokensList, setNextPage, totalTokensDeployed, nextPage, walletBalance, walletConnected } = props;
     const [tokensRows, setTokensRows] = useState([]);
     const [, setLoading] = useState(true);
+    const [activeHeader, setActiveHeader] = useState<string>('');
     const navigate = useNavigate();
 
     const handleItemClick = (token) => {
@@ -106,7 +107,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     if (tokensRows.length === 0) {
         return (
             <NoDataContainer>
-                <Typography variant="subtitle1">No Tokens found</Typography>
+                <Typography variant="subtitle1">LOADING TOKENS KASPANIO</Typography>
             </NoDataContainer>
         );
     }
@@ -114,13 +115,12 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     const tableHeader = (
         <Box
             sx={{
-                padding: '5px 0',
                 height: '8vh',
                 alignContent: 'center',
                 borderBottom: '0.1px solid  rgba(111, 199, 186, 0.3)',
             }}
         >
-            <table style={{ width: '100%' }}>
+            <table style={{ width: '90%' }}>
                 <thead>
                     <tr style={{ display: 'flex' }}>
                         {Object.keys(GridHeaders).map((header: GridHeaders) => (
@@ -128,6 +128,8 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                                 key={header}
                                 name={headersMapper[header].name}
                                 headerFunction={headersMapper[header].headerFunction}
+                                activeHeader={activeHeader}
+                                setActiveHeader={setActiveHeader}
                             />
                         ))}
                     </tr>
@@ -166,6 +168,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                         const tokenKey = `${token.tick}-${uuidv4()}`;
                         return (
                             <TokenRow
+                                walletConnected={walletConnected}
                                 key={tokenKey}
                                 walletBalance={walletBalance}
                                 tokenKey={tokenKey}

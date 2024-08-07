@@ -51,9 +51,10 @@ export const switchNetwork = async (network: string): Promise<void> => {
 };
 
 // Method to disconnect KasWare Wallet
-export const disconnect = async (origin: string): Promise<void> => {
+export const disconnect = async (origin: string): Promise<any> => {
     try {
-        await window.kasware.disconnect(origin);
+        const response = await window.kasware.disconnect(origin);
+        return response;
     } catch (error) {
         console.error(error);
         throw error;

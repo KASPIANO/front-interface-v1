@@ -72,7 +72,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                         padding: 0,
                     }}
                 />
-                GreenEye
+                KaspianLens
             </Logo>
             <NavCenter>
                 <NavButton isActive={activePage === '/'} onClick={() => handleNavButtonClick('/')}>

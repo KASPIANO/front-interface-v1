@@ -1,6 +1,5 @@
 import { FC, useEffect, useState } from 'react';
 import TokenDataGrid from '../../components/krc-20-page/grid-krc-20/Krc20Grid';
-import NotificationComponent from '../../components/notification/Notification';
 import { TokenResponse } from '../../types/Types';
 import { GridLayout } from './GridPageLayout';
 
@@ -10,12 +9,11 @@ import GridTitle from '../../components/krc-20-page/grid-title-sort/GridTitle';
 interface GridPageProps {
     walletAddress: string | null;
     walletBalance: number;
-    showNotification: boolean;
-    setShowNotification: (value: boolean) => void;
+    walletConnected: boolean;
 }
 
 const GridPage: FC<GridPageProps> = (props) => {
-    const { walletAddress, showNotification, setShowNotification, walletBalance } = props;
+    const { walletBalance, walletConnected } = props;
 
     const [tokensList, setTokensList] = useState<TokenResponse[]>([]);
     const [nextPage, setNextPage] = useState<number>(1);
@@ -43,6 +41,7 @@ const GridPage: FC<GridPageProps> = (props) => {
         <GridLayout>
             <GridTitle />
             <TokenDataGrid
+                walletConnected={walletConnected}
                 walletBalance={walletBalance}
                 nextPage={nextPage}
                 totalTokensDeployed={totalTokensDeployed}
@@ -51,12 +50,12 @@ const GridPage: FC<GridPageProps> = (props) => {
                 nextPageParams={nextPageParams}
             />
 
-            {showNotification && walletAddress && (
+            {/* {showNotification && walletAddress && (
                 <NotificationComponent
                     message={`Connected to wallet ${walletAddress.substring(0, 4)}...${walletAddress.substring(walletAddress.length - 4)}`}
                     onClose={() => setShowNotification(false)}
                 />
-            )}
+            )} */}
         </GridLayout>
     );
 };

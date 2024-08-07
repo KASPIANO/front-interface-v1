@@ -1,7 +1,7 @@
-import { Avatar } from '@mui/material';
 import { FC } from 'react';
 import { Token } from '../../../types/Types';
-import { HeaderContainer, Title } from './TokenHeader.s';
+import { HeaderContainer, PriceContainer, Rank, Title, TitleHeaderContainer } from './TokenHeader.s';
+import { Avatar, Typography } from '@mui/material';
 
 interface TokenHeaderProps {
     tokenInfo: Token;
@@ -12,8 +12,20 @@ const TokenHeader: FC<TokenHeaderProps> = (props) => {
 
     return (
         <HeaderContainer>
-            <Avatar alt={tokenInfo.tick} src="/dagknightdog.jpg" />
-            <Title>{tokenInfo.tick}</Title>
+            <TitleHeaderContainer>
+                <Avatar
+                    variant="square"
+                    alt={tokenInfo.tick}
+                    src="/path/to/logo"
+                    sx={{ height: '2vw', width: '2vw' }}
+                />
+                <Title>{tokenInfo.tick}</Title>
+                <Rank>#26</Rank>
+            </TitleHeaderContainer>
+            <PriceContainer>
+                <Typography sx={{ fontWeight: '700', fontSize: '0.9vw' }}>69.20/Sompi</Typography>
+                <Typography sx={{ fontSize: '0.9vw' }}>$0.0001</Typography>
+            </PriceContainer>
         </HeaderContainer>
     );
 };
