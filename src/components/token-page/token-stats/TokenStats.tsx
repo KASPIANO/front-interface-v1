@@ -13,7 +13,7 @@ const TokenStats: FC = () => {
     };
 
     return (
-        <Card sx={{ height: '25vh' }}>
+        <Card sx={{ height: '20vh' }}>
             <OptionSelection
                 options={tradingDataTimeFramesToSelect}
                 value={tradingDataTimeFrame}

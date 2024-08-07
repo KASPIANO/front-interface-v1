@@ -1,17 +1,18 @@
 import { FC, useEffect, useState } from 'react';
 import { Token } from '../../../../types/Types';
-import { Box, Card, Typography, useTheme } from '@mui/material';
-import { SentimentButton, SentimentsContainerBox, DataRow, TokenProfileContainer } from './TokenSideBarInfo.s';
+import { Box, Typography } from '@mui/material';
+import { SentimentButton, SentimentsContainerBox, TokenProfileContainer, StatCard } from './TokenSideBarInfo.s';
 import {
     RocketLaunchRounded,
     SentimentNeutralRounded,
     SvgIconComponent,
-    ThumbsUpDownRounded,
     TrendingDownRounded,
 } from '@mui/icons-material';
 import TokenSidebarSocialsBar, {
     TokenSidebarSocialsBarOptions,
 } from './token-sidebar-socials-bar/TokenSidebarSocialsBar';
+import { Stack } from '@chakra-ui/react';
+import { simplifyNumber } from '../../../../utils/Utils';
 
 export type SentimentButtonsConfig = {
     key: string;
@@ -24,14 +25,13 @@ interface TokenSideBarInfoProps {
 }
 
 const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
+    const { tokenInfo } = props;
     const sentimentButtonsConfig: SentimentButtonsConfig[] = [
         { key: 'positive', icon: RocketLaunchRounded },
         { key: 'negative', icon: TrendingDownRounded },
         { key: 'neutral', icon: SentimentNeutralRounded },
-        { key: 'mixed', icon: ThumbsUpDownRounded },
     ];
 
-    const theme = useTheme();
     const [selectedSentiment, setSelectedSentiment] = useState<string>(null);
     const [sentimentValues, setSentimentValues] = useState({});
     const [socials, setSocials] = useState<TokenSidebarSocialsBarOptions>(null);
@@ -70,7 +70,6 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                         'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Full-Color.png'
                     }
                     sx={{
-                        border: `1px solid ${theme.palette.primary.main}`,
                         height: '17vh',
                         width: '100%',
                     }}
@@ -81,51 +80,51 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                     </Box>
                 )}
             </TokenProfileContainer>
-            <Box>
-                <DataRow gap={1}>
-                    <Card>
+            <Box padding={'10px'}>
+                <Stack direction={'row'} justify={'center'}>
+                    <StatCard>
                         <Typography variant="body2" align="center" color="text.secondary">
                             PRICE USD
                         </Typography>
                         <Typography variant="body2" align="center">
                             ---
                         </Typography>
-                    </Card>
-                    <Card>
+                    </StatCard>
+                    <StatCard>
                         <Typography variant="body2" align="center" color="text.secondary">
                             PRICE
                         </Typography>
                         <Typography variant="body2" align="center">
                             ---
                         </Typography>
-                    </Card>
-                </DataRow>
-                <DataRow mt={1} gap={1}>
-                    <Card>
+                    </StatCard>
+                </Stack>
+                <Stack marginTop={8} direction={'row'} justify={'center'}>
+                    <StatCard>
                         <Typography variant="body2" align="center" color="text.secondary">
                             SUPPLY
                         </Typography>
                         <Typography variant="body2" align="center">
-                            ---
+                            {simplifyNumber(tokenInfo.max)}
                         </Typography>
-                    </Card>
-                    <Card>
+                    </StatCard>
+                    <StatCard>
                         <Typography variant="body2" align="center" color="text.secondary">
                             LIQUIDITY
                         </Typography>
                         <Typography variant="body2" align="center">
                             ---
                         </Typography>
-                    </Card>
-                    <Card>
+                    </StatCard>
+                    <StatCard>
                         <Typography variant="body2" align="center" color="text.secondary">
                             MKT CAP
                         </Typography>
                         <Typography variant="body2" align="center">
                             ---
                         </Typography>
-                    </Card>
-                </DataRow>
+                    </StatCard>
+                </Stack>
             </Box>
             <SentimentsContainerBox>
                 {sentimentButtonsConfig.map((button) => (

@@ -40,7 +40,7 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                 <TabPanel
                     sx={{
                         '&.MuiTabPanel-root': {
-                            padding: '10px',
+                            padding: '0px',
                         },
                     }}
                     value="1"

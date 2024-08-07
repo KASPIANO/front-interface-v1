@@ -24,17 +24,20 @@ const TradingViewWidget = () => {
                 "allow_symbol_change": true,
                 "calendar": false,
                 "support_host": "https://www.tradingview.com"
-                }`;
+            }`;
             container.current.appendChild(script);
+
+            return () => {
+                if (container.current) {
+                    container.current.innerHTML = '';
+                }
+            };
         }
     }, []);
 
     return (
-        <div className="tradingview-widget-container" ref={container} style={{ height: '100%', width: '100%' }}>
-            <div
-                className="tradingview-widget-container__widget"
-                style={{ height: 'calc(100% - 32px)', width: '100%' }}
-            />
+        <div className="tradingview-widget-container" ref={container} style={{ width: '100%' }}>
+            <div className="tradingview-widget-container__widget" style={{ width: '100%' }} />
         </div>
     );
 };
