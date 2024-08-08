@@ -39,8 +39,8 @@ const mockSentimentValues = {
     warning: 500,
 };
 
-const mockBanner =
-    'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Full-Color.png';
+// const mockBanner =
+//     'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Full-Color.png';
 
 const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
     const { tokenInfo, setTokenInfo, priceInfo } = props;
