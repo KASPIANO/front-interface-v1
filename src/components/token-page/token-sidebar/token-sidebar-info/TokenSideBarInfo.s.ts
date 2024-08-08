@@ -12,9 +12,9 @@ export const SentimentsContainerBox = styled(Stack)({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     padding: '20px',
     paddingTop: '0',
+    justifyContent: 'center',
 });
 
 export const SentimentButton = styled(Button)(({ theme }) => ({
@@ -22,6 +22,7 @@ export const SentimentButton = styled(Button)(({ theme }) => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+    height: '7.5vh',
 
     '&.selected': {
         backgroundColor: theme.palette.primary.main,

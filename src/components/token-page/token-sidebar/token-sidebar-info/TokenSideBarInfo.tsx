@@ -1,55 +1,66 @@
 import { FC, useEffect, useState } from 'react';
-import { Token } from '../../../../types/Types';
+import { Token, TokenMetadata } from '../../../../types/Types';
 import { Box, Typography } from '@mui/material';
 import { SentimentButton, SentimentsContainerBox, TokenProfileContainer, StatCard } from './TokenSideBarInfo.s';
-import {
-    RocketLaunchRounded,
-    SentimentNeutralRounded,
-    SvgIconComponent,
-    TrendingDownRounded,
-} from '@mui/icons-material';
+import { RocketLaunchRounded, SentimentNeutralRounded, TrendingDownRounded } from '@mui/icons-material';
 import TokenSidebarSocialsBar, {
     TokenSidebarSocialsBarOptions,
 } from './token-sidebar-socials-bar/TokenSidebarSocialsBar';
 import { Stack } from '@chakra-ui/react';
 import { simplifyNumber } from '../../../../utils/Utils';
+import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
+import TokenInfoDialog from '../../../dialogs/token-info/TokenInfoDialog';
+import { AddBanner, AddBox, AddText } from './token-sidebar-socials-bar/TokenSidebarSocialsBar.s';
+import SuccessModal from '../../../modals/sent-token-info-success/SuccessModal';
 
 export type SentimentButtonsConfig = {
     key: string;
-    icon: SvgIconComponent;
+    icon: any;
 };
 
 interface TokenSideBarInfoProps {
     tokenInfo: Token;
-    priceInfo: any;
+    setTokenInfo: (tokenInfo: any) => void;
+    priceInfo?: any;
 }
 
-const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
-    const { tokenInfo } = props;
-    const sentimentButtonsConfig: SentimentButtonsConfig[] = [
-        { key: 'positive', icon: RocketLaunchRounded },
-        { key: 'negative', icon: TrendingDownRounded },
-        { key: 'neutral', icon: SentimentNeutralRounded },
-    ];
+const mockSocials = {
+    telegram: 'https://t.me/kaspa',
+    website: 'https://kaspa.com',
+    x: 'https://x.com/kaspa',
+};
 
+const mockSentimentValues = {
+    love: 100,
+    positive: 200,
+    neutral: 300,
+    negative: 400,
+    warning: 500,
+};
+
+const mockBanner =
+    'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Full-Color.png';
+
+const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
+    const { tokenInfo, setTokenInfo, priceInfo } = props;
+    const [showTokenInfoDialog, setShowTokenInfoDialog] = useState(false);
     const [selectedSentiment, setSelectedSentiment] = useState<string>(null);
     const [sentimentValues, setSentimentValues] = useState({});
     const [socials, setSocials] = useState<TokenSidebarSocialsBarOptions>(null);
+    const [openModal, setOpenModal] = useState(false);
 
+    const sentimentButtonsConfig: SentimentButtonsConfig[] = [
+        { key: 'love', icon: <FavoriteBorderRoundedIcon sx={{ fontSize: '1.4vw' }} color="success" /> },
+        { key: 'positive', icon: <RocketLaunchRounded sx={{ fontSize: '1.4vw' }} color="primary" /> },
+        { key: 'neutral', icon: <SentimentNeutralRounded sx={{ fontSize: '1.4vw' }} color="info" /> },
+        { key: 'negative', icon: <TrendingDownRounded sx={{ fontSize: '1.4vw' }} color="error" /> },
+        { key: 'warning', icon: <WarningAmberRoundedIcon sx={{ fontSize: '1.4vw' }} color="warning" /> },
+    ];
     useEffect(() => {
-        setSocials({
-            Telegram: 'https://t.me/kaspa',
-            Website: 'https://kaspa.com',
-            Twitter: 'https://twitter.com/kaspa',
-        });
-        // Set sentiment values
-        const newSentimentValues = {};
-        sentimentButtonsConfig.forEach((config) => {
-            newSentimentValues[config.key] = Math.floor(Math.random() * 1000);
-        });
-        setSentimentValues(newSentimentValues);
-    }, [props]);
-
+        setSocials(mockSocials);
+        setSentimentValues(mockSentimentValues);
+    }, []);
     const getSentimentIconValueToDisplay = (key: string): string =>
         sentimentValues[key] ? sentimentValues[key] : '---';
 
@@ -60,20 +71,62 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         // TODO: Implement sentiment button click on backend
     };
 
+    const handleShowTokenInfoDialog = () => {
+        setShowTokenInfoDialog(true);
+    };
+
+    const handleSaveTokenInfo = (newTokenInfo: TokenMetadata) => {
+        // Here you would typically update the token info in your backend
+        console.log('New token info:', newTokenInfo);
+
+        // Merge the new token info with the existing token info
+        setTokenInfo((prevInfo: Token) => {
+            const updatedInfo: Token = {
+                ...prevInfo,
+                description: newTokenInfo.description || prevInfo.description,
+                socials: {
+                    ...prevInfo.socials,
+                    ...newTokenInfo.socials,
+                },
+                logo: newTokenInfo.logo || prevInfo.logo,
+                banner: newTokenInfo.banner || prevInfo.banner,
+                contacts: newTokenInfo.contacts || prevInfo.contacts,
+            };
+
+            return updatedInfo;
+        });
+        setOpenModal(true);
+    };
+
     return (
-        <Box>
+        <Box
+            sx={{
+                scroll: 'auto',
+            }}
+        >
             <TokenProfileContainer>
-                <Box
-                    component="img"
-                    alt={props.tokenInfo.tick}
-                    src={
-                        'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Full-Color.png'
-                    }
-                    sx={{
-                        height: '17vh',
-                        width: '100%',
-                    }}
-                />
+                {true ? (
+                    <Box
+                        component="img"
+                        alt={props.tokenInfo.tick}
+                        src={'/1500x500.jpg'}
+                        sx={{
+                            height: '19vh',
+                            width: '100%',
+                        }}
+                    />
+                ) : (
+                    <AddBanner
+                        onClick={handleShowTokenInfoDialog}
+                        sx={{
+                            height: '19vh',
+                            width: '100%',
+                            backgroundColor: 'grey',
+                        }}
+                    >
+                        <AddText>+ Add Token Metadata</AddText>
+                    </AddBanner>
+                )}
                 {socials !== null && Object.keys(socials).length > 0 && (
                     <Box sx={{ position: 'absolute', bottom: -4, left: '52.3%', transform: 'translateX(-50%)' }}>
                         <TokenSidebarSocialsBar options={socials} />
@@ -87,7 +140,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             PRICE USD
                         </Typography>
                         <Typography variant="body2" align="center">
-                            ---
+                            {priceInfo ? priceInfo.priceUsd : '$0.0003'}
                         </Typography>
                     </StatCard>
                     <StatCard>
@@ -95,7 +148,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             PRICE
                         </Typography>
                         <Typography variant="body2" align="center">
-                            ---
+                            {priceInfo ? priceInfo.price : '0.006KAS'}
                         </Typography>
                     </StatCard>
                 </Stack>
@@ -113,7 +166,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             LIQUIDITY
                         </Typography>
                         <Typography variant="body2" align="center">
-                            ---
+                            {priceInfo ? priceInfo.liquidity : '90K'}
                         </Typography>
                     </StatCard>
                     <StatCard>
@@ -121,27 +174,72 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             MKT CAP
                         </Typography>
                         <Typography variant="body2" align="center">
-                            ---
+                            {priceInfo ? parseInt(tokenInfo.max) * priceInfo.liquidity : '156M'}
                         </Typography>
                     </StatCard>
                 </Stack>
             </Box>
-            <SentimentsContainerBox>
-                {sentimentButtonsConfig.map((button) => (
-                    <SentimentButton
-                        variant="outlined"
-                        key={button.key}
-                        onClick={() => onSentimentButtonClick(button.key)}
-                        disabled={selectedSentiment !== null}
-                        className={button.key === selectedSentiment ? 'selected' : ''}
-                    >
-                        <button.icon />
-                        <Typography variant="body2" align="center">
-                            {getSentimentIconValueToDisplay(button.key)}
+            <Box padding={'10px'}>
+                {true ? (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                        <Typography variant="body2" fontWeight={500}>
+                            Description:
                         </Typography>
-                    </SentimentButton>
-                ))}
-            </SentimentsContainerBox>
+                        <Typography sx={{ fontSize: '1vw' }} color="text.secondary">
+                            Nacho is more than just a memecoin, it is proof of what is possible on the Kaspa
+                            network. With the Kasplex protocol.
+                        </Typography>
+                    </Box>
+                ) : (
+                    <AddBox onClick={handleShowTokenInfoDialog}>
+                        <AddText>+ Add Token Metadata</AddText>
+                    </AddBox>
+                )}
+            </Box>
+            <div>
+                <Typography
+                    variant="body2"
+                    align="center"
+                    sx={{ marginTop: '20px', fontSize: '1.1vw' }}
+                    color="text.primary"
+                >
+                    Community Sentiments
+                </Typography>
+                <SentimentsContainerBox>
+                    {sentimentButtonsConfig.map((button) => (
+                        <SentimentButton
+                            sx={{
+                                '&.MuiButton-root': {
+                                    padding: '10px',
+                                    minWidth: '2vw',
+                                    border: 'transparent',
+                                },
+                            }}
+                            variant="outlined"
+                            key={button.key}
+                            onClick={() => onSentimentButtonClick(button.key)}
+                            disabled={selectedSentiment !== null}
+                            className={button.key === selectedSentiment ? 'selected' : ''}
+                        >
+                            {button.icon}
+                            <Typography
+                                sx={{ fontSize: '1vw' }}
+                                variant="body2"
+                                align="center"
+                                color="text.secondary"
+                            >
+                                {getSentimentIconValueToDisplay(button.key)}
+                            </Typography>
+                        </SentimentButton>
+                    ))}
+                </SentimentsContainerBox>
+            </div>
+            <TokenInfoDialog
+                open={showTokenInfoDialog}
+                onClose={() => setShowTokenInfoDialog(false)}
+                onSave={handleSaveTokenInfo}
+            />
+            <SuccessModal open={openModal} onClose={() => setOpenModal(false)} />
         </Box>
     );
 };

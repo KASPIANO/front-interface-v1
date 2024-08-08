@@ -8,9 +8,11 @@ import TokenSideBarInfo from './token-sidebar-info/TokenSideBarInfo';
 
 interface TokenSideBarProps {
     tokenInfo: Token;
+    setTokenInfo: (tokenInfo: Token) => void;
 }
 
 const TokenSideBar: FC<TokenSideBarProps> = (props) => {
+    const { setTokenInfo, tokenInfo } = props;
     const [selectedSideActionTab, setSelectedSideActionTab] = useState('1');
 
     const handleTabChage = (_event: SyntheticEvent, newValue: string) => {
@@ -45,7 +47,7 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                     }}
                     value="1"
                 >
-                    <TokenSideBarInfo tokenInfo={props.tokenInfo} priceInfo={{}} />
+                    <TokenSideBarInfo tokenInfo={tokenInfo} setTokenInfo={setTokenInfo} />
                 </TabPanel>
                 <TabPanel value="2">Buy The Token</TabPanel>
                 <TabPanel value="3">Sell The Token</TabPanel>

@@ -28,6 +28,14 @@ function SlideTransition(props: SlideProps) {
     return <Slide {...props} direction="left" />;
 }
 
+const alertAutoHideDurationMapper = {
+    error: 4000,
+    success: 4000,
+    warning: 4000,
+    info: 4000,
+    loading: 10000,
+};
+
 export const AlertProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const [alert, setAlert] = useState<{
         message: string;
@@ -84,7 +92,7 @@ export const AlertProvider: FC<{ children: ReactNode }> = ({ children }) => {
             {alert && (
                 <Snackbar
                     open={alert.open}
-                    autoHideDuration={alert.severity === 'loading' ? 4000 : 10000}
+                    autoHideDuration={alertAutoHideDurationMapper[alert.severity]}
                     onClose={handleClose}
                     anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                     sx={{ marginTop: '64px' }}

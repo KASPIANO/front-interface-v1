@@ -9,9 +9,9 @@ export type TokenSidebarSocialsBarOptions = {
 };
 
 const socialIcons: { [key: string]: JSX.Element } = {
-    Telegram: <TelegramIcon sx={{ height: '1.1vw', width: '1.1vw', marginRight: '2px' }} />,
-    Website: <LanguageIcon sx={{ height: '1.1vw', width: '1.1vw', marginRight: '2px' }} />,
-    Twitter: <XIcon sx={{ height: '1.1vw', width: '1.1vw', marginRight: '2px' }} />,
+    telegram: <TelegramIcon sx={{ height: '1.1vw', width: '1.1vw', marginRight: '2px' }} />,
+    website: <LanguageIcon sx={{ height: '1.1vw', width: '1.1vw', marginRight: '2px' }} />,
+    x: <XIcon sx={{ height: '1.1vw', width: '1.1vw', marginRight: '2px' }} />,
 };
 interface TokenSidebarSocialsBarProps {
     options: TokenSidebarSocialsBarOptions;
@@ -22,11 +22,14 @@ const TokenSidebarSocialsBar: FC<TokenSidebarSocialsBarProps> = (props) => {
         window.open(link, '_blank', 'noopener,noreferrer');
     };
 
+    const capitalizeFirstLetter = (string: string) => string.charAt(0).toUpperCase() + string.slice(1);
+
     return (
         <TokenSidebarSocialsBarGroup>
             {Object.keys(props.options).map((key) => (
                 <TokenSidebarSocialsBarButton key={key} onClick={() => openLink(props.options[key])}>
-                    {socialIcons[key]} {key}
+                    {socialIcons[key]}
+                    {capitalizeFirstLetter(key) === 'X' ? '' : capitalizeFirstLetter(key)}
                 </TokenSidebarSocialsBarButton>
             ))}
         </TokenSidebarSocialsBarGroup>

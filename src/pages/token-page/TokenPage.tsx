@@ -47,7 +47,7 @@ const TokenPage: FC<TokenPageProps> = () => {
             {getComponentToShow(<RugScore score={66} />, '19vh')}
             {getComponentToShow(<TopHolders tokenInfo={tokenInfo} />, '19vh')}
             {/* {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)} */}
-            {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} />, '91vh')}
+            {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} setTokenInfo={setTokenInfo} />, '91vh')}
 
             {/* {showNotification && walletAddress && (
                 <NotificationComponent

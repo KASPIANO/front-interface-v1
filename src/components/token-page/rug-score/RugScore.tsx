@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
 import { Card, Typography, useTheme } from '@mui/material';
 import ScoreLine, { ScoreLineConfig } from './score-line/ScoreLine';
 
