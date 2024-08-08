@@ -1,10 +1,11 @@
 import { Typography } from '@mui/material';
 import { FC } from 'react';
 import { FilterButton } from '../filter-button/FilterButton';
+import { FilterState } from '../../../types/Types';
 
 interface GridHeaderProps {
     name: string;
-    headerFunction: () => void;
+    headerFunction: (filterState: FilterState) => void;
     activeHeader: string;
     setActiveHeader: (value: string) => void;
 }

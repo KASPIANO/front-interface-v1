@@ -18,9 +18,10 @@ import { capitalizeFirstLetter, formatDate } from '../grid-krc-20/Krc20Grid.conf
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import { Stat, StatNumber, StatHelpText, StatArrow } from '@chakra-ui/react';
 import { useAlert } from '../../../utils/UseAlert';
+import { TokenListItem } from '../../../types/Types';
 
 interface TokenRowProps {
-    token: any;
+    token: TokenListItem;
     handleItemClick: (token: any) => void;
     tokenKey: string;
     walletBalance: number;
@@ -58,17 +59,15 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
         }
     };
 
-    const preMintedIcons = (preMinted: string, totalSupply: string) => {
-        const preMintedNumber = parseFloat(preMinted);
-        const totalSupplyNumber = parseFloat(totalSupply);
-        const preMintPercentage = ((preMintedNumber / totalSupplyNumber) * 100).toFixed(2);
+    const preMintedIcons = (preMinted: number, totalSupply: number) => {
+        const preMintPercentage = ((preMinted / totalSupply) * 100).toFixed(2);
 
         return (
             <ListItemText
                 sx={{ display: 'flex', justifyContent: 'center' }}
                 primary={
                     <Tooltip title={`${preMintPercentage}% Pre Minted`}>
-                        {preMintedNumber === 0 ? (
+                        {preMinted === 0 ? (
                             <CheckCircleOutlineRoundedIcon style={{ color: 'green', opacity: 0.5 }} />
                         ) : (
                             <ErrorOutlineRoundedIcon style={{ color: 'red', opacity: 0.5 }} />
@@ -95,7 +94,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             }}
                             variant="square"
                             alt={token.tick}
-                            src="/kaspa.svg"
+                            src={token.logoUrl}
                         />
                     </ListItemAvatar>
 
@@ -142,40 +141,20 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }
                     />
                     <Stat sx={{ maxWidth: '11vw' }}>
-                        <StatNumber style={{ fontSize: '1.1vw' }}>
-                            {((token.minted / token.max) * 100).toFixed(2)}%
-                        </StatNumber>
+                        <StatNumber style={{ fontSize: '1.1vw' }}>{token.maxMintedPercent.toFixed(2)}%</StatNumber>
                         <StatHelpText style={{ fontSize: '0.8vw' }}>
                             <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
                             23.36%
                         </StatHelpText>
                     </Stat>
-                    {/* <ListItemText
-                        sx={{ maxWidth: '11vw' }}
-                        primary={
-                            <Typography variant="body2" style={{ fontSize: '1.1vw' }}>
-                                {((token.minted / token.max) * 100).toFixed(2)}%
-                            </Typography>
-                        }
-                    /> */}
 
                     <Stat sx={{ maxWidth: '11vw' }}>
-                        <StatNumber style={{ fontSize: '1.1vw' }}>
-                            {token.holder ? token.holder.length : 0}
-                        </StatNumber>
+                        <StatNumber style={{ fontSize: '1.1vw' }}>{token.totalHolders || 0}</StatNumber>
                         <StatHelpText style={{ fontSize: '0.8vw' }}>
                             <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
                             10.36%
                         </StatHelpText>
                     </Stat>
-                    {/* <ListItemText
-                        sx={{ maxWidth: '9.5vw' }}
-                        primary={
-                            <Typography variant="body2" style={{ fontSize: '1.1vw' }}>
-                                {token.holder ? token.holder.length : 0}
-                            </Typography>
-                        }
-                    /> */}
 
                     {/* <ListItemText
                         sx={{ maxWidth: '9.5vw' }}
