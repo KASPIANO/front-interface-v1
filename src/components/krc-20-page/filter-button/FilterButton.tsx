@@ -6,15 +6,11 @@ import {
     StyledExpandMoreRoundedIcon,
     StyledExpandLessRoundedIcon,
 } from './FilterButton.s';
+import { FilterState } from '../../../types/Types';
 
-enum FilterState {
-    UP = 'UP',
-    DOWN = 'DOWN',
-    NONE = 'NONE',
-}
 
 interface FilterButtonProps {
-    onFilterClick: () => void;
+    onFilterClick: (filterState: FilterState) => void;
     isActive: boolean;
     setActiveHeader: () => void;
 }
@@ -43,9 +39,9 @@ export const FilterButton: FC<FilterButtonProps> = (props) => {
     };
 
     const handleOnFilterClick = () => {
-        toggleFilterIcon();
+        const currentState = toggleFilterIcon();
         setActiveHeader();
-        onFilterClick();
+        onFilterClick(currentState);
     };
 
     return (

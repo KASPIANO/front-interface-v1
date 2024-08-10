@@ -1,10 +1,10 @@
 import { FC, useEffect, useState } from 'react';
 import TokenDataGrid from '../../components/krc-20-page/grid-krc-20/Krc20Grid';
-import { TokenResponse } from '../../types/Types';
+import { Token } from '../../types/Types';
 import { GridLayout } from './GridPageLayout';
 
-import { fetchTokens, fetchTotalTokensDeployed } from '../../DAL/Krc20DAL';
 import GridTitle from '../../components/krc-20-page/grid-title-sort/GridTitle';
+import { countTokens, fetchAllTokens } from '../../DAL/BackendDAL';
 
 interface GridPageProps {
     walletAddress: string | null;
@@ -12,30 +12,39 @@ interface GridPageProps {
     walletConnected: boolean;
 }
 
+const PAGE_TOKENS_COUNT = 50;
+
 const GridPage: FC<GridPageProps> = (props) => {
     const { walletBalance, walletConnected } = props;
 
-    const [tokensList, setTokensList] = useState<TokenResponse[]>([]);
+    const [tokensList, setTokensList] = useState<Token[]>([]);
     const [nextPage, setNextPage] = useState<number>(1);
-    const [nextPageParams, setNextPageParams] = useState<string>('');
     const [totalTokensDeployed, setTotalTokensDeployed] = useState(0);
+    const [sortParams, setSortParams] = useState({ field: '', asc: false });
+
+    const fetchTokensList = async () => {
+        const sortBy = sortParams.field;
+        const sortDirection = sortParams.field ? (sortParams.asc ? 'asc' : 'desc') : null;
+        const currentTokens = await fetchAllTokens(PAGE_TOKENS_COUNT, tokensList.length, sortBy, sortDirection);
+        setTokensList((prevTokensList) => [...prevTokensList, ...currentTokens]);
+    };
+
+    const onSortBy = (field: string, asc: boolean) => {
+        setTokensList([]);
+        setSortParams({ field, asc });
+        setNextPage(1);
+    };
 
     useEffect(() => {
-        fetchTotalTokensDeployed().then((result) => {
+        countTokens().then((result) => {
             setTotalTokensDeployed(result);
         });
     }, []);
 
     useEffect(() => {
-        const fetchTokensList = async () => {
-            const tokensList = await fetchTokens(nextPageParams);
-            setTokensList((prevTokensList) => [...prevTokensList, ...tokensList.result]);
-            setNextPageParams(tokensList.next);
-        };
-
         fetchTokensList();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [nextPage]);
+    }, [nextPage, sortParams]);
 
     return (
         <GridLayout>
@@ -47,7 +56,7 @@ const GridPage: FC<GridPageProps> = (props) => {
                 totalTokensDeployed={totalTokensDeployed}
                 tokensList={tokensList}
                 setNextPage={setNextPage}
-                nextPageParams={nextPageParams}
+                sortBy={onSortBy}
             />
 
             {/* {showNotification && walletAddress && (
