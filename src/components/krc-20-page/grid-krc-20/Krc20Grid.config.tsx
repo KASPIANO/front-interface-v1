@@ -2,7 +2,7 @@ import { Button } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import moment from 'moment';
 
-export const formatDate = (timestamp: string): string => moment(Number(timestamp)).format('DD/MM/YYYY');
+export const formatDate = (timestamp: string | number): string => moment(Number(timestamp)).format('DD/MM/YYYY');
 
 export const capitalizeFirstLetter = (string: string): string => {
     if (!string) return string;

@@ -41,6 +41,18 @@ export interface TokenSocials {
     other?: string;
 }
 
+export interface TokenListItem {
+    tick: string;
+    mtsAdd: number;
+    max: number;
+    minted: number;
+    maxMintedPercent: number;
+    totalHolders: number;
+    pre: number;
+    logoUrl: string;
+    bannerUrl: string;
+}
+
 export interface TokenHolder {
     address: string;
     amount: string;
@@ -119,4 +131,10 @@ export interface TokenInfoDialog {
     logo: string;
     banner: string;
     contacts: string[];
+}
+
+export enum FilterState {
+    UP = 'UP',
+    DOWN = 'DOWN',
+    NONE = 'NONE',
 }
