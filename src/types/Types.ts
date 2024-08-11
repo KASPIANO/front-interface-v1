@@ -9,12 +9,32 @@ export interface Token {
     pre: string;
     mtsAdd: string;
     lim: string;
-    holder?: TokenHolder[];
+    totalHolders: number;
+    topHolders?: TokenHolder[];
     transferTotal?: string;
     sentiment?: TokenSentiment;
     description?: string;
     socials?: TokenSocials;
     contacts?: string[];
+}
+
+export interface TokenListItem {
+    tick: string;
+    ticker?: string;
+    mtsAdd: number;
+    max: number;
+    minted: number;
+    maxMintedPercent: number;
+    totalHolders: number;
+    pre: number;
+    logoUrl: string;
+    bannerUrl: string;
+}
+export interface TokenSearchItems {
+    ticker: string;
+    logo: string;
+    minted?: string;
+    holders?: number;
 }
 
 export interface TokenSentiment {
@@ -39,18 +59,6 @@ export interface TokenSocials {
     explorer?: string;
     chat?: string;
     other?: string;
-}
-
-export interface TokenListItem {
-    tick: string;
-    mtsAdd: number;
-    max: number;
-    minted: number;
-    maxMintedPercent: number;
-    totalHolders: number;
-    pre: number;
-    logoUrl: string;
-    bannerUrl: string;
 }
 
 export interface TokenHolder {

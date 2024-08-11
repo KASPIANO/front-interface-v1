@@ -21,6 +21,7 @@ const App = () => {
     const [walletConnected, setWalletConnected] = useState<boolean>(false);
     const [network, setNetwork] = useState<string>('mainnet'); // New state for network
     const [, setIsConnecting] = useState<boolean>(false);
+    const [backgroundBlur, setBackgroundBlur] = useState(false);
 
     const toggleThemeMode = () => {
         const newMode = themeMode === ThemeModes.DARK ? ThemeModes.LIGHT : ThemeModes.DARK;
@@ -141,12 +142,15 @@ const App = () => {
                             walletBalance={walletBalance}
                             connectWallet={handleConnectWallet}
                             disconnectWallet={handleDisconnect}
+                            setBackgroundBlur={setBackgroundBlur}
+                            backgroundBlur={backgroundBlur}
                         />
                         <Routes>
                             <Route
                                 path="/"
                                 element={
                                     <GridPage
+                                        backgroundBlur={backgroundBlur}
                                         walletConnected={walletConnected}
                                         walletAddress={walletAddress}
                                         walletBalance={walletBalance}

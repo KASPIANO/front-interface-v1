@@ -144,7 +144,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }
                     />
                     <ListItemText
-                        sx={{ maxWidth: '11vw' }}
+                        sx={{ maxWidth: '12vw' }}
                         primary={
                             <Tooltip title={formatNumberWithCommas(token.max)}>
                                 <Typography

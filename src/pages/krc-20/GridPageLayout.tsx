@@ -1,7 +1,13 @@
 import { Grid } from '@mui/material';
 
-export const GridLayout = ({ children }) => (
-    <div style={{ display: 'flex' }}>
+export const GridLayout = ({ children, backgroundBlur }) => (
+    <div
+        style={{
+            display: 'flex',
+            filter: backgroundBlur ? 'blur(6px)' : 'none',
+            transition: 'backdrop-filter 0.3s ease',
+        }}
+    >
         <Grid container spacing={1} padding={2} maxWidth={'97%'}>
             <Grid
                 item

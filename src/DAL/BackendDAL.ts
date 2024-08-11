@@ -1,4 +1,4 @@
-import { Token } from '../types/Types';
+import { Token, TokenListItem } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
@@ -8,7 +8,7 @@ export async function fetchAllTokens(
     skip = 0,
     order: string | null = null,
     direction: string | null = null,
-): Promise<Token[]> {
+): Promise<TokenListItem[]> {
     try {
         const urlParams = new URLSearchParams();
         urlParams.append('skip', skip.toString());

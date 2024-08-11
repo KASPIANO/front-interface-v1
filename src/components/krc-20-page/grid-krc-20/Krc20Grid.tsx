@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { Box, List, Typography } from '@mui/material';
+import { Box, List } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import { FC, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import { FilterState, Token, TokenListItem } from '../../../types/Types';
+import { FilterState, TokenListItem } from '../../../types/Types';
 import { GridHeader } from '../grid-header/GridHeader';
 import { TokenRow } from '../token-row/TokenRow';
 import { StyledDataGridContainer } from './Krc20Grid.s';
