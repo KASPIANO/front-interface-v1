@@ -13,7 +13,7 @@ interface GridHeaderProps {
 const marginMapperByHeader = {
     Ticker: '16vw',
     Age: '9vw',
-    Supply: '10.5vw',
+    Supply: '11.5vw',
     Minted: '10vw',
     Holders: '11vw',
     'Fair Mint': '12vw',
