@@ -1,23 +1,12 @@
-import { createContext, useState, FC, ReactNode } from 'react';
+import { useState, FC, ReactNode } from 'react';
 import { Snackbar, Slide, SlideProps, Box, Typography, IconButton } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import { SpinningIcon } from './CustomSnackBar.s';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-
-export type AlertSeverity = 'error' | 'loading' | 'info' | 'success';
-export type AlertContextType = {
-    showAlert: (
-        message: string,
-        severity: AlertSeverity,
-        details?: string,
-        commit?: string,
-        reveal?: string,
-    ) => void;
-};
-
-export const AlertContext = createContext<AlertContextType | undefined>(undefined);
+import { AlertContext } from '../../main';
+import { AlertSeverity } from '../../types/Types';
 
 const alertColors = {
     error: '#FDEDED', // Light red
@@ -38,6 +27,14 @@ const alertIconColors = {
 function SlideTransition(props: SlideProps) {
     return <Slide {...props} direction="left" />;
 }
+
+const alertAutoHideDurationMapper = {
+    error: 4000,
+    success: 4000,
+    warning: 4000,
+    info: 4000,
+    loading: 10000,
+};
 
 export const AlertProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const [alert, setAlert] = useState<{
@@ -95,7 +92,7 @@ export const AlertProvider: FC<{ children: ReactNode }> = ({ children }) => {
             {alert && (
                 <Snackbar
                     open={alert.open}
-                    autoHideDuration={alert.severity === 'loading' ? 4000 : 10000}
+                    autoHideDuration={alertAutoHideDurationMapper[alert.severity]}
                     onClose={handleClose}
                     anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                     sx={{ marginTop: '64px' }}

@@ -36,6 +36,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const [limitSupplyError, setLimitSupplyError] = useState(false);
     const [preAllocationError, setPreAllocationError] = useState(false);
     const [reviewTokenData, setReviewTokenData] = useState<TokenDeploy>(null);
+    const [descriptionError, setDescriptionError] = useState(false);
 
     const validateTokenFullName = (name: string) => {
         const regex = /^[A-Za-z]{4,6}$/;
@@ -56,6 +57,16 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         if (validateTokenName(event.target.value)) {
             setTokenName(event.target.value);
             debouncedValidateTokenName(event.target.value);
+        }
+    };
+
+    const handleDescriptionChange = (value: string) => {
+        setDescription(value);
+        if (value.length > 100) {
+            setDescription(value.slice(0, 100));
+            setDescriptionError(true);
+        } else {
+            setDescriptionError(false);
         }
     };
 
@@ -329,7 +340,9 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         variant="outlined"
                         fullWidth
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        error={descriptionError}
+                        helperText={descriptionError ? 'Description must be less than 100 characters' : ''}
+                        onChange={(e) => handleDescriptionChange(e.target.value)}
                         placeholder="Token description"
                     />
 

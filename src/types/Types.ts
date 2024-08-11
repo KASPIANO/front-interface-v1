@@ -1,10 +1,8 @@
-// In ../../../types/Types.ts
-
 export interface Token {
-    tick: string;
-    logoURI?: string;
-    symbol?: string;
+    tick?: string;
+    ticker?: string;
     logo?: string;
+    banner?: string;
     state: string;
     max: string;
     minted: string;
@@ -13,6 +11,34 @@ export interface Token {
     lim: string;
     holder?: TokenHolder[];
     transferTotal?: string;
+    sentiment?: TokenSentiment;
+    description?: string;
+    socials?: TokenSocials;
+    contacts?: string[];
+}
+
+export interface TokenSentiment {
+    warning: string;
+    negative: string;
+    neutral: string;
+    positive: string;
+    love: string;
+}
+
+export interface TokenSocials {
+    website?: string;
+    discord?: string;
+    telegram?: string;
+    x?: string;
+    github?: string;
+    medium?: string;
+    reddit?: string;
+    whitepaper?: string;
+    audit?: string;
+    contract?: string;
+    explorer?: string;
+    chat?: string;
+    other?: string;
 }
 
 export interface TokenListItem {
@@ -73,6 +99,38 @@ export interface TokenDeploy {
     telegram?: string;
     logo?: string;
     banner?: string;
+}
+
+export type AlertSeverity = 'error' | 'loading' | 'info' | 'success';
+export type AlertContextType = {
+    showAlert: (
+        message: string,
+        severity: AlertSeverity,
+        details?: string,
+        commit?: string,
+        reveal?: string,
+    ) => void;
+};
+
+export interface TokenMetadata {
+    ticker: string;
+    banner?: string;
+    logo?: string;
+    description?: string;
+    socials?: TokenSocials;
+    sentiment?: TokenSentiment;
+    contacts?: string[];
+}
+
+export interface TokenInfoDialog {
+    ticker: string;
+    description: string;
+    website: string;
+    x: string;
+    telegram: string;
+    logo: string;
+    banner: string;
+    contacts: string[];
 }
 
 export enum FilterState {

@@ -118,7 +118,7 @@ const App = () => {
         }
     };
 
-    if (!themeMode) {
+    if (!themeMode || !showAlert) {
         return null;
     } else {
         return (

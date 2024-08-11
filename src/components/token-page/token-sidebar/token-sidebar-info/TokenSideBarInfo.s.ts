@@ -1,19 +1,20 @@
-import { styled, Box, Button } from '@mui/material';
+import { Stack } from '@chakra-ui/react';
+import { styled, Box, Button, Card } from '@mui/material';
 
 export const DataRow = styled(Box)({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    gap: '1vw',
 });
 
-export const SentimentsContainerBox = styled(Box)({
+export const SentimentsContainerBox = styled(Stack)({
     display: 'flex',
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '1vw',
-    marginTop: '1vh',
+    padding: '20px',
+    paddingTop: '0',
+    justifyContent: 'center',
 });
 
 export const SentimentButton = styled(Button)(({ theme }) => ({
@@ -21,7 +22,7 @@ export const SentimentButton = styled(Button)(({ theme }) => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
+    height: '7.5vh',
 
     '&.selected': {
         backgroundColor: theme.palette.primary.main,
@@ -37,3 +38,16 @@ export const TokenProfileContainer = styled(Box)({
     width: '100%',
     position: 'relative',
 });
+
+export const StatCard = styled(Card)(({ theme }) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '1vh',
+    flex: 1,
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+    borderRadius: '8px',
+    border: `0.5px solid ${theme.palette.primary.main}`,
+}));
