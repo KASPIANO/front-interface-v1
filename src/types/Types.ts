@@ -101,17 +101,6 @@ export interface TokenDeploy {
     banner?: string;
 }
 
-export type AlertSeverity = 'error' | 'loading' | 'info' | 'success';
-export type AlertContextType = {
-    showAlert: (
-        message: string,
-        severity: AlertSeverity,
-        details?: string,
-        commit?: string,
-        reveal?: string,
-    ) => void;
-};
-
 export interface TokenMetadata {
     ticker: string;
     banner?: string;
