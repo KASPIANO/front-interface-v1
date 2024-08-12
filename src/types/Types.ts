@@ -107,6 +107,7 @@ export interface TokenDeploy {
     telegram?: string;
     logo?: string;
     banner?: string;
+    transactionHash?: string;
 }
 
 export interface TokenMetadata {

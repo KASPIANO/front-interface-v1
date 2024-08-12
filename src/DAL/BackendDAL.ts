@@ -58,14 +58,10 @@ export async function countTokens(): Promise<number> {
 }
 
 export async function updateTokenMetadataAfterDeploy(
-    txid: string,
-    tokenDetails: TokenDeploy,
+    tokenDetails: FormData, // TokenDeploy
 ): Promise<AxiosResponse<any> | null> {
     try {
-        const response = await backendService.post<any>(`/${KRC20METADATA_CONTROLLER}/after-deploy`, {
-            ...tokenDetails,
-            transactionHash: txid,
-        });
+        const response = await backendService.post<any>(`/${KRC20METADATA_CONTROLLER}/after-deploy`, tokenDetails);
         return response;
     } catch (error) {
         console.error('Error saving token metadata:', error);

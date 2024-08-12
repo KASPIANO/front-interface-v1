@@ -247,14 +247,22 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             pre: tokenDetails.preAllocation,
         });
 
+        const tokenDetailsForm = new FormData();
+
+        for (const [key, value] of Object.entries(tokenDetails)) {
+            tokenDetailsForm.append(key, value as string);
+        }
+
         try {
             // if (walletBalance >= 1000) {
             // const txid = await deployKRC20Token(inscribeJsonString);
             const txid = 'a599f03ac54d8efa98681b97fab4a90cc74bd55477967a54f7ffb76414bcf6f8';
             console.log(inscribeJsonString);
             console.log('Deployment successful, txid:', txid);
+            tokenDetailsForm.append('transactionHash', txid);
+
             const result = await sendServerRequestAndSetErrorsIfNeeded<boolean>(
-                () => updateTokenMetadataAfterDeploy(txid, tokenDetails),
+                () => updateTokenMetadataAfterDeploy(tokenDetailsForm),
                 setFormErrors,
             );
 
@@ -469,7 +477,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
 
                     <UploadContainer>
                         {logo ? (
-                            <ImagePreview src={logo} alt="Token Logo" />
+                            <ImagePreview src={URL.createObjectURL(logo)} alt="Token Logo" />
                         ) : (
                             <Typography>Upload Token's Logo</Typography>
                         )}
@@ -481,7 +489,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 type="file"
                                 onChange={(event) => {
                                     const inputElement = event.target as HTMLInputElement;
-                                    setLogo(URL.createObjectURL(inputElement.files[0]));
+                                    setLogo(inputElement.files[0]);
                                 }}
                             />
                             <Button variant="text" color="primary" component="span">
@@ -503,7 +511,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
 
                     <UploadContainer>
                         {banner ? (
-                            <ImagePreview src={banner} alt="Token Banner" />
+                            <ImagePreview src={URL.createObjectURL(banner)} alt="Token Banner" />
                         ) : (
                             <Typography>Upload Token's Banner</Typography>
                         )}
@@ -515,7 +523,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 type="file"
                                 onChange={(event) => {
                                     const inputElement = event.target as HTMLInputElement;
-                                    setBanner(URL.createObjectURL(inputElement.files[0]));
+                                    setBanner(inputElement.files[0]);
                                 }}
                             />
                             <Button variant="text" color="primary" component="span">
