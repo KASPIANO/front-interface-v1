@@ -7,6 +7,19 @@ import DeployDialog from '../../components/deploy-page/deploy-dialog/DeployDialo
 import debounce from 'lodash/debounce';
 import { fetchTokenInfo } from '../../DAL/Krc20DAL';
 import { deployKRC20Token } from '../../utils/KaswareUtils';
+import {
+    BackendValidationErrorsType,
+    sendServerRequestAndSetErrorsIfNeeded,
+    updateTokenMetadataAfterDeploy,
+} from '../../DAL/BackendDAL';
+import {
+    setErrorToField,
+    clearFieldErrors,
+    clearFieldErrorsAndSetFieldValue,
+    clearFormErrors,
+    getErrorMessage,
+    hasErrors,
+} from '../../utils/BackendValidationErrorsHandler';
 
 interface DeployPageProps {
     walletBalance: number;
@@ -17,30 +30,29 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const { walletBalance, backgroundBlur } = props;
     const [tokenName, setTokenName] = useState('');
     const [validatedTokenName, setValidatedTokenName] = useState('');
-    const [totalSupply, setTotalSupply] = useState('');
-    const [mintLimit, setMintLimit] = useState('');
+    const [totalSupply, setTotalSupply] = useState('1000');
+    const [mintLimit, setMintLimit] = useState('100');
     const [preAllocation, setPreAllocation] = useState('');
-    const [preAllocationPercentage, setPreAllocationPercentage] = useState('');
-    const [description, setDescription] = useState('');
-    const [website, setWebsite] = useState('');
-    const [x, setX] = useState('');
-    const [discord, setDiscord] = useState('');
-    const [telegram, setTelegram] = useState('');
+    const [preAllocationPercentage, setPreAllocationPercentage] = useState('50');
+    const [description, setDescription] = useState('My great token of gilad state');
+    const [website, setWebsite] = useState('http://gilad.com');
+    const [x, setX] = useState('https://x.com/asd');
+    const [discord, setDiscord] = useState('https://discord.com/asd');
+    const [telegram, setTelegram] = useState('https://t.me/asd');
     const [logo, setLogo] = useState<string | null>(null);
     const [banner, setBanner] = useState<string | null>(null);
     const [showDeployDialog, setShowDeployDialog] = useState(false);
     const [tokenDetails, setTokenDetails] = useState<TokenDeploy | null>(null);
     const [tickerMessage, setTickerMessage] = useState('');
-    const [statusClass, setStatusClass] = useState('');
+    const [formErrors, setFormErrors] = useState<BackendValidationErrorsType>({});
     const [totalSupplyError, setTotalSupplyError] = useState(false);
     const [mintLimitError, setMintLimitError] = useState(false);
     const [limitSupplyError, setLimitSupplyError] = useState(false);
     const [preAllocationError, setPreAllocationError] = useState(false);
     const [reviewTokenData, setReviewTokenData] = useState<TokenDeploy>(null);
-    const [descriptionError, setDescriptionError] = useState(false);
 
     const validateTokenFullName = (name: string) => {
-        const regex = /^[A-Za-z]{4,6}$/;
+        const regex = /^[A-Z]{4,6}$/;
         return regex.test(name);
     };
 
@@ -55,6 +67,9 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     };
 
     const handleTokenNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        clearFieldErrors(formErrors, setFormErrors, 'ticker');
+        setTickerMessage('');
+
         if (validateTokenName(event.target.value)) {
             setTokenName(event.target.value);
             debouncedValidateTokenName(event.target.value);
@@ -65,18 +80,26 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         setDescription(value);
         if (value.length > 100) {
             setDescription(value.slice(0, 100));
-            setDescriptionError(true);
-        } else {
-            setDescriptionError(false);
-        }
+            setErrorToField(
+                formErrors,
+                setFormErrors,
+                'description',
+                'Description must be less than 100 characters.',
+            )
+        } 
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const debouncedValidateTokenName = useCallback(
         debounce(async (name: string) => {
             if (!validateTokenFullName(name)) {
-                setTickerMessage('Token name must be 4-6 letters.');
-                setStatusClass('error');
+                setErrorToField(
+                    formErrors,
+                    setFormErrors,
+                    'ticker',
+                    'Token name must be 4-6 letters and big letters only.',
+                );
+
                 return;
             }
 
@@ -84,9 +107,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             if (isAvailable) {
                 setValidatedTokenName(name);
                 setTickerMessage('Ticker is valid and available to deploy.');
-                setStatusClass('success');
-            } else {
-                setStatusClass('error');
             }
         }, 300),
         [],
@@ -96,15 +116,19 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         try {
             const data = await fetchTokenInfo(ticker, false); // Set holders to false
             if (data && (data.state === 'deployed' || data.state === 'ignored')) {
-                setTickerMessage('Token already exists. Please choose a different ticker.');
-                setStatusClass('error');
+                setErrorToField(
+                    formErrors,
+                    setFormErrors,
+                    'ticker',
+                    'Token already exists. Please choose a different ticker.',
+                );
+
                 return false;
             } else {
                 return true;
             }
         } catch (e) {
-            setTickerMessage('Error checking token availability.');
-            setStatusClass('error');
+            setErrorToField(formErrors, setFormErrors, 'ticker', 'Error checking token availability.');
             return false;
         }
     };
@@ -123,8 +147,12 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         if (!validatedTokenName) {
-            setTickerMessage('Token name must be 4-6 letters.');
-            setStatusClass('error');
+            setErrorToField(
+                formErrors,
+                setFormErrors,
+                'ticker',
+                'Token name must be 4-6 letters and big letters only.',
+            );
             return;
         } else if (!totalSupply || /^0+$/.test(totalSupply)) {
             setTotalSupplyError(true);
@@ -135,7 +163,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         }
 
         setTickerMessage('');
-        setStatusClass('');
+        clearFormErrors(setFormErrors);
 
         const tokenData: TokenDeploy = {
             ticker: validatedTokenName,
@@ -220,14 +248,29 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         });
 
         try {
-            if (walletBalance >= 1000) {
-                const txid = await deployKRC20Token(inscribeJsonString);
-                console.log(inscribeJsonString);
-                console.log('Deployment successful, txid:', txid);
-                setShowDeployDialog(false);
+            // if (walletBalance >= 1000) {
+            // const txid = await deployKRC20Token(inscribeJsonString);
+            const txid = 'a599f03ac54d8efa98681b97fab4a90cc74bd55477967a54f7ffb76414bcf6f8';
+            console.log(inscribeJsonString);
+            console.log('Deployment successful, txid:', txid);
+            const result = await sendServerRequestAndSetErrorsIfNeeded<boolean>(
+                () => updateTokenMetadataAfterDeploy(txid, tokenDetails),
+                setFormErrors,
+            );
+
+            console.log(formErrors);
+
+            if (!result) {
+                // TODO: Show error to the user
+                throw new Error('Failed to save token metadata');
             } else {
-                console.error('Insufficient funds to deploy KRC20 token');
+                // TODO: Show success to the user
             }
+
+            setShowDeployDialog(false);
+            // } else {
+            //     console.error('Insufficient funds to deploy KRC20 token');
+            // }
             // Handle successful deployment (e.g., show a success message, navigate to a different page, etc.)
         } catch (error) {
             console.error('Failed to deploy KRC20 token:', error);
@@ -266,8 +309,15 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 </Tooltip>
                             ),
                         }}
+                        error={hasErrors(formErrors, 'ticker')}
+                        color={
+                            !hasErrors(formErrors, 'ticker') && tickerMessage && tickerMessage.length > 0
+                                ? 'success'
+                                : null
+                        }
+                        focused
+                        helperText={getErrorMessage(formErrors, 'ticker') || tickerMessage}
                     />
-                    <Status className={statusClass}>{tickerMessage}</Status>
 
                     <TextInfo
                         error={totalSupplyError}
@@ -347,10 +397,14 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         variant="outlined"
                         fullWidth
                         value={description}
-                        error={descriptionError}
-                        helperText={descriptionError ? 'Description must be less than 100 characters' : ''}
-                        onChange={(e) => handleDescriptionChange(e.target.value)}
+                        onChange={(e) =>
+                            clearFieldErrorsAndSetFieldValue(formErrors, setFormErrors, 'description', () =>
+                                handleDescriptionChange(e.target.value),
+                            )
+                        }
                         placeholder="Token description"
+                        error={hasErrors(formErrors, 'description')}
+                        helperText={getErrorMessage(formErrors, 'description')}
                     />
 
                     <TextInfo
@@ -358,8 +412,14 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         variant="outlined"
                         fullWidth
                         value={website}
-                        onChange={(e) => setWebsite(e.target.value)}
+                        onChange={(e) =>
+                            clearFieldErrorsAndSetFieldValue(formErrors, setFormErrors, 'website', () =>
+                                setWebsite(e.target.value),
+                            )
+                        }
                         placeholder="Website URL"
+                        error={hasErrors(formErrors, 'website')}
+                        helperText={getErrorMessage(formErrors, 'website')}
                     />
 
                     <TextInfo
@@ -367,8 +427,14 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         variant="outlined"
                         fullWidth
                         value={x}
-                        onChange={(e) => setX(e.target.value)}
+                        onChange={(e) =>
+                            clearFieldErrorsAndSetFieldValue(formErrors, setFormErrors, 'x', () =>
+                                setX(e.target.value),
+                            )
+                        }
                         placeholder="X handle"
+                        error={hasErrors(formErrors, 'x')}
+                        helperText={getErrorMessage(formErrors, 'x')}
                     />
 
                     <TextInfo
@@ -376,8 +442,14 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         variant="outlined"
                         fullWidth
                         value={discord}
-                        onChange={(e) => setDiscord(e.target.value)}
+                        onChange={(e) =>
+                            clearFieldErrorsAndSetFieldValue(formErrors, setFormErrors, 'discord', () =>
+                                setDiscord(e.target.value),
+                            )
+                        }
                         placeholder="Discord link"
+                        error={hasErrors(formErrors, 'discord')}
+                        helperText={getErrorMessage(formErrors, 'discord')}
                     />
 
                     <TextInfo
@@ -385,8 +457,14 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         variant="outlined"
                         fullWidth
                         value={telegram}
-                        onChange={(e) => setTelegram(e.target.value)}
+                        onChange={(e) =>
+                            clearFieldErrorsAndSetFieldValue(formErrors, setFormErrors, 'telegram', () =>
+                                setTelegram(e.target.value),
+                            )
+                        }
                         placeholder="Telegram link"
+                        error={hasErrors(formErrors, 'telegram')}
+                        helperText={getErrorMessage(formErrors, 'telegram')}
                     />
 
                     <UploadContainer>
@@ -488,3 +566,30 @@ const DeployPage: FC<DeployPageProps> = (props) => {
 };
 
 export default DeployPage;
+
+/* 
+{
+    "ticker": "GILAD",
+    "totalSupply": "1000",
+    "mintLimit": "1",
+    "preAllocation": "500",
+    "description": "Gilad Coin",
+    "website": "",
+    "x": "",
+    "discord": "",
+    "telegram": "",
+    "logo": "",
+    "banner": ""
+}
+
+{
+  "p": "KRC-20",
+  "op": "deploy",
+  "tick": "GILAD",
+  "max": "1000",
+  "lim": "1",
+  "pre": "500"
+}
+
+
+*/
