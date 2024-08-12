@@ -39,10 +39,10 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
 
     const handleFocus = () => {
         setIsFocused(true);
+        setBackgroundBlur(true);
         setTimeout(() => {
             setShowOptions(true);
-        }, 1000);
-        setBackgroundBlur(true);
+        }, 600);
     };
 
     const handleBlur = () => {

@@ -161,6 +161,7 @@ const App = () => {
                                 path="/token/:ticker"
                                 element={
                                     <TokenPage
+                                        backgroundBlur={backgroundBlur}
                                         network={network}
                                         walletAddress={walletAddress}
                                         connectWallet={requestAccounts}
@@ -168,7 +169,12 @@ const App = () => {
                                     />
                                 }
                             />
-                            <Route path="/deploy" element={<DeployPage walletBalance={walletBalance} />} />
+                            <Route
+                                path="/deploy"
+                                element={
+                                    <DeployPage walletBalance={walletBalance} backgroundBlur={backgroundBlur} />
+                                }
+                            />
                             {/* Handle 404 - Not Found */}
                             <Route path="*" element={<div>404 - Not Found</div>} />
                         </Routes>

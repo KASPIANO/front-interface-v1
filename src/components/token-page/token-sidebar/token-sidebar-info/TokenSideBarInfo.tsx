@@ -105,7 +105,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
             }}
         >
             <TokenProfileContainer>
-                {true ? (
+                {tokenInfo.banner ? (
                     <Box
                         component="img"
                         alt={props.tokenInfo.tick}
@@ -140,7 +140,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             PRICE USD
                         </Typography>
                         <Typography variant="body2" align="center">
-                            {priceInfo ? priceInfo.priceUsd : '$0.0003'}
+                            {priceInfo ? `$${priceInfo.priceUsd}` : '$0.0003'}
                         </Typography>
                     </StatCard>
                     <StatCard>
@@ -148,7 +148,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             PRICE
                         </Typography>
                         <Typography variant="body2" align="center">
-                            {priceInfo ? priceInfo.price : '0.006KAS'}
+                            {priceInfo ? `${priceInfo.price}KAS` : '0.006KAS'}
                         </Typography>
                     </StatCard>
                 </Stack>
@@ -180,14 +180,13 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                 </Stack>
             </Box>
             <Box padding={'10px'}>
-                {true ? (
+                {tokenInfo.description ? (
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                         <Typography variant="body2" fontWeight={500}>
                             Description:
                         </Typography>
                         <Typography sx={{ fontSize: '1vw' }} color="text.secondary">
-                            Nacho is more than just a memecoin, it is proof of what is possible on the Kaspa
-                            network. With the Kasplex protocol.
+                            {tokenInfo.description}
                         </Typography>
                     </Box>
                 ) : (
