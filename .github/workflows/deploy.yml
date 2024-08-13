@@ -9,12 +9,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    env:
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -30,20 +24,25 @@ jobs:
     - name: Build React app
       run: npm run build
 
+    - name: Install AWS CLI
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y awscli
+
     - name: Deploy to S3
-      uses: aws-actions/s3-sync@v0.3.0  # Use a valid version
-      with:
-        source-dir: 'build'
-        bucket: ${{ secrets.S3_BUCKET_NAME }}
-        endpoint-url: 'https://s3.amazonaws.com'
-        region: ${{ secrets.AWS_REGION }}
-        acl: 'public-read'
-        delete: true
+      run: |
+        aws s3 sync build/ s3://$AWS_S3_BUCKET/ --acl public-read --delete
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
 
     - name: Invalidate CloudFront cache
-      uses: aws-actions/aws-cli@v1  # Updated action
-      with:
-        args: cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+      run: |
+        aws cloudfront create-invalidation \
+          --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+          --paths "/*"
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
