@@ -1,17 +1,21 @@
-// TokenSearch.tsx
-
-import React, { FC, useState } from 'react';
+import { FC, useRef, useState } from 'react';
 import { InputAdornment, Box, Avatar, Autocomplete, MenuItem } from '@mui/material';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import debounce from 'lodash/debounce';
 import { TokenSearchItems } from '../../types/Types';
 import { SearchContainer } from './TokenSearch.s';
+import { useNavigate } from 'react-router-dom';
 
+const styles = `
+  input[type="search"]::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      appearance: none;
+  }
+`;
 const mockTokens: TokenSearchItems[] = [
-    { ticker: 'KASPER', logo: '/kasper.svg' },
-    { ticker: 'NACHO', logo: '/nacho.svg' },
-    { ticker: 'KEKE', logo: '/keke.jpg' },
-    { ticker: 'KSPR', logo: '/kspr.jpg' },
+    { ticker: 'SIRIUS', logo: '/kasper.svg' },
+    { ticker: 'NOCBDC', logo: '/nacho.svg' },
+    { ticker: 'KSBULL', logo: '/keke.jpg' },
+    { ticker: 'SIONE', logo: '/kspr.jpg' },
 ];
 
 interface TokenSearchProps {
@@ -24,19 +28,16 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
     const [searchValue, setSearchValue] = useState('');
     const [tokens, setTokens] = useState<TokenSearchItems[]>(mockTokens);
     const [showOptions, setShowOptions] = useState(false);
+    const navigate = useNavigate();
 
-    const fetchTokens = debounce((query: string) => {
-        const filteredTokens = mockTokens.filter((token) =>
-            token.ticker.toLowerCase().includes(query.toLowerCase()),
-        );
-        setTokens(filteredTokens);
-    }, 300);
+    // const fetchTokens = debounce((query: string) => {
+    //     const filteredTokens = mockTokens.filter((token) =>
+    //         token.ticker.toLowerCase().includes(query.toLowerCase()),
+    //     );
+    //     setTokens(filteredTokens);
+    // }, 300);
 
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchValue(event.target.value);
-        fetchTokens(event.target.value);
-    };
-
+    const inputRef = useRef<HTMLInputElement | null>(null);
     const handleFocus = () => {
         setIsFocused(true);
         setBackgroundBlur(true);
@@ -51,22 +52,51 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
         setBackgroundBlur(false);
     };
 
+    const handleSearchChange = (_event: React.SyntheticEvent, value: string) => {
+        if (value.length === 0) {
+            setTokens(mockTokens);
+            setSearchValue('');
+        } else {
+            setSearchValue(value);
+            // fetchTokens(value);
+        }
+    };
+
+    const handleTokenSelect = (_event: any, value: TokenSearchItems | null) => {
+        if (value) {
+            navigate(`/token/${value.ticker}`);
+            setIsFocused(false);
+            setShowOptions(false);
+            setBackgroundBlur(false);
+            setSearchValue('');
+            if (inputRef.current) {
+                inputRef.current.blur();
+            }
+        }
+    };
+
     return (
         <Box
             sx={{
                 marginRight: '1.5vw',
             }}
         >
+            <style>{styles}</style>
             <Autocomplete
                 sx={{
                     height: '3.5vh',
                     width: isFocused ? '30vw' : '15vw',
-                    transition: 'width 0.3s ease',
+                    transition: 'width 0.2s ease',
                 }}
+                autoSelect={false}
                 freeSolo
+                inputValue={searchValue}
+                onInputChange={handleSearchChange}
+                getOptionLabel={(option: TokenSearchItems) => (option.ticker ? option.ticker : '')}
+                onChange={handleTokenSelect}
                 options={showOptions ? tokens : []} // Show options only when focused
                 renderOption={(props, option) => (
-                    <MenuItem {...props} sx={{ width: '30vw' }}>
+                    <MenuItem {...props} key={option.ticker} sx={{ width: '30vw' }}>
                         <Avatar src={option.logo} alt={option.ticker} sx={{ width: 24, height: 24, mr: 1 }} />
                         {option.ticker}
                     </MenuItem>
@@ -74,13 +104,13 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
                 renderInput={(params) => (
                     <SearchContainer
                         {...params}
-                        placeholder="Search KRC-20 Tokens"
-                        value={searchValue}
-                        onChange={handleSearchChange}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
+                        placeholder="Search KRC-20 Tokens"
+                        inputRef={inputRef}
                         InputProps={{
                             ...params.InputProps,
+                            type: 'search',
                             startAdornment: (
                                 <InputAdornment position="start">
                                     <SearchRoundedIcon sx={{ fontSize: '1vw' }} />

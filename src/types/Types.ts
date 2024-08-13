@@ -135,3 +135,26 @@ export enum FilterState {
     DOWN = 'DOWN',
     NONE = 'NONE',
 }
+
+export interface PortfolioValue {
+    kas: number;
+    change: number;
+    changeDirection: 'increase' | 'decrease';
+}
+
+export interface UserPortfolioOverview {
+    addedTokens: string[];
+    mainWalletAddress: string;
+    alternativeWallets?: string[];
+    user?: UserSettings;
+    paidUser: boolean;
+}
+
+export interface UserSettings {
+    username: string;
+    displayPictureURL?: string;
+    displayNames?: string;
+    email: string;
+    discord?: string;
+    twitter?: string;
+}

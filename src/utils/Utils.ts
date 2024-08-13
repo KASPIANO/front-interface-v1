@@ -24,3 +24,12 @@ export function simplifyNumber(value) {
 }
 
 export const formatNumberWithCommas = (value) => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+export const shortenAddress = (address, startLength = 6, endLength = 4) => {
+    if (address.length <= startLength + endLength) {
+        return address;
+    }
+    const start = address.substring(0, startLength);
+    const end = address.substring(address.length - endLength);
+    return `${start}...${end}`;
+};

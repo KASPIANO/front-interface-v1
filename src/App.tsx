@@ -13,6 +13,7 @@ import { disconnect, isKasWareInstalled, requestAccounts, switchNetwork } from '
 import { getLocalThemeMode, setWalletBalanceUtil, ThemeModes } from './utils/Utils';
 import DeployPage from './pages/deploy-page/DeployPage';
 import { showGlobalSnackbar } from './components/alert-context/AlertContext';
+import PortfolioPage from './pages/portfolio-page/PortfolioPage';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -173,6 +174,12 @@ const App = () => {
                                 path="/deploy"
                                 element={
                                     <DeployPage walletBalance={walletBalance} backgroundBlur={backgroundBlur} />
+                                }
+                            />
+                            <Route
+                                path="/portfolio"
+                                element={
+                                    <PortfolioPage walletAddress={walletAddress} backgroundBlur={backgroundBlur} />
                                 }
                             />
                             {/* Handle 404 - Not Found */}
