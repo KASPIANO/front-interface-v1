@@ -1,7 +1,13 @@
-import { Token, TokenListItem } from '../types/Types';
+import { AxiosError, AxiosResponse } from 'axios';
+import { Token, TokenListItem, TokenDeploy } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
+const KRC20METADATA_CONTROLLER = 'krc20metadata';
+
+export type BackendValidationErrorsType = {
+    [key: string]: string[];
+};
 
 export async function fetchAllTokens(
     limit = 50,
@@ -22,7 +28,7 @@ export async function fetchAllTokens(
         }
         const url = `/${KRC20CONTROLLER}?${urlParams.toString()}`;
 
-        const response = await backendService.get<any>(url);
+        const response = await backendService.get<TokenListItem[]>(url);
 
         return response.data;
     } catch (error) {
@@ -33,7 +39,7 @@ export async function fetchAllTokens(
 
 export async function fetchTokenByTicker(ticker: string): Promise<Token> {
     try {
-        const response = await backendService.get<any>(`/${KRC20CONTROLLER}/${ticker}`);
+        const response = await backendService.get<Token>(`/${KRC20CONTROLLER}/${ticker}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching token from backend:', error);
@@ -43,10 +49,66 @@ export async function fetchTokenByTicker(ticker: string): Promise<Token> {
 
 export async function countTokens(): Promise<number> {
     try {
-        const response = await backendService.get<any>(`/${KRC20CONTROLLER}/count`);
+        const response = await backendService.get<{ count: number }>(`/${KRC20CONTROLLER}/count`);
         return response.data.count;
     } catch (error) {
         console.error('Error counting tokens from backend:', error);
         return 0;
     }
+}
+
+export async function updateTokenMetadataAfterDeploy(
+    tokenDetails: FormData, // TokenDeploy
+): Promise<AxiosResponse<any> | null> {
+    // eslint-disable-next-line no-return-await
+    return await makeUpdateTokenMetadataAfterDeployRequest(tokenDetails, false);
+}
+
+export async function validateFormDetailsForUpdateTokenMetadataAfterDeploy(
+    tokenDetails: FormData, // TokenDeploy
+): Promise<AxiosResponse<any> | null> {
+    // eslint-disable-next-line no-return-await
+    return await makeUpdateTokenMetadataAfterDeployRequest(tokenDetails, true);
+}
+
+export async function makeUpdateTokenMetadataAfterDeployRequest(
+    tokenDetails: FormData, // TokenDeploy
+    validateOnly = false,
+): Promise<AxiosResponse<any> | null> {
+    try {
+        let url = `/${KRC20METADATA_CONTROLLER}/after-deploy`;
+
+        if (validateOnly) {
+            url += '-validate';
+        }
+
+        const response = await backendService.post<any>(url, tokenDetails);
+        return response;
+    } catch (error) {
+        console.error('Error saving token metadata:', error);
+
+        if (error instanceof AxiosError) {
+            return error.response;
+        }
+
+        return null;
+    }
+}
+
+export async function sendServerRequestAndSetErrorsIfNeeded<T>(
+    requestFunction: () => Promise<AxiosResponse<T | BackendValidationErrorsType> | null>,
+    setErrors: (errors: BackendValidationErrorsType) => void,
+) {
+    const response = await requestFunction();
+
+    if (!response) {
+        return null;
+    }
+
+    if (response.status === 400) {
+        setErrors(response.data as BackendValidationErrorsType);
+        return null;
+    }
+
+    return response.data;
 }

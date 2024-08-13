@@ -15,10 +15,14 @@ export const Info = styled(Typography)({
     textAlign: 'center',
 });
 
-export const TextInfo = styled(TextField)({
+export const TextInfo = styled(TextField)(({ theme }) => ({
     width: '100%',
     marginBottom: '2vh',
-});
+
+    '& .MuiFormHelperText-root': {
+        color: theme.palette.success.main,
+    },
+}));
 
 export const Status = styled('div')({
     fontSize: '0.9rem',

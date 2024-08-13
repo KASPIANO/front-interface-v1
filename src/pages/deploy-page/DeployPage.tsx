@@ -1,12 +1,26 @@
 import React, { useState, useCallback, FC } from 'react';
 import { Button, Container, Typography, Tooltip, IconButton, Input } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { DeployForm, ImagePreview, Info, Status, TextInfo, UploadButton, UploadContainer } from './DeployPage.s';
+import { DeployForm, ImagePreview, Info, TextInfo, UploadButton, UploadContainer } from './DeployPage.s';
 import { TokenDeploy } from '../../types/Types';
 import DeployDialog from '../../components/deploy-page/deploy-dialog/DeployDialog';
 import debounce from 'lodash/debounce';
 import { fetchTokenInfo } from '../../DAL/Krc20DAL';
 import { deployKRC20Token } from '../../utils/KaswareUtils';
+import {
+    BackendValidationErrorsType,
+    sendServerRequestAndSetErrorsIfNeeded,
+    updateTokenMetadataAfterDeploy,
+    validateFormDetailsForUpdateTokenMetadataAfterDeploy,
+} from '../../DAL/BackendDAL';
+import {
+    setErrorToField,
+    clearFieldErrors,
+    clearFieldErrorsAndSetFieldValue,
+    clearFormErrors,
+    getErrorMessage,
+    hasErrors,
+} from '../../utils/BackendValidationErrorsHandler';
 
 interface DeployPageProps {
     walletBalance: number;
@@ -26,21 +40,20 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const [x, setX] = useState('');
     const [discord, setDiscord] = useState('');
     const [telegram, setTelegram] = useState('');
-    const [logo, setLogo] = useState<string | null>(null);
-    const [banner, setBanner] = useState<string | null>(null);
+    const [logo, setLogo] = useState<File | null>(null);
+    const [banner, setBanner] = useState<File | null>(null);
     const [showDeployDialog, setShowDeployDialog] = useState(false);
     const [tokenDetails, setTokenDetails] = useState<TokenDeploy | null>(null);
     const [tickerMessage, setTickerMessage] = useState('');
-    const [statusClass, setStatusClass] = useState('');
+    const [formErrors, setFormErrors] = useState<BackendValidationErrorsType>({});
     const [totalSupplyError, setTotalSupplyError] = useState(false);
     const [mintLimitError, setMintLimitError] = useState(false);
     const [limitSupplyError, setLimitSupplyError] = useState(false);
     const [preAllocationError, setPreAllocationError] = useState(false);
     const [reviewTokenData, setReviewTokenData] = useState<TokenDeploy>(null);
-    const [descriptionError, setDescriptionError] = useState(false);
 
     const validateTokenFullName = (name: string) => {
-        const regex = /^[A-Za-z]{4,6}$/;
+        const regex = /^[A-Z]{4,6}$/;
         return regex.test(name);
     };
 
@@ -55,6 +68,9 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     };
 
     const handleTokenNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        clearFieldErrors(formErrors, setFormErrors, 'ticker');
+        setTickerMessage('');
+
         if (validateTokenName(event.target.value)) {
             setTokenName(event.target.value);
             debouncedValidateTokenName(event.target.value);
@@ -65,9 +81,12 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         setDescription(value);
         if (value.length > 100) {
             setDescription(value.slice(0, 100));
-            setDescriptionError(true);
-        } else {
-            setDescriptionError(false);
+            setErrorToField(
+                formErrors,
+                setFormErrors,
+                'description',
+                'Description must be less than 100 characters.',
+            );
         }
     };
 
@@ -75,8 +94,13 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const debouncedValidateTokenName = useCallback(
         debounce(async (name: string) => {
             if (!validateTokenFullName(name)) {
-                setTickerMessage('Token name must be 4-6 letters.');
-                setStatusClass('error');
+                setErrorToField(
+                    formErrors,
+                    setFormErrors,
+                    'ticker',
+                    'Token name must be 4-6 letters and big letters only.',
+                );
+
                 return;
             }
 
@@ -84,9 +108,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             if (isAvailable) {
                 setValidatedTokenName(name);
                 setTickerMessage('Ticker is valid and available to deploy.');
-                setStatusClass('success');
-            } else {
-                setStatusClass('error');
             }
         }, 300),
         [],
@@ -96,15 +117,19 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         try {
             const data = await fetchTokenInfo(ticker, false); // Set holders to false
             if (data && (data.state === 'deployed' || data.state === 'ignored')) {
-                setTickerMessage('Token already exists. Please choose a different ticker.');
-                setStatusClass('error');
+                setErrorToField(
+                    formErrors,
+                    setFormErrors,
+                    'ticker',
+                    'Token already exists. Please choose a different ticker.',
+                );
+
                 return false;
             } else {
                 return true;
             }
         } catch (e) {
-            setTickerMessage('Error checking token availability.');
-            setStatusClass('error');
+            setErrorToField(formErrors, setFormErrors, 'ticker', 'Error checking token availability.');
             return false;
         }
     };
@@ -123,8 +148,12 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         if (!validatedTokenName) {
-            setTickerMessage('Token name must be 4-6 letters.');
-            setStatusClass('error');
+            setErrorToField(
+                formErrors,
+                setFormErrors,
+                'ticker',
+                'Token name must be 4-6 letters and big letters only.',
+            );
             return;
         } else if (!totalSupply || /^0+$/.test(totalSupply)) {
             setTotalSupplyError(true);
@@ -135,7 +164,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         }
 
         setTickerMessage('');
-        setStatusClass('');
+        clearFormErrors(setFormErrors);
 
         const tokenData: TokenDeploy = {
             ticker: validatedTokenName,
@@ -147,8 +176,8 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             x,
             discord,
             telegram,
-            logo: logo || '',
-            banner: banner || '',
+            logo: logo || null,
+            banner: banner || null,
         };
         console.log('Token Data:', tokenData);
 
@@ -210,6 +239,8 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const handleDeploy = async () => {
         if (!tokenDetails) return;
 
+        if (walletBalance < 1000) return;
+
         const inscribeJsonString = JSON.stringify({
             p: 'KRC-20',
             op: 'deploy',
@@ -219,15 +250,51 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             pre: tokenDetails.preAllocation,
         });
 
+        const tokenDetailsForm = new FormData();
+
+        for (const [key, value] of Object.entries(tokenDetails)) {
+            tokenDetailsForm.append(key, value as string);
+        }
+
         try {
-            if (walletBalance >= 1000) {
-                const txid = await deployKRC20Token(inscribeJsonString);
-                console.log(inscribeJsonString);
-                console.log('Deployment successful, txid:', txid);
+            tokenDetailsForm.append('transactionHash', 'validation-only');
+
+            const validateResults = await sendServerRequestAndSetErrorsIfNeeded<boolean>(
+                () => validateFormDetailsForUpdateTokenMetadataAfterDeploy(tokenDetailsForm),
+                setFormErrors,
+            );
+
+            tokenDetailsForm.delete('transactionHash');
+
+            if (!validateResults) {
+                // User need to fix errors
+
                 setShowDeployDialog(false);
-            } else {
-                console.error('Insufficient funds to deploy KRC20 token');
+                return;
             }
+
+            const txid = await deployKRC20Token(inscribeJsonString);
+
+            console.log(inscribeJsonString);
+            console.log('Deployment successful, txid:', txid);
+            tokenDetailsForm.append('transactionHash', txid);
+
+            const result = await sendServerRequestAndSetErrorsIfNeeded<boolean>(
+                () => updateTokenMetadataAfterDeploy(tokenDetailsForm),
+                setFormErrors,
+            );
+
+            if (!result) {
+                // TODO: Show error to the user
+                throw new Error('Failed to save token metadata');
+            } else {
+                // TODO: Show success to the user
+            }
+
+            setShowDeployDialog(false);
+            // } else {
+            //     console.error('Insufficient funds to deploy KRC20 token');
+            // }
             // Handle successful deployment (e.g., show a success message, navigate to a different page, etc.)
         } catch (error) {
             console.error('Failed to deploy KRC20 token:', error);
@@ -266,8 +333,15 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 </Tooltip>
                             ),
                         }}
+                        error={hasErrors(formErrors, 'ticker')}
+                        color={
+                            !hasErrors(formErrors, 'ticker') && tickerMessage && tickerMessage.length > 0
+                                ? 'success'
+                                : null
+                        }
+                        focused
+                        helperText={getErrorMessage(formErrors, 'ticker') || tickerMessage}
                     />
-                    <Status className={statusClass}>{tickerMessage}</Status>
 
                     <TextInfo
                         error={totalSupplyError}
@@ -347,10 +421,14 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         variant="outlined"
                         fullWidth
                         value={description}
-                        error={descriptionError}
-                        helperText={descriptionError ? 'Description must be less than 100 characters' : ''}
-                        onChange={(e) => handleDescriptionChange(e.target.value)}
+                        onChange={(e) =>
+                            clearFieldErrorsAndSetFieldValue(formErrors, setFormErrors, 'description', () =>
+                                handleDescriptionChange(e.target.value),
+                            )
+                        }
                         placeholder="Token description"
+                        error={hasErrors(formErrors, 'description')}
+                        helperText={getErrorMessage(formErrors, 'description')}
                     />
 
                     <TextInfo
@@ -358,8 +436,14 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         variant="outlined"
                         fullWidth
                         value={website}
-                        onChange={(e) => setWebsite(e.target.value)}
+                        onChange={(e) =>
+                            clearFieldErrorsAndSetFieldValue(formErrors, setFormErrors, 'website', () =>
+                                setWebsite(e.target.value),
+                            )
+                        }
                         placeholder="Website URL"
+                        error={hasErrors(formErrors, 'website')}
+                        helperText={getErrorMessage(formErrors, 'website')}
                     />
 
                     <TextInfo
@@ -367,8 +451,14 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         variant="outlined"
                         fullWidth
                         value={x}
-                        onChange={(e) => setX(e.target.value)}
+                        onChange={(e) =>
+                            clearFieldErrorsAndSetFieldValue(formErrors, setFormErrors, 'x', () =>
+                                setX(e.target.value),
+                            )
+                        }
                         placeholder="X handle"
+                        error={hasErrors(formErrors, 'x')}
+                        helperText={getErrorMessage(formErrors, 'x')}
                     />
 
                     <TextInfo
@@ -376,8 +466,14 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         variant="outlined"
                         fullWidth
                         value={discord}
-                        onChange={(e) => setDiscord(e.target.value)}
+                        onChange={(e) =>
+                            clearFieldErrorsAndSetFieldValue(formErrors, setFormErrors, 'discord', () =>
+                                setDiscord(e.target.value),
+                            )
+                        }
                         placeholder="Discord link"
+                        error={hasErrors(formErrors, 'discord')}
+                        helperText={getErrorMessage(formErrors, 'discord')}
                     />
 
                     <TextInfo
@@ -385,13 +481,19 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         variant="outlined"
                         fullWidth
                         value={telegram}
-                        onChange={(e) => setTelegram(e.target.value)}
+                        onChange={(e) =>
+                            clearFieldErrorsAndSetFieldValue(formErrors, setFormErrors, 'telegram', () =>
+                                setTelegram(e.target.value),
+                            )
+                        }
                         placeholder="Telegram link"
+                        error={hasErrors(formErrors, 'telegram')}
+                        helperText={getErrorMessage(formErrors, 'telegram')}
                     />
 
                     <UploadContainer>
                         {logo ? (
-                            <ImagePreview src={logo} alt="Token Logo" />
+                            <ImagePreview src={URL.createObjectURL(logo)} alt="Token Logo" />
                         ) : (
                             <Typography>Upload Token's Logo</Typography>
                         )}
@@ -403,7 +505,8 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 type="file"
                                 onChange={(event) => {
                                     const inputElement = event.target as HTMLInputElement;
-                                    setLogo(URL.createObjectURL(inputElement.files[0]));
+                                    setLogo(inputElement.files[0]);
+                                    clearFieldErrors(formErrors, setFormErrors, 'logo');
                                 }}
                             />
                             <Button variant="text" color="primary" component="span">
@@ -414,6 +517,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                             sx={{ width: '1vw', height: '2vw' }}
                             onClick={() => {
                                 setLogo(null);
+                                clearFieldErrors(formErrors, setFormErrors, 'logo');
                             }}
                             disabled={!logo}
                             color="primary"
@@ -422,10 +526,13 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                             Clear
                         </Button>
                     </UploadContainer>
+                    {hasErrors(formErrors, 'logo') && (
+                        <Info className="error">{'File type must be image and size must be less than 50MB'}</Info>
+                    )}
 
                     <UploadContainer>
                         {banner ? (
-                            <ImagePreview src={banner} alt="Token Banner" />
+                            <ImagePreview src={URL.createObjectURL(banner)} alt="Token Banner" />
                         ) : (
                             <Typography>Upload Token's Banner</Typography>
                         )}
@@ -437,7 +544,8 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 type="file"
                                 onChange={(event) => {
                                     const inputElement = event.target as HTMLInputElement;
-                                    setBanner(URL.createObjectURL(inputElement.files[0]));
+                                    setBanner(inputElement.files[0]);
+                                    clearFieldErrors(formErrors, setFormErrors, 'banner');
                                 }}
                             />
                             <Button variant="text" color="primary" component="span">
@@ -447,6 +555,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 sx={{ width: '1vw', height: '2vw' }}
                                 onClick={() => {
                                     setBanner(null);
+                                    clearFieldErrors(formErrors, setFormErrors, 'banner');
                                 }}
                                 disabled={!banner}
                                 color="primary"
@@ -456,6 +565,9 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                             </Button>
                         </UploadButton>
                     </UploadContainer>
+                    {hasErrors(formErrors, 'banner') && (
+                        <Info className="error">{'File type must be image and size must be less than 50MB'}</Info>
+                    )}
 
                     <Button
                         sx={{
