@@ -28,7 +28,7 @@ export async function fetchAllTokens(
         }
         const url = `/${KRC20CONTROLLER}?${urlParams.toString()}`;
 
-        const response = await backendService.get<Token[]>(url);
+        const response = await backendService.get<TokenListItem[]>(url);
 
         return response.data;
     } catch (error) {
@@ -60,12 +60,33 @@ export async function countTokens(): Promise<number> {
 export async function updateTokenMetadataAfterDeploy(
     tokenDetails: FormData, // TokenDeploy
 ): Promise<AxiosResponse<any> | null> {
+    // eslint-disable-next-line no-return-await
+    return await makeUpdateTokenMetadataAfterDeployRequest(tokenDetails, false);
+}
+
+export async function validateFormDetailsForUpdateTokenMetadataAfterDeploy(
+    tokenDetails: FormData, // TokenDeploy
+): Promise<AxiosResponse<any> | null> {
+    // eslint-disable-next-line no-return-await
+    return await makeUpdateTokenMetadataAfterDeployRequest(tokenDetails, true);
+}
+
+export async function makeUpdateTokenMetadataAfterDeployRequest(
+    tokenDetails: FormData, // TokenDeploy
+    validateOnly = false,
+): Promise<AxiosResponse<any> | null> {
     try {
-        const response = await backendService.post<any>(`/${KRC20METADATA_CONTROLLER}/after-deploy`, tokenDetails);
+        let url = `/${KRC20METADATA_CONTROLLER}/after-deploy`;
+
+        if (validateOnly) {
+            url += '-validate';
+        }
+
+        const response = await backendService.post<any>(url, tokenDetails);
         return response;
     } catch (error) {
         console.error('Error saving token metadata:', error);
-        
+
         if (error instanceof AxiosError) {
             return error.response;
         }

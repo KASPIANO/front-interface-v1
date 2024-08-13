@@ -1,7 +1,7 @@
 import React, { useState, useCallback, FC } from 'react';
 import { Button, Container, Typography, Tooltip, IconButton, Input } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { DeployForm, ImagePreview, Info, Status, TextInfo, UploadButton, UploadContainer } from './DeployPage.s';
+import { DeployForm, ImagePreview, Info, TextInfo, UploadButton, UploadContainer } from './DeployPage.s';
 import { TokenDeploy } from '../../types/Types';
 import DeployDialog from '../../components/deploy-page/deploy-dialog/DeployDialog';
 import debounce from 'lodash/debounce';
@@ -11,6 +11,7 @@ import {
     BackendValidationErrorsType,
     sendServerRequestAndSetErrorsIfNeeded,
     updateTokenMetadataAfterDeploy,
+    validateFormDetailsForUpdateTokenMetadataAfterDeploy,
 } from '../../DAL/BackendDAL';
 import {
     setErrorToField,
@@ -30,17 +31,17 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const { walletBalance, backgroundBlur } = props;
     const [tokenName, setTokenName] = useState('');
     const [validatedTokenName, setValidatedTokenName] = useState('');
-    const [totalSupply, setTotalSupply] = useState('1000');
-    const [mintLimit, setMintLimit] = useState('100');
+    const [totalSupply, setTotalSupply] = useState('');
+    const [mintLimit, setMintLimit] = useState('');
     const [preAllocation, setPreAllocation] = useState('');
-    const [preAllocationPercentage, setPreAllocationPercentage] = useState('50');
-    const [description, setDescription] = useState('My great token of gilad state');
-    const [website, setWebsite] = useState('http://gilad.com');
-    const [x, setX] = useState('https://x.com/asd');
-    const [discord, setDiscord] = useState('https://discord.com/asd');
-    const [telegram, setTelegram] = useState('https://t.me/asd');
-    const [logo, setLogo] = useState<string | null>(null);
-    const [banner, setBanner] = useState<string | null>(null);
+    const [preAllocationPercentage, setPreAllocationPercentage] = useState('');
+    const [description, setDescription] = useState('');
+    const [website, setWebsite] = useState('');
+    const [x, setX] = useState('');
+    const [discord, setDiscord] = useState('');
+    const [telegram, setTelegram] = useState('');
+    const [logo, setLogo] = useState<File | null>(null);
+    const [banner, setBanner] = useState<File | null>(null);
     const [showDeployDialog, setShowDeployDialog] = useState(false);
     const [tokenDetails, setTokenDetails] = useState<TokenDeploy | null>(null);
     const [tickerMessage, setTickerMessage] = useState('');
@@ -85,8 +86,8 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 setFormErrors,
                 'description',
                 'Description must be less than 100 characters.',
-            )
-        } 
+            );
+        }
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -175,8 +176,8 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             x,
             discord,
             telegram,
-            logo: logo || '',
-            banner: banner || '',
+            logo: logo || null,
+            banner: banner || null,
         };
         console.log('Token Data:', tokenData);
 
@@ -238,6 +239,8 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const handleDeploy = async () => {
         if (!tokenDetails) return;
 
+        if (walletBalance < 1000) return;
+
         const inscribeJsonString = JSON.stringify({
             p: 'KRC-20',
             op: 'deploy',
@@ -254,9 +257,24 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         }
 
         try {
-            // if (walletBalance >= 1000) {
-            // const txid = await deployKRC20Token(inscribeJsonString);
-            const txid = 'a599f03ac54d8efa98681b97fab4a90cc74bd55477967a54f7ffb76414bcf6f8';
+            tokenDetailsForm.append('transactionHash', 'validation-only');
+
+            const validateResults = await sendServerRequestAndSetErrorsIfNeeded<boolean>(
+                () => validateFormDetailsForUpdateTokenMetadataAfterDeploy(tokenDetailsForm),
+                setFormErrors,
+            );
+
+            tokenDetailsForm.delete('transactionHash');
+
+            if (!validateResults) {
+                // User need to fix errors
+
+                setShowDeployDialog(false);
+                return;
+            }
+
+            const txid = await deployKRC20Token(inscribeJsonString);
+
             console.log(inscribeJsonString);
             console.log('Deployment successful, txid:', txid);
             tokenDetailsForm.append('transactionHash', txid);
@@ -265,8 +283,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 () => updateTokenMetadataAfterDeploy(tokenDetailsForm),
                 setFormErrors,
             );
-
-            console.log(formErrors);
 
             if (!result) {
                 // TODO: Show error to the user
@@ -490,6 +506,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 onChange={(event) => {
                                     const inputElement = event.target as HTMLInputElement;
                                     setLogo(inputElement.files[0]);
+                                    clearFieldErrors(formErrors, setFormErrors, 'logo');
                                 }}
                             />
                             <Button variant="text" color="primary" component="span">
@@ -500,6 +517,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                             sx={{ width: '1vw', height: '2vw' }}
                             onClick={() => {
                                 setLogo(null);
+                                clearFieldErrors(formErrors, setFormErrors, 'logo');
                             }}
                             disabled={!logo}
                             color="primary"
@@ -508,6 +526,9 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                             Clear
                         </Button>
                     </UploadContainer>
+                    {hasErrors(formErrors, 'logo') && (
+                        <Info className="error">{'File type must be image and size must be less than 50MB'}</Info>
+                    )}
 
                     <UploadContainer>
                         {banner ? (
@@ -524,6 +545,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 onChange={(event) => {
                                     const inputElement = event.target as HTMLInputElement;
                                     setBanner(inputElement.files[0]);
+                                    clearFieldErrors(formErrors, setFormErrors, 'banner');
                                 }}
                             />
                             <Button variant="text" color="primary" component="span">
@@ -533,6 +555,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 sx={{ width: '1vw', height: '2vw' }}
                                 onClick={() => {
                                     setBanner(null);
+                                    clearFieldErrors(formErrors, setFormErrors, 'banner');
                                 }}
                                 disabled={!banner}
                                 color="primary"
@@ -542,6 +565,9 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                             </Button>
                         </UploadButton>
                     </UploadContainer>
+                    {hasErrors(formErrors, 'banner') && (
+                        <Info className="error">{'File type must be image and size must be less than 50MB'}</Info>
+                    )}
 
                     <Button
                         sx={{
@@ -574,30 +600,3 @@ const DeployPage: FC<DeployPageProps> = (props) => {
 };
 
 export default DeployPage;
-
-/* 
-{
-    "ticker": "GILAD",
-    "totalSupply": "1000",
-    "mintLimit": "1",
-    "preAllocation": "500",
-    "description": "Gilad Coin",
-    "website": "",
-    "x": "",
-    "discord": "",
-    "telegram": "",
-    "logo": "",
-    "banner": ""
-}
-
-{
-  "p": "KRC-20",
-  "op": "deploy",
-  "tick": "GILAD",
-  "max": "1000",
-  "lim": "1",
-  "pre": "500"
-}
-
-
-*/

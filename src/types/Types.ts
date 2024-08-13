@@ -105,8 +105,8 @@ export interface TokenDeploy {
     x?: string;
     discord?: string;
     telegram?: string;
-    logo?: string;
-    banner?: string;
+    logo?: File;
+    banner?: File;
     transactionHash?: string;
 }
 
