@@ -1,10 +1,9 @@
 import { FC, useEffect, useState } from 'react';
-import { PortfolioValue, TokenListItem } from '../../types/Types';
-import { countTokens, fetchAllTokens } from '../../DAL/BackendDAL';
 import { PortfolioLayout } from './PortfolioPageLayout';
 import UserProfile from '../../components/portfolio-page/user-profile/UserProfile';
 import PortfolioPanel from '../../components/portfolio-page/user-profile/portfolio-tab-panel/PortfolioPanel';
 import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
+import { PortfolioValue } from '../../types/Types';
 
 interface PortfolioPageProps {
     walletAddress: string | null;
