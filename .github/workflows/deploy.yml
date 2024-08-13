@@ -34,7 +34,7 @@ jobs:
 
     - name: Debug AWS Configuration
       run: |
-        aws s3 ls --region ${{ secrets.AWS_REGION }}
+        aws s3 ls --region ${{ env.AWS_REGION }}
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -42,7 +42,7 @@ jobs:
 
     - name: Deploy to S3
       run: |
-        aws s3 sync build/ s3://${{ secrets.S3_BUCKET_NAME }}/ --acl public-read --delete
+        aws s3 sync build/ s3://${{ env.S3_BUCKET_NAME }}/ --acl public-read --delete
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -51,9 +51,11 @@ jobs:
     - name: Invalidate CloudFront cache
       run: |
         aws cloudfront create-invalidation \
-          --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+          --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
           --paths "/*"
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
+        CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
