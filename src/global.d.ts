@@ -15,6 +15,7 @@ interface Kasware {
         event: 'accountsChanged' | 'networkChanged' | 'disconnect',
         handler: (data: any) => void,
     ) => void;
+    _selectedAddress: string;
 }
 
 interface Window {

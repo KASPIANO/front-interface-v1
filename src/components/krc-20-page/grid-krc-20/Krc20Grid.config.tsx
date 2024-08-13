@@ -15,13 +15,13 @@ export const columns: GridColDef[] = [
         field: 'mtsAdd',
         headerName: 'Date of Deployment',
         width: 100,
-        valueGetter: (value, row) => formatDate(row.mtsAdd),
+        valueGetter: (_value, row) => formatDate(row.mtsAdd),
     },
     {
         field: 'percentageMinted',
         headerName: '% Minted',
         width: 100,
-        valueGetter: (value, row) => `${((row.minted / row.max) * 100).toFixed(2)}%`,
+        valueGetter: (_value, row) => `${((row.minted / row.max) * 100).toFixed(2)}%`,
         // valueGetter: (params) => `${((params.row.minted / params.row.max) * 100).toFixed(2)}%`,
     },
     {
@@ -34,7 +34,7 @@ export const columns: GridColDef[] = [
         field: 'pre',
         headerName: 'Pre-Minted %',
         width: 100,
-        valueGetter: (value, row) => `${((row.pre / row.max) * 100).toFixed(2)}%`,
+        valueGetter: (_value, row) => `${((row.pre / row.max) * 100).toFixed(2)}%`,
     },
     {
         field: 'max',
@@ -46,7 +46,7 @@ export const columns: GridColDef[] = [
         field: 'age',
         headerName: 'Age',
         width: 100,
-        valueGetter: (value, row) => `${moment().diff(Number(row.mtsAdd), 'days')} days`,
+        valueGetter: (_value, row) => `${moment().diff(Number(row.mtsAdd), 'days')} days`,
     },
     // { field: 'price', headerName: 'Price', width: 150, valueGetter: (params) => (0).toFixed(2) }, // Assuming static price as 0.00
     // { field: 'volume', headerName: 'Volume', width: 150, valueGetter: (params) => 0 }, // Assuming static volume as 0

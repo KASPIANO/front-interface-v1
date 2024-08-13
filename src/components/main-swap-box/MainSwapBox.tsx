@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { Token, TokenResponse } from '../../types/Types';
-import SwapForm from './swap-form/SwapForm';
-import SlippageControl from './box-settings/BoxSettings';
 import { Box } from '@mui/material';
+import { Token, TokenResponse } from '../../types/Types';
+import SlippageControl from './box-settings/BoxSettings';
+import SwapForm from './swap-form/SwapForm';
 
 interface MainSwapBoxProps {
     isPayingActive: boolean;
@@ -51,9 +51,6 @@ const MainSwapBox: React.FC<MainSwapBoxProps> = ({
     slippageMode,
     slippageValue,
     openSlippageModal,
-    handleTokenSelect,
-    closeTokenModal,
-    handleSlippageSave,
     tokens,
 }) => (
     <Box

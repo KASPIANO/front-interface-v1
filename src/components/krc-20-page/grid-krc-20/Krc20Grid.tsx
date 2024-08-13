@@ -1,28 +1,28 @@
-import { FC, useEffect, useState } from 'react';
+import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
+import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
+import UnfoldMoreRoundedIcon from '@mui/icons-material/UnfoldMoreRounded';
 import {
+    Avatar,
+    Box,
     Button,
+    Divider,
     List,
     ListItem,
     ListItemAvatar,
     ListItemButton,
-    Avatar,
-    Typography,
-    Divider,
-    Box,
     ListItemText,
+    Typography,
 } from '@mui/material';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import Skeleton from '@mui/material/Skeleton';
 import Tooltip from '@mui/material/Tooltip';
 import moment from 'moment';
+import { FC, useEffect, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { createGlobalStyle } from 'styled-components';
 import { fetchTokenInfo } from '../../../DAL/Krc20DAL';
 import { TokenResponse } from '../../../types/Types';
-import { NoDataContainer, StyledDataGridContainer, TableHeader } from './Krc20Grid.s';
-import { createGlobalStyle } from 'styled-components';
 import { formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
-import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
-import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
-import UnfoldMoreRoundedIcon from '@mui/icons-material/UnfoldMoreRounded';
+import { NoDataContainer, StyledDataGridContainer, TableHeader } from './Krc20Grid.s';
 
 const GlobalStyle = createGlobalStyle`
   #scrollableList {
@@ -66,7 +66,7 @@ const capitalizeFirstLetter = (string: string): string => {
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     const { tokensList, setNextPage, totalTokensDeployed, nextPage } = props;
     const [tokensRows, setTokensRows] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [, setLoading] = useState(true);
 
     useEffect(() => {
         const loadTokens = async () => {

@@ -15,11 +15,11 @@ import {
     SearchContainer,
 } from './NavBar.s';
 
-interface Token {
-    symbol: string;
-    name: string;
-    logoURI: string;
-}
+// interface Token {
+//     symbol: string;
+//     name: string;
+//     logoURI: string;
+// }
 
 interface NavbarProps {
     walletAddress: string | null;
@@ -34,17 +34,16 @@ const Navbar: React.FC<NavbarProps> = (props) => {
     const [activePage, setActivePage] = useState('Swap');
     const themeContext = useContext(ThemeContext);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [searchValue, setSearchValue] = useState('');
+    const [, setSearchValue] = useState('');
 
-    const handleTokenSelect = (token: Token) => {
-        console.log('Selected token:', token);
-        setIsModalOpen(false);
-    };
+    // const handleTokenSelect = (token: Token) => {
+    //     console.log('Selected token:', token);
+    //     setIsModalOpen(false);
+    // };
 
-    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchValue(event.target.value);
-    };
+    // const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     setSearchValue(event.target.value);
+    // };
 
     return (
         <NavbarContainer>

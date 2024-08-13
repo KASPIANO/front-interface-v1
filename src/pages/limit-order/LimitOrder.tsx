@@ -10,7 +10,7 @@ interface LimitOrderPageProps {
     walletBalance: number;
 }
 
-const LimitOrderPage: FC<LimitOrderPageProps> = ({ walletAddress, connectWallet, walletBalance }) => (
+const LimitOrderPage: FC<LimitOrderPageProps> = ({ walletAddress, connectWallet }) => (
     <Layout walletAddress={walletAddress} connectWallet={connectWallet} showBackgroundEffect={false}>
         <Container>
             <TradingViewChart />

@@ -39,8 +39,6 @@ const GridPage: FC<GridPageProps> = (props) => {
     const {
         walletAddress,
         connectWallet,
-        walletBalance,
-        isConnecting,
         showNotification,
         setShowNotification,
         setWalletAddress,
@@ -49,7 +47,7 @@ const GridPage: FC<GridPageProps> = (props) => {
 
     const [network, setNetwork] = useState<string>('mainnet'); // New state for network
 
-    const [isBlurred, setIsBlurred] = useState<boolean>(false);
+    const [isBlurred] = useState<boolean>(false);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [tokensList, setTokensList] = useState<TokenResponse[]>([]);
     const [nextPage, setNextPage] = useState<number>(1);

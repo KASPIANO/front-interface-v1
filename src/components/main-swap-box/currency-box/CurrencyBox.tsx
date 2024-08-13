@@ -1,8 +1,7 @@
-import { StyledInputContainer, StyledAmountInput, TokensAutocomplete } from './CurrencyBox.s';
-import { FormControl, TextField } from '@mui/material';
-import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
+import { FormControl } from '@mui/material';
 import { FC } from 'react';
 import { TokenResponse } from '../../../types/Types';
+import { StyledAmountInput, StyledInputContainer } from './CurrencyBox.s';
 
 interface CurrencyBoxProps {
     active: boolean;
@@ -12,11 +11,11 @@ interface CurrencyBoxProps {
 }
 
 const CurrencyBox: FC<CurrencyBoxProps> = (props) => {
-    const { active, paying, setPaying, tokens } = props;
+    const { active, paying, setPaying } = props;
 
-    const onGroupChange = (event: any) => {
-        setPaying(event.target.value);
-    };
+    // const onGroupChange = (event: any) => {
+    //     setPaying(event.target.value);
+    // };
     return (
         <StyledInputContainer active={active}>
             <FormControl>
