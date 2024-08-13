@@ -158,3 +158,12 @@ export interface UserSettings {
     discord?: string;
     twitter?: string;
 }
+
+export interface TokenRowPortfolioItem {
+    ticker: string;
+    balance: string;
+    price?: string;
+    totalValue?: string;
+    oneDayChange?: string;
+    logoUrl?: string;
+}
