@@ -1,12 +1,12 @@
 import { FC, useState } from 'react';
-import { Tab, Tabs } from '@mui/material';
+import { Tabs } from '@mui/material';
 import TabContext from '@mui/lab/TabContext';
 import { TabPanelContainer, TabPanelStyled, TabStyled } from './PortfolioPanel.s';
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
 
 const PortfolioPanel: FC = () => {
     const [value, setValue] = useState('1');
-    const [paidUser, setPaidUser] = useState(false);
+    const [paidUser] = useState(false);
 
     const handleChange = (_event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
