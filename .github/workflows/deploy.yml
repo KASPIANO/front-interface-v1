@@ -9,6 +9,12 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -25,25 +31,17 @@ jobs:
       run: npm run build
 
     - name: Deploy to S3
-      uses: jakejarvis/s3-sync-action@v0.8.0
+      uses: aws-actions/s3-sync@v0.3.0
       with:
-        args: --acl public-read --delete
-      env:
-        SOURCE_DIR: 'build'
-        AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        source-dir: 'build'
+        bucket: ${{ secrets.S3_BUCKET_NAME }}
+        endpoint-url: 'https://s3.amazonaws.com'
+        region: ${{ secrets.AWS_REGION }}
+        acl: 'public-read'
+        delete: true
 
     - name: Invalidate CloudFront cache
-      if: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}
       run: |
         aws cloudfront create-invalidation \
           --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
           --paths "/*"
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-        CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
