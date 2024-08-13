@@ -9,12 +9,32 @@ export interface Token {
     pre: string;
     mtsAdd: string;
     lim: string;
-    holder?: TokenHolder[];
+    totalHolders: number;
+    topHolders?: TokenHolder[];
     transferTotal?: string;
     sentiment?: TokenSentiment;
     description?: string;
     socials?: TokenSocials;
     contacts?: string[];
+}
+
+export interface TokenListItem {
+    tick: string;
+    ticker?: string;
+    mtsAdd: number;
+    max: number;
+    minted: number;
+    maxMintedPercent: number;
+    totalHolders: number;
+    pre: number;
+    logoUrl: string;
+    bannerUrl: string;
+}
+export interface TokenSearchItems {
+    ticker: string;
+    logo: string;
+    minted?: string;
+    holders?: number;
 }
 
 export interface TokenSentiment {
@@ -39,18 +59,6 @@ export interface TokenSocials {
     explorer?: string;
     chat?: string;
     other?: string;
-}
-
-export interface TokenListItem {
-    tick: string;
-    mtsAdd: number;
-    max: number;
-    minted: number;
-    maxMintedPercent: number;
-    totalHolders: number;
-    pre: number;
-    logoUrl: string;
-    bannerUrl: string;
 }
 
 export interface TokenHolder {
@@ -101,17 +109,6 @@ export interface TokenDeploy {
     banner?: string;
 }
 
-export type AlertSeverity = 'error' | 'loading' | 'info' | 'success';
-export type AlertContextType = {
-    showAlert: (
-        message: string,
-        severity: AlertSeverity,
-        details?: string,
-        commit?: string,
-        reveal?: string,
-    ) => void;
-};
-
 export interface TokenMetadata {
     ticker: string;
     banner?: string;
@@ -137,4 +134,27 @@ export enum FilterState {
     UP = 'UP',
     DOWN = 'DOWN',
     NONE = 'NONE',
+}
+
+export interface PortfolioValue {
+    kas: number;
+    change: number;
+    changeDirection: 'increase' | 'decrease';
+}
+
+export interface UserPortfolioOverview {
+    addedTokens: string[];
+    mainWalletAddress: string;
+    alternativeWallets?: string[];
+    user?: UserSettings;
+    paidUser: boolean;
+}
+
+export interface UserSettings {
+    username: string;
+    displayPictureURL?: string;
+    displayNames?: string;
+    email: string;
+    discord?: string;
+    twitter?: string;
 }

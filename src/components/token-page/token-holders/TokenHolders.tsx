@@ -24,13 +24,13 @@ const TokenHolders: FC<TokenHoldersProps> = (props) => {
     const [tokenHolders, setTokenHolders] = useState<TokenHolder[]>([]);
 
     useEffect(() => {
-        setTokenHolders(props.tokenInfo?.holder || []);
+        setTokenHolders(props.tokenInfo?.topHolders || []);
 
-        // const tokenHoldersDuplicated = [...props.tokenInfo?.holder || []].flatMap((holder) =>
+        // const tokenHoldersDuplicated = [...props.tokenInfo?.topHolders || []].flatMap((holder) =>
         //     Array(20).fill(holder)
         // );
         // setTokenHolders(tokenHoldersDuplicated);
-    }, [props.tokenInfo?.holder]);
+    }, [props.tokenInfo?.topHolders]);
 
     const handleLimitChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setLimit(Number(event.target.value));

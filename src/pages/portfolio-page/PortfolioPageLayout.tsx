@@ -1,6 +1,6 @@
 import { Grid } from '@mui/material';
 
-export const GridLayout = ({ children, backgroundBlur }) => (
+export const PortfolioLayout = ({ children, backgroundBlur }) => (
     <div
         style={{
             display: 'flex',
@@ -8,7 +8,7 @@ export const GridLayout = ({ children, backgroundBlur }) => (
             transition: 'backdrop-filter 0.3s ease',
         }}
     >
-        <Grid container spacing={1} padding={2} maxWidth={'97%'}>
+        <Grid container spacing={1} padding={2.5} maxWidth={'97%'}>
             <Grid
                 item
                 xs={12}
@@ -17,7 +17,7 @@ export const GridLayout = ({ children, backgroundBlur }) => (
                 lg={12}
                 sx={{
                     '&.MuiGrid-item': {
-                        paddingTop: 0,
+                        paddingTop: 2,
                     },
                 }}
             >
@@ -26,20 +26,6 @@ export const GridLayout = ({ children, backgroundBlur }) => (
 
             <Grid item xs={12} sm={12} md={12} lg={12}>
                 {children[1]}
-            </Grid>
-            <Grid
-                sx={{
-                    '&.MuiGrid-item': {
-                        paddingTop: 0,
-                    },
-                }}
-                item
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-            >
-                {children[2]}
             </Grid>
 
             <Grid item xs={12} sm={12} md={12} lg={12}>

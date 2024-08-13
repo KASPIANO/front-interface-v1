@@ -1,21 +1,12 @@
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
-import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import { Avatar, IconButton, Tooltip, Typography } from '@mui/material';
-import InputAdornment from '@mui/material/InputAdornment';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../../main';
 import { ThemeModes } from '../../utils/Utils';
-import {
-    ConnectButton,
-    Logo,
-    NavbarContainer,
-    NavButton,
-    NavCenter,
-    SearchContainer,
-    WalletBalance,
-} from './NavBar.s';
+import { ConnectButton, Logo, NavbarContainer, NavButton, NavCenter, WalletBalance } from './NavBar.s';
+import TokenSearch from '../token-search/TokenSearch';
 
 interface NavbarProps {
     walletAddress: string | null;
@@ -25,23 +16,22 @@ interface NavbarProps {
     onNetworkChange: (network: string) => void;
     walletBalance: number;
     walletConnected: boolean;
+    setBackgroundBlur: (isFocused: boolean) => void;
+    backgroundBlur: boolean;
 }
 
 const Navbar: React.FC<NavbarProps> = (props) => {
-    const { walletBalance, walletConnected, disconnectWallet, connectWallet } = props;
+    const { walletBalance, walletConnected, disconnectWallet, connectWallet, setBackgroundBlur, backgroundBlur } =
+        props;
     const [activePage, setActivePage] = useState('/');
+
     const themeContext = useContext(ThemeContext);
-    const [, setSearchValue] = useState('');
     const navigate = useNavigate();
 
     const darkmode = themeContext.themeMode === ThemeModes.DARK;
     useEffect(() => {
         setActivePage(window.location.pathname);
     }, []);
-
-    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchValue(event.target.value);
-    };
 
     const handleNavButtonClick = (page: string) => {
         setActivePage(page);
@@ -62,7 +52,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
     };
 
     return (
-        <NavbarContainer>
+        <NavbarContainer sx={{ height: backgroundBlur ? '9vh' : '7vh' }}>
             <Logo onClick={() => handleNavButtonClick('/')}>
                 <Avatar
                     src="/kaspa.svg"
@@ -72,7 +62,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                         padding: 0,
                     }}
                 />
-                KaspianLens
+                Kaspiano
             </Logo>
             <NavCenter>
                 <NavButton isActive={activePage === '/'} onClick={() => handleNavButtonClick('/')}>
@@ -89,7 +79,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                 </NavButton>
             </NavCenter>
             <div style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}>
-                <SearchContainer
+                {/* <SearchContainer
                     type="search"
                     placeholder={'Search KRC-20 Tokens'}
                     value={''}
@@ -112,7 +102,8 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                             height: '3.5vh',
                         },
                     }}
-                />
+                /> */}
+                <TokenSearch setBackgroundBlur={setBackgroundBlur} />
                 <WalletBalance>
                     <Typography variant="body1" style={{ fontSize: '1vw', marginRight: '1vw' }}>
                         {formatNumberWithCommas(walletBalance)} KAS

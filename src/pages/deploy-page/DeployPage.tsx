@@ -10,10 +10,11 @@ import { deployKRC20Token } from '../../utils/KaswareUtils';
 
 interface DeployPageProps {
     walletBalance: number;
+    backgroundBlur: boolean;
 }
 
 const DeployPage: FC<DeployPageProps> = (props) => {
-    const { walletBalance } = props;
+    const { walletBalance, backgroundBlur } = props;
     const [tokenName, setTokenName] = useState('');
     const [validatedTokenName, setValidatedTokenName] = useState('');
     const [totalSupply, setTotalSupply] = useState('');
@@ -236,7 +237,13 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     };
 
     return (
-        <Container sx={{ width: '90%' }}>
+        <Container
+            sx={{
+                width: '90%',
+                filter: backgroundBlur ? 'blur(6px)' : 'none',
+                transition: 'backdrop-filter 0.3s ease',
+            }}
+        >
             <DeployForm>
                 <Typography sx={{ fontSize: '2.2vw', fontWeight: '500' }} variant="h4" gutterBottom>
                     KRC-20 Token Information

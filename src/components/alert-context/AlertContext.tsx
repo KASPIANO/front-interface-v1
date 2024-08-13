@@ -1,60 +1,51 @@
-import { useState, FC, ReactNode } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 import { Snackbar, Slide, SlideProps, Box, Typography, IconButton } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import { SpinningIcon } from './CustomSnackBar.s';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { AlertContext } from '../../main';
-import { AlertSeverity } from '../../types/Types';
+
+type AlertSeverity = 'error' | 'success' | 'warning' | 'info' | 'loading';
+
+interface AlertOptions {
+    message: string;
+    severity: AlertSeverity;
+    details?: string;
+    commit?: string;
+    reveal?: string;
+}
 
 const alertColors = {
-    error: '#FDEDED', // Light red
-    success: '#EDF7ED', // Light green
-    warning: '#FFF4E5', // Light yellow
-    info: '#E5F6FD', // Light blue
-    loading: '#FFF4E5', // Using warning color for loading
+    error: '#FDEDED',
+    success: '#EDF7ED',
+    warning: '#FFF4E5',
+    info: '#E5F6FD',
+    loading: '#FFF4E5',
 };
 
 const alertIconColors = {
-    error: '#D32F2F', // Dark red
-    success: '#388E3C', // Dark green
-    warning: '#FBC02D', // Dark yellow
-    info: '#1976D2', // Dark blue
-    loading: '#FBC02D', // Using warning color for loading
+    error: '#D32F2F',
+    success: '#388E3C',
+    warning: '#FBC02D',
+    info: '#1976D2',
+    loading: '#FBC02D',
 };
 
 function SlideTransition(props: SlideProps) {
     return <Slide {...props} direction="left" />;
 }
 
-const alertAutoHideDurationMapper = {
-    error: 4000,
-    success: 4000,
-    warning: 4000,
-    info: 4000,
-    loading: 10000,
-};
+let showSnackbar: (options: AlertOptions) => void;
 
-export const AlertProvider: FC<{ children: ReactNode }> = ({ children }) => {
-    const [alert, setAlert] = useState<{
-        message: string;
-        severity: AlertSeverity;
-        details?: string;
-        commit?: string;
-        reveal?: string;
-        open: boolean;
-    } | null>(null);
-    const [copied, setCopied] = useState(false);
+const SnackbarComponent: React.FC = () => {
+    const [alert, setAlert] = React.useState<(AlertOptions & { open: boolean }) | null>(null);
+    const [copied, setCopied] = React.useState(false);
 
-    const showAlert = (
-        message: string,
-        severity: AlertSeverity,
-        details?: string,
-        commit?: string,
-        reveal?: string,
-    ) => {
-        setAlert({ message, severity, details, commit, reveal, open: true });
+    showSnackbar = (options: AlertOptions) => {
+        setAlert({ ...options, open: true });
     };
 
     const handleClose = () => setAlert(null);
@@ -64,7 +55,7 @@ export const AlertProvider: FC<{ children: ReactNode }> = ({ children }) => {
             .writeText(text)
             .then(() => {
                 setCopied(true);
-                setTimeout(() => setCopied(false), 2000); // Hide the message after 2 seconds
+                setTimeout(() => setCopied(false), 2000);
             })
             .catch((err) => {
                 console.error('Failed to copy: ', err);
@@ -87,12 +78,11 @@ export const AlertProvider: FC<{ children: ReactNode }> = ({ children }) => {
     };
 
     return (
-        <AlertContext.Provider value={{ showAlert }}>
-            {children}
+        <>
             {alert && (
                 <Snackbar
                     open={alert.open}
-                    autoHideDuration={alertAutoHideDurationMapper[alert.severity]}
+                    autoHideDuration={4000}
                     onClose={handleClose}
                     anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                     sx={{ marginTop: '64px' }}
@@ -169,6 +159,17 @@ export const AlertProvider: FC<{ children: ReactNode }> = ({ children }) => {
                     message="Copied to clipboard!"
                 />
             )}
-        </AlertContext.Provider>
+        </>
     );
+};
+
+const snackbarDiv = document.createElement('div');
+document.body.appendChild(snackbarDiv);
+const root = createRoot(snackbarDiv);
+root.render(<SnackbarComponent />);
+
+export const showGlobalSnackbar = (options: AlertOptions) => {
+    if (showSnackbar) {
+        showSnackbar(options);
+    }
 };

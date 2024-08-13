@@ -19,3 +19,13 @@ export const fetchWalletBalance = async (address: string): Promise<number> => {
         return 0;
     }
 };
+
+export const kaspaLivePrice = async (): Promise<number> => {
+    try {
+        const response = await kasInfoService.get<any>('info/price');
+        return response.data.price;
+    } catch (error) {
+        console.error('Error fetching kaspa live price:', error);
+        return 0;
+    }
+};

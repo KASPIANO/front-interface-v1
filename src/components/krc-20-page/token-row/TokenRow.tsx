@@ -17,8 +17,8 @@ import { formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
 import { capitalizeFirstLetter, formatDate } from '../grid-krc-20/Krc20Grid.config';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import { Stat, StatNumber, StatHelpText, StatArrow } from '@chakra-ui/react';
-import { useAlert } from '../../../utils/UseAlert';
 import { TokenListItem } from '../../../types/Types';
+import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 
 interface TokenRowProps {
     token: TokenListItem;
@@ -30,16 +30,22 @@ interface TokenRowProps {
 
 export const TokenRow: FC<TokenRowProps> = (props) => {
     const { token, handleItemClick, tokenKey, walletBalance, walletConnected } = props;
-    const { showAlert } = useAlert();
 
     const handleMint = async (event, ticker: string) => {
         event.stopPropagation();
         if (!walletConnected) {
-            showAlert('Please connect your wallet to mint a token', 'error');
+            showGlobalSnackbar({
+                message: 'Please connect your wallet to mint a token',
+                severity: 'error',
+            });
+
             return;
         }
         if (walletBalance < 1) {
-            showAlert('You need at least 1 KAS to mint a token', 'error');
+            showGlobalSnackbar({
+                message: 'You need at least 1 KAS to mint a token',
+                severity: 'error',
+            });
             return;
         }
         const inscribeJsonString = JSON.stringify({
@@ -51,11 +57,21 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
             const mint = await mintKRC20Token(inscribeJsonString);
             if (mint) {
                 const { commit, reveal } = JSON.parse(mint);
-                showAlert('Token minted successfully', 'success', null, commit, reveal);
+                showGlobalSnackbar({
+                    message: 'Token minted successfully',
+                    severity: 'success',
+                    commit,
+                    reveal,
+                });
+
                 console.log(mint);
             }
         } catch (error) {
-            showAlert('Token minting failed', 'error', error.message);
+            showGlobalSnackbar({
+                message: 'Token minting failed',
+                severity: 'error',
+                details: error.message,
+            });
         }
     };
 
@@ -128,7 +144,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }
                     />
                     <ListItemText
-                        sx={{ maxWidth: '11vw' }}
+                        sx={{ maxWidth: '12vw' }}
                         primary={
                             <Tooltip title={formatNumberWithCommas(token.max)}>
                                 <Typography

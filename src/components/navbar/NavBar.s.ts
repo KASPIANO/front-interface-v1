@@ -1,4 +1,4 @@
-import { Button, MenuItem, Select, styled, TextField } from '@mui/material';
+import { Button, MenuItem, Select, styled } from '@mui/material';
 import { NavButtonProps } from '../../types/Types';
 
 export const NavbarContainer = styled('div')({
@@ -6,7 +6,7 @@ export const NavbarContainer = styled('div')({
     justifyContent: 'space-between',
     borderBottom: '0.5px solid #2b2b3b',
     width: '100%',
-    height: '7vh',
+
     padding: '8px 8px',
 });
 
@@ -49,12 +49,6 @@ export const NavCenter = styled('div')({
     flex: 1,
     position: 'relative',
     width: 'auto',
-});
-
-export const SearchContainer = styled(TextField)({
-    backgroundColor: '#2b2b3b',
-    marginRight: '2vw',
-    borderRadius: '6px',
 });
 
 export const WalletBalance = styled('div')({

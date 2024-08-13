@@ -16,11 +16,12 @@ interface TokenPageProps {
     connectWallet?: () => void;
     handleNetworkChange: (network: string) => void;
     network: string;
+    backgroundBlur: boolean;
 }
 
-const TokenPage: FC<TokenPageProps> = () => {
+const TokenPage: FC<TokenPageProps> = (props) => {
     const { ticker } = useParams();
-
+    const { backgroundBlur } = props;
     const [tokenInfo, setTokenInfo] = useState<Token>(null);
 
     useEffect(() => {
@@ -40,7 +41,7 @@ const TokenPage: FC<TokenPageProps> = () => {
         tokenInfo ? component : <Skeleton variant="rectangular" height={height} width={width} />;
 
     return (
-        <TokenPageLayout>
+        <TokenPageLayout backgroundBlur={backgroundBlur}>
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '11.5vh')}
             {getComponentToShow(<TokenGraph />, '30vh')}
             {getComponentToShow(<TokenStats />)}
