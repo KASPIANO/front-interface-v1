@@ -22,7 +22,6 @@ export const setErrorToField = (
     field: string,
     error: string,
 ) => {
-    const fieldErrors = formErrors[field] || [];
     setFormErrors({ ...formErrors, [field]: [error] });
 };
 
@@ -49,4 +48,4 @@ export const clearFieldErrorsAndSetFieldValue = (
 ) => {
     clearFieldErrors(formErrors, setFormErrors, field);
     setFieldValue();
-}
+};

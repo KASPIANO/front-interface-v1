@@ -1,5 +1,5 @@
-import { AxiosError, AxiosResponse } from 'axios';
-import { Token, TokenListItem, TokenDeploy } from '../types/Types';
+import { AxiosError, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
+import { Token, TokenListItem, TokenSearchItems } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
@@ -109,6 +109,20 @@ export async function sendServerRequestAndSetErrorsIfNeeded<T>(
         setErrors(response.data as BackendValidationErrorsType);
         return null;
     }
+
+    return response.data;
+}
+
+export async function searchToken(query: string, cancelToken: CancelToken = null): Promise<TokenSearchItems[]> {
+    const requestOptions: AxiosRequestConfig = {
+        params: { query },
+    };
+
+    if (cancelToken) {
+        requestOptions.cancelToken = cancelToken;
+    }
+
+    const response = await backendService.get<TokenSearchItems[]>(`/${KRC20CONTROLLER}/search`, requestOptions);
 
     return response.data;
 }
