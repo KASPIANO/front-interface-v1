@@ -10,7 +10,7 @@ interface TopHoldersProps {
 }
 
 const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
-    const numberOfHoldersToSelect = [10, 20, 30, 40, 50];
+    const numberOfHoldersToSelect = [5, 10, 20, 30, 40, 50];
     const [tokenHoldersToShow, setTokenHoldersToShow] = useState(numberOfHoldersToSelect[0]);
     const [topHoldersPercentage, setTopHoldersPercentage] = useState('---');
     const [tokenHolders, setTokenHolders] = useState(tokenInfo?.topHolders || []);
