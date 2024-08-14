@@ -51,9 +51,6 @@ const MainSwapBox: React.FC<MainSwapBoxProps> = ({
     slippageMode,
     slippageValue,
     openSlippageModal,
-    handleTokenSelect,
-    closeTokenModal,
-    handleSlippageSave,
     tokens,
 }) => (
     <Box

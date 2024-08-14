@@ -179,7 +179,11 @@ const App = () => {
                             <Route
                                 path="/portfolio"
                                 element={
-                                    <PortfolioPage walletAddress={walletAddress} backgroundBlur={backgroundBlur} />
+                                    <PortfolioPage
+                                        walletAddress={walletAddress}
+                                        backgroundBlur={backgroundBlur}
+                                        walletConnected={walletConnected}
+                                    />
                                 }
                             />
                             {/* Handle 404 - Not Found */}

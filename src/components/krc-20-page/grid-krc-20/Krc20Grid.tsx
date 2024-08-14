@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { FilterState, TokenListItem } from '../../../types/Types';
 import { GridHeader } from '../grid-header/GridHeader';
-import { TokenRow } from '../token-row/TokenRow';
+import { TokenRow } from '../token-row-grid/TokenRow';
 import { StyledDataGridContainer } from './Krc20Grid.s';
 import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 

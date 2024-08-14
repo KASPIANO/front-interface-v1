@@ -13,8 +13,7 @@ import {
 } from '@mui/material';
 import moment from 'moment';
 import { FC } from 'react';
-import { formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
-import { capitalizeFirstLetter, formatDate } from '../grid-krc-20/Krc20Grid.config';
+import { capitalizeFirstLetter, formatDate, formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import { Stat, StatNumber, StatHelpText, StatArrow } from '@chakra-ui/react';
 import { TokenListItem } from '../../../types/Types';
