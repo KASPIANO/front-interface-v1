@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import { FC, useState } from 'react';
 import { Box, Card, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
 

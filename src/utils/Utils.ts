@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export enum ThemeModes {
     DARK = 'dark',
     LIGHT = 'light',
@@ -32,4 +34,11 @@ export const shortenAddress = (address, startLength = 6, endLength = 4) => {
     const start = address.substring(0, startLength);
     const end = address.substring(address.length - endLength);
     return `${start}...${end}`;
+};
+
+export const formatDate = (timestamp: string | number): string => moment(Number(timestamp)).format('DD/MM/YYYY');
+
+export const capitalizeFirstLetter = (string: string): string => {
+    if (!string) return string;
+    return string.charAt(0).toUpperCase() + string.slice(1);
 };

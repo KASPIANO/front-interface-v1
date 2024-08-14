@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Box, Card, Tooltip, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
 import _ from 'lodash';
@@ -13,7 +13,7 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
     const numberOfHoldersToSelect = [5, 10, 20, 30, 40, 50];
     const [tokenHoldersToShow, setTokenHoldersToShow] = useState(numberOfHoldersToSelect[0]);
     const [topHoldersPercentage, setTopHoldersPercentage] = useState('---');
-    const [tokenHolders, setTokenHolders] = useState(tokenInfo?.topHolders || []);
+    const [tokenHolders] = useState(tokenInfo?.topHolders || []);
 
     const updateTokenHoldersToShow = (value: number) => {
         setTokenHoldersToShow(value);

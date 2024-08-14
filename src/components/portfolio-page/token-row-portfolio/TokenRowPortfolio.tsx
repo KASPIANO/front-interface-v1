@@ -12,8 +12,8 @@ import {
 import { FC, useState } from 'react';
 import { transferKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
-import { capitalizeFirstLetter } from '../../krc-20-page/grid-krc-20/Krc20Grid.config';
 import { TokenRowPortfolioItem } from '../../../types/Types';
+import { capitalizeFirstLetter } from '../../../utils/Utils';
 
 interface TokenRowPortfolioProps {
     token: TokenRowPortfolioItem;
@@ -23,7 +23,7 @@ interface TokenRowPortfolioProps {
 
 const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
     const { token, walletConnected, kasPrice } = props;
-    const [destAddress, setDestAddress] = useState<string>('');
+    const [destAddress] = useState<string>('');
 
     const handleTranfer = async (event, ticker: string) => {
         event.stopPropagation();
