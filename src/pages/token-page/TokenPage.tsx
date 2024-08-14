@@ -45,7 +45,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '11.5vh')}
             {getComponentToShow(<TokenGraph />, '30vh')}
             {getComponentToShow(<TokenStats />)}
-            {getComponentToShow(<RugScore score={66} />, '19vh')}
+            {getComponentToShow(<RugScore score={66} onRecalculate={() => {}} />, '19vh')}
             {getComponentToShow(<TopHolders tokenInfo={tokenInfo} />, '19vh')}
             {/* {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)} */}
             {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} setTokenInfo={setTokenInfo} />, '91vh')}

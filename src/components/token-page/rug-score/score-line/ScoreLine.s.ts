@@ -1,15 +1,19 @@
 import { Slider, styled } from '@mui/material';
 
 export const ScoreLineSlider = styled(Slider)({
-    height: '2vh',
-    width: '25vw',
+    width: '95%',
+    paddingBottom: '0px', // Add some bottom padding for better spacing
 
     '& .MuiSlider-track': {
-        height: '1vh',
+        height: '3vh', // Same height as the rail for consistency
+    },
+    '& .MuiSlider-rail': {
+        height: '3vh', // Same height as the track for consistency
+        borderRadius: 4, // Adding slight rounding to the edges
     },
     '& .MuiSlider-thumb': {
-        height: '3vh',
-        width: '3vh',
+        height: '4vh', // Make the thumb larger
+        width: '4vh',
         '&:focus, &:hover, &.Mui-active': {
             boxShadow: 'inherit',
         },

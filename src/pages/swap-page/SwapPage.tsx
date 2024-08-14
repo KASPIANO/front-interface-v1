@@ -153,10 +153,8 @@ const SwapPage: FC<SwapPageProps> = (props) => {
 
     const handleTokenSelect = (token: Token) => {
         if (isPayingTokenModal) {
-            setPayingCurrency(token.symbol);
             setPayingCurrencyImage(token.logo);
         } else {
-            setReceivingCurrency(token.symbol);
             setReceivingCurrencyImage(token.logo);
         }
         closeTokenModal();

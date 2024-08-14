@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { ScoreLineSlider } from './ScoreLine.s';
-import { useTheme } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 
 export type ScoreLineConfig = {
     [color: string]: {
@@ -15,6 +15,7 @@ interface ScoreLineProps {
 }
 
 const ScoreLine: FC<ScoreLineProps> = (props) => {
+    const { value } = props;
     const theme = useTheme();
 
     const generateGradient = (colorRanges) => {
@@ -51,38 +52,42 @@ const ScoreLine: FC<ScoreLineProps> = (props) => {
     const [thumbColor, setThumbColor] = useState(null);
 
     useEffect(() => {
-        const color = getColorByValue(props.value, props.config);
+        const color = getColorByValue(value, props.config);
         setThumbColor(color);
-    }, [props.value]);
+    }, [value]);
 
     return (
-        <ScoreLineSlider
-            value={props.value}
-            aria-labelledby="color-slider"
-            valueLabelDisplay="on"
-            valueLabelFormat={(value) => `${value}%`}
-            disabled
-            sx={{
-                mt: 2,
-                '& .MuiSlider-track': {
-                    background: 'transparent',
-                    border: 'none',
-                },
-                '& .MuiSlider-rail': {
-                    opacity: 1,
-                    background: generateGradient(props.config),
-                },
-                '& .MuiSlider-thumb': {
-                    background: thumbColor,
-                },
-                '& .MuiSlider-valueLabel': {
-                    background: thumbColor,
-                },
-                '& .MuiSlider-valueLabelLabel': {
-                    color: theme.palette.getContrastText(thumbColor || '#000'),
-                },
-            }}
-        />
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <ScoreLineSlider
+                value={value}
+                aria-labelledby="color-slider"
+                valueLabelDisplay="on"
+                valueLabelFormat={(value) => `${value}%`}
+                disabled
+                sx={{
+                    mt: 2,
+                    '& .MuiSlider-track': {
+                        background: 'transparent',
+                    },
+                    '& .MuiSlider-rail': {
+                        opacity: 1,
+                        background: generateGradient(props.config),
+                        border: `1px solid ${theme.palette.primary.main}`,
+                        borderRadius: '8px',
+                    },
+                    '& .MuiSlider-thumb': {
+                        background: thumbColor,
+                        border: `1.5px solid ${theme.palette.primary.main}`,
+                    },
+                    '& .MuiSlider-valueLabel': {
+                        background: thumbColor,
+                    },
+                    '& .MuiSlider-valueLabelLabel': {
+                        color: theme.palette.getContrastText(thumbColor || '#000'),
+                    },
+                }}
+            />
+        </Box>
     );
 };
 

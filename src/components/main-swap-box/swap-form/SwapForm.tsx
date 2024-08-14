@@ -46,7 +46,6 @@ const SwapForm: React.FC<SwapFormProps> = (props) => {
         isConnecting,
         switchAssets,
         connectWallet,
-        openTokenModal,
         receivingCurrency,
         tokens,
     } = props;

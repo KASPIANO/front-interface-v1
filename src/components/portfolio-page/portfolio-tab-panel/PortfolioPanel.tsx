@@ -3,8 +3,17 @@ import { Tabs } from '@mui/material';
 import TabContext from '@mui/lab/TabContext';
 import { TabPanelContainer, TabPanelStyled, TabStyled } from './PortfolioPanel.s';
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
+import PortfolioTokenGrid from '../portfolio-token-grid/PortfolioTokenGrid';
+import { TokenRowPortfolioItem } from '../../../types/Types';
 
-const PortfolioPanel: FC = () => {
+interface PortfolioPanelProps {
+    kasPrice: number;
+    walletConnected: boolean;
+    tokenList: TokenRowPortfolioItem[];
+}
+
+const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
+    const { tokenList, kasPrice, walletConnected } = props;
     const [value, setValue] = useState('1');
     const [paidUser] = useState(false);
 
@@ -41,7 +50,13 @@ const PortfolioPanel: FC = () => {
                         value="4"
                     />
                 </Tabs>
-                <TabPanelStyled value="1">Overview </TabPanelStyled>
+                <TabPanelStyled value="1">
+                    <PortfolioTokenGrid
+                        tokensList={tokenList}
+                        kasPrice={kasPrice}
+                        walletConnected={walletConnected}
+                    />
+                </TabPanelStyled>
                 <TabPanelStyled value="2">Activity</TabPanelStyled>
                 <TabPanelStyled value="3">Portfolio Insights </TabPanelStyled>
                 <TabPanelStyled value="4">Wallet Tracking </TabPanelStyled>

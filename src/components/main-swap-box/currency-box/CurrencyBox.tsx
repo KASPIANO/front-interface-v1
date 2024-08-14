@@ -11,11 +11,8 @@ interface CurrencyBoxProps {
 }
 
 const CurrencyBox: FC<CurrencyBoxProps> = (props) => {
-    const { active, paying, setPaying, tokens } = props;
+    const { active, paying, setPaying } = props;
 
-    const onGroupChange = (event: any) => {
-        setPaying(event.target.value);
-    };
     return (
         <StyledInputContainer active={active}>
             <FormControl>
