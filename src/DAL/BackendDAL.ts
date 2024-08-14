@@ -1,5 +1,5 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
-import { Token, TokenListItem, TokenDeploy, TokenSearchItems } from '../types/Types';
+import { Token, TokenListItem, TokenSearchItems } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
