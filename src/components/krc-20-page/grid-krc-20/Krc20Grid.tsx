@@ -6,10 +6,10 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { FilterState, TokenListItem } from '../../../types/Types';
+import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 import { GridHeader } from '../grid-header/GridHeader';
 import { TokenRow } from '../token-row-grid/TokenRow';
 import { StyledDataGridContainer } from './Krc20Grid.s';
-import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 
 interface TokenDataGridProps {
     tokensList: TokenListItem[];
@@ -93,6 +93,27 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
             </table>
         </Box>
     );
+
+    const preMintedIcons = (preMinted: string, totalSupply: string) => {
+        const preMintedNumber = parseFloat(preMinted);
+        const totalSupplyNumber = parseFloat(totalSupply);
+        const preMintPercentage = ((preMintedNumber / totalSupplyNumber) * 100).toFixed(2);
+
+        return (
+            <ListItemText
+                sx={{ marginLeft: '1vw' }}
+                primary={
+                    <Tooltip title={`${preMintPercentage}% Pre Minted`}>
+                        {preMintedNumber === 0 ? (
+                            <CheckCircleOutlineRoundedIcon style={{ color: 'green', opacity: 0.5 }} />
+                        ) : (
+                            <ErrorOutlineRoundedIcon style={{ color: 'red', opacity: 0.5 }} />
+                        )}
+                    </Tooltip>
+                }
+            />
+        );
+    };
 
     return (
         <StyledDataGridContainer>

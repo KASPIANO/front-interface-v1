@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from 'react';
+import Footer from '../../components/footer/Footer';
 import TokenDataGrid from '../../components/krc-20-page/grid-krc-20/Krc20Grid';
 import { TokenListItem } from '../../types/Types';
 import { GridLayout } from './GridPageLayout';
@@ -47,6 +48,65 @@ const GridPage: FC<GridPageProps> = (props) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [nextPage, sortParams]);
 
+    useEffect(() => {
+        const handleAccountsChanged = async (accounts: string[]) => {
+            if (accounts.length === 0) {
+                setWalletAddress(null);
+                setWalletBalance(0);
+                localStorage.removeItem('isWalletConnected');
+            } else {
+                setWalletAddress(accounts[0]);
+                const balance = await fetchWalletBalance(accounts[0]);
+                setWalletBalance(setWalletBalanceUtil(balance));
+            }
+        };
+
+        const handleDisconnect = () => {
+            setWalletAddress(null);
+            setWalletBalance(0);
+            localStorage.removeItem('isWalletConnected');
+        };
+
+        const checkWalletConnection = async () => {
+            const isWalletConnected = localStorage.getItem('isWalletConnected');
+            if (isWalletConnected === 'true' && isKasWareInstalled()) {
+                const accounts = await requestAccounts();
+                if (accounts.length > 0) {
+                    setWalletAddress(accounts[0]);
+                    const balance = await fetchWalletBalance(accounts[0]);
+                    setWalletBalance(setWalletBalanceUtil(balance));
+                    setShowNotification(true);
+                    setTimeout(() => setShowNotification(false), 5000);
+                }
+            }
+        };
+
+        if (isKasWareInstalled()) {
+            onAccountsChanged(handleAccountsChanged);
+            window.kasware.on('disconnect', handleDisconnect);
+        }
+
+        checkWalletConnection();
+
+        return () => {
+            if (isKasWareInstalled()) {
+                removeAccountsChangedListener(handleAccountsChanged);
+                window.kasware.removeListener('disconnect', handleDisconnect);
+            }
+        };
+    }, [walletAddress]);
+
+    const handleNetworkChange = async (newNetwork: string) => {
+        if (network !== newNetwork) {
+            try {
+                await switchNetwork(newNetwork);
+                setNetwork(newNetwork);
+            } catch (error) {
+                console.error('Error switching network:', error);
+            }
+        }
+    };
+
     return (
         <GridLayout backgroundBlur={backgroundBlur}>
             <GridTitle />
@@ -59,6 +119,7 @@ const GridPage: FC<GridPageProps> = (props) => {
                 setNextPage={setNextPage}
                 sortBy={onSortBy}
             />
+            <Footer />
 
             {/* {showNotification && walletAddress && (
                 <NotificationComponent

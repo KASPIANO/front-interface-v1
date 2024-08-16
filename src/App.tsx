@@ -2,18 +2,16 @@ import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Navbar from './components/navbar/Navbar';
+import { showGlobalSnackbar } from './components/alert-context/AlertContext';
 import { fetchWalletBalance } from './DAL/KaspaApiDal';
 import { ThemeContext } from './main';
+import DeployPage from './pages/deploy-page/DeployPage';
 import GridPage from './pages/krc-20/GridPage';
-import TokenPage from './pages/token-page/TokenPage';
+import PortfolioPage from './pages/portfolio-page/PortfolioPage';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
 import { disconnect, isKasWareInstalled, requestAccounts, switchNetwork } from './utils/KaswareUtils';
 import { getLocalThemeMode, setWalletBalanceUtil, ThemeModes } from './utils/Utils';
-import DeployPage from './pages/deploy-page/DeployPage';
-import { showGlobalSnackbar } from './components/alert-context/AlertContext';
-import PortfolioPage from './pages/portfolio-page/PortfolioPage';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -98,6 +96,9 @@ const App = () => {
                         details: `Connected to wallet ${accounts[0].substring(0, 9)}....${accounts[0].substring(accounts[0].length - 4)}`,
                     });
                 }
+            } else {
+                console.log('KasWare extension not detected');
+                localStorage.setItem('isWalletConnected', 'false');
             }
         } catch (error) {
             console.error('Error connecting to wallet:', error);
@@ -124,6 +125,8 @@ const App = () => {
                     details: error.message,
                 });
             }
+        } catch (error) {
+            console.error('Error reconnecting to wallet:', error);
         }
     };
 

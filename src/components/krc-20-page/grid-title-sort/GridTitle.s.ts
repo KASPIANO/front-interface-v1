@@ -9,15 +9,14 @@ export const HeaderContainer = styled(Box)({
     padding: '10px',
     borderRadius: '8px 8px 0 0',
     marginLeft: '1vw',
-    '&.MuiBox-root': {
-        paddingBottom: '0',
-    },
+    // '&.MuiBox-root': {
+    //     padding: '0',
+    // },
 });
 
 export const SortButtonGroup = styled(ButtonGroup)({
     height: '3.5vh',
-    borderRadius: '2px',
-    marginRight: '1vw',
+    borderRadius: '9px',
     '& .MuiButton-root': {
         backgroundColor: 'rgba(111, 199, 186, 0.25)', // Primary color with less opacity
     },

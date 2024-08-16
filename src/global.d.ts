@@ -1,6 +1,5 @@
 interface Kasware {
     requestAccounts: () => Promise<string[]>;
-    _selectedAddress: string;
     getAccounts: () => Promise<string[]>;
     getNetwork: () => Promise<string>;
     switchNetwork: (network: string) => Promise<void>;
@@ -16,6 +15,7 @@ interface Kasware {
         event: 'accountsChanged' | 'networkChanged' | 'disconnect',
         handler: (data: any) => void,
     ) => void;
+    _selectedAddress: string;
 }
 
 interface Window {

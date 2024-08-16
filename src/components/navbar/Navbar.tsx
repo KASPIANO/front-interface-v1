@@ -5,13 +5,19 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../../main';
 import { ThemeModes } from '../../utils/Utils';
-import { ConnectButton, Logo, NavbarContainer, NavButton, NavCenter, WalletBalance } from './NavBar.s';
 import TokenSearch from '../token-search/TokenSearch';
+import { ConnectButton, Logo, NavbarContainer, NavButton, NavCenter, WalletBalance } from './NavBar.s';
+
+// interface Token {
+//     symbol: string;
+//     name: string;
+//     logoURI: string;
+// }
 
 interface NavbarProps {
     walletAddress: string | null;
     connectWallet: () => void;
-    disconnectWallet: () => void;
+    tokensList: TokenResponse[];
     network: string;
     onNetworkChange: (network: string) => void;
     walletBalance: number;
@@ -33,10 +39,9 @@ const Navbar: React.FC<NavbarProps> = (props) => {
         setActivePage(window.location.pathname);
     }, []);
 
-    const handleNavButtonClick = (page: string) => {
-        setActivePage(page);
-        navigate(page);
-    };
+    // const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     setSearchValue(event.target.value);
+    // };
 
     const formatNumberWithCommas = (value: number) => {
         const [integerPart] = value.toString().split('.');
@@ -84,7 +89,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                     type="search"
                     placeholder={'Search KRC-20 Tokens'}
                     value={''}
-                    onChange={(event) => handleSearch(event as React.ChangeEvent<HTMLInputElement>)}
+                    onChange={(event) => setSearchValue(event.target.value)}
                     sx={{
                         '& input': {
                             fontSize: '1vw',

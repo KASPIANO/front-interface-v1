@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { FC, useState } from 'react';
 import BackgroundEffect from '../../components/background-effect/BackgroundEffect';
 import Footer from '../../components/footer/Footer';
@@ -12,8 +13,9 @@ import { SwapLayout } from './SwapPageLayout';
 
 interface SwapPageProps {
     walletAddress: string | null;
-    connectWallet?: () => void;
+    connectWallet: () => void;
     walletBalance: number;
+    isConnecting: boolean;
     showNotification: boolean;
     setShowNotification: (value: boolean) => void;
     setWalletAddress: (value: string | null) => void;
@@ -26,7 +28,8 @@ interface SwapPageProps {
 // ];
 
 const SwapPage: FC<SwapPageProps> = (props) => {
-    const { walletAddress, connectWallet, walletBalance, showNotification, setShowNotification } = props;
+    const { walletAddress, connectWallet, walletBalance, isConnecting, showNotification, setShowNotification } =
+        props;
 
     const [paying, setPaying] = useState<string>('');
     const [receiving, setReceiving] = useState<string>('');
@@ -185,7 +188,7 @@ const SwapPage: FC<SwapPageProps> = (props) => {
                     walletAddress={walletAddress}
                     walletBalance={walletBalance}
                     receivingBalance={receivingBalance}
-                    isConnecting={false}
+                    isConnecting={isConnecting}
                     switchAssets={switchAssets}
                     connectWallet={connectWallet}
                     openTokenModal={openTokenModal}
