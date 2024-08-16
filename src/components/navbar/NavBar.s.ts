@@ -1,5 +1,4 @@
 import { Button, MenuItem, Select, styled } from '@mui/material';
-import { NavButtonProps } from '../../types/Types';
 
 export const NavbarContainer = styled('div')({
     display: 'flex',
@@ -10,7 +9,9 @@ export const NavbarContainer = styled('div')({
     padding: '8px 8px',
 });
 
-export const NavButton = styled(Button)<NavButtonProps>(({ isActive }) => ({
+export const NavButton = styled(Button, {
+    shouldForwardProp: (prop) => prop !== 'isActive',
+})<{ isActive: boolean }>(({ isActive }) => ({
     fontWeight: 500,
     cursor: 'pointer',
     fontSize: '1vw',

@@ -7,7 +7,22 @@ import { ThemeModes } from './utils/Utils.ts';
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export const ThemeContext = React.createContext({ themeMode: ThemeModes.DARK, toggleThemeMode: () => {} });
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const container = document.getElementById('root');
+if (!container) {
+    throw new Error('Root container missing in index.html');
+}
+
+// Use a singleton pattern to ensure createRoot is called only once
+let root;
+if (!(container as any).__root) {
+    root = ReactDOM.createRoot(container);
+    (container as any).__root = root;
+} else {
+    root = (container as any).__root;
+}
+
+// Render the App component
+root.render(
     <React.StrictMode>
         <App />
     </React.StrictMode>,
