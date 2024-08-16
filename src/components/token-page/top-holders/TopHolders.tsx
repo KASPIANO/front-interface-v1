@@ -42,7 +42,7 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
                         TOP HOLDERS
                     </Typography>
 
-                    <Tooltip title="The Rug Score is an algorithm based on token collection metrics and social media footprints. The score ranges from 1 to 100, with 100 being the best. It represents the collection's transparency and trustworthiness. If you find the score unsatisfactory, you can send a request to review it with the 'Send Request' button near the token header.">
+                    <Tooltip title="Top holders represent the amount of tokens held by the top X holders combined. This metric helps understand token distribution, potential whale dominance, and the risk of market manipulation. A large concentration of tokens among few holders might be a red flag.">
                         <InfoOutlinedIcon fontSize="small" />
                     </Tooltip>
                 </Box>

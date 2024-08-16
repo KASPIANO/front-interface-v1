@@ -3,10 +3,10 @@ import { alpha } from '@mui/material/styles';
 
 export const OptionSelectionGroup = styled(ButtonGroup)(({ theme }) => ({
     height: '3.5vh',
-    borderRadius: '2px',
+    borderRadius: '4px',
     marginRight: '1vw',
+    boxShadow: `0 2px 4px ${alpha(theme.palette.grey[500], 0.2)}`, // Subtle shadow
     '& .MuiButton-root': {
-        border: 'none',
         color: theme.palette.text.primary,
     },
 }));
@@ -14,25 +14,25 @@ export const OptionSelectionGroup = styled(ButtonGroup)(({ theme }) => ({
 export const OptionSelectionButton = styled(Button)(({ theme }) => ({
     color: theme.palette.text.primary,
     '&.MuiButtonGroup-middleButton': {
-        backgroundColor: alpha(theme.palette.primary.main, 0.25),
+        backgroundColor: alpha(theme.palette.primary.light, 0.1),
     },
     '&.MuiButtonGroup-firstButton': {
-        backgroundColor: alpha(theme.palette.primary.main, 0.25),
+        backgroundColor: alpha(theme.palette.primary.light, 0.1),
+        borderRadius: '4px 0 0 4px', // Rounded corners on the left
     },
     '&.MuiButtonGroup-lastButton': {
-        backgroundColor: alpha(theme.palette.primary.main, 0.25),
+        backgroundColor: alpha(theme.palette.primary.light, 0.1),
+        borderRadius: '0 4px 4px 0', // Rounded corners on the right
     },
     '&.MuiButton-root': {
-        padding: theme.spacing(1, 1),
-        fontSize: theme.typography.fontSize,
+        fontSize: '1vw', // Slightly larger text
+        border: `1px solid ${alpha(theme.palette.primary.main, 0.5)}`, // Subtle border
     },
-
     '&:hover': {
-        backgroundColor: alpha(theme.palette.primary.main, 0.7), // Stronger opacity on hover
-        border: `none`,
+        backgroundColor: alpha(theme.palette.primary.light, 0.2),
+        border: `1px solid ${alpha(theme.palette.primary.main, 0.8)}`, // Darker border on hover
     },
-
     '&.selected': {
-        backgroundColor: alpha(theme.palette.primary.main, 0.8),
+        backgroundColor: alpha(theme.palette.primary.main, 0.4),
     },
 }));
