@@ -9,5 +9,5 @@ export const kasInfoService = axios.create({
 });
 
 export const backendService = axios.create({
-    baseURL: import.meta.env.VITE_APP_BACKEND_ENDPOINT,
+    baseURL: import.meta.env.VITE_API_ENDPOINT,
 });

@@ -65,7 +65,6 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                 />
                 Kaspiano
             </Logo>
-            <div>{import.meta.env.VITE_API_ENDPOINT}</div>
             <NavCenter>
                 <NavButton isActive={activePage === '/'} onClick={() => handleNavButtonClick('/')}>
                     KRC-20
