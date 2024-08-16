@@ -21,11 +21,11 @@ export function simplifyNumber(value) {
     } else if (value >= 1e3) {
         return `${(value / 1e3).toFixed(0)}K`;
     } else {
-        return value.toString().length <= 7 ? value : 'Value too BIG';
+        return value?.toString().length <= 7 ? value : 'Value too BIG';
     }
 }
 
-export const formatNumberWithCommas = (value) => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+export const formatNumberWithCommas = (value) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 export const shortenAddress = (address, startLength = 6, endLength = 4) => {
     if (address.length <= startLength + endLength) {

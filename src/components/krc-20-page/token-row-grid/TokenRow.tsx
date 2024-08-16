@@ -1,3 +1,4 @@
+import { Stat, StatArrow, StatHelpText, StatNumber } from '@chakra-ui/react';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
 import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
 import {
@@ -13,10 +14,9 @@ import {
 } from '@mui/material';
 import moment from 'moment';
 import { FC } from 'react';
-import { capitalizeFirstLetter, formatDate, formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
-import { mintKRC20Token } from '../../../utils/KaswareUtils';
-import { Stat, StatNumber, StatHelpText, StatArrow } from '@chakra-ui/react';
 import { TokenListItem } from '../../../types/Types';
+import { mintKRC20Token } from '../../../utils/KaswareUtils';
+import { capitalizeFirstLetter, formatDate, formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 
 interface TokenRowProps {
@@ -75,7 +75,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
     };
 
     const preMintedIcons = (preMinted: number, totalSupply: number) => {
-        const preMintPercentage = ((preMinted / totalSupply) * 100).toFixed(2);
+        const preMintPercentage = ((preMinted / totalSupply) * 100)?.toFixed(2);
 
         return (
             <ListItemText
@@ -156,7 +156,9 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }
                     />
                     <Stat sx={{ maxWidth: '11vw' }}>
-                        <StatNumber style={{ fontSize: '1.1vw' }}>{token.maxMintedPercent.toFixed(2)}%</StatNumber>
+                        <StatNumber style={{ fontSize: '1.1vw' }}>
+                            {token.maxMintedPercent?.toFixed(2)}%
+                        </StatNumber>
                         <StatHelpText style={{ fontSize: '0.8vw' }}>
                             <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
                             23.36%
