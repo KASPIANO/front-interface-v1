@@ -59,7 +59,8 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                     sx={{
                         width: '6.5vh',
                         height: '6.5vh',
-                        marginTop: '1vh',
+                        marginTop: '0.8vh',
+                        marginRight: '0.2vw',
                     }}
                 />
                 Kaspiano
