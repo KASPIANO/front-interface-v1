@@ -21,6 +21,10 @@ jobs:
     - name: Install dependencies
       run: npm install
 
+    - name: Create .env file
+      run: |
+        echo "VITE_API_ENDPOINT=${{ secrets.VITE_API_ENDPOINT }}" >> .env
+
     - name: Build React app
       run: npm run build
 
