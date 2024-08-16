@@ -5,8 +5,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../../main';
 import { ThemeModes } from '../../utils/Utils';
-import { ConnectButton, Logo, NavbarContainer, NavButton, NavCenter, WalletBalance } from './NavBar.s';
 import TokenSearch from '../token-search/TokenSearch';
+import { ConnectButton, Logo, NavbarContainer, NavButton, NavCenter, WalletBalance } from './NavBar.s';
 
 interface NavbarProps {
     walletAddress: string | null;
@@ -65,6 +65,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                 />
                 Kaspiano
             </Logo>
+            <div>{import.meta.env.VITE_API_URL}</div>
             <NavCenter>
                 <NavButton isActive={activePage === '/'} onClick={() => handleNavButtonClick('/')}>
                     KRC-20
