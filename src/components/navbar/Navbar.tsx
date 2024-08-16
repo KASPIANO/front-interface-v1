@@ -55,11 +55,11 @@ const Navbar: React.FC<NavbarProps> = (props) => {
         <NavbarContainer sx={{ height: backgroundBlur ? '9vh' : '7vh' }}>
             <Logo onClick={() => handleNavButtonClick('/')} sx={{ display: 'flex', alignContent: 'center' }}>
                 <Avatar
-                    src="/KaspianoLogo.png"
+                    src="/Logo.png"
                     sx={{
-                        width: '11.5vh',
-                        height: '11.5vh',
-                        marginTop: '1.5vh',
+                        width: '6.5vh',
+                        height: '6.5vh',
+                        marginTop: '1vh',
                     }}
                 />
                 Kaspiano
