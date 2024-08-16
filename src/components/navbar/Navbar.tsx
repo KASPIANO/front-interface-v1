@@ -52,7 +52,6 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                     <img src="/logo.svg" alt="Logo" width={150} height={60} />
                 </Link>
             </Logo>
-            <div>{import.meta.env.VITE_API_URL}</div>
             <NavCenter>
                 <NavButtons>
                     <Button onClick={themeContext.toggleThemeMode}>darkmode</Button>
