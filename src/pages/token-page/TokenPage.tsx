@@ -17,12 +17,14 @@ interface TokenPageProps {
     handleNetworkChange: (network: string) => void;
     network: string;
     backgroundBlur: boolean;
+    setWalletBalance: (balance: number) => void;
 }
 
 const TokenPage: FC<TokenPageProps> = (props) => {
     const { ticker } = useParams();
-    const { backgroundBlur } = props;
+    const { backgroundBlur, setWalletBalance } = props;
     const [tokenInfo, setTokenInfo] = useState<Token>(null);
+    const [tokenXHandle, setTokenXHandle] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -37,6 +39,12 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         fetchData();
     }, [ticker]);
 
+    useEffect(() => {
+        if (tokenInfo) {
+            setTokenXHandle(!!tokenInfo.socials?.x);
+        }
+    }, [tokenInfo]);
+
     const getComponentToShow = (component: JSX.Element, height?: string, width?: string) =>
         tokenInfo ? component : <Skeleton variant="rectangular" height={height} width={width} />;
 
@@ -45,7 +53,15 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '11.5vh')}
             {getComponentToShow(<TokenGraph />, '30vh')}
             {getComponentToShow(<TokenStats />)}
-            {getComponentToShow(<RugScore score={66} onRecalculate={() => {}} />, '19vh')}
+            {getComponentToShow(
+                <RugScore
+                    score={66}
+                    onRecalculate={() => {}}
+                    xHandle={tokenXHandle}
+                    setWalletBalance={setWalletBalance}
+                />,
+                '19vh',
+            )}
             {getComponentToShow(<TopHolders tokenInfo={tokenInfo} />, '19vh')}
             {/* {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)} */}
             {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} setTokenInfo={setTokenInfo} />, '91vh')}

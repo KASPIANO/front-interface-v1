@@ -57,7 +57,7 @@ const ScoreLine: FC<ScoreLineProps> = (props) => {
     }, [value]);
 
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '1.2vh' }}>
             <ScoreLineSlider
                 value={value}
                 aria-labelledby="color-slider"

@@ -15,12 +15,32 @@ export const requestAccounts = async (): Promise<string[]> => {
     }
 };
 
+export const getWalletAddress = async (): Promise<string> => {
+    try {
+        const accounts = await window.kasware.requestAccounts();
+        return accounts[0] || '';
+    } catch (error) {
+        console.error('Connect failed', error);
+        throw error;
+    }
+};
+
 // Method to get current account address
 export const getAccounts = async (): Promise<string[]> => {
     try {
         const accounts = await window.kasware.getAccounts();
         console.log(accounts);
         return accounts;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getCurrentAccount = async (): Promise<string> => {
+    try {
+        const accounts = await window.kasware.getAccounts();
+        return accounts[0];
     } catch (error) {
         console.error(error);
         throw error;
@@ -93,10 +113,8 @@ export const sendKaspa = async (
 ): Promise<string> => {
     try {
         const txid = await window.kasware.sendKaspa(toAddress, sompi, options);
-        console.log(txid);
         return txid;
     } catch (error) {
-        console.error(error);
         throw error;
     }
 };
