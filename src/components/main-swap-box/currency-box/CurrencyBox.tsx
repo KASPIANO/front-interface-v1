@@ -1,5 +1,5 @@
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
-import { AutocompleteRenderOptionState, FormControl } from '@mui/material';
+import { FormControl } from '@mui/material';
 import { FC, HTMLAttributes, useState } from 'react';
 import { TokenResponse } from '../../../types/Types';
 import { StyledAmountInput, StyledInputContainer, TokensAutocomplete } from './CurrencyBox.s';
@@ -12,7 +12,7 @@ interface CurrencyBoxProps {
 }
 
 const CurrencyBox: FC<CurrencyBoxProps> = (props) => {
-    const { active, paying, setPaying, tokens } = props;
+    const { paying, setPaying, tokens } = props;
     const [isActive, setIsActive] = useState(false);
     return (
         <StyledInputContainer
@@ -29,10 +29,8 @@ const CurrencyBox: FC<CurrencyBoxProps> = (props) => {
                     getOptionLabel={(option: TokenResponse) => option.tick}
                     renderInput={() => <></>}
                     renderOption={(
-                        props: HTMLAttributes<HTMLLIElement> & { key: any },
+                        _props: HTMLAttributes<HTMLLIElement> & { key: any },
                         option: TokenResponse,
-                        state: AutocompleteRenderOptionState,
-                        ownerState,
                     ) => (
                         <img
                             src={option.logo}

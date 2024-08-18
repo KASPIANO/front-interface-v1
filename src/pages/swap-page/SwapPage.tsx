@@ -1,11 +1,14 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import BackgroundEffect from '../../components/background-effect/BackgroundEffect';
 import Footer from '../../components/footer/Footer';
 import MainSwapBox from '../../components/main-swap-box/MainSwapBox';
 import SlippageModal from '../../components/modals/slippage-modal/SlippageModal';
 import WalletModal from '../../components/modals/wallet-modal/WalletModal';
 import NotificationComponent from '../../components/notification/Notification';
+import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
+import { fetchReceivingBalance, fetchTokens } from '../../DAL/Krc20DAL';
 import { Token, TokenResponse } from '../../types/Types';
+import { setWalletBalanceUtil } from '../../utils/Utils';
 import { BlurOverlay, Heading, MainContent } from './SwapPage.s';
 import { SwapLayout } from './SwapPageLayout';
 
@@ -25,7 +28,15 @@ interface SwapPageProps {
 // ];
 
 const SwapPage: FC<SwapPageProps> = (props) => {
-    const { walletAddress, connectWallet, walletBalance, showNotification, setShowNotification } = props;
+    const {
+        walletAddress,
+        connectWallet,
+        walletBalance,
+        showNotification,
+        setShowNotification,
+        setWalletAddress,
+        setWalletBalance,
+    } = props;
 
     const [paying, setPaying] = useState<string>('');
     const [receiving, setReceiving] = useState<string>('');
@@ -33,7 +44,7 @@ const SwapPage: FC<SwapPageProps> = (props) => {
     const [payingCurrencyImage, setPayingCurrencyImage] = useState<string>('/kas.svg');
     const [receivingCurrency, setReceivingCurrency] = useState<string>('Select Token');
     const [receivingCurrencyImage, setReceivingCurrencyImage] = useState<string | null>(null);
-    const [receivingBalance] = useState<number>(0);
+    const [receivingBalance, setReceivingBalance] = useState<number>(0);
     const [isPayingActive] = useState<boolean>(false);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [, setIsTokenModalOpen] = useState<boolean>(false);
@@ -42,58 +53,58 @@ const SwapPage: FC<SwapPageProps> = (props) => {
     const [slippageMode, setSlippageMode] = useState<string>('Auto');
     const [slippageValue, setSlippageValue] = useState<string>('1%');
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-    const [tokens] = useState<TokenResponse[]>([]);
+    const [tokens, setTokens] = useState<TokenResponse[]>([]);
 
-    // useEffect(() => {
-    //     const handleAccountsChanged = async (accounts: string[]) => {
-    //         if (accounts.length === 0) {
-    //             setWalletAddress(null);
-    //             setWalletBalance(0);
-    //             setReceivingBalance(0);
-    //             localStorage.removeItem('isWalletConnected');
-    //         } else {
-    //             setWalletAddress(accounts[0]);
-    //             const balance = await fetchWalletBalance(accounts[0]);
-    //             setWalletBalance(setWalletBalanceUtil(balance));
-    //         }
-    //     };
+    useEffect(() => {
+        const handleAccountsChanged = async (accounts: string[]) => {
+            if (accounts.length === 0) {
+                setWalletAddress(null);
+                setWalletBalance(0);
+                setReceivingBalance(0);
+                localStorage.removeItem('isWalletConnected');
+            } else {
+                setWalletAddress(accounts[0]);
+                const balance = await fetchWalletBalance(accounts[0]);
+                setWalletBalance(setWalletBalanceUtil(balance));
+            }
+        };
 
-    //     const handleDisconnect = () => {
-    //         setWalletAddress(null);
-    //         setWalletBalance(0);
-    //         setReceivingBalance(0);
-    //         localStorage.removeItem('isWalletConnected');
-    //     };
+        const handleDisconnect = () => {
+            setWalletAddress(null);
+            setWalletBalance(0);
+            setReceivingBalance(0);
+            localStorage.removeItem('isWalletConnected');
+        };
 
-    //     const checkWalletConnection = async () => {
-    //         const isWalletConnected = localStorage.getItem('isWalletConnected');
-    //         if (isWalletConnected === 'true' && window.kasware) {
-    //             await window.kasware.requestAccounts();
-    //             const selectedAddress = window.kasware._selectedAddress;
-    //             if (selectedAddress) {
-    //                 setWalletAddress(selectedAddress);
-    //                 const balance = await fetchWalletBalance(selectedAddress);
-    //                 setWalletBalance(setWalletBalanceUtil(balance));
-    //                 setShowNotification(true);
-    //                 setTimeout(() => setShowNotification(false), 5000);
-    //             }
-    //         }
-    //     };
+        const checkWalletConnection = async () => {
+            const isWalletConnected = localStorage.getItem('isWalletConnected');
+            if (isWalletConnected === 'true' && window.kasware) {
+                await window.kasware.requestAccounts();
+                const selectedAddress = window.kasware._selectedAddress;
+                if (selectedAddress) {
+                    setWalletAddress(selectedAddress);
+                    const balance = await fetchWalletBalance(selectedAddress);
+                    setWalletBalance(setWalletBalanceUtil(balance));
+                    setShowNotification(true);
+                    setTimeout(() => setShowNotification(false), 5000);
+                }
+            }
+        };
 
-    //     if (window.kasware) {
-    //         window.kasware.on('accountsChanged', handleAccountsChanged);
-    //         window.kasware.on('disconnect', handleDisconnect);
-    //     }
+        if (window.kasware) {
+            window.kasware.on('accountsChanged', handleAccountsChanged);
+            window.kasware.on('disconnect', handleDisconnect);
+        }
 
-    //     checkWalletConnection();
+        checkWalletConnection();
 
-    //     return () => {
-    //         if (window.kasware && window.kasware.removeListener) {
-    //             window.kasware.removeListener('accountsChanged', handleAccountsChanged);
-    //             window.kasware.removeListener('disconnect', handleDisconnect);
-    //         }
-    //     };
-    // }, [walletAddress, setShowNotification]);
+        return () => {
+            if (window.kasware && window.kasware.removeListener) {
+                window.kasware.removeListener('accountsChanged', handleAccountsChanged);
+                window.kasware.removeListener('disconnect', handleDisconnect);
+            }
+        };
+    }, [walletAddress, setShowNotification, setWalletAddress, setWalletBalance]);
 
     const switchAssets = () => {
         const tempPaying = paying;
@@ -110,24 +121,24 @@ const SwapPage: FC<SwapPageProps> = (props) => {
         setReceivingCurrencyImage(tempPayingCurrencyImage);
     };
 
-    // useEffect(() => {
-    //     const formatBalance = (balance: number) => (isNaN(balance) ? '0.00' : balance.toFixed(4));
+    useEffect(() => {
+        const formatBalance = (balance: number) => (isNaN(balance) ? '0.00' : balance.toFixed(4));
 
-    //     if (walletAddress) {
-    //         fetchReceivingBalance(walletAddress, receivingCurrency).then((balanceInToken) => {
-    //             setReceivingBalance(parseFloat(formatBalance(balanceInToken)));
-    //         });
-    //     }
-    // }, [walletAddress, receivingCurrency]);
+        if (walletAddress) {
+            fetchReceivingBalance(walletAddress, receivingCurrency).then((balanceInToken) => {
+                setReceivingBalance(parseFloat(formatBalance(balanceInToken)));
+            });
+        }
+    }, [walletAddress, receivingCurrency]);
 
-    // useEffect(() => {
-    //     const fetchTokensList = async () => {
-    //         const tokensList = await fetchTokens();
-    //         setTokens(tokensList);
-    //     };
+    useEffect(() => {
+        const fetchTokensList = async () => {
+            const tokensList = await fetchTokens();
+            setTokens(tokensList.result);
+        };
 
-    //     fetchTokensList();
-    // }, []);
+        fetchTokensList();
+    }, []);
 
     const openSlippageModal = () => {
         setIsModalOpen(true);
