@@ -19,7 +19,7 @@ export const BackgroundContainer = styled('div')({
     width: '100%',
     height: '100%',
     overflow: 'hidden',
-    backgroundColor: '#71c7ba',
+    backgroundColor: '#121212',
     zIndex: -1,
 });
 

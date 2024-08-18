@@ -2,15 +2,16 @@ import { Autocomplete, Box, InputBase, Select, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles';
 import { InputContainerProps } from '../../../types/Types';
 
-export const StyledInputContainer = styled(Box)<InputContainerProps>({
+export const StyledInputContainer = styled(Box)<InputContainerProps>(({ active }) => ({
     display: 'flex',
     alignItems: 'center',
-    backgroundColor: '#2b2b3b',
+    borderColor: active ? 'white' : '#39ddbe',
+    borderStyle: 'solid',
     borderRadius: '8px',
     padding: '10px',
     marginBottom: '20px',
     height: '12vh',
-});
+}));
 
 export const StyledCurrencySelector = styled(Select)({
     backgroundColor: '#353545',

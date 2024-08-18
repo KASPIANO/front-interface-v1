@@ -2,7 +2,8 @@ import { styled } from '@mui/material/styles';
 import { InputContainerProps } from '../../../types/Types';
 
 export const SwapContainer = styled('div')({
-    backgroundColor: '#1e1e2f',
+    borderColor: '#39ddbe',
+    borderStyle: 'solid',
     padding: '20px',
     borderRadius: '12px',
     width: '48vw',

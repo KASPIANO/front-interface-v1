@@ -2,7 +2,6 @@ import { FC, useState } from 'react';
 import BackgroundEffect from '../../components/background-effect/BackgroundEffect';
 import Footer from '../../components/footer/Footer';
 import MainSwapBox from '../../components/main-swap-box/MainSwapBox';
-import MiniNavbar from '../../components/mini-navbar/MiniNavbar';
 import SlippageModal from '../../components/modals/slippage-modal/SlippageModal';
 import WalletModal from '../../components/modals/wallet-modal/WalletModal';
 import NotificationComponent from '../../components/notification/Notification';
@@ -168,7 +167,6 @@ const SwapPage: FC<SwapPageProps> = (props) => {
     return (
         <SwapLayout>
             {/* <Navbar walletAddress={walletAddress} connectWallet={connectWallet} tokens={tokens} /> */}
-            <MiniNavbar />
             <BackgroundEffect />
             <MainContent>
                 <Heading>Trade your favorite KRC-20 tokens</Heading>

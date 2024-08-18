@@ -2,24 +2,26 @@ import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { showGlobalSnackbar } from './components/alert-context/AlertContext';
 import Navbar from './components/navbar/Navbar';
 import { fetchWalletBalance } from './DAL/KaspaApiDal';
 import { ThemeContext } from './main';
+import DeployPage from './pages/deploy-page/DeployPage';
 import GridPage from './pages/krc-20/GridPage';
+import PortfolioPage from './pages/portfolio-page/PortfolioPage';
+import SwapPage from './pages/swap-page/SwapPage';
 import TokenPage from './pages/token-page/TokenPage';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
 import { disconnect, isKasWareInstalled, requestAccounts, switchNetwork } from './utils/KaswareUtils';
 import { getLocalThemeMode, setWalletBalanceUtil, ThemeModes } from './utils/Utils';
-import DeployPage from './pages/deploy-page/DeployPage';
-import { showGlobalSnackbar } from './components/alert-context/AlertContext';
-import PortfolioPage from './pages/portfolio-page/PortfolioPage';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
     const [walletAddress, setWalletAddress] = useState<string | null>(null);
     const [walletBalance, setWalletBalance] = useState<number>(0);
     const [walletConnected, setWalletConnected] = useState<boolean>(false);
+    const [showNotification, setShowNotification] = useState<boolean>(false);
     const [network, setNetwork] = useState<string>('mainnet'); // New state for network
     const [, setIsConnecting] = useState<boolean>(false);
     const [backgroundBlur, setBackgroundBlur] = useState(false);
@@ -183,6 +185,19 @@ const App = () => {
                                         walletAddress={walletAddress}
                                         backgroundBlur={backgroundBlur}
                                         walletConnected={walletConnected}
+                                    />
+                                }
+                            />
+                            <Route
+                                path="/swap"
+                                element={
+                                    <SwapPage
+                                        walletAddress={walletAddress}
+                                        walletBalance={walletBalance}
+                                        setShowNotification={setShowNotification}
+                                        setWalletAddress={setWalletAddress}
+                                        setWalletBalance={setWalletBalance}
+                                        showNotification={showNotification}
                                     />
                                 }
                             />

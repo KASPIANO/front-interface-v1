@@ -1,5 +1,5 @@
 import { FormControl } from '@mui/material';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { TokenResponse } from '../../../types/Types';
 import { StyledAmountInput, StyledInputContainer } from './CurrencyBox.s';
 
@@ -12,9 +12,15 @@ interface CurrencyBoxProps {
 
 const CurrencyBox: FC<CurrencyBoxProps> = (props) => {
     const { active, paying, setPaying } = props;
-
+    const [isActive, setIsActive] = useState(false);
     return (
-        <StyledInputContainer active={active}>
+        <StyledInputContainer
+            active={isActive}
+            onMouseEnter={() => setIsActive(true)}
+            onFocus={() => setIsActive(true)}
+            onBlur={() => setIsActive(false)}
+            onMouseLeave={() => setIsActive(false)}
+        >
             <FormControl>
                 {/* <TokensAutocomplete
                     id="token-autocomplete"
