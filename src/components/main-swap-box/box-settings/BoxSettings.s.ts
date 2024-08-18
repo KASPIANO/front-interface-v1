@@ -11,11 +11,11 @@ export const SlippageSetting = styled(Box)({
     borderStyle: 'solid',
     padding: '8px 8px',
     borderRadius: '16px',
-});
-export const RightButtonsContainer = styled('div')({
     display: 'flex',
     flexDirection: 'row',
+    alignItems: 'center',
 });
+export const RightButtonsContainer = styled('div')({});
 
 export const ButtonGroup = styled(Box)({
     display: 'flex',

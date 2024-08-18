@@ -29,12 +29,12 @@ const SlippageControl: React.FC<SlippageControlProps> = (props) => {
             <RightButtonsContainer>
                 <SlippageSetting>
                     <SlippageText> {`Slippage: ${slippageMode} ${slippageValue}`}</SlippageText>
+                    <Tooltip title="Slippage Settings" placement="top">
+                        <IconButton onClick={openSlippageModal}>
+                            <SettingsRoundedIcon />
+                        </IconButton>
+                    </Tooltip>
                 </SlippageSetting>
-                <Tooltip title="Slippage Settings" placement="top">
-                    <IconButton onClick={openSlippageModal}>
-                        <SettingsRoundedIcon />
-                    </IconButton>
-                </Tooltip>
             </RightButtonsContainer>
         </ButtonGroup>
     );
