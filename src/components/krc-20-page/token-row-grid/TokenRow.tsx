@@ -119,13 +119,13 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }}
                         primary={
                             <Tooltip title={token.tick}>
-                                <Typography variant="body1" style={{ fontSize: '1.2vw' }}>
+                                <Typography variant="body1" style={{ fontSize: '1vw' }}>
                                     {capitalizeFirstLetter(token.tick)}
                                 </Typography>
                             </Tooltip>
                         }
                         secondary={
-                            <Typography variant="body2" style={{ fontSize: '1.1vw' }}>
+                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
                                 {formatDate(token.mtsAdd)}
                             </Typography>
                         }
@@ -136,7 +136,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         primary={
                             <Typography
                                 variant="body2"
-                                style={{ fontSize: '1.1vw', display: 'flex', justifyContent: 'center' }}
+                                style={{ fontSize: '1vw', display: 'flex', justifyContent: 'center' }}
                             >
                                 {`${moment().diff(Number(token.mtsAdd), 'days')} days`}
                             </Typography>
@@ -148,7 +148,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             <Tooltip title={formatNumberWithCommas(token.max)}>
                                 <Typography
                                     variant="body2"
-                                    style={{ fontSize: '1.1vw', display: 'flex', justifyContent: 'center' }}
+                                    style={{ fontSize: '1vw', display: 'flex', justifyContent: 'center' }}
                                 >
                                     {simplifyNumber(token.max)}
                                 </Typography>
@@ -156,9 +156,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }
                     />
                     <Stat sx={{ maxWidth: '11vw' }}>
-                        <StatNumber style={{ fontSize: '1.1vw' }}>
-                            {token.maxMintedPercent?.toFixed(2)}%
-                        </StatNumber>
+                        <StatNumber style={{ fontSize: '1vw' }}>{token.maxMintedPercent?.toFixed(2)}%</StatNumber>
                         <StatHelpText style={{ fontSize: '0.8vw' }}>
                             <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
                             23.36%
@@ -166,7 +164,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     </Stat>
 
                     <Stat sx={{ maxWidth: '11vw' }}>
-                        <StatNumber style={{ fontSize: '1.1vw' }}>{token.totalHolders || 0}</StatNumber>
+                        <StatNumber style={{ fontSize: '1vw' }}>{token.totalHolders || 0}</StatNumber>
                         <StatHelpText style={{ fontSize: '0.8vw' }}>
                             <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
                             10.36%
@@ -185,7 +183,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemText
                         sx={{ maxWidth: '11vw' }}
                         primary={
-                            <Typography variant="body2" style={{ fontSize: '1.1vw' }}>
+                            <Typography variant="body2" style={{ fontSize: '1vw' }}>
                                 {preMintedIcons(token.pre, token.max)}
                             </Typography>
                         }

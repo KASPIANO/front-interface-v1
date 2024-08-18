@@ -72,7 +72,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                 borderBottom: '0.1px solid  rgba(111, 199, 186, 0.3)',
             }}
         >
-            <table style={{ width: '90%' }}>
+            <table style={{ width: '100%' }}>
                 <thead>
                     <tr style={{ display: 'flex' }}>
                         {Object.keys(GridHeaders).map((header: GridHeaders) => (
