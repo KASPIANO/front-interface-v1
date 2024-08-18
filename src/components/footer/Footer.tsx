@@ -9,7 +9,7 @@ const Footer: React.FC = () => (
     <FooterContainer>
         <FooterContent>
             <Typography sx={{ fontSize: '1.2vw', marginRight: '0.5vw' }}>v1.0.0</Typography>
-            <Typography sx={{ fontSize: '1.2vw' }}>Kaspulse</Typography>
+            <Typography sx={{ fontSize: '1.2vw' }}>Kaspiano</Typography>
             <SocialMediaContainer>
                 <BottomNavigationAction label="Github" icon={<GitHubIcon />} />
                 <BottomNavigationAction label="Github" icon={<CloseRoundedIcon />} />

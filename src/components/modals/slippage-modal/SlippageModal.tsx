@@ -104,8 +104,8 @@ const SlippageModal: React.FC<SlippageModalProps> = ({ onClose, onSave }) => {
                                 }}
                             >
                                 {slippage === 'Auto'
-                                    ? 'Kaspulse will automatically choose the optimal slippage for your transaction(s).'
-                                    : 'Kaspulse will automatically choose the optimal slippage for your transaction(s), but with a set maximum.'}
+                                    ? 'Kaspiano will automatically choose the optimal slippage for your transaction(s).'
+                                    : 'Kaspiano will automatically choose the optimal slippage for your transaction(s), but with a set maximum.'}
                             </p>
                         </div>
                     )}

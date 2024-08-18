@@ -1,7 +1,8 @@
-import { FormControl } from '@mui/material';
-import { FC, useState } from 'react';
+import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
+import { AutocompleteRenderOptionState, FormControl } from '@mui/material';
+import { FC, HTMLAttributes, useState } from 'react';
 import { TokenResponse } from '../../../types/Types';
-import { StyledAmountInput, StyledInputContainer } from './CurrencyBox.s';
+import { StyledAmountInput, StyledInputContainer, TokensAutocomplete } from './CurrencyBox.s';
 
 interface CurrencyBoxProps {
     active: boolean;
@@ -11,7 +12,7 @@ interface CurrencyBoxProps {
 }
 
 const CurrencyBox: FC<CurrencyBoxProps> = (props) => {
-    const { active, paying, setPaying } = props;
+    const { active, paying, setPaying, tokens } = props;
     const [isActive, setIsActive] = useState(false);
     return (
         <StyledInputContainer
@@ -22,11 +23,17 @@ const CurrencyBox: FC<CurrencyBoxProps> = (props) => {
             onMouseLeave={() => setIsActive(false)}
         >
             <FormControl>
-                {/* <TokensAutocomplete
+                <TokensAutocomplete
                     id="token-autocomplete"
                     options={tokens}
                     getOptionLabel={(option: TokenResponse) => option.tick}
-                    renderOption={(option: TokenResponse) => (
+                    renderInput={() => <></>}
+                    renderOption={(
+                        props: HTMLAttributes<HTMLLIElement> & { key: any },
+                        option: TokenResponse,
+                        state: AutocompleteRenderOptionState,
+                        ownerState,
+                    ) => (
                         <img
                             src={option.logo}
                             alt={option.tick}
@@ -38,8 +45,7 @@ const CurrencyBox: FC<CurrencyBoxProps> = (props) => {
                     ListboxProps={{ style: { fontSize: '0.8vw' } }}
                     autoSelect={false}
                     value={'Kas'}
-                    onChange={onGroupChange}
-                /> */}
+                />
             </FormControl>
 
             <StyledAmountInput
