@@ -3,7 +3,7 @@ import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import { IconButton, Tooltip } from '@mui/material';
 import React from 'react';
-import { ButtonGroup, SlippageSetting, SlippageText } from './BoxSettings.s';
+import { ButtonGroup, RightButtonsContainer, SlippageSetting, SlippageText } from './BoxSettings.s';
 
 interface SlippageControlProps {
     slippageMode: string;
@@ -26,14 +26,16 @@ const SlippageControl: React.FC<SlippageControlProps> = (props) => {
                     <RefreshRoundedIcon />
                 </IconButton>
             </Tooltip>
-            <SlippageSetting>
-                <SlippageText> {`Slippage: ${slippageMode} ${slippageValue}`}</SlippageText>
-            </SlippageSetting>
-            <Tooltip title="Slippage Settings" placement="top">
-                <IconButton onClick={openSlippageModal}>
-                    <SettingsRoundedIcon />
-                </IconButton>
-            </Tooltip>
+            <RightButtonsContainer>
+                <SlippageSetting>
+                    <SlippageText> {`Slippage: ${slippageMode} ${slippageValue}`}</SlippageText>
+                </SlippageSetting>
+                <Tooltip title="Slippage Settings" placement="top">
+                    <IconButton onClick={openSlippageModal}>
+                        <SettingsRoundedIcon />
+                    </IconButton>
+                </Tooltip>
+            </RightButtonsContainer>
         </ButtonGroup>
     );
 };
