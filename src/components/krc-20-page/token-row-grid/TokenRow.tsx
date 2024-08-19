@@ -79,13 +79,17 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
 
         return (
             <ListItemText
-                sx={{ display: 'flex', justifyContent: 'center' }}
+                sx={{ display: 'flex' }}
                 primary={
                     <Tooltip title={`${preMintPercentage}% Pre Minted`}>
                         {preMinted === 0 ? (
-                            <CheckCircleOutlineRoundedIcon style={{ color: 'green', opacity: 0.5 }} />
+                            <CheckCircleOutlineRoundedIcon
+                                style={{ color: 'green', opacity: 0.5, height: '1.5vw', width: '1.5vw' }}
+                            />
                         ) : (
-                            <ErrorOutlineRoundedIcon style={{ color: 'red', opacity: 0.5 }} />
+                            <ErrorOutlineRoundedIcon
+                                style={{ color: 'red', opacity: 0.5, height: '1.5vw', width: '1.5vw' }}
+                            />
                         )}
                     </Tooltip>
                 }
@@ -115,7 +119,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
 
                     <ListItemText
                         sx={{
-                            maxWidth: '11vw',
+                            maxWidth: '16.5%',
                         }}
                         primary={
                             <Tooltip title={token.tick}>
@@ -132,47 +136,51 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     />
 
                     <ListItemText
-                        sx={{ maxWidth: '8vw' }}
+                        sx={{ maxWidth: '13%' }}
                         primary={
                             <Typography
                                 variant="body2"
-                                style={{ fontSize: '1vw', display: 'flex', justifyContent: 'center' }}
+                                style={{ fontSize: '1vw', display: 'flex', justifyContent: 'flex-start' }}
                             >
                                 {`${moment().diff(Number(token.mtsAdd), 'days')} days`}
                             </Typography>
                         }
                     />
                     <ListItemText
-                        sx={{ maxWidth: '12vw' }}
+                        sx={{ maxWidth: '13%' }}
                         primary={
                             <Tooltip title={formatNumberWithCommas(token.max)}>
                                 <Typography
                                     variant="body2"
-                                    style={{ fontSize: '1vw', display: 'flex', justifyContent: 'center' }}
+                                    style={{ fontSize: '1vw', display: 'flex', justifyContent: 'flex-start' }}
                                 >
                                     {simplifyNumber(token.max)}
                                 </Typography>
                             </Tooltip>
                         }
                     />
-                    <Stat sx={{ maxWidth: '11vw' }}>
-                        <StatNumber style={{ fontSize: '1vw' }}>{token.maxMintedPercent?.toFixed(2)}%</StatNumber>
-                        <StatHelpText style={{ fontSize: '0.8vw' }}>
+                    <Stat maxWidth="14%" display="flex" justifyContent="flex-start">
+                        <StatNumber style={{ fontSize: '1vw' }} margin="0">
+                            {token.maxMintedPercent?.toFixed(2)}%
+                        </StatNumber>
+                        <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
                             <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
                             23.36%
                         </StatHelpText>
                     </Stat>
 
-                    <Stat sx={{ maxWidth: '11vw' }}>
-                        <StatNumber style={{ fontSize: '1vw' }}>{token.totalHolders || 0}</StatNumber>
-                        <StatHelpText style={{ fontSize: '0.8vw' }}>
+                    <Stat maxWidth="16.5%">
+                        <StatNumber style={{ fontSize: '1vw' }} margin="0">
+                            {token.totalHolders || 0}
+                        </StatNumber>
+                        <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
                             <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
                             10.36%
                         </StatHelpText>
                     </Stat>
 
                     {/* <ListItemText
-                        sx={{ maxWidth: '9.5vw' }}
+                        sx={{ width: '9.5vw' }}
                         primary={
                             <Typography variant="body2" style={{ fontSize: '1.1vw' }}>
                                 {token.transferTotal ? token.transferTotal : 0}
@@ -181,16 +189,16 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     /> */}
 
                     <ListItemText
-                        sx={{ maxWidth: '11vw' }}
+                        sx={{ maxWidth: '13%' }}
                         primary={
                             <Typography variant="body2" style={{ fontSize: '1vw' }}>
                                 {preMintedIcons(token.pre, token.max)}
                             </Typography>
                         }
                     />
-                    {token.minted < token.max && (
+                    {token.minted < token.max ? (
                         <ListItemText
-                            sx={{ maxWidth: '11vw', display: 'flex', justifyContent: 'center' }}
+                            sx={{ maxWidth: '10%', display: 'flex', justifyContent: 'center' }}
                             primary={
                                 <Button
                                     onClick={(event) => handleMint(event, token.tick)}
@@ -207,6 +215,8 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                                 </Button>
                             }
                         />
+                    ) : (
+                        <div style={{ width: '10%' }} />
                     )}
                 </ListItemButton>
             </ListItem>
