@@ -1,9 +1,10 @@
 import { FC, useEffect, useState } from 'react';
-import { Box, Card, Tooltip, Typography } from '@mui/material';
+import { Box, Card, Divider, Tooltip, Typography, useTheme } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
-import _ from 'lodash';
+import _, { set } from 'lodash';
 import { Token } from '../../../types/Types';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { fetchDevWalletBalance } from '../../../DAL/Krc20DAL';
 
 interface TopHoldersProps {
     tokenInfo: Token;
@@ -13,26 +14,50 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
     const numberOfHoldersToSelect = [5, 10, 20, 30, 40, 50];
     const [tokenHoldersToShow, setTokenHoldersToShow] = useState(numberOfHoldersToSelect[0]);
     const [topHoldersPercentage, setTopHoldersPercentage] = useState('---');
-    const [tokenHolders] = useState(tokenInfo?.topHolders || []);
+    const [devWalletPercentage, setDevWalletPercentage] = useState('---');
+    const [tokenHolders] = useState(tokenInfo.holder || []);
+    const theme = useTheme();
 
     const updateTokenHoldersToShow = (value: number) => {
         setTokenHoldersToShow(value);
     };
 
     useEffect(() => {
-        const holdersToCalaulate = tokenHolders.slice(0, tokenHoldersToShow);
+        const calculatePercentages = async () => {
+            const holdersToCalculate = tokenHolders.slice(0, tokenHoldersToShow);
 
-        const totalHolding = _.sum(_.map(holdersToCalaulate, (h) => parseFloat(h.amount)));
+            // Fetch dev wallet balance
+            const devWalletBalance = await fetchDevWalletBalance(tokenInfo.tick, tokenInfo.to);
+            const devWalletBalanceKAS = parseFloat(devWalletBalance) / 1e8;
 
-        if (tokenInfo.topHolders) {
-            const totalPercentage = (totalHolding / parseFloat(tokenInfo?.minted || '0')) * 100;
+            const totalSupply = parseFloat(tokenInfo?.max) / 1e8;
+            const devWalletPercent = devWalletBalanceKAS === 0 ? 0 : (devWalletBalanceKAS / totalSupply) * 100;
+            setDevWalletPercentage(`${devWalletPercent.toFixed(2)}%`);
+
+            // Calculate top holders percentage
+            const totalHolding = holdersToCalculate
+                .map((h) => parseFloat(h.amount) / 1e8)
+                .reduce((acc, curr) => acc + curr, 0);
+
+            const totalPercentage = (totalHolding / totalSupply) * 100;
             setTopHoldersPercentage(`${totalPercentage.toFixed(2)}%`);
-        } else {
-            setTopHoldersPercentage('---');
-        }
+        };
+
+        calculatePercentages();
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tokenHoldersToShow, tokenHolders, tokenInfo?.minted]);
+    }, [tokenHoldersToShow, tokenInfo]);
+
+    const getTopHoldersColor = (percentage: number) => {
+        if (percentage < 15) {
+            return theme.palette.primary.main;
+        } else if (percentage >= 15 && percentage <= 30) {
+            return 'yellow';
+        } else {
+            return 'red';
+        }
+    };
+    const percentageValue = parseFloat(topHoldersPercentage);
 
     return (
         <Card sx={{ height: '19vh', padding: '8px 10px' }}>
@@ -53,7 +78,27 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
                 />
             </Box>
 
-            <Typography variant="h5">{topHoldersPercentage}</Typography>
+            <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginTop: '4vh',
+                    justifyContent: 'center',
+                }}
+            >
+                <Typography
+                    variant="h5"
+                    sx={{
+                        marginRight: 4,
+                    }}
+                >
+                    {topHoldersPercentage}
+                </Typography>
+                <Divider orientation="vertical" flexItem />
+                <Typography sx={{ marginLeft: 4, fontSize: '1.3vw' }}>
+                    DEV WALLET HOLDS: {devWalletPercentage}
+                </Typography>
+            </Box>
         </Card>
     );
 };

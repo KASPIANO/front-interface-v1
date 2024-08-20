@@ -16,6 +16,10 @@ export interface Token {
     description?: string;
     socials?: TokenSocials;
     contacts?: string[];
+    devWallet?: string;
+    totalMints: string;
+    holder?: TokenHolder[];
+    to?: string;
 }
 
 export interface TokenListItem {
@@ -56,8 +60,6 @@ export interface TokenSocials {
     whitepaper?: string;
     audit?: string;
     contract?: string;
-    explorer?: string;
-    chat?: string;
     other?: string;
 }
 
