@@ -169,6 +169,8 @@ const App = () => {
                                         connectWallet={requestAccounts}
                                         handleNetworkChange={handleNetworkChange}
                                         setWalletBalance={setWalletBalance}
+                                        walletBalance={walletBalance}
+                                        walletConnected={walletConnected}
                                     />
                                 }
                             />

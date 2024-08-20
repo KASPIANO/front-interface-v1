@@ -119,7 +119,7 @@ export const darkTheme = createTheme({
             styleOverrides: {
                 root: {
                     backgroundColor: 'transparent',
-                    border: '1px solid #424242',
+                    border: '1px solid rgba(111, 199, 186, 0.2)',
                 },
             },
         },

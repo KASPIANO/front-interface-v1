@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { Box, Card, Typography } from '@mui/material';
+import { Box, Card, Divider, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
 
 const TokenStats: FC = () => {
@@ -13,35 +13,56 @@ const TokenStats: FC = () => {
     };
 
     return (
-        <Card sx={{ height: '20vh' }}>
-            <OptionSelection
-                options={tradingDataTimeFramesToSelect}
-                value={tradingDataTimeFrame}
-                onChange={updateTradingDataTimeFrame}
-            />
-            <Box>
-                <Typography variant="body2" align="center">
-                    TRADES ({tradingDataTimeFrame})
-                </Typography>
-                <Typography variant="body2" align="center">
-                    -
-                </Typography>
+        <Card sx={{ height: '20vh', padding: '8px 10px' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold', mr: 1 }}>
+                        STATS
+                    </Typography>
+                </Box>
+                <OptionSelection
+                    options={tradingDataTimeFramesToSelect}
+                    value={tradingDataTimeFrame}
+                    onChange={updateTradingDataTimeFrame}
+                />
             </Box>
-            <Box>
-                <Typography variant="body2" align="center">
-                    VOLUME ({tradingDataTimeFrame})
-                </Typography>
-                <Typography variant="body2" align="center">
-                    -
-                </Typography>
-            </Box>
-            <Box>
-                <Typography variant="body2" align="center">
-                    PENDING BUYS
-                </Typography>
-                <Typography variant="body2" align="center">
-                    -
-                </Typography>
+            <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginTop: '3vh',
+                    columnGap: '3vw',
+                    justifyContent: 'center',
+                }}
+            >
+                <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="body2" align="center">
+                        TRADES ({tradingDataTimeFrame})
+                    </Typography>
+                    <Typography variant="body2" align="center">
+                        -
+                    </Typography>
+                </Box>
+
+                <Divider orientation="vertical" flexItem />
+                <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="body2" align="center">
+                        VOLUME ({tradingDataTimeFrame})
+                    </Typography>
+                    <Typography variant="body2" align="center">
+                        -
+                    </Typography>
+                </Box>
+
+                <Divider orientation="vertical" flexItem />
+                <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="body2" align="center">
+                        PENDING BUYS
+                    </Typography>
+                    <Typography variant="body2" align="center">
+                        -
+                    </Typography>
+                </Box>
             </Box>
         </Card>
     );

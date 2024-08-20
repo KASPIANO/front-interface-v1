@@ -41,7 +41,6 @@ const RugScore: FC<RugScoreProps> = (props) => {
                         'kaspatest:qrzsn5eu6s28evw0k26qahjn0nwwzwjgn0qp3p37zl7z5lvx64h923agfaskv',
                         VERIFICATION_FEE_SOMPI,
                     );
-                    console.log('Transaction ID:', txid);
 
                     // Get the current account's address
                     const account = await getCurrentAccount();

@@ -1,7 +1,6 @@
 import { FC, useEffect, useState } from 'react';
-import { Box, Card, Divider, Tooltip, Typography, useTheme } from '@mui/material';
+import { Box, Card, Divider, Tooltip, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
-import _, { set } from 'lodash';
 import { Token } from '../../../types/Types';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { fetchDevWalletBalance } from '../../../DAL/Krc20DAL';
@@ -16,7 +15,6 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
     const [topHoldersPercentage, setTopHoldersPercentage] = useState('---');
     const [devWalletPercentage, setDevWalletPercentage] = useState('---');
     const [tokenHolders] = useState(tokenInfo.holder || []);
-    const theme = useTheme();
 
     const updateTokenHoldersToShow = (value: number) => {
         setTokenHoldersToShow(value);
@@ -47,17 +45,6 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tokenHoldersToShow, tokenInfo]);
-
-    const getTopHoldersColor = (percentage: number) => {
-        if (percentage < 15) {
-            return theme.palette.primary.main;
-        } else if (percentage >= 15 && percentage <= 30) {
-            return 'yellow';
-        } else {
-            return 'red';
-        }
-    };
-    const percentageValue = parseFloat(topHoldersPercentage);
 
     return (
         <Card sx={{ height: '19vh', padding: '8px 10px' }}>

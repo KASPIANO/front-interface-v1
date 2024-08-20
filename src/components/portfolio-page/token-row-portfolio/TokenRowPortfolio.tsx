@@ -57,8 +57,6 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                     commit,
                     reveal,
                 });
-
-                console.log(mint);
             }
         } catch (error) {
             showGlobalSnackbar({

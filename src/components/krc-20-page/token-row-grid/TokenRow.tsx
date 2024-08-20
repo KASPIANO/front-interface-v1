@@ -62,8 +62,6 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     commit,
                     reveal,
                 });
-
-                console.log(mint);
             }
         } catch (error) {
             showGlobalSnackbar({

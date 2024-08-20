@@ -1,7 +1,6 @@
 import { Skeleton } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import RugScore from '../../components/token-page/rug-score/RugScore';
 import TokenHeader from '../../components/token-page/token-header/TokenHeader';
 import TokenSideBar from '../../components/token-page/token-sidebar/TokenSideBar';
 import TokenStats from '../../components/token-page/token-stats/TokenStats';
@@ -10,6 +9,8 @@ import { fetchTokenInfo } from '../../DAL/Krc20DAL';
 import { Token } from '../../types/Types';
 import { TokenPageLayout } from './TokenPageLayout';
 import TokenGraph from '../../components/token-page/token-graph/TokenGraph';
+import RugScore from '../../components/token-page/rug-score/RugScore';
+import MintingComponent from '../../components/token-page/minting-status/MintingStatus';
 
 interface TokenPageProps {
     walletAddress: string | null;
@@ -18,9 +19,12 @@ interface TokenPageProps {
     network: string;
     backgroundBlur: boolean;
     setWalletBalance: (balance: number) => void;
+    walletBalance: number;
+    walletConnected: boolean;
 }
 
 const TokenPage: FC<TokenPageProps> = (props) => {
+    const { walletConnected, walletBalance } = props;
     const { ticker } = useParams();
     const { backgroundBlur, setWalletBalance } = props;
     const [tokenInfo, setTokenInfo] = useState<Token>(null);
@@ -51,8 +55,15 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     return (
         <TokenPageLayout backgroundBlur={backgroundBlur}>
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '11.5vh')}
-            {getComponentToShow(<TokenGraph />, '30vh')}
+            {getComponentToShow(<TokenGraph />, '35vh')}
             {getComponentToShow(<TokenStats />)}
+            {getComponentToShow(
+                <MintingComponent
+                    tokenInfo={tokenInfo}
+                    walletBalance={walletBalance}
+                    walletConnected={walletConnected}
+                />,
+            )}
             {getComponentToShow(
                 <RugScore
                     score={66}
