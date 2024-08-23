@@ -38,7 +38,8 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
                 .reduce((acc, curr) => acc + curr, 0);
 
             const totalPercentage = (totalHolding / totalSupply) * 100;
-            setTopHoldersPercentage(`${totalPercentage.toFixed(2)}%`);
+            const totalPercentageFixed = totalPercentage ? totalPercentage.toFixed(2) : '---';
+            setTopHoldersPercentage(`${totalPercentageFixed}%`);
         };
 
         calculatePercentages();

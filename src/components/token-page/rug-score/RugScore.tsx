@@ -111,7 +111,7 @@ const RugScore: FC<RugScoreProps> = (props) => {
             {!xHandle && (
                 <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '2vh' }}>
                     <Button variant="outlined" startIcon={<AddCircleOutlineIcon />} onClick={handleOpenDialog}>
-                        Add X/Twitter Handle to show score
+                        List Project to show score
                     </Button>
                 </Box>
             )}

@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Box, Button, Card, Typography } from '@mui/material';
+import { Box, Button, Card, Tooltip, Typography } from '@mui/material';
 import { Token } from '../../../types/Types';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
@@ -41,6 +41,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
         try {
             const mint = await mintKRC20Token(inscribeJsonString);
             if (mint) {
+                console.log(mint);
                 const { commit, reveal } = JSON.parse(mint);
                 showGlobalSnackbar({
                     message: 'Token minted successfully',
@@ -57,6 +58,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
             });
         }
     };
+    const limitPerMint = parseFloat(tokenInfo.lim) / 1e8;
     return (
         <Card
             sx={{
@@ -64,9 +66,12 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                 height: '20vh',
             }}
         >
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold', mr: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold' }}>
                     MINT STATUS
+                </Typography>
+                <Typography color="text.secondary" sx={{ fontWeight: 500, fontSize: '0.9vw' }}>
+                    Limit Per Mint: {limitPerMint}
                 </Typography>
             </Box>
             {/* Left Side: Minting Info */}
@@ -103,17 +108,29 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                     </Box>
                 </Box>
                 {/* Right Side: Mint Button */}
-                <Button
-                    onClick={() => handleMint(tokenInfo.tick)}
-                    variant="contained"
-                    color="primary"
-                    style={{
-                        fontSize: '0.8vw',
-                    }}
-                    disabled={isMintingDisabled || !walletConnected || walletBalance < 1}
+                <Tooltip
+                    title={
+                        !walletConnected
+                            ? 'Please connect your wallet to mint a token'
+                            : walletBalance < 1
+                              ? 'You need at least 1 KAS to mint a token'
+                              : isMintingDisabled
+                                ? 'This token is sold out'
+                                : ''
+                    }
                 >
-                    {isMintingDisabled ? 'Sold Out' : 'Mint'}
-                </Button>
+                    <Button
+                        onClick={() => handleMint(tokenInfo.tick)}
+                        variant="contained"
+                        color="primary"
+                        style={{
+                            fontSize: '0.8vw',
+                        }}
+                        disabled={isMintingDisabled || !walletConnected || walletBalance < 1}
+                    >
+                        {isMintingDisabled ? 'Sold Out' : 'Mint'}
+                    </Button>
+                </Tooltip>
             </Box>
         </Card>
     );

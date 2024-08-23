@@ -7,7 +7,6 @@ import TokenSidebarSocialsBar, {
     TokenSidebarSocialsBarOptions,
 } from './token-sidebar-socials-bar/TokenSidebarSocialsBar';
 import { Stack } from '@chakra-ui/react';
-import { simplifyNumber } from '../../../../utils/Utils';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import TokenInfoDialog from '../../../dialogs/token-info/TokenInfoDialog';
@@ -98,6 +97,8 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         setOpenModal(true);
     };
 
+    const tokenMax = parseInt(tokenInfo.max) / 1e8;
+
     return (
         <Box
             sx={{
@@ -124,7 +125,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             backgroundColor: 'grey',
                         }}
                     >
-                        <AddText>+ Add Token Metadata</AddText>
+                        <AddText>+ List Token</AddText>
                     </AddBanner>
                 )}
                 {socials !== null && Object.keys(socials).length > 0 && (
@@ -158,7 +159,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             SUPPLY
                         </Typography>
                         <Typography variant="body2" align="center">
-                            {simplifyNumber(tokenInfo.max)}
+                            {tokenMax}
                         </Typography>
                     </StatCard>
                     <StatCard>
@@ -191,7 +192,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                     </Box>
                 ) : (
                     <AddBox onClick={handleShowTokenInfoDialog}>
-                        <AddText>+ Add Token Metadata</AddText>
+                        <AddText>+ List Token</AddText>
                     </AddBox>
                 )}
             </Box>
@@ -199,7 +200,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                 <Typography
                     variant="body2"
                     align="center"
-                    sx={{ marginTop: '20px', fontSize: '1.1vw' }}
+                    sx={{ marginTop: '10px', fontSize: '1.1vw' }}
                     color="text.primary"
                 >
                     Community Sentiments

@@ -21,6 +21,8 @@ export interface Token {
     holder?: TokenHolder[];
     to?: string;
     mintTotal: string;
+    volume?: string;
+    price?: string;
 }
 
 export interface TokenResponse {
@@ -40,6 +42,8 @@ export interface TokenResponse {
     contacts: string[];
     description: string;
     sentiment: TokenSentiment;
+    volume?: number;
+    price?: number;
 }
 
 export interface TokenListItem {

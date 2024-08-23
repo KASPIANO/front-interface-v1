@@ -56,7 +56,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         <TokenPageLayout backgroundBlur={backgroundBlur}>
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '11.5vh')}
             {getComponentToShow(<TokenGraph />, '35vh')}
-            {getComponentToShow(<TokenStats />)}
+            {getComponentToShow(<TokenStats tokenInfo={tokenInfo} />)}
             {getComponentToShow(
                 <MintingComponent
                     tokenInfo={tokenInfo}
