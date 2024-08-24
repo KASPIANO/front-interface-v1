@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const KRC20InfoService = axios.create({
-    baseURL: 'https://tn11api.kasplex.org/v1',
+    baseURL: 'https://tn10api.kasplex.org/v1',
 });
 
 export const kasInfoService = axios.create({
@@ -9,5 +9,5 @@ export const kasInfoService = axios.create({
 });
 
 export const backendService = axios.create({
-    baseURL: import.meta.env.VITE_APP_BACKEND_ENDPOINT,
+    baseURL: import.meta.env.VITE_API_ENDPOINT,
 });

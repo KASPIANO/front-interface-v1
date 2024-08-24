@@ -1,7 +1,6 @@
 import { Skeleton } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import RugScore from '../../components/token-page/rug-score/RugScore';
 import TokenHeader from '../../components/token-page/token-header/TokenHeader';
 import TokenSideBar from '../../components/token-page/token-sidebar/TokenSideBar';
 import TokenStats from '../../components/token-page/token-stats/TokenStats';
@@ -10,6 +9,8 @@ import { fetchTokenInfo } from '../../DAL/Krc20DAL';
 import { Token } from '../../types/Types';
 import { TokenPageLayout } from './TokenPageLayout';
 import TokenGraph from '../../components/token-page/token-graph/TokenGraph';
+import RugScore from '../../components/token-page/rug-score/RugScore';
+import MintingComponent from '../../components/token-page/minting-status/MintingStatus';
 
 interface TokenPageProps {
     walletAddress: string | null;
@@ -17,12 +18,17 @@ interface TokenPageProps {
     handleNetworkChange: (network: string) => void;
     network: string;
     backgroundBlur: boolean;
+    setWalletBalance: (balance: number) => void;
+    walletBalance: number;
+    walletConnected: boolean;
 }
 
 const TokenPage: FC<TokenPageProps> = (props) => {
+    const { walletConnected, walletBalance } = props;
     const { ticker } = useParams();
-    const { backgroundBlur } = props;
+    const { backgroundBlur, setWalletBalance } = props;
     const [tokenInfo, setTokenInfo] = useState<Token>(null);
+    const [tokenXHandle, setTokenXHandle] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -37,15 +43,36 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         fetchData();
     }, [ticker]);
 
+    useEffect(() => {
+        if (tokenInfo) {
+            setTokenXHandle(!!tokenInfo.socials?.x);
+        }
+    }, [tokenInfo]);
+
     const getComponentToShow = (component: JSX.Element, height?: string, width?: string) =>
         tokenInfo ? component : <Skeleton variant="rectangular" height={height} width={width} />;
 
     return (
         <TokenPageLayout backgroundBlur={backgroundBlur}>
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '11.5vh')}
-            {getComponentToShow(<TokenGraph />, '30vh')}
-            {getComponentToShow(<TokenStats />)}
-            {getComponentToShow(<RugScore score={66} onRecalculate={() => {}} />, '19vh')}
+            {getComponentToShow(<TokenGraph />, '35vh')}
+            {getComponentToShow(<TokenStats tokenInfo={tokenInfo} />)}
+            {getComponentToShow(
+                <MintingComponent
+                    tokenInfo={tokenInfo}
+                    walletBalance={walletBalance}
+                    walletConnected={walletConnected}
+                />,
+            )}
+            {getComponentToShow(
+                <RugScore
+                    score={66}
+                    onRecalculate={() => {}}
+                    xHandle={tokenXHandle}
+                    setWalletBalance={setWalletBalance}
+                />,
+                '19vh',
+            )}
             {getComponentToShow(<TopHolders tokenInfo={tokenInfo} />, '19vh')}
             {/* {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)} */}
             {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} setTokenInfo={setTokenInfo} />, '91vh')}

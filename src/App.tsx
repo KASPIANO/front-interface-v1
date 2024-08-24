@@ -116,6 +116,7 @@ const App = () => {
             try {
                 await switchNetwork(newNetwork);
                 setNetwork(newNetwork);
+                showGlobalSnackbar({ message: `Switched to ${newNetwork}`, severity: 'success' });
             } catch (error) {
                 console.error('Error switching network:', error);
                 showGlobalSnackbar({
@@ -167,6 +168,9 @@ const App = () => {
                                         walletAddress={walletAddress}
                                         connectWallet={requestAccounts}
                                         handleNetworkChange={handleNetworkChange}
+                                        setWalletBalance={setWalletBalance}
+                                        walletBalance={walletBalance}
+                                        walletConnected={walletConnected}
                                     />
                                 }
                             />

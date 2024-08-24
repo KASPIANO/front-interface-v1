@@ -16,6 +16,34 @@ export interface Token {
     description?: string;
     socials?: TokenSocials;
     contacts?: string[];
+    devWallet?: string;
+    totalMints: string;
+    holder?: TokenHolder[];
+    to?: string;
+    mintTotal: string;
+    volume?: string;
+    price?: string;
+}
+
+export interface TokenResponse {
+    ticker: string;
+    maxSupply: number;
+    topHolders: TokenHolder[];
+    logo: string;
+    banner: string;
+    totalTrades: number;
+    mintedSupply: number;
+    mintedSupplyPercent: number;
+    mintLimit: number;
+    devWallet: string;
+    totalHolders: number;
+    totalMints: number;
+    socials: TokenSocials;
+    contacts: string[];
+    description: string;
+    sentiment: TokenSentiment;
+    volume?: number;
+    price?: number;
 }
 
 export interface TokenListItem {
@@ -56,8 +84,6 @@ export interface TokenSocials {
     whitepaper?: string;
     audit?: string;
     contract?: string;
-    explorer?: string;
-    chat?: string;
     other?: string;
 }
 
@@ -66,13 +92,6 @@ export interface TokenHolder {
     amount: string;
 }
 
-export interface TokenResponse {
-    tick: string;
-    maxSupply: string;
-    minted: string;
-    state: string;
-    logo: string;
-}
 export interface TokenListResponse {
     result: TokenResponse[];
     next: string;

@@ -1,4 +1,4 @@
-import React, { FC,  useRef, useState } from 'react';
+import React, { FC, useRef, useState } from 'react';
 import { InputAdornment, Box, Avatar, Autocomplete, MenuItem, Skeleton } from '@mui/material';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import { TokenSearchItems } from '../../types/Types';
@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { debounce } from 'lodash';
 import { searchToken } from '../../DAL/BackendDAL';
 import axios, { CancelTokenSource } from 'axios';
+import { GlobalStyleAutoComplete } from '../../utils/GlobalStyleScrollBar';
 
 const styles = `
   input[type="search"]::-webkit-search-cancel-button {
@@ -118,6 +119,7 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
             }}
         >
             <style>{styles}</style>
+            <GlobalStyleAutoComplete />
             <Autocomplete
                 sx={{
                     height: '3.5vh',

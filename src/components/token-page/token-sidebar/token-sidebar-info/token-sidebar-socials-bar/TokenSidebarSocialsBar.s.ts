@@ -35,7 +35,7 @@ export const AddBox = styled(Button)(({ theme }) => ({
     alignItems: 'center',
     backgroundColor: alpha(theme.palette.primary.main, 0.1),
     borderRadius: '5px',
-    height: '12vh',
+    height: '19vh',
     width: '100%',
     padding: '1vh',
     cursor: 'pointer',
