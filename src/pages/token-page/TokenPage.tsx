@@ -66,7 +66,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             )}
             {getComponentToShow(
                 <RugScore
-                    score={66}
+                    score={77}
                     onRecalculate={() => {}}
                     xHandle={tokenXHandle}
                     setWalletBalance={setWalletBalance}

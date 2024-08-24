@@ -106,7 +106,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
             }}
         >
             <TokenProfileContainer>
-                {tokenInfo.banner ? (
+                {true ? (
                     <Box
                         component="img"
                         alt={props.tokenInfo.tick}
@@ -181,10 +181,13 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                 </Stack>
             </Box>
             <Box padding={'10px'}>
-                {tokenInfo.description ? (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                {true ? (
+                    <Box
+                        sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', height: '19vh' }}
+                    >
                         <Typography variant="body2" fontWeight={500}>
-                            Description:
+                            Description: Nacho is the name of the cat owned by Shai Wyborski, a member of the core
+                            team behind Kaspa. This project pays homage to Shai, and his cat Nacho.
                         </Typography>
                         <Typography sx={{ fontSize: '1vw' }} color="text.secondary">
                             {tokenInfo.description}

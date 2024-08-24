@@ -23,8 +23,8 @@ const TokenHeader: FC<TokenHeaderProps> = (props) => {
                 <Rank>#26</Rank>
             </TitleHeaderContainer>
             <PriceContainer>
-                <Typography sx={{ fontWeight: '700', fontSize: '0.9vw' }}>69.20/Sompi</Typography>
-                <Typography sx={{ fontSize: '0.9vw' }}>$0.0001</Typography>
+                <Typography sx={{ fontWeight: '700', fontSize: '0.9vw' }}>420.69/Sompi</Typography>
+                <Typography sx={{ fontSize: '0.9vw' }}>$0.0069</Typography>
             </PriceContainer>
         </HeaderContainer>
     );

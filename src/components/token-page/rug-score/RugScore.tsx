@@ -100,7 +100,7 @@ const RugScore: FC<RugScoreProps> = (props) => {
                         <InfoOutlinedIcon fontSize="small" />
                     </Tooltip>
                 </Box>
-                {xHandle && (
+                {true && (
                     <Tooltip title="Click to recalculate the Rug Score.">
                         <IconButton onClick={onRecalculate} aria-label="recalculate score" sx={{ padding: 0 }}>
                             <RefreshIcon />
@@ -108,14 +108,14 @@ const RugScore: FC<RugScoreProps> = (props) => {
                     </Tooltip>
                 )}
             </Box>
-            {!xHandle && (
+            {!true && (
                 <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '2vh' }}>
                     <Button variant="outlined" startIcon={<AddCircleOutlineIcon />} onClick={handleOpenDialog}>
                         List Project to show score
                     </Button>
                 </Box>
             )}
-            {xHandle && score !== null ? <ScoreLine value={score} config={scoreLineRanges} /> : null}
+            {true && score !== null ? <ScoreLine value={score} config={scoreLineRanges} /> : null}
 
             <RugScoreDialog
                 open={openDialog}
