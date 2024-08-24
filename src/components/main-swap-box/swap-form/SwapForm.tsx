@@ -25,14 +25,6 @@ interface SwapFormProps {
     tokens: TokenResponse[];
 }
 
-const kasToken: TokenResponse = {
-    tick: 'kas',
-    minted: '0',
-    state: 'deployed',
-    maxSupply: '1000000',
-    logo: '/kaspa.svg',
-};
-
 const SwapForm: React.FC<SwapFormProps> = (props) => {
     const {
         isPayingActive,
@@ -53,7 +45,7 @@ const SwapForm: React.FC<SwapFormProps> = (props) => {
     return (
         <SwapContainer>
             <Label>Sell</Label>
-            <CurrencyBox tokens={[kasToken]} active={isPayingActive} paying={paying} setPaying={setPaying} />
+            <CurrencyBox tokens={[]} active={isPayingActive} paying={paying} setPaying={setPaying} />
             {walletAddress && (
                 <BalanceInfo>
                     <BalanceText>

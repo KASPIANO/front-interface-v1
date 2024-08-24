@@ -129,7 +129,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                     </AddBanner>
                 )}
                 {socials !== null && Object.keys(socials).length > 0 && (
-                    <Box sx={{ position: 'absolute', bottom: -4, left: '52.3%', transform: 'translateX(-50%)' }}>
+                    <Box sx={{ position: 'absolute', bottom: -9, left: '52.3%', transform: 'translateX(-50%)' }}>
                         <TokenSidebarSocialsBar options={socials} />
                     </Box>
                 )}
