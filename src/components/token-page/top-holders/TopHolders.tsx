@@ -49,7 +49,7 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
     }, [tokenHoldersToShow, tokenInfo]);
 
     return (
-        <Card sx={{ height: '19vh', padding: '8px 10px' }}>
+        <Card sx={{ height: '18vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold', mr: 1 }}>

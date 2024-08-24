@@ -102,7 +102,11 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
     return (
         <Box
             sx={{
-                scroll: 'auto',
+                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                height: '100%',
             }}
         >
             <TokenProfileContainer>
@@ -110,7 +114,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                     <Box
                         component="img"
                         alt={props.tokenInfo.tick}
-                        src={'/1500x500.jpg'}
+                        src={tokenInfo.banner}
                         sx={{
                             height: '19vh',
                             width: '100%',
@@ -196,13 +200,8 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                     </AddBox>
                 )}
             </Box>
-            <div>
-                <Typography
-                    variant="body2"
-                    align="center"
-                    sx={{ marginTop: '10px', fontSize: '1.1vw' }}
-                    color="text.primary"
-                >
+            <Box sx={{ mt: 'auto' }}>
+                <Typography variant="body2" align="center" sx={{ fontSize: '1.1vw' }} color="text.primary">
                     Community Sentiments
                 </Typography>
                 <SentimentsContainerBox>
@@ -233,7 +232,8 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                         </SentimentButton>
                     ))}
                 </SentimentsContainerBox>
-            </div>
+            </Box>
+
             <TokenInfoDialog
                 open={showTokenInfoDialog}
                 onClose={() => setShowTokenInfoDialog(false)}

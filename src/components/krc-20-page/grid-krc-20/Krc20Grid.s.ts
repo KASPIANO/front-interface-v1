@@ -4,7 +4,7 @@ import { styled } from '@mui/material/styles';
 export const TableHeader = styled('th')({});
 
 export const StyledDataGridContainer = styled(Box)({
-    height: '80vh',
+    height: '78vh',
     width: '83vw',
     display: 'flex',
     borderRadius: '8px',

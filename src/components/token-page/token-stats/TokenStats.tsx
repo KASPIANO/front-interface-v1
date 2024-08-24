@@ -66,7 +66,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     <Typography variant="body2" align="center">
                         VOLUME ({tradingDataTimeFrame})
                     </Typography>
-                    <Typography variant="body2" align="center">
+                    <Typography variant="body2" align="center" sx={{ fontWeight: 'bold' }}>
                         {tokenInfo.volume ? `$${tokenInfo.volume}` : '$69,420,880'}
                     </Typography>
                 </Box>
@@ -76,7 +76,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     <Typography variant="body2" align="center">
                         PRICE PER TOKEN ({tradingDataTimeFrame})
                     </Typography>
-                    <Typography variant="body2" align="center">
+                    <Typography variant="body2" align="center" sx={{ fontWeight: 'bold' }}>
                         {tokenInfo.price ? `${tokenInfo.price}/SOMPI` : '69,420/SOMPI'}
                     </Typography>
                 </Box>
@@ -85,7 +85,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     <Typography variant="body2" align="center">
                         PRE MINTED
                     </Typography>
-                    <Typography variant="body2" align="center">
+                    <Typography variant="body2" align="center" sx={{ fontWeight: 'bold' }}>
                         {preMintedDataToShow}
                     </Typography>
                 </Box>
@@ -94,7 +94,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     <Typography variant="body2" align="center">
                         AGE
                     </Typography>
-                    <Typography variant="body2" align="center">
+                    <Typography variant="body2" align="center" sx={{ fontWeight: 'bold' }}>
                         {calculateAgeInDays(age)} days
                     </Typography>
                 </Box>
