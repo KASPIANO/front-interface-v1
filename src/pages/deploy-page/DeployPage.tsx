@@ -179,7 +179,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             logo: logo || null,
             banner: banner || null,
         };
-        console.log('Token Data:', tokenData);
 
         const reviewTokenData: TokenDeploy = {
             ticker: validatedTokenName,

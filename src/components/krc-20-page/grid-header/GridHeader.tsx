@@ -11,12 +11,21 @@ interface GridHeaderProps {
 }
 
 const marginMapperByHeader = {
-    Ticker: '16vw',
-    Age: '9vw',
-    Supply: '11.3vw',
-    Minted: '10.4vw',
-    Holders: '11vw',
-    'Fair Mint': '12vw',
+    Ticker: '17.5%',
+    Age: '12%',
+    Supply: '12%',
+    Minted: '13.5%',
+    Holders: '14%',
+    'Fair Mint': '26%',
+};
+
+const marginLeft = {
+    Ticker: '5%',
+    Age: 0,
+    Supply: 0,
+    Minted: 0,
+    Holders: 0,
+    'Fair Mint': '0',
 };
 
 const disableSort = (name) => name === 'Ticker' || name === 'Age' || name === 'Minted' || name === 'Holders';
@@ -25,12 +34,12 @@ export const GridHeader: FC<GridHeaderProps> = ({ name, headerFunction, activeHe
     <th
         style={{
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
             minWidth: marginMapperByHeader[name],
+            marginLeft: marginLeft[name],
         }}
     >
-        <Typography sx={{ fontWeight: 600, fontSize: '2.4vh' }}>{name}</Typography>
+        <Typography sx={{ fontWeight: 600, fontSize: '1.2vw' }}>{name}</Typography>
         {disableSort(name) && (
             <FilterButton
                 onFilterClick={headerFunction}

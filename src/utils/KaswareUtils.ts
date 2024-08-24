@@ -7,8 +7,17 @@ export const isKasWareInstalled = (): boolean => typeof window.kasware !== 'unde
 export const requestAccounts = async (): Promise<string[]> => {
     try {
         const accounts = await window.kasware.requestAccounts();
-        console.log('Connect success', accounts);
         return accounts;
+    } catch (error) {
+        console.error('Connect failed', error);
+        throw error;
+    }
+};
+
+export const getWalletAddress = async (): Promise<string> => {
+    try {
+        const accounts = await window.kasware.requestAccounts();
+        return accounts[0] || '';
     } catch (error) {
         console.error('Connect failed', error);
         throw error;
@@ -19,8 +28,18 @@ export const requestAccounts = async (): Promise<string[]> => {
 export const getAccounts = async (): Promise<string[]> => {
     try {
         const accounts = await window.kasware.getAccounts();
-        console.log(accounts);
+
         return accounts;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getCurrentAccount = async (): Promise<string> => {
+    try {
+        const accounts = await window.kasware.getAccounts();
+        return accounts[0];
     } catch (error) {
         console.error(error);
         throw error;
@@ -31,7 +50,6 @@ export const getAccounts = async (): Promise<string[]> => {
 export const getNetwork = async (): Promise<string> => {
     try {
         const network = await window.kasware.getNetwork();
-        console.log(network);
         return network;
     } catch (error) {
         console.error(error);
@@ -43,7 +61,6 @@ export const getNetwork = async (): Promise<string> => {
 export const switchNetwork = async (network: string): Promise<void> => {
     try {
         await window.kasware.switchNetwork(network);
-        console.log('Switched network');
     } catch (error) {
         console.error(error);
         throw error;
@@ -65,7 +82,6 @@ export const disconnect = async (origin: string): Promise<any> => {
 export const getPublicKey = async (): Promise<string> => {
     try {
         const publicKey = await window.kasware.getPublicKey();
-        console.log(publicKey);
         return publicKey;
     } catch (error) {
         console.error(error);
@@ -77,7 +93,6 @@ export const getPublicKey = async (): Promise<string> => {
 export const getBalance = async (): Promise<{ confirmed: number; unconfirmed: number; total: number }> => {
     try {
         const balance = await window.kasware.getBalance();
-        console.log(balance);
         return balance;
     } catch (error) {
         console.error(error);
@@ -93,10 +108,8 @@ export const sendKaspa = async (
 ): Promise<string> => {
     try {
         const txid = await window.kasware.sendKaspa(toAddress, sompi, options);
-        console.log(txid);
         return txid;
     } catch (error) {
-        console.error(error);
         throw error;
     }
 };
@@ -105,7 +118,6 @@ export const sendKaspa = async (
 export const signMessage = async (msg: string, type: 'ecdsa' | 'bip322-simple' = 'ecdsa'): Promise<string> => {
     try {
         const signature = await window.kasware.signMessage(msg, type);
-        console.log(signature);
         return signature;
     } catch (error) {
         console.error(error);
@@ -117,7 +129,6 @@ export const signMessage = async (msg: string, type: 'ecdsa' | 'bip322-simple' =
 export const pushTx = async (options: { rawtx: string }): Promise<string> => {
     try {
         const txid = await window.kasware.pushTx(options);
-        console.log(txid);
         return txid;
     } catch (error) {
         console.error(error);
@@ -130,7 +141,6 @@ export const deployKRC20Token = async (inscribeJsonString: string): Promise<stri
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2);
-        console.log(txid);
         return txid;
     } catch (error) {
         console.error('Failed to deploy KRC20 token:', error);
@@ -143,7 +153,6 @@ export const mintKRC20Token = async (inscribeJsonString: string): Promise<string
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3);
-        console.log(txid);
         return txid;
     } catch (error) {
         console.error('Failed to mint KRC20 token:', error);
@@ -156,7 +165,6 @@ export const transferKRC20Token = async (inscribeJsonString: string, destAddr: s
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4, destAddr);
-        console.log(txid);
         return txid;
     } catch (error) {
         console.error('Failed to transfer KRC20 token:', error);
