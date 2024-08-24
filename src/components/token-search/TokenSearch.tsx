@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, useCallback, useRef, useState } from 'react';
 import { InputAdornment, Box, Avatar, Autocomplete, MenuItem, Skeleton } from '@mui/material';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import { TokenSearchItems } from '../../types/Types';
@@ -28,6 +28,8 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
     const [showOptions, setShowOptions] = useState(false);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const transitionDuration = 200;
 
     const cancelTokenRef = useRef<CancelTokenSource>(null);
 
@@ -47,7 +49,6 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
 
             try {
                 const resultTokens = await searchToken(query, cancelTokenRef.current.token);
-
                 setTokens(resultTokens);
 
                 setLoading(false);
@@ -59,28 +60,35 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
                     setLoading(false);
                 }
             }
-        }, 500),
+        }, 300),
     ).current; // 500ms debounce time
 
-    const handleFetchingTokens = (query: string) => {
-        if (query && query.length > 0) {
-            setLoading(true);
-            debouncedSearch(query);
-        } else {
-            if (cancelTokenRef.current) {
-                cancelTokenRef.current.cancel('Operation canceled due to empty search.');
+    const handleFetchingTokens = useCallback(
+        (query: string) => {
+            if (query && query.length > 0) {
+                setTokens([]);
+                setLoading(true);
+                debouncedSearch(query);
+            } else {
+                if (cancelTokenRef.current) {
+                    cancelTokenRef.current.cancel('Operation canceled due to empty search.');
+                }
+                setTokens([]);
+                setLoading(false);
             }
-            setTokens([]);
-        }
-    };
+        },
+        [debouncedSearch],
+    );
 
     const inputRef = useRef<HTMLInputElement | null>(null);
     const handleFocus = () => {
         setIsFocused(true);
         setBackgroundBlur(true);
+        setIsTransitioning(true);
         setTimeout(() => {
+            setIsTransitioning(false);
             setShowOptions(true);
-        }, 600);
+        }, transitionDuration);
     };
 
     const handleBlur = () => {
@@ -89,15 +97,13 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
         setBackgroundBlur(false);
     };
 
-    const handleSearchChange = (_event: React.SyntheticEvent, value: string) => {
-        if (value.length === 0) {
-            setSearchValue('');
-        } else {
+    const handleSearchChange = useCallback(
+        (_event: React.SyntheticEvent, value: string) => {
             setSearchValue(value);
-        }
-
-        handleFetchingTokens(value);
-    };
+            handleFetchingTokens(value);
+        },
+        [handleFetchingTokens],
+    );
 
     const handleTokenSelect = (_event: any, value: TokenSearchItems | null) => {
         if (value) {
@@ -125,7 +131,14 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
                     height: '3.5vh',
                     width: isFocused ? '30vw' : '15vw',
                     transition: 'width 0.2s ease',
+                    '& .MuiAutocomplete-listbox': {
+                        overflowX: 'hidden', // Hide horizontal scrollbar
+                    },
+                    '& .MuiAutocomplete-popper': {
+                        width: '30vw !important', // Force the popper to be the same width as the expanded input
+                    },
                 }}
+                open={showOptions && !isTransitioning}
                 autoSelect={false}
                 freeSolo
                 filterOptions={(x) => x}
@@ -135,7 +148,7 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
                 onChange={handleTokenSelect}
                 options={showOptions ? (loading ? loadingArray : tokens) : []} // Show options only when focused
                 renderOption={(props, option) => (
-                    <MenuItem {...props} key={option.ticker} sx={{ width: '30vw' }}>
+                    <MenuItem {...props} key={`{option.ticker}`} sx={{ width: '28vw' }}>
                         {loading ? (
                             <Skeleton key={`${option.ticker}-s1`} variant="circular" width={24} height={24} />
                         ) : (
@@ -179,7 +192,6 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
                             '& input': {
                                 fontSize: '0.8vw',
                                 textAlign: 'start',
-                                width: '30vw',
                             },
                             '& input::placeholder': {
                                 fontSize: '0.8vw',
