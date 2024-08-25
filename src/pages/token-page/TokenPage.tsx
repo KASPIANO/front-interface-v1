@@ -34,7 +34,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         const fetchData = async () => {
             try {
                 const data = await fetchTokenInfo(ticker);
-                setTokenInfo(data[0]);
+                setTokenInfo(data);
             } catch (error) {
                 console.error('Error fetching token info:', error);
             }

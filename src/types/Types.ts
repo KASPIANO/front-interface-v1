@@ -127,6 +127,13 @@ export interface TokenDeploy {
     logo?: File;
     banner?: File;
     transactionHash?: string;
+    whitepaper?: string;
+    medium?: string;
+    audit?: string;
+    contract?: string;
+    github?: string;
+    contacts?: string[];
+    founders?: string[];
 }
 
 export interface TokenMetadata {

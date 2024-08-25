@@ -117,7 +117,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
 
                     <ListItemText
                         sx={{
-                            maxWidth: '16.5%',
+                            maxWidth: '17%',
                         }}
                         primary={
                             <Tooltip title={token.tick}>
