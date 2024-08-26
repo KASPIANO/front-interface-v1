@@ -313,6 +313,15 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         }
     };
 
+    const handleXChange = (value: string) => {
+        if (!value.startsWith('@')) {
+            setErrorToField(formErrors, setFormErrors, 'x', 'Handle should start with "@"');
+        } else {
+            setX(value);
+            clearFieldErrors(formErrors, setFormErrors, 'x');
+        }
+    };
+
     return (
         <Container
             sx={{
@@ -485,18 +494,26 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                             <TextInfo
-                                label="X Handle"
+                                label="X Handle (Twitter)"
                                 variant="outlined"
                                 fullWidth
                                 value={x}
-                                onChange={(e) =>
-                                    clearFieldErrorsAndSetFieldValue(formErrors, setFormErrors, 'x', () =>
-                                        setX(e.target.value),
-                                    )
-                                }
+                                onChange={(e) => handleXChange(e.target.value)}
                                 placeholder="X handle"
                                 error={hasErrors(formErrors, 'x')}
                                 helperText={getErrorMessage(formErrors, 'x')}
+                                InputProps={{
+                                    endAdornment: (
+                                        <Tooltip
+                                            placement="left"
+                                            title="It can be a Twitter handle, email, or Telegram. Should start with '@'."
+                                        >
+                                            <IconButton>
+                                                <InfoOutlinedIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                    ),
+                                }}
                             />
                         </Grid>
                         <Grid item xs={6}>
@@ -571,6 +588,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 placeholder="Audit report link"
                             />
                         </Grid>
+
                         <Grid item xs={6}>
                             <TextInfo
                                 label="Founders X Handles"
@@ -578,7 +596,20 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 fullWidth
                                 value={foundersHandles}
                                 onChange={(e) => setFoundersHandles(e.target.value)}
-                                placeholder="Founders' X handles"
+                                placeholder="Founder handles"
+                                helperText="Separate multiple handles with a comma (e.g., @founder1, @founder2)"
+                                InputProps={{
+                                    endAdornment: (
+                                        <Tooltip
+                                            placement="left"
+                                            title="List founder's X/Twitter handles. Separate multiple handles using commas."
+                                        >
+                                            <IconButton>
+                                                <InfoOutlinedIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                    ),
+                                }}
                             />
                         </Grid>
                         <Grid item xs={6}>
@@ -589,6 +620,24 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 value={contact}
                                 onChange={(e) => setContact(e.target.value)}
                                 placeholder="Contact information"
+                                helperText="Example: @twitter_handle, email@example.com, @telegram_handle (separate with commas)"
+                                FormHelperTextProps={{
+                                    sx: {
+                                        color: 'text.secondary', // This will use the default text color defined by the theme
+                                    },
+                                }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <Tooltip
+                                            placement="left"
+                                            title="Provide multiple contact methods separated by commas, such as Twitter handles, emails, or Telegram handles."
+                                        >
+                                            <IconButton>
+                                                <InfoOutlinedIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                    ),
+                                }}
                             />
                         </Grid>
                     </Grid>
@@ -685,8 +734,8 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     </Button>
                 </form>
                 <Info>
-                    Note: Each deployment costs 1000 $KAS. This cannot be undone, check the ticker properly and
-                    make sure you understand your actions.
+                    Note: Each deployment costs 1000 $KAS. This cannot be undone, check the ticker and the details
+                    before you deploy.
                 </Info>
             </DeployForm>
             {showDeployDialog && tokenDetails && (
