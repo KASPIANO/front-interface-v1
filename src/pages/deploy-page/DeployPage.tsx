@@ -322,6 +322,29 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         }
     };
 
+    const validateImageSize = (file: File | null, maxSizeMB: number) => {
+        if (file) {
+            const fileSizeMB = file.size / (1024 * 1024);
+            return fileSizeMB <= maxSizeMB;
+        }
+        return true;
+    };
+
+    const setLogoHandler = (file: File | null) => {
+        if (validateImageSize(file, 50)) {
+            setLogo(file);
+            clearFieldErrors(formErrors, setFormErrors, 'logo');
+        }
+    };
+
+    // Handler for setting banner with validation
+    const setBannerHandler = (file: File | null) => {
+        if (validateImageSize(file, 50)) {
+            setBanner(file);
+            clearFieldErrors(formErrors, setFormErrors, 'banner');
+        }
+    };
+
     return (
         <Container
             sx={{
@@ -656,14 +679,16 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 type="file"
                                 onChange={(event) => {
                                     const inputElement = event.target as HTMLInputElement;
-                                    setLogo(inputElement.files[0]);
-                                    clearFieldErrors(formErrors, setFormErrors, 'logo');
+                                    setLogoHandler(inputElement.files[0]);
                                 }}
                             />
                             <Button variant="text" color="primary" component="span">
                                 Choose File or Drag
                             </Button>
                         </UploadButton>
+                        <Typography variant="caption" color="text.secondary">
+                            Recommended size: 400x400 pixels. Max file size: 50MB.
+                        </Typography>
                         <Button
                             sx={{ width: '1vw', height: '2vw' }}
                             onClick={() => {
@@ -695,26 +720,28 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 type="file"
                                 onChange={(event) => {
                                     const inputElement = event.target as HTMLInputElement;
-                                    setBanner(inputElement.files[0]);
-                                    clearFieldErrors(formErrors, setFormErrors, 'banner');
+                                    setBannerHandler(inputElement.files[0]);
                                 }}
                             />
                             <Button variant="text" color="primary" component="span">
                                 Choose File or Drag
                             </Button>
-                            <Button
-                                sx={{ width: '1vw', height: '2vw' }}
-                                onClick={() => {
-                                    setBanner(null);
-                                    clearFieldErrors(formErrors, setFormErrors, 'banner');
-                                }}
-                                disabled={!banner}
-                                color="primary"
-                                variant="contained"
-                            >
-                                Clear
-                            </Button>
                         </UploadButton>
+                        <Typography variant="caption" color="text.secondary">
+                            Recommended size: 1500x500 pixels. Max file size: 50MB.
+                        </Typography>
+                        <Button
+                            sx={{ width: '1vw', height: '2vw' }}
+                            onClick={() => {
+                                setBanner(null);
+                                clearFieldErrors(formErrors, setFormErrors, 'banner');
+                            }}
+                            disabled={!banner}
+                            color="primary"
+                            variant="contained"
+                        >
+                            Clear
+                        </Button>
                     </UploadContainer>
                     {hasErrors(formErrors, 'banner') && (
                         <Info className="error">{'File type must be image and size must be less than 50MB'}</Info>
