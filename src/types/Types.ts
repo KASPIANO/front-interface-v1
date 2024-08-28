@@ -52,18 +52,6 @@ export interface TokenMetadataResponse {
     sentiment: TokenSentiment;
 }
 
-export interface TokenListItem {
-    tick: string;
-    ticker?: string;
-    mtsAdd: number;
-    max: number;
-    minted: number;
-    maxMintedPercent: number;
-    totalHolders: number;
-    pre: number;
-    logoUrl: string;
-    bannerUrl: string;
-}
 export interface TokenListItemResponse {
     ticker: string;
     creationDate: number;

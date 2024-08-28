@@ -1,5 +1,5 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
-import { Token, TokenListItem, TokenSearchItems } from '../types/Types';
+import { Token, TokenListItemResponse, TokenSearchItems } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
@@ -14,7 +14,7 @@ export async function fetchAllTokens(
     skip = 0,
     order: string | null = null,
     direction: string | null = null,
-): Promise<TokenListItem[]> {
+): Promise<TokenListItemResponse[]> {
     try {
         const urlParams = new URLSearchParams();
         urlParams.append('skip', skip.toString());
@@ -28,7 +28,7 @@ export async function fetchAllTokens(
         }
         const url = `/${KRC20CONTROLLER}?${urlParams.toString()}`;
 
-        const response = await backendService.get<TokenListItem[]>(url);
+        const response = await backendService.get<TokenListItemResponse[]>(url);
 
         return response.data;
     } catch (error) {

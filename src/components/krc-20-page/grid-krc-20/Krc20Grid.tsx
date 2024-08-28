@@ -5,14 +5,14 @@ import { FC, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import { FilterState, TokenListItem } from '../../../types/Types';
+import { FilterState,  TokenListItemResponse } from '../../../types/Types';
 import { GridHeader } from '../grid-header/GridHeader';
 import { TokenRow } from '../token-row-grid/TokenRow';
 import { StyledDataGridContainer } from './Krc20Grid.s';
 import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 
 interface TokenDataGridProps {
-    tokensList: TokenListItem[];
+    tokensList: TokenListItemResponse[];
     setNextPage: (value: number) => void;
     totalTokensDeployed: number;
     nextPage: number;
@@ -41,9 +41,9 @@ const headersMapper: Record<GridHeaders, { name: string; headerFunction?: boolea
 };
 
 const fieldToSortProp = {
-    [GridHeaders.TICKER]: 'tick',
-    [GridHeaders.AGE]: 'mtsAdd',
-    [GridHeaders.MINTED]: 'maxMintedPercent',
+    [GridHeaders.TICKER]: 'ticker',
+    [GridHeaders.AGE]: 'creationDate',
+    [GridHeaders.MINTED]: 'totalMintedPercent',
     [GridHeaders.HOLDERS]: 'totalHolders',
 };
 
@@ -53,7 +53,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     const navigate = useNavigate();
 
     const handleItemClick = (token) => {
-        navigate(`/token/${token.tick}`);
+        navigate(`/token/${token.ticker}`);
     };
 
     const headerFunction = (field: string, filterState: FilterState) => {
@@ -123,7 +123,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                     }
                 >
                     {tokensList.map((token) => {
-                        const tokenKey = `${token.tick}-${uuidv4()}`;
+                        const tokenKey = `${token.ticker}-${uuidv4()}`;
                         return (
                             <TokenRow
                                 walletConnected={walletConnected}
