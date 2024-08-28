@@ -105,13 +105,8 @@ export async function fetchTotalTokensDeployed(): Promise<number> {
     }
 }
 export async function fetchDevWalletBalance(ticker: string, devWallet: string): Promise<any> {
-    try {
-        const response = await KRC20InfoService.get<any>(`krc20/address/${devWallet}/token/${ticker}`);
-        return response.data.result[0].balance;
-    } catch (error) {
-        console.error('Error fetching token count:', error);
-        return 0;
-    }
+    const response = await KRC20InfoService.get<any>(`krc20/address/${devWallet}/token/${ticker}`);
+    return response.data.result[0].balance;
 }
 // This iterates through the 50 items from the api and fecthes the token info for each token, in the data base the token details and al together in the ticker, no need for 2 requests
 // the only thing is that you need to do pagination, 50 tokes per request, make it so that you can implement sort by relevant headers in the table, and also by the relevant time frame,

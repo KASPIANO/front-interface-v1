@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { Token, TokenMetadata } from '../../../../types/Types';
+import { TokenMetadataResponse, TokenResponse, TokenSentiment } from '../../../../types/Types';
 import { Box, Typography } from '@mui/material';
 import { SentimentButton, SentimentsContainerBox, TokenProfileContainer, StatCard } from './TokenSideBarInfo.s';
 import { RocketLaunchRounded, SentimentNeutralRounded, TrendingDownRounded } from '@mui/icons-material';
@@ -19,24 +19,10 @@ export type SentimentButtonsConfig = {
 };
 
 interface TokenSideBarInfoProps {
-    tokenInfo: Token;
+    tokenInfo: TokenResponse;
     setTokenInfo: (tokenInfo: any) => void;
     priceInfo?: any;
 }
-
-const mockSocials = {
-    telegram: 'https://t.me/kaspa',
-    website: 'https://kaspa.com',
-    x: 'https://x.com/kaspa',
-};
-
-const mockSentimentValues = {
-    love: 100,
-    positive: 200,
-    neutral: 300,
-    negative: 400,
-    warning: 500,
-};
 
 // const mockBanner =
 //     'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Full-Color.png';
@@ -45,7 +31,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
     const { tokenInfo, setTokenInfo, priceInfo } = props;
     const [showTokenInfoDialog, setShowTokenInfoDialog] = useState(false);
     const [selectedSentiment, setSelectedSentiment] = useState<string>(null);
-    const [sentimentValues, setSentimentValues] = useState({});
+    const [sentimentValues, setSentimentValues] = useState<TokenSentiment | null>(null);
     const [socials, setSocials] = useState<TokenSidebarSocialsBarOptions>(null);
     const [openModal, setOpenModal] = useState(false);
 
@@ -57,11 +43,20 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         { key: 'warning', icon: <WarningAmberRoundedIcon sx={{ fontSize: '1.4vw' }} color="warning" /> },
     ];
     useEffect(() => {
-        setSocials(mockSocials);
-        setSentimentValues(mockSentimentValues);
-    }, []);
+        setSocials((tokenInfo.metadata?.socials || {}) as TokenSidebarSocialsBarOptions);
+        setSentimentValues(
+            tokenInfo.metadata?.sentiment || {
+                love: 0,
+                positive: 0,
+                neutral: 0,
+                negative: 0,
+                warning: 0,
+            }
+        );
+
+    }, [tokenInfo]);
     const getSentimentIconValueToDisplay = (key: string): string =>
-        sentimentValues[key] ? sentimentValues[key] : '---';
+        sentimentValues ? (sentimentValues[key] || "0") : '---';
 
     const onSentimentButtonClick = (key: string) => {
         setSelectedSentiment(key);
@@ -74,22 +69,18 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         setShowTokenInfoDialog(true);
     };
 
-    const handleSaveTokenInfo = (newTokenInfo: TokenMetadata) => {
+    const handleSaveTokenInfo = (newTokenInfo: Partial<TokenMetadataResponse>) => {
         // Here you would typically update the token info in your backend
         console.log('New token info:', newTokenInfo);
 
         // Merge the new token info with the existing token info
-        setTokenInfo((prevInfo: Token) => {
-            const updatedInfo: Token = {
+        setTokenInfo((prevInfo: TokenResponse) => {
+            const updatedInfo: TokenResponse = {
                 ...prevInfo,
-                description: newTokenInfo.description || prevInfo.description,
-                socials: {
-                    ...prevInfo.socials,
-                    ...newTokenInfo.socials,
+                metadata: {
+                    ...prevInfo.metadata,
+                    ...newTokenInfo,
                 },
-                logo: newTokenInfo.logo || prevInfo.logo,
-                banner: newTokenInfo.banner || prevInfo.banner,
-                contacts: newTokenInfo.contacts || prevInfo.contacts,
             };
 
             return updatedInfo;
@@ -97,7 +88,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         setOpenModal(true);
     };
 
-    const tokenMax = parseInt(tokenInfo.max) / 1e8;
+    const tokenMax = tokenInfo.totalSupply;
 
     return (
         <Box
@@ -110,11 +101,11 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
             }}
         >
             <TokenProfileContainer>
-                {tokenInfo.banner ? (
+                {tokenInfo.metadata?.bannerUrl ? (
                     <Box
                         component="img"
-                        alt={props.tokenInfo.tick}
-                        src={tokenInfo.banner}
+                        alt={props.tokenInfo.ticker}
+                        src={tokenInfo.metadata?.bannerUrl}
                         sx={{
                             height: '19vh',
                             width: '100%',
@@ -185,13 +176,13 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                 </Stack>
             </Box>
             <Box padding={'10px'}>
-                {tokenInfo.description ? (
+                {tokenInfo.metadata?.description ? (
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                         <Typography variant="body2" fontWeight={500}>
                             Description:
                         </Typography>
                         <Typography sx={{ fontSize: '1vw' }} color="text.secondary">
-                            {tokenInfo.description}
+                            {tokenInfo.metadata?.description}
                         </Typography>
                     </Box>
                 ) : (

@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import TokenDataGrid from '../../components/krc-20-page/grid-krc-20/Krc20Grid';
-import { TokenListItem } from '../../types/Types';
+import { TokenListItemResponse } from '../../types/Types';
 import { GridLayout } from './GridPageLayout';
 
 import GridTitle from '../../components/krc-20-page/grid-title-sort/GridTitle';
@@ -18,7 +18,7 @@ const PAGE_TOKENS_COUNT = 50;
 const GridPage: FC<GridPageProps> = (props) => {
     const { walletBalance, walletConnected, backgroundBlur } = props;
 
-    const [tokensList, setTokensList] = useState<TokenListItem[]>([]);
+    const [tokensList, setTokensList] = useState<TokenListItemResponse[]>([]);
     const [nextPage, setNextPage] = useState<number>(1);
     const [totalTokensDeployed, setTotalTokensDeployed] = useState(0);
     const [sortParams, setSortParams] = useState({ field: '', asc: false });

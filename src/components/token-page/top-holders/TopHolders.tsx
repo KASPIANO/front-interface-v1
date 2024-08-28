@@ -1,12 +1,12 @@
 import { FC, useEffect, useState } from 'react';
 import { Box, Card, Divider, Tooltip, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
-import { Token } from '../../../types/Types';
+import { TokenResponse } from '../../../types/Types';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { fetchDevWalletBalance } from '../../../DAL/Krc20DAL';
 
 interface TopHoldersProps {
-    tokenInfo: Token;
+    tokenInfo: TokenResponse;
 }
 
 const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
@@ -14,7 +14,7 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
     const [tokenHoldersToShow, setTokenHoldersToShow] = useState(numberOfHoldersToSelect[0]);
     const [topHoldersPercentage, setTopHoldersPercentage] = useState('---');
     const [devWalletPercentage, setDevWalletPercentage] = useState('---');
-    const [tokenHolders] = useState(tokenInfo.holder || []);
+    const [tokenHolders] = useState(tokenInfo.topHolders || []);
 
     const updateTokenHoldersToShow = (value: number) => {
         setTokenHoldersToShow(value);
@@ -23,18 +23,22 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
     useEffect(() => {
         const calculatePercentages = async () => {
             const holdersToCalculate = tokenHolders.slice(0, tokenHoldersToShow);
+            const { totalSupply } = tokenInfo;
 
-            // Fetch dev wallet balance
-            const devWalletBalance = await fetchDevWalletBalance(tokenInfo.tick, tokenInfo.to);
-            const devWalletBalanceKAS = parseFloat(devWalletBalance) / 1e8;
+            try {
+                // Fetch dev wallet balance
+                const devWalletBalance = await fetchDevWalletBalance(tokenInfo.ticker, tokenInfo.devWallet);
+                const devWalletBalanceKAS = parseFloat(devWalletBalance) / 1e8;
 
-            const totalSupply = parseFloat(tokenInfo?.max) / 1e8;
-            const devWalletPercent = devWalletBalanceKAS === 0 ? 0 : (devWalletBalanceKAS / totalSupply) * 100;
-            setDevWalletPercentage(`${devWalletPercent.toFixed(2)}%`);
+                const devWalletPercent = devWalletBalanceKAS === 0 ? 0 : (devWalletBalanceKAS / totalSupply) * 100;
+                setDevWalletPercentage(`${devWalletPercent.toFixed(2)}%`);
+            } catch (error) {
+                console.error('Error fetching dev wallet balance:', error);
+            }
 
             // Calculate top holders percentage
             const totalHolding = holdersToCalculate
-                .map((h) => parseFloat(h.amount) / 1e8)
+                .map((h) => parseFloat(h.amount))
                 .reduce((acc, curr) => acc + curr, 0);
 
             const totalPercentage = (totalHolding / totalSupply) * 100;

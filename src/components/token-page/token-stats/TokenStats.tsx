@@ -1,10 +1,10 @@
 import { FC, useState } from 'react';
 import { Box, Card, Divider, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
-import { Token } from '../../../types/Types';
+import { TokenResponse } from '../../../types/Types';
 
 interface TokenStatsProps {
-    tokenInfo: Token;
+    tokenInfo: TokenResponse;
 }
 
 function calculateAgeInDays(timestamp) {
@@ -34,11 +34,14 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         setTradingDataTimeFrame(value);
     };
 
-    const tokenPreMinted = tokenInfo.pre ? parseInt(tokenInfo.pre) / 1e8 : '39420';
+    const tokenPreMinted = tokenInfo.preMintedSupply ? tokenInfo.preMintedSupply : '39420';
     const preMintedPercentage =
-        tokenInfo.pre !== '0' ? ((parseInt(tokenInfo.pre) / parseInt(tokenInfo.max)) * 100).toFixed(2) : '';
-    const preMintedDataToShow = tokenInfo.pre !== '0' ? `${tokenPreMinted} (${preMintedPercentage}%)` : '0';
-    const age = tokenInfo.mtsAdd;
+        tokenInfo.preMintedSupply !== 0
+            ? ((tokenInfo.preMintedSupply / tokenInfo.totalSupply) * 100).toFixed(2)
+            : '';
+    const preMintedDataToShow =
+        tokenInfo.preMintedSupply !== 0 ? `${tokenPreMinted} (${preMintedPercentage}%)` : 0;
+    const age = tokenInfo.creationDate;
     return (
         <Card sx={{ height: '20vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
