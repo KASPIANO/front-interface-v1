@@ -1,5 +1,5 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
-import { Token, TokenListItemResponse, TokenSearchItems } from '../types/Types';
+import { Token, TokenListItemResponse, TokenResponse, TokenSearchItems } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
@@ -37,13 +37,13 @@ export async function fetchAllTokens(
     }
 }
 
-export async function fetchTokenByTicker(ticker: string): Promise<Token> {
+export async function fetchTokenByTicker(ticker: string): Promise<TokenResponse> {
     try {
-        const response = await backendService.get<Token>(`/${KRC20CONTROLLER}/${ticker}`);
+        const response = await backendService.get<TokenResponse>(`/${KRC20CONTROLLER}/${ticker}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching token from backend:', error);
-        return {} as Token;
+        return {} as TokenResponse;
     }
 }
 

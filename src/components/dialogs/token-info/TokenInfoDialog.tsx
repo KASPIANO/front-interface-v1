@@ -11,13 +11,13 @@ import {
 } from '@mui/material';
 import { DialogContainer } from './TokenDialogInfo.s';
 import { UploadContainer, ImagePreview, UploadButton } from '../../../pages/deploy-page/DeployPage.s';
-import { TokenMetadata } from '../../../types/Types';
+import { TokenMetadata, TokenMetadataResponse } from '../../../types/Types';
 import { GlobalStyleDialog } from '../../../utils/GlobalStyleScrollBar';
 
 interface TokenInfoDialogProps {
     open: boolean;
     onClose: () => void;
-    onSave: (tokenInfo: TokenMetadata) => void;
+    onSave: (tokenInfo: TokenMetadataResponse) => void;
 }
 
 const TokenInfoDialog: React.FC<TokenInfoDialogProps> = ({ open, onClose, onSave }) => {
@@ -32,17 +32,15 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = ({ open, onClose, onSave
 
     const handleSave = () => {
         const contactsArr = contacts.split(',');
-        const tokenMetadata: TokenMetadata = {
-            ticker: tokenName,
+        const tokenMetadata: Partial<TokenMetadataResponse> = {
             description,
             socials: {
                 telegram,
                 website,
                 x,
             },
-
-            logo,
-            banner,
+            logoUrl: logo,
+            bannerUrl: banner,
             contacts: contactsArr,
         };
 

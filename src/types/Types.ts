@@ -27,21 +27,20 @@ export interface Token {
 
 export interface TokenResponse {
     ticker: string;
-    maxSupply: number;
+    creationDate: number;
+    totalSupply: number;
+    totalMintTimes: number;
+    totalMinted: number;
+    totalMintedPercent: number;
+    totalHolders: number;
+    preMintedSupply: number;
     topHolders: TokenHolder[];
-    logo: string;
-    banner: string;
-    totalTrades: number;
-    mintedSupply: number;
-    mintedSupplyPercent: number;
     mintLimit: number;
     devWallet: string;
-    totalHolders: number;
-    totalMints: number;
-    contacts: string[];
+    metadata: TokenMetadataResponse;
     volume?: number;
     price?: number;
-    metadata: TokenMetadataResponse;
+    totalTrades?: number;
 }
 
 export interface TokenMetadataResponse {
@@ -50,6 +49,7 @@ export interface TokenMetadataResponse {
     description: string;
     socials: TokenSocials;
     sentiment: TokenSentiment;
+    contacts: string[];
 }
 
 export interface TokenListItemResponse {
