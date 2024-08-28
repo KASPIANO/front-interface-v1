@@ -38,9 +38,9 @@ export interface TokenResponse {
     mintLimit: number;
     devWallet: string;
     metadata: TokenMetadataResponse;
+    totalTrades: number;
     volume?: number;
     price?: number;
-    totalTrades?: number;
 }
 
 export interface TokenMetadataResponse {
@@ -50,6 +50,7 @@ export interface TokenMetadataResponse {
     socials: TokenSocials;
     sentiment: TokenSentiment;
     contacts: string[];
+    rugScore: number;
 }
 
 export interface TokenListItemResponse {
@@ -71,11 +72,11 @@ export interface TokenSearchItems {
 }
 
 export interface TokenSentiment {
-    warning: string;
-    negative: string;
-    neutral: string;
-    positive: string;
-    love: string;
+    warning: number;
+    negative: number;
+    neutral: number;
+    positive: number;
+    love: number;
 }
 
 export interface TokenSocials {
