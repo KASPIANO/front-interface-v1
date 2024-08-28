@@ -70,13 +70,12 @@ const RealTimeGraph: React.FC<RealTimeGraphProps> = ({ newDates, newPrices }) =>
                     paper_bgcolor: theme.palette.background.paper,
                     plot_bgcolor: theme.palette.background.paper,
 
-                    width: 920,
-                    height: 205,
                     xaxis: { automargin: true },
                     yaxis: { title: 'Price', automargin: true },
                     margin: { t: 35, r: 35, b: 35, l: 40 }, // Adjust margin as needed
                     hovermode: 'closest',
                 }}
+                style={{ width: '100%', height: '100%' }}
                 config={{
                     displayModeBar: true, // Keep the mode bar for reset button
                     modeBarButtonsToRemove: [

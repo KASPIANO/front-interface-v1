@@ -38,12 +38,18 @@ export interface TokenResponse {
     devWallet: string;
     totalHolders: number;
     totalMints: number;
-    socials: TokenSocials;
     contacts: string[];
-    description: string;
-    sentiment: TokenSentiment;
     volume?: number;
     price?: number;
+    metadata: TokenMetadataResponse;
+}
+
+export interface TokenMetadataResponse {
+    logoUrl: string;
+    bannerUrl: string;
+    description: string;
+    socials: TokenSocials;
+    sentiment: TokenSentiment;
 }
 
 export interface TokenListItem {
@@ -55,6 +61,17 @@ export interface TokenListItem {
     maxMintedPercent: number;
     totalHolders: number;
     pre: number;
+    logoUrl: string;
+    bannerUrl: string;
+}
+export interface TokenListItemResponse {
+    ticker: string;
+    creationDate: number;
+    totalSupply: number;
+    totalMinted: number;
+    totalMintedPercent: number;
+    totalHolders: number;
+    preMintedSupply: number;
     logoUrl: string;
     bannerUrl: string;
 }
@@ -127,6 +144,13 @@ export interface TokenDeploy {
     logo?: File;
     banner?: File;
     transactionHash?: string;
+    whitepaper?: string;
+    medium?: string;
+    audit?: string;
+    contract?: string;
+    github?: string;
+    contacts?: string[];
+    founders?: string[];
 }
 
 export interface TokenMetadata {

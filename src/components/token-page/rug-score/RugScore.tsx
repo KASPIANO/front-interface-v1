@@ -90,7 +90,14 @@ const RugScore: FC<RugScoreProps> = (props) => {
     };
 
     return (
-        <Card sx={{ height: '19vh', padding: '8px 10px' }}>
+        <Card
+            sx={{
+                height: '18vh',
+                padding: '8px 10px',
+                display: 'flex',
+                flexDirection: 'column',
+            }}
+        >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold', mr: 1 }}>
@@ -109,7 +116,7 @@ const RugScore: FC<RugScoreProps> = (props) => {
                 )}
             </Box>
             {!xHandle && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '2vh' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: '3vh' }}>
                     <Button variant="outlined" startIcon={<AddCircleOutlineIcon />} onClick={handleOpenDialog}>
                         List Project to show score
                     </Button>

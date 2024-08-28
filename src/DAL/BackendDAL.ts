@@ -123,6 +123,5 @@ export async function searchToken(query: string, cancelToken: CancelToken = null
     }
 
     const response = await backendService.get<TokenSearchItems[]>(`/${KRC20CONTROLLER}/search`, requestOptions);
-
     return response.data;
 }

@@ -22,11 +22,9 @@ const DeployDialog: React.FC<DeployDialogProps> = ({ open, onClose, onDeploy, to
         </DialogContent>
         <DialogActions>
             <Box sx={{ flexGrow: 1 }}>
-                <Button onClick={onClose} color="secondary">
-                    Cancel
-                </Button>
+                <Button onClick={onClose}>Cancel</Button>
             </Box>
-            <Button onClick={onDeploy} color="secondary">
+            <Button onClick={onDeploy} variant="contained">
                 Deploy
             </Button>
         </DialogActions>

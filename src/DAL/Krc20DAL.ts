@@ -69,7 +69,7 @@ export const fetchTokens = async (next?: string): Promise<TokenListResponse> => 
 export const fetchTokenInfo = async (tick: string, holders = true): Promise<Token> => {
     try {
         const response = await KRC20InfoService.get<any>(`krc20/token/${tick}?holder=${holders}`);
-        return response.data.result;
+        return response.data.result[0];
     } catch (error) {
         console.error('Error fetching token info:', error);
         return {} as Token;

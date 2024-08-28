@@ -34,6 +34,14 @@ const alertIconColors = {
     loading: '#FBC02D',
 };
 
+const autoHideDuration = {
+    error: 6000,
+    success: 4000,
+    warning: 8000,
+    info: 4000,
+    loading: null,
+};
+
 function SlideTransition(props: SlideProps) {
     return <Slide {...props} direction="left" />;
 }
@@ -82,7 +90,7 @@ const SnackbarComponent: React.FC = () => {
             {alert && (
                 <Snackbar
                     open={alert.open}
-                    autoHideDuration={4000}
+                    autoHideDuration={autoHideDuration[alert.severity]}
                     onClose={handleClose}
                     anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                     sx={{ marginTop: '64px' }}

@@ -20,7 +20,7 @@ export const TextInfo = styled(TextField)(({ theme }) => ({
     marginBottom: '2vh',
 
     '& .MuiFormHelperText-root': {
-        color: theme.palette.success.main,
+        color: theme.palette.success.secondary,
     },
 }));
 
