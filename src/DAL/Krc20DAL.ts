@@ -1,4 +1,4 @@
-import { Token, TokenListResponse } from '../types/Types';
+import { Krc20ApiTokenListResponse, Krc20ApiTokenResponse } from '../types/Types';
 import { KRC20InfoService } from './AxiosInstaces';
 
 export const fetchReceivingBalance = async (address: string, tokenSymbol: string): Promise<number> => {
@@ -45,7 +45,7 @@ export async function fetchMintHistory(ticker: string, urlParams = ''): Promise<
     }
 }
 
-export const fetchTokens = async (next?: string): Promise<TokenListResponse> => {
+export const fetchTokens = async (next?: string): Promise<Krc20ApiTokenListResponse> => {
     try {
         const nextString = next ? `?next=${next}` : '';
         const response = await KRC20InfoService.get<any>(`krc20/tokenlist${nextString}`);
@@ -66,13 +66,13 @@ export const fetchTokens = async (next?: string): Promise<TokenListResponse> => 
     }
 };
 
-export const fetchTokenInfo = async (tick: string, holders = true): Promise<Token> => {
+export const fetchTokenInfo = async (tick: string, holders = true): Promise<Krc20ApiTokenResponse> => {
     try {
         const response = await KRC20InfoService.get<any>(`krc20/token/${tick}?holder=${holders}`);
         return response.data.result[0];
     } catch (error) {
         console.error('Error fetching token info:', error);
-        return {} as Token;
+        return {} as Krc20ApiTokenResponse;
     }
 };
 

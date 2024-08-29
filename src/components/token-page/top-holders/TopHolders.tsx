@@ -1,12 +1,12 @@
 import { FC, useEffect, useState } from 'react';
 import { Box, Card, Divider, Tooltip, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
-import { TokenResponse } from '../../../types/Types';
+import { BackendTokenResponse } from '../../../types/Types';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { fetchDevWalletBalance } from '../../../DAL/Krc20DAL';
 
 interface TopHoldersProps {
-    tokenInfo: TokenResponse;
+    tokenInfo: BackendTokenResponse;
 }
 
 const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
@@ -37,9 +37,7 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
             }
 
             // Calculate top holders percentage
-            const totalHolding = holdersToCalculate
-                .map((h) => parseFloat(h.amount))
-                .reduce((acc, curr) => acc + curr, 0);
+            const totalHolding = holdersToCalculate.map((h) => h.balance).reduce((acc, curr) => acc + curr, 0);
 
             const totalPercentage = (totalHolding / totalSupply) * 100;
             const totalPercentageFixed = totalPercentage ? totalPercentage.toFixed(2) : '---';

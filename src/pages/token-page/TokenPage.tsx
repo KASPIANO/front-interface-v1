@@ -5,7 +5,7 @@ import TokenHeader from '../../components/token-page/token-header/TokenHeader';
 import TokenSideBar from '../../components/token-page/token-sidebar/TokenSideBar';
 import TokenStats from '../../components/token-page/token-stats/TokenStats';
 import TopHolders from '../../components/token-page/top-holders/TopHolders';
-import { TokenResponse } from '../../types/Types';
+import { BackendTokenResponse } from '../../types/Types';
 import { TokenPageLayout } from './TokenPageLayout';
 import TokenGraph from '../../components/token-page/token-graph/TokenGraph';
 import RugScore from '../../components/token-page/rug-score/RugScore';
@@ -27,7 +27,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const { walletConnected, walletBalance } = props;
     const { ticker } = useParams();
     const { backgroundBlur, setWalletBalance } = props;
-    const [tokenInfo, setTokenInfo] = useState<TokenResponse>(null);
+    const [tokenInfo, setTokenInfo] = useState<BackendTokenResponse>(null);
     const [tokenXHandle, setTokenXHandle] = useState(false);
 
     useEffect(() => {
@@ -66,7 +66,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             )}
             {getComponentToShow(
                 <RugScore
-                    score={66}
+                    score={tokenInfo?.metadata?.rugScore}
                     onRecalculate={() => {}}
                     xHandle={tokenXHandle}
                     setWalletBalance={setWalletBalance}

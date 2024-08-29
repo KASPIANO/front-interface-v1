@@ -2,14 +2,14 @@ import { Tab, Tabs } from '@mui/material';
 import TabPanel from '@mui/lab/TabPanel';
 import TabContext from '@mui/lab/TabContext';
 import { FC, useState, SyntheticEvent } from 'react';
-import { TokenResponse } from '../../../types/Types';
+import { BackendTokenResponse } from '../../../types/Types';
 import { SideBarContainer } from './TokenSideBar.s';
 import TokenSideBarInfo from './token-sidebar-info/TokenSideBarInfo';
 import { GlobalStyleTokenSideBar } from '../../../utils/GlobalStyleScrollBar';
 
 interface TokenSideBarProps {
-    tokenInfo: TokenResponse;
-    setTokenInfo: (tokenInfo: TokenResponse) => void;
+    tokenInfo: BackendTokenResponse;
+    setTokenInfo: (tokenInfo: BackendTokenResponse) => void;
 }
 
 const TokenSideBar: FC<TokenSideBarProps> = (props) => {

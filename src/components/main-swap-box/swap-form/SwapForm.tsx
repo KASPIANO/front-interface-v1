@@ -1,7 +1,7 @@
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
 import React from 'react';
 import { BalanceButtons, BalanceText } from '../../../pages/swap-page/SwapPage.s';
-import { TokenResponse } from '../../../types/Types';
+import { BackendTokenResponse } from '../../../types/Types';
 import CurrencyBox from '../currency-box/CurrencyBox';
 import { BalanceInfo, Label, SwapButton, SwapContainer, SwitchButton } from './SwapForm.s';
 
@@ -22,7 +22,7 @@ interface SwapFormProps {
     switchAssets: () => void;
     connectWallet: () => void;
     openTokenModal: (isPaying: boolean) => void;
-    tokens: TokenResponse[];
+    tokens: BackendTokenResponse[];
 }
 
 const SwapForm: React.FC<SwapFormProps> = (props) => {
