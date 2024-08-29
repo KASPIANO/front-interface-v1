@@ -1,12 +1,12 @@
 import { FC, useEffect, useState } from 'react';
 import { Box, Card, Divider, Tooltip, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
-import { TokenResponse } from '../../../types/Types';
+import { BackendTokenResponse } from '../../../types/Types';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { fetchDevWalletBalance } from '../../../DAL/Krc20DAL';
 
 interface TopHoldersProps {
-    tokenInfo: TokenResponse;
+    tokenInfo: BackendTokenResponse;
 }
 
 const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
@@ -28,18 +28,15 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
             try {
                 // Fetch dev wallet balance
                 const devWalletBalance = await fetchDevWalletBalance(tokenInfo.ticker, tokenInfo.devWallet);
-                const devWalletBalanceKAS = parseFloat(devWalletBalance) / 1e8;
 
-                const devWalletPercent = devWalletBalanceKAS === 0 ? 0 : (devWalletBalanceKAS / totalSupply) * 100;
+                const devWalletPercent = devWalletBalance === 0 ? 0 : (devWalletBalance / totalSupply) * 100;
                 setDevWalletPercentage(`${devWalletPercent.toFixed(2)}%`);
             } catch (error) {
                 console.error('Error fetching dev wallet balance:', error);
             }
 
             // Calculate top holders percentage
-            const totalHolding = holdersToCalculate
-                .map((h) => parseFloat(h.amount))
-                .reduce((acc, curr) => acc + curr, 0);
+            const totalHolding = holdersToCalculate.map((h) => h.balance).reduce((acc, curr) => acc + curr, 0);
 
             const totalPercentage = (totalHolding / totalSupply) * 100;
             const totalPercentageFixed = totalPercentage ? totalPercentage.toFixed(2) : '---';

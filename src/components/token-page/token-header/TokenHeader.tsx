@@ -1,10 +1,10 @@
 import { FC } from 'react';
-import { TokenResponse } from '../../../types/Types';
+import { BackendTokenResponse } from '../../../types/Types';
 import { HeaderContainer, PriceContainer, Rank, Title, TitleHeaderContainer } from './TokenHeader.s';
 import { Avatar, Typography } from '@mui/material';
 
 interface TokenHeaderProps {
-    tokenInfo: TokenResponse;
+    tokenInfo: BackendTokenResponse;
 }
 
 const TokenHeader: FC<TokenHeaderProps> = (props) => {

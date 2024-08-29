@@ -6,7 +6,7 @@ import MiniNavbar from '../../components/mini-navbar/MiniNavbar';
 import SlippageModal from '../../components/modals/slippage-modal/SlippageModal';
 import WalletModal from '../../components/modals/wallet-modal/WalletModal';
 import NotificationComponent from '../../components/notification/Notification';
-import { Token, TokenResponse } from '../../types/Types';
+import { BackendTokenResponse } from '../../types/Types';
 import { BlurOverlay, Heading, MainContent } from './SwapPage.s';
 import { SwapLayout } from './SwapPageLayout';
 
@@ -43,7 +43,7 @@ const SwapPage: FC<SwapPageProps> = (props) => {
     const [slippageMode, setSlippageMode] = useState<string>('Auto');
     const [slippageValue, setSlippageValue] = useState<string>('1%');
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-    const [tokens] = useState<TokenResponse[]>([]);
+    const [tokens] = useState<BackendTokenResponse[]>([]);
 
     // useEffect(() => {
     //     const handleAccountsChanged = async (accounts: string[]) => {
@@ -151,11 +151,11 @@ const SwapPage: FC<SwapPageProps> = (props) => {
         setIsBlurred(false);
     };
 
-    const handleTokenSelect = (token: Token) => {
+    const handleTokenSelect = (token: BackendTokenResponse) => {
         if (isPayingTokenModal) {
-            setPayingCurrencyImage(token.logo);
+            setPayingCurrencyImage(token.metadata?.logoUrl);
         } else {
-            setReceivingCurrencyImage(token.logo);
+            setReceivingCurrencyImage(token.metadata?.logoUrl);
         }
         closeTokenModal();
     };

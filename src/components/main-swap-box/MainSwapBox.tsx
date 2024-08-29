@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Box } from '@mui/material';
-import { Token, TokenResponse } from '../../types/Types';
+import { BackendTokenResponse } from '../../types/Types';
 import SlippageControl from './box-settings/BoxSettings';
 import SwapForm from './swap-form/SwapForm';
 
@@ -25,10 +25,10 @@ interface MainSwapBoxProps {
     slippageMode: string;
     slippageValue: string;
     openSlippageModal: () => void;
-    handleTokenSelect: (token: Token) => void;
+    handleTokenSelect: (token: BackendTokenResponse) => void;
     closeTokenModal: () => void;
     handleSlippageSave: (mode: string, value: string) => void;
-    tokens: TokenResponse[];
+    tokens: BackendTokenResponse[];
 }
 
 const MainSwapBox: React.FC<MainSwapBoxProps> = ({

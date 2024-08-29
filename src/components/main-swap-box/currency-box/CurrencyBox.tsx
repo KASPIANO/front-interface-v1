@@ -1,13 +1,13 @@
 import { FormControl } from '@mui/material';
 import { FC } from 'react';
-import { TokenResponse } from '../../../types/Types';
+import { BackendTokenResponse } from '../../../types/Types';
 import { StyledAmountInput, StyledInputContainer } from './CurrencyBox.s';
 
 interface CurrencyBoxProps {
     active: boolean;
     paying: string;
     setPaying: (value: string) => void;
-    tokens: TokenResponse[];
+    tokens: BackendTokenResponse[];
 }
 
 const CurrencyBox: FC<CurrencyBoxProps> = (props) => {
@@ -19,8 +19,8 @@ const CurrencyBox: FC<CurrencyBoxProps> = (props) => {
                 {/* <TokensAutocomplete
                     id="token-autocomplete"
                     options={tokens}
-                    getOptionLabel={(option: TokenResponse) => option.tick}
-                    renderOption={(option: TokenResponse) => (
+                    getOptionLabel={(option: BackendTokenResponse) => option.tick}
+                    renderOption={(option: BackendTokenResponse) => (
                         <img
                             src={option.logo}
                             alt={option.tick}

@@ -1,4 +1,4 @@
-import { Token, TokenListResponse } from '../types/Types';
+import { Krc20ApiTokenListResponse, Krc20ApiTokenResponse } from '../types/Types';
 import { KRC20InfoService } from './AxiosInstaces';
 
 export const fetchReceivingBalance = async (address: string, tokenSymbol: string): Promise<number> => {
@@ -45,7 +45,7 @@ export async function fetchMintHistory(ticker: string, urlParams = ''): Promise<
     }
 }
 
-export const fetchTokens = async (next?: string): Promise<TokenListResponse> => {
+export const fetchTokens = async (next?: string): Promise<Krc20ApiTokenListResponse> => {
     try {
         const nextString = next ? `?next=${next}` : '';
         const response = await KRC20InfoService.get<any>(`krc20/tokenlist${nextString}`);
@@ -66,13 +66,13 @@ export const fetchTokens = async (next?: string): Promise<TokenListResponse> => 
     }
 };
 
-export const fetchTokenInfo = async (tick: string, holders = true): Promise<Token> => {
+export const fetchTokenInfo = async (tick: string, holders = true): Promise<Krc20ApiTokenResponse> => {
     try {
         const response = await KRC20InfoService.get<any>(`krc20/token/${tick}?holder=${holders}`);
         return response.data.result[0];
     } catch (error) {
         console.error('Error fetching token info:', error);
-        return {} as Token;
+        return {} as Krc20ApiTokenResponse;
     }
 };
 
@@ -104,9 +104,12 @@ export async function fetchTotalTokensDeployed(): Promise<number> {
         return 0;
     }
 }
-export async function fetchDevWalletBalance(ticker: string, devWallet: string): Promise<any> {
+export async function fetchDevWalletBalance(ticker: string, devWallet: string): Promise<number> {
     const response = await KRC20InfoService.get<any>(`krc20/address/${devWallet}/token/${ticker}`);
-    return response.data.result[0].balance;
+
+    const balance = response.data.result[0].balance || '0';
+
+    return parseFloat(balance) / 1e8;
 }
 // This iterates through the 50 items from the api and fecthes the token info for each token, in the data base the token details and al together in the ticker, no need for 2 requests
 // the only thing is that you need to do pagination, 50 tokes per request, make it so that you can implement sort by relevant headers in the table, and also by the relevant time frame,

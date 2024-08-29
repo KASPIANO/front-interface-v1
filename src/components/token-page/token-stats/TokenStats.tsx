@@ -1,10 +1,10 @@
 import { FC, useState } from 'react';
 import { Box, Card, Divider, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
-import { TokenResponse } from '../../../types/Types';
+import { BackendTokenResponse } from '../../../types/Types';
 
 interface TokenStatsProps {
-    tokenInfo: TokenResponse;
+    tokenInfo: BackendTokenResponse;
 }
 
 function calculateAgeInDays(timestamp) {

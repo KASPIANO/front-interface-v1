@@ -1,11 +1,11 @@
 import { FC } from 'react';
 import { Box, Button, Card, Tooltip, Typography } from '@mui/material';
-import { TokenResponse } from '../../../types/Types';
+import { BackendTokenResponse } from '../../../types/Types';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 
 interface MintingComponentProps {
-    tokenInfo: TokenResponse;
+    tokenInfo: BackendTokenResponse;
     walletConnected: boolean;
     walletBalance: number;
 }

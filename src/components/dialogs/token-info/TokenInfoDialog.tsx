@@ -11,13 +11,13 @@ import {
 } from '@mui/material';
 import { DialogContainer } from './TokenDialogInfo.s';
 import { UploadContainer, ImagePreview, UploadButton } from '../../../pages/deploy-page/DeployPage.s';
-import { TokenMetadataResponse } from '../../../types/Types';
+import { BackendTokenMetadata } from '../../../types/Types';
 import { GlobalStyleDialog } from '../../../utils/GlobalStyleScrollBar';
 
 interface TokenInfoDialogProps {
     open: boolean;
     onClose: () => void;
-    onSave: (tokenInfo: Partial<TokenMetadataResponse>) => void;
+    onSave: (tokenInfo: Partial<BackendTokenMetadata>) => void;
 }
 
 const TokenInfoDialog: React.FC<TokenInfoDialogProps> = ({ open, onClose, onSave }) => {
@@ -32,7 +32,7 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = ({ open, onClose, onSave
 
     const handleSave = () => {
         const contactsArr = contacts.split(',');
-        const tokenMetadata: Partial<TokenMetadataResponse> = {
+        const tokenMetadata: Partial<BackendTokenMetadata> = {
             description,
             socials: {
                 telegram,

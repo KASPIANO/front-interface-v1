@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { TokenMetadataResponse, TokenResponse, TokenSentiment } from '../../../../types/Types';
+import { BackendTokenMetadata, BackendTokenResponse, TokenSentiment } from '../../../../types/Types';
 import { Box, Typography } from '@mui/material';
 import { SentimentButton, SentimentsContainerBox, TokenProfileContainer, StatCard } from './TokenSideBarInfo.s';
 import { RocketLaunchRounded, SentimentNeutralRounded, TrendingDownRounded } from '@mui/icons-material';
@@ -19,7 +19,7 @@ export type SentimentButtonsConfig = {
 };
 
 interface TokenSideBarInfoProps {
-    tokenInfo: TokenResponse;
+    tokenInfo: BackendTokenResponse;
     setTokenInfo: (tokenInfo: any) => void;
     priceInfo?: any;
 }
@@ -51,12 +51,11 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                 neutral: 0,
                 negative: 0,
                 warning: 0,
-            }
+            },
         );
-
     }, [tokenInfo]);
     const getSentimentIconValueToDisplay = (key: string): string =>
-        sentimentValues ? (sentimentValues[key] || "0") : '---';
+        sentimentValues ? sentimentValues[key] || '0' : '---';
 
     const onSentimentButtonClick = (key: string) => {
         setSelectedSentiment(key);
@@ -69,13 +68,13 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         setShowTokenInfoDialog(true);
     };
 
-    const handleSaveTokenInfo = (newTokenInfo: Partial<TokenMetadataResponse>) => {
+    const handleSaveTokenInfo = (newTokenInfo: Partial<BackendTokenMetadata>) => {
         // Here you would typically update the token info in your backend
         console.log('New token info:', newTokenInfo);
 
         // Merge the new token info with the existing token info
-        setTokenInfo((prevInfo: TokenResponse) => {
-            const updatedInfo: TokenResponse = {
+        setTokenInfo((prevInfo: BackendTokenResponse) => {
+            const updatedInfo: BackendTokenResponse = {
                 ...prevInfo,
                 metadata: {
                     ...prevInfo.metadata,
@@ -170,7 +169,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             MKT CAP
                         </Typography>
                         <Typography variant="body2" align="center">
-                            {priceInfo ? parseInt(tokenInfo.max) * priceInfo.liquidity : '156M'}
+                            {priceInfo ? tokenInfo.totalSupply * priceInfo.liquidity : '---'}
                         </Typography>
                     </StatCard>
                 </Stack>
