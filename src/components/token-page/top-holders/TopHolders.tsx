@@ -28,9 +28,8 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
             try {
                 // Fetch dev wallet balance
                 const devWalletBalance = await fetchDevWalletBalance(tokenInfo.ticker, tokenInfo.devWallet);
-                const devWalletBalanceKAS = parseFloat(devWalletBalance) / 1e8;
 
-                const devWalletPercent = devWalletBalanceKAS === 0 ? 0 : (devWalletBalanceKAS / totalSupply) * 100;
+                const devWalletPercent = devWalletBalance === 0 ? 0 : (devWalletBalance / totalSupply) * 100;
                 setDevWalletPercentage(`${devWalletPercent.toFixed(2)}%`);
             } catch (error) {
                 console.error('Error fetching dev wallet balance:', error);
