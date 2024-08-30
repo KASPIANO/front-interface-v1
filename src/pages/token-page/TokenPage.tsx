@@ -5,12 +5,12 @@ import TokenHeader from '../../components/token-page/token-header/TokenHeader';
 import TokenSideBar from '../../components/token-page/token-sidebar/TokenSideBar';
 import TokenStats from '../../components/token-page/token-stats/TokenStats';
 import TopHolders from '../../components/token-page/top-holders/TopHolders';
-import { fetchTokenInfo } from '../../DAL/Krc20DAL';
-import { Token } from '../../types/Types';
+import { BackendTokenResponse } from '../../types/Types';
 import { TokenPageLayout } from './TokenPageLayout';
 import TokenGraph from '../../components/token-page/token-graph/TokenGraph';
 import RugScore from '../../components/token-page/rug-score/RugScore';
 import MintingComponent from '../../components/token-page/minting-status/MintingStatus';
+import { fetchTokenByTicker } from '../../DAL/BackendDAL';
 
 interface TokenPageProps {
     walletAddress: string | null;
@@ -27,14 +27,14 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const { walletConnected, walletBalance } = props;
     const { ticker } = useParams();
     const { backgroundBlur, setWalletBalance } = props;
-    const [tokenInfo, setTokenInfo] = useState<Token>(null);
+    const [tokenInfo, setTokenInfo] = useState<BackendTokenResponse>(null);
     const [tokenXHandle, setTokenXHandle] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await fetchTokenInfo(ticker);
-                setTokenInfo(data[0]);
+                const data = await fetchTokenByTicker(ticker);
+                setTokenInfo(data);
             } catch (error) {
                 console.error('Error fetching token info:', error);
             }
@@ -45,7 +45,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
 
     useEffect(() => {
         if (tokenInfo) {
-            setTokenXHandle(!!tokenInfo.socials?.x);
+            setTokenXHandle(!!tokenInfo.metadata.socials?.x);
         }
     }, [tokenInfo]);
 
@@ -66,7 +66,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             )}
             {getComponentToShow(
                 <RugScore
-                    score={66}
+                    score={tokenInfo?.metadata?.rugScore}
                     onRecalculate={() => {}}
                     xHandle={tokenXHandle}
                     setWalletBalance={setWalletBalance}

@@ -1,10 +1,10 @@
 import { FC, useState } from 'react';
 import { Box, Card, Divider, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
-import { Token } from '../../../types/Types';
+import { BackendTokenResponse } from '../../../types/Types';
 
 interface TokenStatsProps {
-    tokenInfo: Token;
+    tokenInfo: BackendTokenResponse;
 }
 
 function calculateAgeInDays(timestamp) {
@@ -34,11 +34,14 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         setTradingDataTimeFrame(value);
     };
 
-    const tokenPreMinted = tokenInfo.pre ? parseInt(tokenInfo.pre) / 1e8 : '39420';
+    const tokenPreMinted = tokenInfo.preMintedSupply ? tokenInfo.preMintedSupply : '39420';
     const preMintedPercentage =
-        tokenInfo.pre !== '0' ? ((parseInt(tokenInfo.pre) / parseInt(tokenInfo.max)) * 100).toFixed(2) : '';
-    const preMintedDataToShow = tokenInfo.pre !== '0' ? `${tokenPreMinted} (${preMintedPercentage}%)` : '0';
-    const age = tokenInfo.mtsAdd;
+        tokenInfo.preMintedSupply !== 0
+            ? ((tokenInfo.preMintedSupply / tokenInfo.totalSupply) * 100).toFixed(2)
+            : '';
+    const preMintedDataToShow =
+        tokenInfo.preMintedSupply !== 0 ? `${tokenPreMinted} (${preMintedPercentage}%)` : 0;
+    const age = tokenInfo.creationDate;
     return (
         <Card sx={{ height: '20vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -66,7 +69,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     <Typography variant="body2" align="center">
                         VOLUME ({tradingDataTimeFrame})
                     </Typography>
-                    <Typography variant="body2" align="center">
+                    <Typography variant="body2" align="center" sx={{ fontWeight: 'bold' }}>
                         {tokenInfo.volume ? `$${tokenInfo.volume}` : '$69,420,880'}
                     </Typography>
                 </Box>
@@ -76,7 +79,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     <Typography variant="body2" align="center">
                         PRICE PER TOKEN ({tradingDataTimeFrame})
                     </Typography>
-                    <Typography variant="body2" align="center">
+                    <Typography variant="body2" align="center" sx={{ fontWeight: 'bold' }}>
                         {tokenInfo.price ? `${tokenInfo.price}/SOMPI` : '69,420/SOMPI'}
                     </Typography>
                 </Box>
@@ -85,7 +88,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     <Typography variant="body2" align="center">
                         PRE MINTED
                     </Typography>
-                    <Typography variant="body2" align="center">
+                    <Typography variant="body2" align="center" sx={{ fontWeight: 'bold' }}>
                         {preMintedDataToShow}
                     </Typography>
                 </Box>
@@ -94,7 +97,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     <Typography variant="body2" align="center">
                         AGE
                     </Typography>
-                    <Typography variant="body2" align="center">
+                    <Typography variant="body2" align="center" sx={{ fontWeight: 'bold' }}>
                         {calculateAgeInDays(age)} days
                     </Typography>
                 </Box>

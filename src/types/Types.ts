@@ -1,60 +1,61 @@
-export interface Token {
-    tick?: string;
-    ticker?: string;
-    logo?: string;
-    banner?: string;
-    state: string;
+export interface Krc20ApiTokenResponse {
+    tick: string;
     max: string;
-    minted: string;
-    pre: string;
-    mtsAdd: string;
     lim: string;
-    totalHolders: number;
-    topHolders?: TokenHolder[];
-    transferTotal?: string;
-    sentiment?: TokenSentiment;
-    description?: string;
-    socials?: TokenSocials;
-    contacts?: string[];
-    devWallet?: string;
-    totalMints: string;
-    holder?: TokenHolder[];
-    to?: string;
+    dec: string;
+    minted: string;
+    opScoreAdd: string;
+    opScoreMod: string;
+    state: string;
+    hashRev: string;
+    mtsAdd: string;
+    holderTotal: string;
+    transferTotal: string;
     mintTotal: string;
-    volume?: string;
-    price?: string;
+    holder: Krc20ApiTokenHolder[];
 }
 
-export interface TokenResponse {
+export interface Krc20ApiTokenHolder {
+    address: string;
+    amount: string;
+}
+
+export interface BackendTokenResponse {
     ticker: string;
-    maxSupply: number;
-    topHolders: TokenHolder[];
-    logo: string;
-    banner: string;
-    totalTrades: number;
-    mintedSupply: number;
-    mintedSupplyPercent: number;
+    creationDate: number;
+    totalSupply: number;
+    totalMintTimes: number;
+    totalMinted: number;
+    totalMintedPercent: number;
+    totalHolders: number;
+    preMintedSupply: number;
+    topHolders: BackendTokenHolder[];
     mintLimit: number;
     devWallet: string;
-    totalHolders: number;
-    totalMints: number;
-    socials: TokenSocials;
-    contacts: string[];
-    description: string;
-    sentiment: TokenSentiment;
+    metadata: BackendTokenMetadata;
+    totalTrades: number;
     volume?: number;
     price?: number;
 }
 
-export interface TokenListItem {
-    tick: string;
-    ticker?: string;
-    mtsAdd: number;
-    max: number;
-    minted: number;
-    maxMintedPercent: number;
+export interface BackendTokenMetadata {
+    logoUrl: string;
+    bannerUrl: string;
+    description: string;
+    socials: TokenSocials;
+    sentiment: TokenSentiment;
+    contacts: string[];
+    rugScore: number;
+}
+
+export interface TokenListItemResponse {
+    ticker: string;
+    creationDate: number;
+    totalSupply: number;
+    totalMinted: number;
+    totalMintedPercent: number;
     totalHolders: number;
-    pre: number;
+    preMintedSupply: number;
     logoUrl: string;
     bannerUrl: string;
 }
@@ -66,11 +67,11 @@ export interface TokenSearchItems {
 }
 
 export interface TokenSentiment {
-    warning: string;
-    negative: string;
-    neutral: string;
-    positive: string;
-    love: string;
+    warning: number;
+    negative: number;
+    neutral: number;
+    positive: number;
+    love: number;
 }
 
 export interface TokenSocials {
@@ -87,13 +88,13 @@ export interface TokenSocials {
     other?: string;
 }
 
-export interface TokenHolder {
+export interface BackendTokenHolder {
     address: string;
-    amount: string;
+    balance: number;
 }
 
-export interface TokenListResponse {
-    result: TokenResponse[];
+export interface Krc20ApiTokenListResponse {
+    result: Krc20ApiTokenResponse[];
     next: string;
     prev: string;
 }
@@ -127,16 +128,13 @@ export interface TokenDeploy {
     logo?: File;
     banner?: File;
     transactionHash?: string;
-}
-
-export interface TokenMetadata {
-    ticker: string;
-    banner?: string;
-    logo?: string;
-    description?: string;
-    socials?: TokenSocials;
-    sentiment?: TokenSentiment;
+    whitepaper?: string;
+    medium?: string;
+    audit?: string;
+    contract?: string;
+    github?: string;
     contacts?: string[];
+    founders?: string[];
 }
 
 export interface TokenInfoDialog {

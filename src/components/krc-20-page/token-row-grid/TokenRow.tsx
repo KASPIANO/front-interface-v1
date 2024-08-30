@@ -14,13 +14,13 @@ import {
 } from '@mui/material';
 import moment from 'moment';
 import { FC } from 'react';
-import { TokenListItem } from '../../../types/Types';
+import { TokenListItemResponse } from '../../../types/Types';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import { capitalizeFirstLetter, formatDate, formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 
 interface TokenRowProps {
-    token: TokenListItem;
+    token: TokenListItemResponse;
     handleItemClick: (token: any) => void;
     tokenKey: string;
     walletBalance: number;
@@ -110,25 +110,25 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                                 borderRadius: 5,
                             }}
                             variant="square"
-                            alt={token.tick}
+                            alt={token.ticker}
                             src={token.logoUrl}
                         />
                     </ListItemAvatar>
 
                     <ListItemText
                         sx={{
-                            maxWidth: '16.5%',
+                            maxWidth: '17%',
                         }}
                         primary={
-                            <Tooltip title={token.tick}>
+                            <Tooltip title={token.ticker}>
                                 <Typography variant="body1" style={{ fontSize: '1vw' }}>
-                                    {capitalizeFirstLetter(token.tick)}
+                                    {capitalizeFirstLetter(token.ticker)}
                                 </Typography>
                             </Tooltip>
                         }
                         secondary={
                             <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
-                                {formatDate(token.mtsAdd)}
+                                {formatDate(token.creationDate)}
                             </Typography>
                         }
                     />
@@ -140,26 +140,26 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                                 variant="body2"
                                 style={{ fontSize: '1vw', display: 'flex', justifyContent: 'flex-start' }}
                             >
-                                {`${moment().diff(Number(token.mtsAdd), 'days')} days`}
+                                {`${moment().diff(Number(token.creationDate), 'days')} days`}
                             </Typography>
                         }
                     />
                     <ListItemText
                         sx={{ maxWidth: '13%' }}
                         primary={
-                            <Tooltip title={formatNumberWithCommas(token.max)}>
+                            <Tooltip title={formatNumberWithCommas(token.totalSupply)}>
                                 <Typography
                                     variant="body2"
                                     style={{ fontSize: '1vw', display: 'flex', justifyContent: 'flex-start' }}
                                 >
-                                    {simplifyNumber(token.max)}
+                                    {simplifyNumber(token.totalSupply)}
                                 </Typography>
                             </Tooltip>
                         }
                     />
                     <Stat maxWidth="14%" display="flex" justifyContent="flex-start">
                         <StatNumber style={{ fontSize: '1vw' }} margin="0">
-                            {token.maxMintedPercent?.toFixed(2)}%
+                            {token.totalMintedPercent?.toFixed(2)}%
                         </StatNumber>
                         <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
                             <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
@@ -190,16 +190,16 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         sx={{ maxWidth: '13%' }}
                         primary={
                             <Typography variant="body2" style={{ fontSize: '1vw' }}>
-                                {preMintedIcons(token.pre, token.max)}
+                                {preMintedIcons(token.preMintedSupply, token.totalSupply)}
                             </Typography>
                         }
                     />
-                    {token.minted < token.max ? (
+                    {token.preMintedSupply < token.totalSupply ? (
                         <ListItemText
                             sx={{ maxWidth: '10%', display: 'flex', justifyContent: 'center' }}
                             primary={
                                 <Button
-                                    onClick={(event) => handleMint(event, token.tick)}
+                                    onClick={(event) => handleMint(event, token.ticker)}
                                     variant="contained"
                                     color="primary"
                                     style={{
@@ -207,7 +207,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                                         width: '3vw',
                                         fontSize: '0.8vw',
                                     }}
-                                    disabled={token.minted >= token.max}
+                                    disabled={token.preMintedSupply >= token.totalSupply}
                                 >
                                     Mint
                                 </Button>

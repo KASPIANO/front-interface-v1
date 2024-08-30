@@ -1,11 +1,11 @@
 import { FC } from 'react';
 import { Box, Button, Card, Tooltip, Typography } from '@mui/material';
-import { Token } from '../../../types/Types';
+import { BackendTokenResponse } from '../../../types/Types';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 
 interface MintingComponentProps {
-    tokenInfo: Token;
+    tokenInfo: BackendTokenResponse;
     walletConnected: boolean;
     walletBalance: number;
 }
@@ -13,9 +13,9 @@ interface MintingComponentProps {
 const MintingComponent: FC<MintingComponentProps> = (props) => {
     const { tokenInfo, walletConnected, walletBalance } = props;
     // Calculate the total mints possible and mints left
-    const totalMintsPossible = Math.floor(parseFloat(tokenInfo.max) / parseFloat(tokenInfo.lim));
-    const mintsLeft = totalMintsPossible - parseInt(tokenInfo.mintTotal);
-    const isMintingDisabled = parseFloat(tokenInfo.minted) >= parseFloat(tokenInfo.max);
+    const totalMintsPossible = Math.floor(tokenInfo.totalSupply / tokenInfo.mintLimit);
+    const mintsLeft = totalMintsPossible - tokenInfo.totalMintTimes;
+    const isMintingDisabled = tokenInfo.totalMinted >= tokenInfo.totalSupply;
 
     const handleMint = async (ticker: string) => {
         if (!walletConnected) {
@@ -58,7 +58,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
             });
         }
     };
-    const limitPerMint = parseFloat(tokenInfo.lim) / 1e8;
+    const limitPerMint = tokenInfo.mintLimit;
     return (
         <Card
             sx={{
@@ -97,7 +97,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                     <Box sx={{ marginRight: '2vw', textAlign: 'center' }}>
                         <Typography sx={{ fontSize: '1vw', fontWeight: 'bold' }}>Total Mints</Typography>
                         <Typography sx={{ fontSize: '1vw' }}>
-                            {tokenInfo.mintTotal} / {totalMintsPossible}
+                            {tokenInfo.totalMintTimes} / {totalMintsPossible}
                         </Typography>
                     </Box>
 
@@ -120,7 +120,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                     }
                 >
                     <Button
-                        onClick={() => handleMint(tokenInfo.tick)}
+                        onClick={() => handleMint(tokenInfo.ticker)}
                         variant="contained"
                         color="primary"
                         style={{

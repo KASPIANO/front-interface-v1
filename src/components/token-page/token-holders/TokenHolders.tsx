@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { Token, TokenHolder } from '../../../types/Types';
+import { BackendTokenHolder, BackendTokenResponse } from '../../../types/Types';
 import {
     Box,
     MenuItem,
@@ -16,12 +16,12 @@ import {
 } from '@mui/material';
 
 interface TokenHoldersProps {
-    tokenInfo: Token;
+    tokenInfo: BackendTokenResponse;
 }
 
 const TokenHolders: FC<TokenHoldersProps> = (props) => {
     const [limit, setLimit] = useState(10);
-    const [tokenHolders, setTokenHolders] = useState<TokenHolder[]>([]);
+    const [tokenHolders, setTokenHolders] = useState<BackendTokenHolder[]>([]);
 
     useEffect(() => {
         setTokenHolders(props.tokenInfo?.topHolders || []);
@@ -78,7 +78,7 @@ const TokenHolders: FC<TokenHoldersProps> = (props) => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {tokenHolders.slice(0, limit).map((holder: TokenHolder) => (
+                            {tokenHolders.slice(0, limit).map((holder: BackendTokenHolder) => (
                                 <TableRow key={holder.address}>
                                     <TableCell>
                                         <Tooltip title={holder.address}>
@@ -95,14 +95,10 @@ const TokenHolders: FC<TokenHoldersProps> = (props) => {
                                         </Tooltip>
                                     </TableCell>
                                     <TableCell>
-                                        {(
-                                            (parseFloat(holder.amount) /
-                                                parseFloat(props.tokenInfo?.minted || '0')) *
-                                            100
-                                        ).toFixed(2)}
+                                        {((holder.balance / (props.tokenInfo?.totalMinted || 0)) * 100).toFixed(2)}
                                         %
                                     </TableCell>
-                                    <TableCell>{holder.amount}</TableCell>
+                                    <TableCell>{holder.balance}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
