@@ -21,6 +21,7 @@ import {
     getErrorMessage,
     hasErrors,
 } from '../../utils/BackendValidationErrorsHandler';
+import { convertToProtocolFormat } from '../../utils/Utils';
 
 interface DeployPageProps {
     walletBalance: number;
@@ -59,7 +60,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const [reviewTokenData, setReviewTokenData] = useState<TokenDeploy>(null);
 
     // Function to convert user input to protocol format (9 decimals)
-    const convertToProtocolFormat = (value: string): string => (parseFloat(value) * 1e8).toFixed(0);
+
     const validateTokenFullName = (name: string) => {
         const regex = /^[A-Za-z]{4,6}$/;
         return regex.test(name);
