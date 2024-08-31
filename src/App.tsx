@@ -34,7 +34,7 @@ const App = () => {
     const [network, setNetwork] = useState<string>('mainnet'); // New state for network
     const [, setIsConnecting] = useState<boolean>(false);
     const [backgroundBlur, setBackgroundBlur] = useState(false);
-    const [userVerified, setUserVerified] = useState<UserVerfication>(null);
+    const [, setUserVerified] = useState<UserVerfication>(null);
 
     const toggleThemeMode = () => {
         const newMode = themeMode === ThemeModes.DARK ? ThemeModes.LIGHT : ThemeModes.DARK;
