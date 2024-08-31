@@ -1,14 +1,14 @@
-import { FC, useState, useCallback } from 'react';
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Typography,
-    Button,
     Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
     TextField,
+    Typography,
 } from '@mui/material';
+import { FC, useCallback, useState } from 'react';
 
 interface RugScoreDialogProps {
     open: boolean;

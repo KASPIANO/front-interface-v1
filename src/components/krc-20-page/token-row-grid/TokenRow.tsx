@@ -121,13 +121,13 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }}
                         primary={
                             <Tooltip title={token.ticker}>
-                                <Typography variant="body1" style={{ fontSize: '1vw' }}>
+                                <Typography component={'span'} variant="body1" style={{ fontSize: '1vw' }}>
                                     {capitalizeFirstLetter(token.ticker)}
                                 </Typography>
                             </Tooltip>
                         }
                         secondary={
-                            <Typography variant="body2" style={{ fontSize: '0.9vw' }}>
+                            <Typography component={'span'} variant="body2" style={{ fontSize: '0.9vw' }}>
                                 {formatDate(token.creationDate)}
                             </Typography>
                         }
@@ -137,6 +137,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         sx={{ maxWidth: '13%' }}
                         primary={
                             <Typography
+                                component={'span'}
                                 variant="body2"
                                 style={{ fontSize: '1vw', display: 'flex', justifyContent: 'flex-start' }}
                             >
@@ -149,6 +150,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         primary={
                             <Tooltip title={formatNumberWithCommas(token.totalSupply)}>
                                 <Typography
+                                    component={'span'}
                                     variant="body2"
                                     style={{ fontSize: '1vw', display: 'flex', justifyContent: 'flex-start' }}
                                 >
@@ -180,7 +182,8 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     {/* <ListItemText
                         sx={{ width: '9.5vw' }}
                         primary={
-                            <Typography variant="body2" style={{ fontSize: '1.1vw' }}>
+                            <Typography
+                            component={'span'} variant="body2" style={{ fontSize: '1.1vw' }}>
                                 {token.transferTotal ? token.transferTotal : 0}
                             </Typography>
                         }
@@ -189,7 +192,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemText
                         sx={{ maxWidth: '13%' }}
                         primary={
-                            <Typography variant="body2" style={{ fontSize: '1vw' }}>
+                            <Typography component={'span'} variant="body2" style={{ fontSize: '1vw' }}>
                                 {preMintedIcons(token.preMintedSupply, token.totalSupply)}
                             </Typography>
                         }
