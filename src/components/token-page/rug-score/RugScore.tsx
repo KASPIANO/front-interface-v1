@@ -1,14 +1,14 @@
-import { FC, useState, useCallback } from 'react';
-import { Card, Typography, useTheme, IconButton, Tooltip, Box, Button } from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import ScoreLine, { ScoreLineConfig } from './score-line/ScoreLine';
-import RugScoreDialog from './dialog/RugScoreDialog';
-import { getCurrentAccount, sendKaspa } from '../../../utils/KaswareUtils';
-import { showGlobalSnackbar } from '../../alert-context/AlertContext';
+import { Box, Button, Card, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import { FC, useCallback, useState } from 'react';
 import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
+import { getCurrentAccount, sendKaspa } from '../../../utils/KaswareUtils';
 import { setWalletBalanceUtil } from '../../../utils/Utils';
+import { showGlobalSnackbar } from '../../alert-context/AlertContext';
+import RugScoreDialog from './dialog/RugScoreDialog';
+import ScoreLine, { ScoreLineConfig } from './score-line/ScoreLine';
 
 interface RugScoreProps {
     score: number | null;
