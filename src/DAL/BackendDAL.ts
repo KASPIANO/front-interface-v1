@@ -1,5 +1,5 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
-import { TokenListItemResponse, BackendTokenResponse, TokenSearchItems } from '../types/Types';
+import { BackendTokenResponse, TokenListItemResponse, TokenSearchItems } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
@@ -9,12 +9,12 @@ export type BackendValidationErrorsType = {
     [key: string]: string[];
 };
 
-export async function fetchAllTokens(
+export const fetchAllTokens = async (
     limit = 50,
     skip = 0,
     order: string | null = null,
     direction: string | null = null,
-): Promise<TokenListItemResponse[]> {
+): Promise<TokenListItemResponse[]> => {
     try {
         const urlParams = new URLSearchParams();
         urlParams.append('skip', skip.toString());
@@ -35,7 +35,7 @@ export async function fetchAllTokens(
         console.error('Error fetching tokens from backend:', error);
         return [];
     }
-}
+};
 
 export async function fetchTokenByTicker(ticker: string): Promise<BackendTokenResponse> {
     try {

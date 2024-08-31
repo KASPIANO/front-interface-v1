@@ -5,11 +5,10 @@ import { FC, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import { FilterState,  TokenListItemResponse } from '../../../types/Types';
+import { FilterState, TokenListItemResponse } from '../../../types/Types';
+import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 import { GridHeader } from '../grid-header/GridHeader';
 import { TokenRow } from '../token-row-grid/TokenRow';
-import { StyledDataGridContainer } from './Krc20Grid.s';
-import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 
 interface TokenDataGridProps {
     tokensList: TokenListItemResponse[];
@@ -95,7 +94,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     );
 
     return (
-        <StyledDataGridContainer>
+        <>
             <GlobalStyle />
             {tableHeader}
             <List
@@ -137,7 +136,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                     })}
                 </InfiniteScroll>
             </List>
-        </StyledDataGridContainer>
+        </>
     );
 };
 
