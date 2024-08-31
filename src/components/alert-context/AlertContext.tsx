@@ -16,6 +16,7 @@ interface AlertOptions {
     details?: string;
     commit?: string;
     reveal?: string;
+    kasware?: boolean;
 }
 
 const alertColors = {
@@ -109,7 +110,14 @@ const SnackbarComponent: React.FC = () => {
                     >
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                             {getIcon(alert.severity)}
-                            <Typography sx={{ ml: 1, color: alertIconColors[alert.severity], fontWeight: 'bold' }}>
+                            <Typography
+                                sx={{
+                                    fontSize: '1rem',
+                                    ml: 1,
+                                    color: alertIconColors[alert.severity],
+                                    fontWeight: 'bold',
+                                }}
+                            >
                                 {alert.message}
                             </Typography>
                         </Box>
@@ -120,6 +128,26 @@ const SnackbarComponent: React.FC = () => {
                                 {alert.details}
                             </Typography>
                         )}
+                        {alert.kasware && (
+                            <Typography
+                                sx={{
+                                    fontSize: '1.5rem',
+                                    color: alertIconColors[alert.severity],
+                                    opacity: 0.8,
+                                    fontWeight: 'bold',
+                                }}
+                            >
+                                <a
+                                    href="https://chromewebstore.google.com/detail/kasware-wallet/hklhheigdmpoolooomdihmhlpjjdbklf"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ textDecoration: 'none', color: alertIconColors[alert.severity] }}
+                                >
+                                    Install Kasware Wallet Extension by clicking here
+                                </a>
+                            </Typography>
+                        )}
+
                         {alert.commit && (
                             <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
                                 <Typography
