@@ -14,6 +14,10 @@ import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
 import { disconnect, isKasWareInstalled, requestAccounts, switchNetwork } from './utils/KaswareUtils';
 import { getLocalThemeMode, setWalletBalanceUtil, ThemeModes } from './utils/Utils';
+import Footer from './components/footer/Footer';
+import PrivacyPolicy from './pages/compliance/PrivacyPolicy';
+import TermsOfService from './pages/compliance/TermsOfService';
+import TrustSafety from './pages/compliance/TrustSafety';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -190,9 +194,13 @@ const App = () => {
                                     />
                                 }
                             />
+                            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                            <Route path="/terms-service" element={<TermsOfService />} />
+                            <Route path="/trust-safety" element={<TrustSafety />} />
                             {/* Handle 404 - Not Found */}
                             <Route path="*" element={<div>404 - Not Found</div>} />
                         </Routes>
+                        <Footer />
                     </BrowserRouter>
                 </ThemeProvider>
             </ThemeContext.Provider>
