@@ -352,6 +352,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 width: '90%',
                 filter: backgroundBlur ? 'blur(6px)' : 'none',
                 transition: 'backdrop-filter 0.3s ease',
+                marginBottom: '5vh',
             }}
         >
             <DeployForm>
