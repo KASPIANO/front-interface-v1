@@ -1,13 +1,13 @@
-import React, { FC, useCallback, useRef, useState } from 'react';
-import { InputAdornment, Box, Avatar, Autocomplete, MenuItem, Skeleton } from '@mui/material';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import { TokenSearchItems } from '../../types/Types';
-import { SearchContainer } from './TokenSearch.s';
-import { useNavigate } from 'react-router-dom';
-import { debounce } from 'lodash';
-import { searchToken } from '../../DAL/BackendDAL';
+import { Autocomplete, Avatar, Box, InputAdornment, MenuItem, Skeleton } from '@mui/material';
 import axios, { CancelTokenSource } from 'axios';
+import { debounce } from 'lodash';
+import React, { FC, useCallback, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { searchToken } from '../../DAL/BackendDAL';
+import { TokenSearchItems } from '../../types/Types';
 import { GlobalStyleAutoComplete } from '../../utils/GlobalStyleScrollBar';
+import { SearchContainer } from './TokenSearch.s';
 
 const styles = `
   input[type="search"]::-webkit-search-cancel-button {
@@ -82,6 +82,7 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
 
     const inputRef = useRef<HTMLInputElement | null>(null);
     const handleFocus = () => {
+        handleFetchingTokens(searchValue);
         setIsFocused(true);
         setBackgroundBlur(true);
         setIsTransitioning(true);
@@ -146,7 +147,7 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
                 onInputChange={handleSearchChange}
                 getOptionLabel={(option: TokenSearchItems) => (option.ticker ? option.ticker : '')}
                 onChange={handleTokenSelect}
-                options={showOptions ? (loading ? loadingArray : tokens) : []} // Show options only when focused
+                options={showOptions && searchValue ? (loading ? loadingArray : tokens) : []} // Show options only when focused
                 renderOption={(props, option) => (
                     <MenuItem {...props} key={`{option.ticker}`} sx={{ width: '28vw' }}>
                         {loading ? (
@@ -160,7 +161,12 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
                             />
                         )}
                         {loading ? (
-                            <Skeleton key={`${option.ticker}-s2`} variant="text" width={100} sx={{ ml: 1 }} />
+                            <Skeleton
+                                key={`${option.ticker}-s2`}
+                                variant="text"
+                                width={100}
+                                sx={{ ml: 1, lg: 1, sm: 1 }}
+                            />
                         ) : (
                             option.ticker
                         )}
