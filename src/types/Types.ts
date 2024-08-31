@@ -185,3 +185,11 @@ export interface TokenRowPortfolioItem {
     oneDayChange?: string;
     logoUrl?: string;
 }
+
+export interface UserVerfication {
+    userWalletAddress: string;
+    userSignedMessageTxId: string;
+    requestId: string;
+    requestNonce: string;
+    requestTimestamp: string;
+}

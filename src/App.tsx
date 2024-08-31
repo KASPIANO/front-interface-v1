@@ -12,12 +12,19 @@ import PortfolioPage from './pages/portfolio-page/PortfolioPage';
 import TokenPage from './pages/token-page/TokenPage';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
-import { disconnect, isKasWareInstalled, requestAccounts, switchNetwork } from './utils/KaswareUtils';
-import { getLocalThemeMode, setWalletBalanceUtil, ThemeModes } from './utils/Utils';
+import { disconnect, isKasWareInstalled, requestAccounts, signMessage, switchNetwork } from './utils/KaswareUtils';
+import {
+    generateNonce,
+    generateRequestId,
+    getLocalThemeMode,
+    setWalletBalanceUtil,
+    ThemeModes,
+} from './utils/Utils';
 import Footer from './components/footer/Footer';
 import PrivacyPolicy from './pages/compliance/PrivacyPolicy';
 import TermsOfService from './pages/compliance/TermsOfService';
 import TrustSafety from './pages/compliance/TrustSafety';
+import { UserVerfication } from './types/Types';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -27,6 +34,7 @@ const App = () => {
     const [network, setNetwork] = useState<string>('mainnet'); // New state for network
     const [, setIsConnecting] = useState<boolean>(false);
     const [backgroundBlur, setBackgroundBlur] = useState(false);
+    const [, setUserVerified] = useState<UserVerfication>(null);
 
     const toggleThemeMode = () => {
         const newMode = themeMode === ThemeModes.DARK ? ThemeModes.LIGHT : ThemeModes.DARK;
@@ -102,6 +110,50 @@ const App = () => {
                         details: `Connected to wallet ${accounts[0].substring(0, 9)}....${accounts[0].substring(accounts[0].length - 4)}`,
                     });
                 }
+                const nonce = generateNonce();
+                const requestId = generateRequestId();
+                const requestDate = new Date().toISOString();
+                const userVerificationMessage = `
+kaspiano.com wants you to sign in with your Kaspa account:
+
+${accounts[0]}
+
+Welcome to Kaspiano. Signing is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give Kaspiano permission to perform any transactions with your wallet.
+
+URI: https://kaspiano.com
+
+Version: 1
+
+Nonce: ${nonce}
+
+Issued At: ${requestDate}
+
+Request ID: ${requestId}
+                    `;
+
+                const userVerification = await signMessage(userVerificationMessage);
+                if (userVerification) {
+                    setUserVerified({
+                        userWalletAddress: accounts[0],
+                        userSignedMessageTxId: userVerification,
+                        requestId,
+                        requestNonce: nonce,
+                        requestTimestamp: requestDate,
+                    });
+                    console.log('User Verification:', userVerification, accounts[0]);
+                } else {
+                    showGlobalSnackbar({
+                        message: 'Failed to sign message',
+                        severity: 'error',
+                    });
+                    await handleDisconnect();
+                }
+            } else {
+                showGlobalSnackbar({
+                    message: 'Kasware not installed',
+                    severity: 'error',
+                    kasware: true,
+                });
             }
         } catch (error) {
             console.error('Error connecting to wallet:', error);
