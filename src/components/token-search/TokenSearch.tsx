@@ -1,13 +1,13 @@
-import React, { FC, useCallback, useRef, useState } from 'react';
-import { InputAdornment, Box, Avatar, Autocomplete, MenuItem, Skeleton } from '@mui/material';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import { TokenSearchItems } from '../../types/Types';
-import { SearchContainer } from './TokenSearch.s';
-import { useNavigate } from 'react-router-dom';
-import { debounce } from 'lodash';
-import { searchToken } from '../../DAL/BackendDAL';
+import { Autocomplete, Avatar, Box, InputAdornment, MenuItem, Skeleton } from '@mui/material';
 import axios, { CancelTokenSource } from 'axios';
-import { GlobalStyleAutoComplete } from '../../utils/GlobalStyleScrollBar';
+import { debounce } from 'lodash';
+import React, { FC, useCallback, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { searchToken } from '../../DAL/BackendDAL';
+import { TokenSearchItems } from '../../types/Types';
+import { GlobalStyleAutoComplete, GlobalStyleTokenSideBar } from '../../utils/GlobalStyleScrollBar';
+import { SearchContainer } from './TokenSearch.s';
 
 const styles = `
   input[type="search"]::-webkit-search-cancel-button {
@@ -82,6 +82,7 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
 
     const inputRef = useRef<HTMLInputElement | null>(null);
     const handleFocus = () => {
+        handleFetchingTokens(searchValue);
         setIsFocused(true);
         setBackgroundBlur(true);
         setIsTransitioning(true);
@@ -119,89 +120,97 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
     };
 
     return (
-        <Box
-            sx={{
-                marginRight: '1.5vw',
-            }}
-        >
-            <style>{styles}</style>
-            <GlobalStyleAutoComplete />
-            <Autocomplete
+        <>
+            <GlobalStyleTokenSideBar />
+            <Box
                 sx={{
-                    height: '3.5vh',
-                    width: isFocused ? '30vw' : '15vw',
-                    transition: 'width 0.2s ease',
-                    '& .MuiAutocomplete-listbox': {
-                        overflowX: 'hidden', // Hide horizontal scrollbar
-                    },
-                    '& .MuiAutocomplete-popper': {
-                        width: '30vw !important', // Force the popper to be the same width as the expanded input
-                    },
+                    marginRight: '1.5vw',
                 }}
-                open={showOptions && !isTransitioning}
-                autoSelect={false}
-                freeSolo
-                filterOptions={(x) => x}
-                inputValue={searchValue}
-                onInputChange={handleSearchChange}
-                getOptionLabel={(option: TokenSearchItems) => (option.ticker ? option.ticker : '')}
-                onChange={handleTokenSelect}
-                options={showOptions ? (loading ? loadingArray : tokens) : []} // Show options only when focused
-                renderOption={(props, option) => (
-                    <MenuItem {...props} key={`{option.ticker}`} sx={{ width: '28vw' }}>
-                        {loading ? (
-                            <Skeleton key={`${option.ticker}-s1`} variant="circular" width={24} height={24} />
-                        ) : (
-                            <Avatar
-                                key={`${option.ticker}-avatar`}
-                                src={option.logo}
-                                alt={option.ticker}
-                                sx={{ width: 24, height: 24, mr: 1 }}
-                            />
-                        )}
-                        {loading ? (
-                            <Skeleton key={`${option.ticker}-s2`} variant="text" width={100} sx={{ ml: 1 }} />
-                        ) : (
-                            option.ticker
-                        )}
-                    </MenuItem>
-                )}
-                renderInput={(params) => (
-                    <SearchContainer
-                        {...params}
-                        onFocus={handleFocus}
-                        onBlur={handleBlur}
-                        placeholder="Search KRC-20 Tokens"
-                        inputRef={inputRef}
-                        InputProps={{
-                            ...params.InputProps,
-                            type: 'search',
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchRoundedIcon sx={{ fontSize: '1vw' }} />
-                                </InputAdornment>
-                            ),
-                            sx: {
+            >
+                <style>{styles}</style>
+                <GlobalStyleAutoComplete />
+                <Autocomplete
+                    sx={{
+                        height: '3.5vh',
+                        width: isFocused ? '30vw' : '15vw',
+                        transition: 'width 0.2s ease',
+                        '& .MuiAutocomplete-listbox': {
+                            overflowX: 'hidden', // Hide horizontal scrollbar
+                        },
+                        '& .MuiAutocomplete-popper': {
+                            width: '30vw !important', // Force the popper to be the same width as the expanded input
+                        },
+                    }}
+                    open={showOptions && !isTransitioning}
+                    autoSelect={false}
+                    freeSolo
+                    filterOptions={(x) => x}
+                    inputValue={searchValue}
+                    onInputChange={handleSearchChange}
+                    getOptionLabel={(option: TokenSearchItems) => (option.ticker ? option.ticker : '')}
+                    onChange={handleTokenSelect}
+                    options={showOptions && searchValue ? (loading ? loadingArray : tokens) : []} // Show options only when focused
+                    renderOption={(props, option) => (
+                        <MenuItem {...props} key={`{option.ticker}`} sx={{ width: '28vw' }}>
+                            {loading ? (
+                                <Skeleton key={`${option.ticker}-s1`} variant="circular" width={24} height={24} />
+                            ) : (
+                                <Avatar
+                                    key={`${option.ticker}-avatar`}
+                                    src={option.logo}
+                                    alt={option.ticker}
+                                    sx={{ width: 24, height: 24, mr: 1 }}
+                                />
+                            )}
+                            {loading ? (
+                                <Skeleton
+                                    key={`${option.ticker}-s2`}
+                                    variant="text"
+                                    width={100}
+                                    sx={{ ml: 1, lg: 1, sm: 1 }}
+                                />
+                            ) : (
+                                option.ticker
+                            )}
+                        </MenuItem>
+                    )}
+                    renderInput={(params) => (
+                        <SearchContainer
+                            {...params}
+                            onFocus={handleFocus}
+                            onBlur={handleBlur}
+                            placeholder="Search KRC-20 Tokens"
+                            inputRef={inputRef}
+                            InputProps={{
+                                ...params.InputProps,
+                                type: 'search',
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchRoundedIcon sx={{ fontSize: '1vw' }} />
+                                    </InputAdornment>
+                                ),
+                                sx: {
+                                    height: isFocused ? '5vh' : '3.5vh',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                },
+                            }}
+                            sx={{
                                 height: isFocused ? '5vh' : '3.5vh',
-                                display: 'flex',
-                                alignItems: 'center',
-                            },
-                        }}
-                        sx={{
-                            height: isFocused ? '5vh' : '3.5vh',
-                            '& input': {
-                                fontSize: '0.8vw',
-                                textAlign: 'start',
-                            },
-                            '& input::placeholder': {
-                                fontSize: '0.8vw',
-                                textAlign: 'start',
-                            },
-                        }}
-                    />
-                )}
-            />
-        </Box>
+                                '& input': {
+                                    fontSize: '0.8vw',
+                                    textAlign: 'start',
+                                },
+                                '& input::placeholder': {
+                                    fontSize: '0.8vw',
+                                    textAlign: 'start',
+                                },
+                            }}
+                        />
+                    )}
+                />
+            </Box>
+        </>
     );
 };
 
