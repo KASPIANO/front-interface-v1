@@ -1,3 +1,4 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
 import { BackendTokenResponse, TokenListItemResponse, TokenSearchItems } from '../types/Types';
 import { backendService } from './AxiosInstaces';
@@ -125,3 +126,25 @@ export async function searchToken(query: string, cancelToken: CancelToken = null
     const response = await backendService.get<TokenSearchItems[]>(`/${KRC20CONTROLLER}/search`, requestOptions);
     return response.data;
 }
+
+export const signTransaction = async (walletAddress) => {
+    const response = await backendService.post('/auth/sign', { walletAddress });
+    return response.data;
+};
+
+export const fetchProtectedResource = async () => {
+    const response = await backendService.get('/protected');
+    return response.data;
+};
+
+export const useSignMutation = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: signTransaction,
+        onSuccess: (data) => {
+            console.log('Signed transaction:', data);
+            queryClient.invalidateQueries({ queryKey: ['protected'] });
+            // Invalidate and refetch the protected resource after signing
+        },
+    });
+};
