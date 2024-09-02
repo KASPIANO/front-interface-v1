@@ -315,8 +315,15 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     };
 
     const handleXChange = (value: string) => {
-        if (!value.startsWith('@')) {
-            setErrorToField(formErrors, setFormErrors, 'x', 'Handle should start with "@"');
+        const xUrlPattern = /^https?:\/\/(www\.)?x\.com\/[a-zA-Z0-9_]{1,15}$/;
+
+        if (!xUrlPattern.test(value)) {
+            setErrorToField(
+                formErrors,
+                setFormErrors,
+                'x',
+                'Please enter a valid X URL (e.g., https://x.com/username)',
+            );
         } else {
             setX(value);
             clearFieldErrors(formErrors, setFormErrors, 'x');
@@ -519,7 +526,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                             <TextInfo
-                                label="X Handle (Twitter)"
+                                label="X (Twitter) URL"
                                 variant="outlined"
                                 fullWidth
                                 value={x}
@@ -529,10 +536,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 helperText={getErrorMessage(formErrors, 'x')}
                                 InputProps={{
                                     endAdornment: (
-                                        <Tooltip
-                                            placement="left"
-                                            title="It can be a Twitter handle, email, or Telegram. Should start with '@'."
-                                        >
+                                        <Tooltip placement="left" title="Profile Twitter/X URL.">
                                             <IconButton>
                                                 <InfoOutlinedIcon fontSize="small" />
                                             </IconButton>

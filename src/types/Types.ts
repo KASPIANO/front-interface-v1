@@ -46,6 +46,7 @@ export interface BackendTokenMetadata {
     sentiment: TokenSentiment;
     contacts: string[];
     rugScore: number;
+    founders?: string[];
 }
 
 export interface TokenListItemResponse {
