@@ -119,17 +119,20 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                                 : ''
                     }
                 >
-                    <Button
-                        onClick={() => handleMint(tokenInfo.ticker)}
-                        variant="contained"
-                        color="primary"
-                        style={{
-                            fontSize: '0.8vw',
-                        }}
-                        disabled={isMintingDisabled || !walletConnected || walletBalance < 1}
-                    >
-                        {isMintingDisabled ? 'Sold Out' : 'Mint'}
-                    </Button>
+                    <span>
+                        <Button
+                            onClick={() => handleMint(tokenInfo.ticker)}
+                            variant="contained"
+                            color="primary"
+                            style={{
+                                fontSize: '0.8vw',
+                                width: '100%',
+                            }}
+                            disabled={isMintingDisabled || !walletConnected || walletBalance < 1}
+                        >
+                            {isMintingDisabled ? 'Sold Out' : 'Mint'}
+                        </Button>
+                    </span>
                 </Tooltip>
             </Box>
         </Card>

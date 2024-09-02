@@ -47,19 +47,17 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = ({ open, onClose, onSave
         setDescription(value);
     };
 
-    const handleXChange = (value: string) => {
-        const xUrlPattern = /^https?:\/\/(www\.)?x\.com\/[a-zA-Z0-9_]{1,15}$/;
-
-        if (!xUrlPattern.test(value)) {
-            setXError('Please enter a valid X URL (e.g., https://x.com/username)');
-        } else {
-            setXError('');
-        }
-        setX(value);
-    };
-
     const handleSave = () => {
         const contactsArr = contacts.split(',');
+        const twitterUrlPattern = /^(https?:\/\/)?(www\.)?twitter\.com\/[a-zA-Z0-9_]{1,15}$/;
+
+        // Check if the Twitter (x) URL is valid
+        if (x && !twitterUrlPattern.test(x)) {
+            setXError(
+                'Please enter a valid Twitter URL (e.g., https://twitter.com/username, twitter.com/username)',
+            );
+            return;
+        }
         const tokenMetadata: Partial<BackendTokenMetadata> = {
             description,
             socials: {
@@ -109,7 +107,7 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = ({ open, onClose, onSave
                     <TextField
                         label="X (Twitter)"
                         value={x}
-                        onChange={(e) => handleXChange(e.target.value)}
+                        onChange={(e) => setX(e.target.value)}
                         fullWidth
                         margin="normal"
                         error={!!xError}
@@ -245,8 +243,8 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = ({ open, onClose, onSave
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={onClose}>Cancel</Button>
-                    <Button onClick={handleSave} color="primary">
-                        Save
+                    <Button onClick={handleSave} color="primary" variant="contained">
+                        Save & Pay
                     </Button>
                 </DialogActions>
             </DialogContainer>

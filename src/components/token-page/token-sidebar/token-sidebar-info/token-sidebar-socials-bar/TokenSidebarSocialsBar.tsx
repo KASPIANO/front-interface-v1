@@ -5,7 +5,9 @@ import LanguageIcon from '@mui/icons-material/Language';
 import XIcon from '@mui/icons-material/X';
 
 export type TokenSidebarSocialsBarOptions = {
-    [socialName: string]: string;
+    telegram?: string;
+    website?: string;
+    x?: string;
 };
 
 const socialIcons: { [key: string]: JSX.Element } = {

@@ -44,7 +44,17 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         { key: 'warning', icon: <WarningAmberRoundedIcon sx={{ fontSize: '1.4vw' }} color="warning" /> },
     ];
     useEffect(() => {
-        setSocials((tokenInfo.metadata?.socials || {}) as TokenSidebarSocialsBarOptions);
+        setSocials((prevSocials) => {
+            if (tokenInfo.metadata?.socials) {
+                return {
+                    telegram: tokenInfo.metadata.socials.telegram || '',
+                    website: tokenInfo.metadata.socials.website || '',
+                    x: tokenInfo.metadata.socials.x || '',
+                };
+            }
+            return prevSocials;
+        });
+
         setSentimentValues(
             tokenInfo.metadata?.sentiment || {
                 love: 0,

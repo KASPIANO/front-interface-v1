@@ -190,6 +190,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
+
         if (!validatedTokenName) {
             setErrorToField(formErrors, setFormErrors, 'ticker', 'Token name must be 4-6 letters.');
             return;
@@ -198,6 +199,17 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             return;
         } else if (!mintLimit || /^0+$/.test(mintLimit)) {
             setMintLimitError(true);
+            return;
+        }
+        const twitterUrlPattern = /^(https?:\/\/)?(www\.)?twitter\.com\/[a-zA-Z0-9_]{1,15}$/;
+
+        if (x && !twitterUrlPattern.test(x)) {
+            setErrorToField(
+                formErrors,
+                setFormErrors,
+                'x',
+                'Please enter a valid Twitter URL (e.g., https://twitter.com/username, twitter.com/username)',
+            );
             return;
         }
 
@@ -311,22 +323,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             console.error('Failed to deploy KRC20 token:', error);
             setShowDeployDialog(false);
             // Handle error (e.g., show an error message)
-        }
-    };
-
-    const handleXChange = (value: string) => {
-        const xUrlPattern = /^https?:\/\/(www\.)?x\.com\/[a-zA-Z0-9_]{1,15}$/;
-
-        if (!xUrlPattern.test(value)) {
-            setErrorToField(
-                formErrors,
-                setFormErrors,
-                'x',
-                'Please enter a valid X URL (e.g., https://x.com/username)',
-            );
-        } else {
-            setX(value);
-            clearFieldErrors(formErrors, setFormErrors, 'x');
         }
     };
 
@@ -530,7 +526,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 variant="outlined"
                                 fullWidth
                                 value={x}
-                                onChange={(e) => handleXChange(e.target.value)}
+                                onChange={(e) => setX(e.target.value)}
                                 placeholder="X handle"
                                 error={hasErrors(formErrors, 'x')}
                                 helperText={getErrorMessage(formErrors, 'x')}
