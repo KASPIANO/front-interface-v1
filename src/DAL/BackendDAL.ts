@@ -4,6 +4,7 @@ import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
 const KRC20METADATA_CONTROLLER = 'krc20metadata';
+const AUTH_CONTROLLER = 'auth';
 
 export type BackendValidationErrorsType = {
     [key: string]: string[];
@@ -148,3 +149,24 @@ export async function searchToken(query: string, cancelToken: CancelToken = null
     const response = await backendService.get<TokenSearchItems[]>(`/${KRC20CONTROLLER}/search`, requestOptions);
     return response.data;
 }
+
+interface SignWallet {
+    signature: string;
+    walletAddress: string;
+}
+
+export const signWallet = async (signWallet: SignWallet): Promise<void> => {
+    try {
+        const url = `/${AUTH_CONTROLLER}/sign`;
+
+        const response = await backendService.post<void>(url, {
+            signature: signWallet.signature,
+            walletAddress: signWallet.walletAddress,
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error('Error sign wallet from backend:', error);
+        return null;
+    }
+};
