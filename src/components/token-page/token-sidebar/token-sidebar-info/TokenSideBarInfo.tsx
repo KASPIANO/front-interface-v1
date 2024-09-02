@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { BackendTokenMetadata, BackendTokenResponse, TokenSentiment } from '../../../../types/Types';
-import { Box, Typography } from '@mui/material';
+import { Box, Tooltip, Typography } from '@mui/material';
 import { SentimentButton, SentimentsContainerBox, TokenProfileContainer, StatCard } from './TokenSideBarInfo.s';
 import { RocketLaunchRounded, SentimentNeutralRounded, TrendingDownRounded } from '@mui/icons-material';
 import TokenSidebarSocialsBar, {
@@ -12,6 +12,7 @@ import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import TokenInfoDialog from '../../../dialogs/token-info/TokenInfoDialog';
 import { AddBanner, AddBox, AddText } from './token-sidebar-socials-bar/TokenSidebarSocialsBar.s';
 import SuccessModal from '../../../modals/sent-token-info-success/SuccessModal';
+import { formatNumberWithCommas, simplifyNumber } from '../../../../utils/Utils';
 
 export type SentimentButtonsConfig = {
     key: string;
@@ -87,8 +88,6 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         setOpenModal(true);
     };
 
-    const tokenMax = tokenInfo.totalSupply;
-
     return (
         <Box
             sx={{
@@ -152,9 +151,11 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                         <Typography variant="body2" align="center" color="text.secondary">
                             SUPPLY
                         </Typography>
-                        <Typography variant="body2" align="center">
-                            {tokenMax}
-                        </Typography>
+                        <Tooltip title={formatNumberWithCommas(tokenInfo.totalSupply)}>
+                            <Typography variant="body2" align="center">
+                                {simplifyNumber(tokenInfo.totalSupply)}
+                            </Typography>
+                        </Tooltip>
                     </StatCard>
                     <StatCard>
                         <Typography variant="body2" align="center" color="text.secondary">
