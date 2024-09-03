@@ -37,10 +37,21 @@ export const fetchAllTokens = async (
     }
 };
 
-export async function fetchTokenByTicker(ticker: string, wallet?: string): Promise<BackendTokenResponse> {
+export async function fetchTokenByTicker(
+    ticker: string,
+    wallet?: string,
+    refresh = false,
+): Promise<BackendTokenResponse> {
+    const params = {};
+
+    if (refresh) {
+        params['refresh'] = true;
+    }
+
     try {
         const response = await backendService.get<BackendTokenResponse>(`/${KRC20CONTROLLER}/${ticker}`, {
             headers: { wallet },
+            params,
         });
         return response.data;
     } catch (error) {

@@ -62,6 +62,8 @@ const TokenPage: FC<TokenPageProps> = (props) => {
                     tokenInfo={tokenInfo}
                     walletBalance={walletBalance}
                     walletConnected={walletConnected}
+                    walletAddress={props.walletAddress}
+                    setTokenInfo={setTokenInfo}
                 />,
             )}
             {getComponentToShow(

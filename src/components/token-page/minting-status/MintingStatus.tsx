@@ -3,11 +3,14 @@ import { Box, Button, Card, Tooltip, Typography } from '@mui/material';
 import { BackendTokenResponse } from '../../../types/Types';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
+import { fetchTokenByTicker } from '../../../DAL/BackendDAL';
 
 interface MintingComponentProps {
     tokenInfo: BackendTokenResponse;
     walletConnected: boolean;
     walletBalance: number;
+    walletAddress: string | null;
+    setTokenInfo: (tokenInfo: BackendTokenResponse) => void;
 }
 
 const MintingComponent: FC<MintingComponentProps> = (props) => {
@@ -50,6 +53,9 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                     reveal,
                 });
             }
+
+            const updatedTokenData = await fetchTokenByTicker(ticker, props.walletAddress, true);
+            props.setTokenInfo(updatedTokenData);
         } catch (error) {
             showGlobalSnackbar({
                 message: 'Token minting failed',
