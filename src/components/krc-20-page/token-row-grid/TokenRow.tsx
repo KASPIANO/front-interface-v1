@@ -25,6 +25,7 @@ interface TokenRowProps {
     tokenKey: string;
     walletBalance: number;
     walletConnected: boolean;
+    walletAddress: string | null;
 }
 
 export const TokenRow: FC<TokenRowProps> = (props) => {
