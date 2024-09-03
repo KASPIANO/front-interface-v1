@@ -33,7 +33,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await fetchTokenByTicker(ticker);
+                const data = await fetchTokenByTicker(ticker, props.walletAddress);
                 setTokenInfo(data);
             } catch (error) {
                 console.error('Error fetching token info:', error);
@@ -41,7 +41,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         };
 
         fetchData();
-    }, [ticker]);
+    }, [ticker, props.walletAddress]);
 
     useEffect(() => {
         if (tokenInfo) {
@@ -67,6 +67,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             {getComponentToShow(
                 <RugScore
                     score={tokenInfo?.metadata?.rugScore}
+                    // eslint-disable-next-line @typescript-eslint/no-empty-function
                     onRecalculate={() => {}}
                     xHandle={tokenXHandle}
                     setWalletBalance={setWalletBalance}
@@ -75,7 +76,15 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             )}
             {getComponentToShow(<TopHolders tokenInfo={tokenInfo} />, '19vh')}
             {/* {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)} */}
-            {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} setTokenInfo={setTokenInfo} />, '91vh')}
+            {getComponentToShow(
+                <TokenSideBar
+                    tokenInfo={tokenInfo}
+                    setTokenInfo={setTokenInfo}
+                    walletConnected={props.walletConnected}
+                    walletAddress={props.walletAddress}
+                />,
+                '91vh',
+            )}
 
             {/* {showNotification && walletAddress && (
                 <NotificationComponent

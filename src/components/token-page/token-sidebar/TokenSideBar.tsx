@@ -10,6 +10,8 @@ import { GlobalStyleTokenSideBar } from '../../../utils/GlobalStyleScrollBar';
 interface TokenSideBarProps {
     tokenInfo: BackendTokenResponse;
     setTokenInfo: (tokenInfo: BackendTokenResponse) => void;
+    walletAddress: string | null;
+    walletConnected: boolean;
 }
 
 const TokenSideBar: FC<TokenSideBarProps> = (props) => {
@@ -52,7 +54,12 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                         }}
                         value="1"
                     >
-                        <TokenSideBarInfo tokenInfo={tokenInfo} setTokenInfo={setTokenInfo} />
+                        <TokenSideBarInfo
+                            tokenInfo={tokenInfo}
+                            setTokenInfo={setTokenInfo}
+                            walletConnected={props.walletConnected}
+                            walletAddress={props.walletAddress}
+                        />
                     </TabPanel>
                     <TabPanel value="2">Buy The Token</TabPanel>
                     <TabPanel value="3">Sell The Token</TabPanel>

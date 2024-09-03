@@ -44,6 +44,7 @@ export interface BackendTokenMetadata {
     description: string;
     socials: TokenSocials;
     sentiment: TokenSentiment;
+    selectedSentiment: keyof TokenSentiment | null;
     contacts: string[];
     rugScore: number;
     founders?: string[];

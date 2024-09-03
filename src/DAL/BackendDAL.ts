@@ -1,5 +1,5 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
-import { BackendTokenResponse, TokenListItemResponse, TokenSearchItems } from '../types/Types';
+import { BackendTokenResponse, TokenListItemResponse, TokenSearchItems, TokenSentiment } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
@@ -37,9 +37,11 @@ export const fetchAllTokens = async (
     }
 };
 
-export async function fetchTokenByTicker(ticker: string): Promise<BackendTokenResponse> {
+export async function fetchTokenByTicker(ticker: string, wallet?: string): Promise<BackendTokenResponse> {
     try {
-        const response = await backendService.get<BackendTokenResponse>(`/${KRC20CONTROLLER}/${ticker}`);
+        const response = await backendService.get<BackendTokenResponse>(`/${KRC20CONTROLLER}/${ticker}`, {
+            headers: { wallet },
+        });
         return response.data;
     } catch (error) {
         console.error('Error fetching token from backend:', error);
@@ -55,6 +57,27 @@ export async function countTokens(): Promise<number> {
         console.error('Error counting tokens from backend:', error);
         return 0;
     }
+}
+
+export async function updateWalletSentiment(
+    ticker: string,
+    wallet: string,
+    sentiment: keyof TokenSentiment,
+): Promise<TokenSentiment> {
+    const result = await backendService.post<TokenSentiment>(
+        `/${KRC20METADATA_CONTROLLER}/set-sentiment`,
+        {
+            sentiment,
+            ticker,
+        },
+        {
+            headers: {
+                wallet,
+            },
+        },
+    );
+
+    return result.data;
 }
 
 export async function updateTokenMetadataAfterDeploy(
