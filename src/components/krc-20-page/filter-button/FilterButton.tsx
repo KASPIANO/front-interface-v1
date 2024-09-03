@@ -8,7 +8,6 @@ import {
 } from './FilterButton.s';
 import { FilterState } from '../../../types/Types';
 
-
 interface FilterButtonProps {
     onFilterClick: (filterState: FilterState) => void;
     isActive: boolean;
