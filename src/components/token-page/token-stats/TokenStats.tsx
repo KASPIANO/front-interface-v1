@@ -34,13 +34,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         setTradingDataTimeFrame(value);
     };
 
-    const tokenPreMinted = tokenInfo.preMintedSupply ? tokenInfo.preMintedSupply : '39420';
-    const preMintedPercentage =
-        tokenInfo.preMintedSupply !== 0
-            ? ((tokenInfo.preMintedSupply / tokenInfo.totalSupply) * 100).toFixed(2)
-            : '';
-    const preMintedDataToShow =
-        tokenInfo.preMintedSupply !== 0 ? `${tokenPreMinted} (${preMintedPercentage}%)` : 0;
+    const totalMintedDataToShow = `${(tokenInfo.totalMintedPercent * 100).toFixed(3)}%`;
     return (
         <Card sx={{ height: '20vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -85,10 +79,10 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                 <Divider orientation="vertical" flexItem />
                 <Box sx={{ textAlign: 'center' }}>
                     <Typography sx={{ fontSize: '1vw' }} align="center">
-                        PRE MINTED
+                        TOTAL MINTED
                     </Typography>
                     <Typography align="center" sx={{ fontSize: '0.9vw', fontWeight: 'bold' }}>
-                        {preMintedDataToShow}
+                        {totalMintedDataToShow}
                     </Typography>
                 </Box>
                 <Divider orientation="vertical" flexItem />

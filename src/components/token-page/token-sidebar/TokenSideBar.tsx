@@ -15,7 +15,7 @@ interface TokenSideBarProps {
 }
 
 const TokenSideBar: FC<TokenSideBarProps> = (props) => {
-    const { setTokenInfo, tokenInfo } = props;
+    const { setTokenInfo, tokenInfo, walletAddress, walletConnected } = props;
     const [selectedSideActionTab, setSelectedSideActionTab] = useState('1');
 
     const handleTabChage = (_event: SyntheticEvent, newValue: string) => {
@@ -57,8 +57,8 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                         <TokenSideBarInfo
                             tokenInfo={tokenInfo}
                             setTokenInfo={setTokenInfo}
-                            walletConnected={props.walletConnected}
-                            walletAddress={props.walletAddress}
+                            walletConnected={walletConnected}
+                            walletAddress={walletAddress}
                         />
                     </TabPanel>
                     <TabPanel value="2">Buy The Token</TabPanel>

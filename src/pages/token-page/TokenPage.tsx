@@ -24,16 +24,15 @@ interface TokenPageProps {
 }
 
 const TokenPage: FC<TokenPageProps> = (props) => {
-    const { walletConnected, walletBalance } = props;
+    const { walletConnected, walletBalance, walletAddress, setWalletBalance, backgroundBlur } = props;
     const { ticker } = useParams();
-    const { backgroundBlur, setWalletBalance } = props;
     const [tokenInfo, setTokenInfo] = useState<BackendTokenResponse>(null);
     const [tokenXHandle, setTokenXHandle] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await fetchTokenByTicker(ticker, props.walletAddress);
+                const data = await fetchTokenByTicker(ticker, walletAddress);
                 setTokenInfo(data);
             } catch (error) {
                 console.error('Error fetching token info:', error);
@@ -41,7 +40,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         };
 
         fetchData();
-    }, [ticker, props.walletAddress]);
+    }, [ticker, walletAddress]);
 
     useEffect(() => {
         if (tokenInfo) {
@@ -62,8 +61,9 @@ const TokenPage: FC<TokenPageProps> = (props) => {
                     tokenInfo={tokenInfo}
                     walletBalance={walletBalance}
                     walletConnected={walletConnected}
-                    walletAddress={props.walletAddress}
+                    walletAddress={walletAddress}
                     setTokenInfo={setTokenInfo}
+                    setWalletBalance={setWalletBalance}
                 />,
             )}
             {getComponentToShow(
@@ -82,8 +82,8 @@ const TokenPage: FC<TokenPageProps> = (props) => {
                 <TokenSideBar
                     tokenInfo={tokenInfo}
                     setTokenInfo={setTokenInfo}
-                    walletConnected={props.walletConnected}
-                    walletAddress={props.walletAddress}
+                    walletConnected={walletConnected}
+                    walletAddress={walletAddress}
                 />,
                 '91vh',
             )}

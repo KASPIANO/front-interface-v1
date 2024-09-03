@@ -1,9 +1,10 @@
 import { FC } from 'react';
 import { Box, Button, Card, Tooltip, Typography } from '@mui/material';
 import { BackendTokenResponse } from '../../../types/Types';
-import { mintKRC20Token } from '../../../utils/KaswareUtils';
+import { getCurrentAccount, mintKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { fetchTokenByTicker } from '../../../DAL/BackendDAL';
+import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
 
 interface MintingComponentProps {
     tokenInfo: BackendTokenResponse;
@@ -11,10 +12,11 @@ interface MintingComponentProps {
     walletBalance: number;
     walletAddress: string | null;
     setTokenInfo: (tokenInfo: BackendTokenResponse) => void;
+    setWalletBalance: (balance: number) => void;
 }
 
 const MintingComponent: FC<MintingComponentProps> = (props) => {
-    const { tokenInfo, walletConnected, walletBalance } = props;
+    const { tokenInfo, walletConnected, walletBalance, setWalletBalance, setTokenInfo, walletAddress } = props;
     // Calculate the total mints possible and mints left
     const totalMintsPossible = Math.floor(tokenInfo.totalSupply / tokenInfo.mintLimit);
     const mintsLeft = totalMintsPossible - tokenInfo.totalMintTimes;
@@ -53,9 +55,11 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                     reveal,
                 });
             }
-
-            const updatedTokenData = await fetchTokenByTicker(ticker, props.walletAddress, true);
-            props.setTokenInfo(updatedTokenData);
+            const account = await getCurrentAccount();
+            const updatedTokenData = await fetchTokenByTicker(ticker, walletAddress, true);
+            const balance = await fetchWalletBalance(account);
+            setWalletBalance(balance);
+            setTokenInfo(updatedTokenData);
         } catch (error) {
             showGlobalSnackbar({
                 message: 'Token minting failed',

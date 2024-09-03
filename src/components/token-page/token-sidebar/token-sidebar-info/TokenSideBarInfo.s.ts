@@ -1,5 +1,5 @@
 import { Stack } from '@chakra-ui/react';
-import { styled, Box, Button, Card, CircularProgress } from '@mui/material';
+import { styled, Box, Button, Card, CircularProgress, alpha } from '@mui/material';
 
 const SENTIMENT_BUTTONS_HEIGHT = '7.5vh';
 const SENTIMENT_BUTTONS_PADDING = '10px';
@@ -35,7 +35,7 @@ export const SentimentButton = styled(Button)(({ theme }) => ({
     },
 
     '&.selected': {
-        backgroundColor: theme.palette.primary.main,
+        backgroundColor: alpha(theme.palette.primary.main, 0.4),
         color: theme.palette.primary.contrastText,
     },
 }));
