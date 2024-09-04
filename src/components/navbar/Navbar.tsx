@@ -1,13 +1,24 @@
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import MenuIcon from '@mui/icons-material/Menu';
 import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
-import { Avatar, Drawer, IconButton, List, ListItem, ListItemText, Tooltip, Typography } from '@mui/material';
+import {
+    Avatar,
+    Drawer,
+    IconButton,
+    List,
+    ListItem,
+    ListItemText,
+    Tooltip,
+    Typography,
+    useMediaQuery,
+} from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../../main';
 import { ThemeModes } from '../../utils/Utils';
 import TokenSearch from '../token-search/TokenSearch';
 import { ConnectButton, Logo, NavbarContainer, NavButton, NavCenter, WalletBalance } from './NavBar.s';
+import { NavbarLayouts } from './NavbarLayouts';
 
 interface NavbarProps {
     walletAddress: string | null;
@@ -25,7 +36,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
         props;
     const [activePage, setActivePage] = useState('/');
     const [drawerOpen, setDrawerOpen] = useState(false);
-
+    const isMobile = useMediaQuery('(max-width:600px)');
     const themeContext = useContext(ThemeContext);
     const navigate = useNavigate();
 
@@ -58,34 +69,51 @@ const Navbar: React.FC<NavbarProps> = (props) => {
         setDrawerOpen(open);
     };
 
-    const menuItems = (
-        <List>
-            <ListItem button onClick={() => handleNavButtonClick('/')}>
-                <ListItemText primary="KRC-20" />
-            </ListItem>
-            <ListItem button onClick={() => handleNavButtonClick('/deploy')}>
-                <ListItemText primary="Deploy" />
-            </ListItem>
-            <ListItem button onClick={() => handleNavButtonClick('/portfolio')}>
-                <ListItemText primary="Portfolio" />
-            </ListItem>
-        </List>
+    const LogoComponent = (
+        <Logo onClick={() => handleNavButtonClick('/')} sx={{ display: 'flex', alignContent: 'center' }}>
+            <Avatar
+                src="/Logo.png"
+                sx={{
+                    width: '6.5vh',
+                    height: '6.5vh',
+                    marginTop: '0.8vh',
+                    marginRight: '0.2vw',
+                }}
+            />
+            <Typography variant="body2">Kaspiano</Typography>
+        </Logo>
+    );
+    const SearchComponent = <TokenSearch setBackgroundBlur={setBackgroundBlur} />;
+
+    const WalletComponent = (
+        <>
+            <WalletBalance>
+                <Typography variant="body1" style={{ fontSize: '1vw', marginRight: '1vw' }}>
+                    {formatNumberWithCommas(walletBalance)} KAS
+                </Typography>
+            </WalletBalance>
+            <ConnectButton onClick={handleConnectButton}>
+                {walletConnected ? 'Disconnect' : 'Connect'}
+            </ConnectButton>
+        </>
     );
 
-    return (
-        <NavbarContainer sx={{ height: backgroundBlur ? '9vh' : '7vh' }}>
-            <Logo onClick={() => handleNavButtonClick('/')} sx={{ display: 'flex', alignContent: 'center' }}>
-                <Avatar
-                    src="/Logo.png"
-                    sx={{
-                        width: '6.5vh',
-                        height: '6.5vh',
-                        marginTop: '0.8vh',
-                        marginRight: '0.2vw',
-                    }}
-                />
-                Kaspiano
-            </Logo>
+    const ThemeComponent = darkmode ? (
+        <Tooltip title={'Light Mode'} placement="bottom">
+            <IconButton onClick={themeContext.toggleThemeMode}>
+                <LightModeRoundedIcon />
+            </IconButton>
+        </Tooltip>
+    ) : (
+        <Tooltip title={'Dark Mode'} placement="bottom">
+            <IconButton onClick={themeContext.toggleThemeMode}>
+                <NightlightRoundIcon />
+            </IconButton>
+        </Tooltip>
+    );
+
+    const MenuComponent = (
+        <>
             <IconButton
                 edge="start"
                 color="inherit"
@@ -109,70 +137,35 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                     Portfolio
                 </NavButton>
             </NavCenter>
-            <div style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}>
-                {/* <SearchContainer
-                    type="search"
-                    placeholder={'Search KRC-20 Tokens'}
-                    value={''}
-                    onChange={(event) => handleSearch(event as React.ChangeEvent<HTMLInputElement>)}
-                    sx={{
-                        '& input': {
-                            fontSize: '1vw',
-                        },
-                        '& input::placeholder': {
-                            fontSize: '1vw',
-                        },
-                    }}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchRoundedIcon sx={{ fontSize: '1vw' }} />
-                            </InputAdornment>
-                        ),
-                        style: {
-                            height: '3.5vh',
-                        },
-                    }}
-                /> */}
-                <TokenSearch setBackgroundBlur={setBackgroundBlur} />
-                <WalletBalance>
-                    <Typography variant="body1" style={{ fontSize: '1vw', marginRight: '1vw' }}>
-                        {formatNumberWithCommas(walletBalance)} KAS
-                    </Typography>
-                </WalletBalance>
-                <ConnectButton onClick={handleConnectButton}>
-                    {walletConnected ? 'Disconnect' : 'Connect'}
-                </ConnectButton>
-                {/* <FormControl variant="outlined" size="small" sx={{ marginLeft: '1vw' }}>
-                    <NetworkSelect
-                        SelectDisplayProps={{
-                            style: {
-                                padding: '0.5vh 0.5vw',
-                            },
-                        }}
-                        value={network}
-                        onChange={(event) => onNetworkChange(event.target.value as string)}
-                        displayEmpty
-                        inputProps={{ 'aria-label': 'Without label' }}
-                    >
-                        <NetworkSelectItem value="mainnet">Mainnet</NetworkSelectItem>
-                        <NetworkSelectItem value="testnet">Testnet</NetworkSelectItem>
-                    </NetworkSelect>
-                </FormControl> */}
-                {darkmode ? (
-                    <Tooltip title={'Light Mode'} placement="bottom">
-                        <IconButton onClick={themeContext.toggleThemeMode}>
-                            <LightModeRoundedIcon />
-                        </IconButton>
-                    </Tooltip>
-                ) : (
-                    <Tooltip title={'Dark Mode'} placement="bottom">
-                        <IconButton onClick={themeContext.toggleThemeMode}>
-                            <NightlightRoundIcon />
-                        </IconButton>
-                    </Tooltip>
-                )}
-            </div>
+        </>
+    );
+    const menuItems = (
+        <>
+            {isMobile && SearchComponent}
+            <List>
+                <ListItem onClick={() => handleNavButtonClick('/')}>
+                    <ListItemText primary="KRC-20" />
+                </ListItem>
+                <ListItem onClick={() => handleNavButtonClick('/deploy')}>
+                    <ListItemText primary="Deploy" />
+                </ListItem>
+                <ListItem onClick={() => handleNavButtonClick('/portfolio')}>
+                    <ListItemText primary="Portfolio" />
+                </ListItem>
+            </List>
+            {isMobile && WalletComponent}
+            {isMobile && ThemeComponent}
+        </>
+    );
+    return (
+        <NavbarContainer sx={{ height: backgroundBlur ? '9vh' : '7vh' }}>
+            <NavbarLayouts
+                LogoComponent={LogoComponent}
+                MenuComponent={MenuComponent}
+                SearchComponent={SearchComponent}
+                ThemeComponent={ThemeComponent}
+                WalletComponent={WalletComponent}
+            />
             <Drawer anchor="left" open={drawerOpen} onClose={() => toggleDrawer(false)}>
                 {menuItems}
             </Drawer>
