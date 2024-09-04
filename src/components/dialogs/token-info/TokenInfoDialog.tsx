@@ -20,7 +20,8 @@ interface TokenInfoDialogProps {
     onSave: (tokenInfo: Partial<BackendTokenMetadata>) => void;
 }
 
-const TokenInfoDialog: React.FC<TokenInfoDialogProps> = ({ open, onClose, onSave }) => {
+const TokenInfoDialog: React.FC<TokenInfoDialogProps> = (props) => {
+    const { open, onClose, onSave } = props;
     const [description, setDescription] = useState('');
     const [website, setWebsite] = useState('');
     const [x, setX] = useState('');

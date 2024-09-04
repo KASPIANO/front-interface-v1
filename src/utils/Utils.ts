@@ -57,3 +57,5 @@ export function generateRequestId() {
         return v.toString(16);
     });
 }
+
+export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

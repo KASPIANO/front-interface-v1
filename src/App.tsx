@@ -233,7 +233,13 @@ Request ID: ${requestId}
                             <Route
                                 path="/deploy"
                                 element={
-                                    <DeployPage walletBalance={walletBalance} backgroundBlur={backgroundBlur} />
+                                    <DeployPage
+                                        walletBalance={walletBalance}
+                                        backgroundBlur={backgroundBlur}
+                                        walletConnected={walletConnected}
+                                        setWalletBalance={setWalletBalance}
+                                        walletAddress={walletAddress}
+                                    />
                                 }
                             />
                             <Route

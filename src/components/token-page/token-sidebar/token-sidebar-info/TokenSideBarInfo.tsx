@@ -125,6 +125,8 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         setOpenModal(true);
     };
 
+    const preMintedSupplyPercentage = (tokenInfo.preMintedSupply / tokenInfo.totalSupply) * 100;
+
     return (
         <Box
             sx={{
@@ -196,10 +198,10 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                     </StatCard>
                     <StatCard>
                         <Typography variant="body2" align="center" color="text.secondary">
-                            LIQUIDITY
+                            PREMINTED
                         </Typography>
                         <Typography variant="body2" align="center">
-                            {priceInfo ? priceInfo.liquidity : '90K'}
+                            {preMintedSupplyPercentage.toFixed(2)}%
                         </Typography>
                     </StatCard>
                     <StatCard>

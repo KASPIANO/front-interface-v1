@@ -54,6 +54,7 @@ const ScoreLine: FC<ScoreLineProps> = (props) => {
     useEffect(() => {
         const color = getColorByValue(value, config);
         setThumbColor(color);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value]);
 
     return (

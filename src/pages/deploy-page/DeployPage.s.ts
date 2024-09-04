@@ -24,6 +24,15 @@ export const TextInfo = styled(TextField)(({ theme }) => ({
     },
 }));
 
+export const TextInfoTicker = styled(TextField)(({ theme }) => ({
+    width: '100%',
+    marginBottom: '2vh',
+
+    '& .MuiFormHelperText-root': {
+        color: theme.palette.success.main,
+    },
+}));
+
 export const Status = styled('div')({
     fontSize: '0.9rem',
     '&.error': {

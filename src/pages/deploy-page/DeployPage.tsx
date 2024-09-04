@@ -1,18 +1,21 @@
 import React, { useState, useCallback, FC } from 'react';
 import { Button, Container, Typography, Tooltip, IconButton, Input, Grid } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { DeployForm, ImagePreview, Info, TextInfo, UploadButton, UploadContainer } from './DeployPage.s';
-import { TokenDeploy } from '../../types/Types';
+import {
+    DeployForm,
+    ImagePreview,
+    Info,
+    TextInfo,
+    TextInfoTicker,
+    UploadButton,
+    UploadContainer,
+} from './DeployPage.s';
+import { TokenKRC20Deploy, TokenKRC20DeployMetadata } from '../../types/Types';
 import DeployDialog from '../../components/deploy-page/deploy-dialog/DeployDialog';
 import debounce from 'lodash/debounce';
 import { fetchTokenInfo } from '../../DAL/Krc20DAL';
-import { deployKRC20Token } from '../../utils/KaswareUtils';
-import {
-    BackendValidationErrorsType,
-    sendServerRequestAndSetErrorsIfNeeded,
-    updateTokenMetadataAfterDeploy,
-    validateFormDetailsForUpdateTokenMetadataAfterDeploy,
-} from '../../DAL/BackendDAL';
+import { deployKRC20Token, sendKaspa } from '../../utils/KaswareUtils';
+import { BackendValidationErrorsType } from '../../DAL/BackendDAL';
 import {
     setErrorToField,
     clearFieldErrors,
@@ -21,15 +24,25 @@ import {
     getErrorMessage,
     hasErrors,
 } from '../../utils/BackendValidationErrorsHandler';
-import { convertToProtocolFormat } from '../../utils/Utils';
+import { convertToProtocolFormat, delay, setWalletBalanceUtil } from '../../utils/Utils';
+import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
+import ReviewListTokenDialog from '../../components/dialogs/token-info/review-list-token/ReviewListTokenDialog';
+import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
 
 interface DeployPageProps {
     walletBalance: number;
     backgroundBlur: boolean;
+    walletConnected: boolean;
+    setWalletBalance: (balance: number) => void;
+    walletAddress: string | null;
 }
 
+const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
+const VERIFICATION_FEE_KAS = 1250;
+const VERIFICATION_FEE_SOMPI = VERIFICATION_FEE_KAS * KASPA_TO_SOMPI;
+
 const DeployPage: FC<DeployPageProps> = (props) => {
-    const { walletBalance, backgroundBlur } = props;
+    const { walletBalance, backgroundBlur, walletConnected, walletAddress, setWalletBalance } = props;
     const [tokenName, setTokenName] = useState('');
     const [validatedTokenName, setValidatedTokenName] = useState('');
     const [totalSupply, setTotalSupply] = useState('');
@@ -50,16 +63,18 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const [logo, setLogo] = useState<File | null>(null);
     const [banner, setBanner] = useState<File | null>(null);
     const [showDeployDialog, setShowDeployDialog] = useState(false);
-    const [tokenDetails, setTokenDetails] = useState<TokenDeploy | null>(null);
+    const [tokenKRC20Details, setTokenKRC20Details] = useState<TokenKRC20Deploy | null>(null);
+    const [tokenMetadataDetails, setTokenMetadataDetails] = useState<TokenKRC20DeployMetadata | null>(null);
     const [tickerMessage, setTickerMessage] = useState('');
     const [formErrors, setFormErrors] = useState<BackendValidationErrorsType>({});
     const [totalSupplyError, setTotalSupplyError] = useState(false);
     const [mintLimitError, setMintLimitError] = useState(false);
     const [limitSupplyError, setLimitSupplyError] = useState(false);
     const [preAllocationError, setPreAllocationError] = useState(false);
-    const [reviewTokenData, setReviewTokenData] = useState<TokenDeploy>(null);
-
-    // Function to convert user input to protocol format (9 decimals)
+    const [reviewTokenData, setReviewTokenData] = useState<TokenKRC20Deploy>(null);
+    const [isTokenDeployed, setIsTokenDeployed] = useState(false);
+    const [showReviewListTokenDialog, setShowReviewListTokenDialog] = useState(false);
+    const [isDeploying, setIsDeploying] = useState(false);
 
     const validateTokenFullName = (name: string) => {
         const regex = /^[A-Za-z]{4,6}$/;
@@ -188,7 +203,69 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         }
     };
 
-    const handleSubmit = (event: React.FormEvent) => {
+    const handleSubmitTokenMetadata = (event: React.FormEvent) => {
+        event.preventDefault();
+        const twitterUrlPattern = /^(https?:\/\/)?(www\.)?twitter\.com\/[a-zA-Z0-9_]{1,15}$/;
+
+        if (x && !twitterUrlPattern.test(x)) {
+            setErrorToField(
+                formErrors,
+                setFormErrors,
+                'x',
+                'Please enter a valid Twitter URL (e.g., https://twitter.com/username, twitter.com/username)',
+            );
+            return;
+        }
+        const tokenMetadata: TokenKRC20DeployMetadata = {
+            description,
+            website,
+            x,
+            discord,
+            telegram,
+            logo,
+            banner,
+            whitepaper,
+            medium,
+            github,
+            audit,
+            contacts: contact.split(',').map((contact) => contact.trim()),
+            founders: foundersHandles.split(',').map((handle) => handle.trim()),
+        };
+
+        setTokenMetadataDetails(tokenMetadata);
+        setShowReviewListTokenDialog(true);
+    };
+
+    const handleTokenListing = async () => {
+        if (!tokenMetadataDetails) return;
+        if (walletBalance < VERIFICATION_FEE_SOMPI) {
+            showGlobalSnackbar({
+                message: 'Insufficient funds to list token',
+                severity: 'error',
+            });
+            return;
+        }
+        const txid = await sendKaspa(
+            'kaspatest:qrzsn5eu6s28evw0k26qahjn0nwwzwjgn0qp3p37zl7z5lvx64h923agfaskv',
+            VERIFICATION_FEE_SOMPI,
+        );
+        if (txid) {
+            showGlobalSnackbar({
+                message: 'Payment successful',
+                severity: 'success',
+            });
+            // Token listing request to backend
+            console.log('Token listing request to backend:', tokenMetadataDetails);
+            setShowReviewListTokenDialog(false);
+        } else {
+            showGlobalSnackbar({
+                message: 'Payment failed',
+                severity: 'error',
+            });
+        }
+    };
+
+    const handleSubmitKRC20 = (event: React.FormEvent) => {
         event.preventDefault();
 
         if (!validatedTokenName) {
@@ -201,51 +278,28 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             setMintLimitError(true);
             return;
         }
-        const twitterUrlPattern = /^(https?:\/\/)?(www\.)?twitter\.com\/[a-zA-Z0-9_]{1,15}$/;
-
-        if (x && !twitterUrlPattern.test(x)) {
-            setErrorToField(
-                formErrors,
-                setFormErrors,
-                'x',
-                'Please enter a valid Twitter URL (e.g., https://twitter.com/username, twitter.com/username)',
-            );
-            return;
-        }
 
         setTickerMessage('');
         clearFormErrors(setFormErrors);
 
-        const tokenData: TokenDeploy = {
+        const tokenData: TokenKRC20Deploy = {
             ticker: validatedTokenName,
             totalSupply: convertToProtocolFormat(totalSupply),
             mintLimit: convertToProtocolFormat(mintLimit),
-            preAllocation: convertToProtocolFormat(preAllocation),
-            description,
-            website,
-            x,
-            discord,
-            telegram,
-            logo: logo || null,
-            banner: banner || null,
-            whitepaper,
-            medium,
-            github,
-            audit,
-            founders: foundersHandles.split(',').map((handle) => handle.trim()),
-            contacts: contact.split(',').map((contact) => contact.trim()),
+            preAllocation: preAllocation ? convertToProtocolFormat(preAllocation) : '',
         };
         console.log(tokenData);
-
-        const reviewTokenData: TokenDeploy = {
+        const preAllocationChecker = preAllocation ? preAllocation : '0';
+        const reviewTokenData: TokenKRC20Deploy = {
             ticker: validatedTokenName,
             totalSupply,
             mintLimit,
-            preAllocation: `${preAllocation} (${preAllocationPercentage}%)`,
+            preAllocation: `${preAllocationChecker} (${preAllocationPercentage}%)`,
         };
+        console.log(reviewTokenData);
 
         setReviewTokenData(reviewTokenData);
-        setTokenDetails(tokenData);
+        setTokenKRC20Details(tokenData);
         setShowDeployDialog(true);
     };
 
@@ -260,61 +314,89 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     };
 
     const handleDeploy = async () => {
-        if (!tokenDetails) return;
+        if (!tokenKRC20Details) return;
 
-        if (walletBalance < 1000) return;
+        if (walletBalance < 1000) {
+            showGlobalSnackbar({
+                message: 'Insufficient funds to deploy token, you need 1000 KAS',
+                severity: 'error',
+            });
+            return;
+        }
 
         const inscribeJsonString = JSON.stringify({
             p: 'KRC-20',
             op: 'deploy',
-            tick: tokenDetails.ticker,
-            max: tokenDetails.totalSupply,
-            lim: tokenDetails.mintLimit,
-            pre: tokenDetails.preAllocation,
+            tick: tokenKRC20Details.ticker,
+            max: tokenKRC20Details.totalSupply,
+            lim: tokenKRC20Details.mintLimit,
+            pre: tokenKRC20Details.preAllocation,
         });
 
-        const tokenDetailsForm = new FormData();
+        // const tokenDetailsForm = new FormData();
 
-        for (const [key, value] of Object.entries(tokenDetails)) {
-            tokenDetailsForm.append(key, value as string);
-        }
+        // for (const [key, value] of Object.entries(tokenKRC20Details)) {
+        //     tokenDetailsForm.append(key, value as string);
+        // }
 
         try {
-            tokenDetailsForm.append('transactionHash', 'validation-only');
+            // You add this GILAD I do not get it lol
+            // const validateResults = await sendServerRequestAndSetErrorsIfNeeded<boolean>(
+            //     () => validateFormDetailsForUpdateTokenMetadataAfterDeploy(tokenDetailsForm),
+            //     setFormErrors,
+            // );
 
-            const validateResults = await sendServerRequestAndSetErrorsIfNeeded<boolean>(
-                () => validateFormDetailsForUpdateTokenMetadataAfterDeploy(tokenDetailsForm),
-                setFormErrors,
-            );
+            // if (!validateResults) {
+            //     // User need to fix errors
 
-            tokenDetailsForm.delete('transactionHash');
+            //     setShowDeployDialog(false);
+            //     return;
+            // }
 
-            if (!validateResults) {
-                // User need to fix errors
-
-                setShowDeployDialog(false);
-                return;
-            }
-
+            setIsDeploying(true);
             const txid = await deployKRC20Token(inscribeJsonString);
 
-            console.log(inscribeJsonString);
-            console.log('Deployment successful, txid:', txid);
-            tokenDetailsForm.append('transactionHash', txid);
+            if (txid) {
+                await delay(14000);
+                const token = await fetchTokenInfo(tokenKRC20Details.ticker, true);
 
-            const result = await sendServerRequestAndSetErrorsIfNeeded<boolean>(
-                () => updateTokenMetadataAfterDeploy(tokenDetailsForm),
-                setFormErrors,
-            );
+                if (token.state === 'deployed') {
+                    showGlobalSnackbar({
+                        message: 'Token deployed successfully',
+                        severity: 'success',
+                    });
+                    setShowDeployDialog(false);
+                    setIsDeploying(false);
+                    const balance = await fetchWalletBalance(walletAddress);
+                    setWalletBalance(setWalletBalanceUtil(balance));
+                    console.log('token', token);
+                    setIsTokenDeployed(true);
 
-            if (!result) {
-                // TODO: Show error to the user
-                throw new Error('Failed to save token metadata');
-            } else {
-                // TODO: Show success to the user
+                    console.log(inscribeJsonString);
+                    console.log('Deployment successful, txid:', txid);
+                } else {
+                    showGlobalSnackbar({
+                        message: 'Token deployment failed',
+                        severity: 'error',
+                    });
+                    setShowDeployDialog(false);
+                    setIsDeploying(false);
+                }
             }
 
-            setShowDeployDialog(false);
+            // const result = await sendServerRequestAndSetErrorsIfNeeded<boolean>(
+            //     () => updateTokenMetadataAfterDeploy(tokenDetailsForm),
+            //     setFormErrors,
+            // );
+
+            // if (!result) {
+            //     // TODO: Show error to the user
+            //     throw new Error('Failed to save token metadata');
+            // } else {
+            //     // TODO: Show success to the user
+            // }
+
+            // setShowDeployDialog(false);
             // } else {
             //     console.error('Insufficient funds to deploy KRC20 token');
             // }
@@ -322,6 +404,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         } catch (error) {
             console.error('Failed to deploy KRC20 token:', error);
             setShowDeployDialog(false);
+            setIsDeploying(false);
             // Handle error (e.g., show an error message)
         }
     };
@@ -362,10 +445,10 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 <Typography sx={{ fontSize: '2.2vw', fontWeight: '500' }} variant="h4" gutterBottom>
                     KRC-20 Token Information
                 </Typography>
-                <form id="tokenForm" onSubmit={handleSubmit}>
+                <form id="tokenKrc20Form" onSubmit={handleSubmitKRC20}>
                     <Grid container spacing={2}>
                         <Grid item xs={6}>
-                            <TextInfo
+                            <TextInfoTicker
                                 label="Name of the token"
                                 variant="outlined"
                                 fullWidth
@@ -469,18 +552,19 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                             />
                         </Grid>
                     </Grid>
+                </form>
 
-                    <Typography
-                        sx={{ fontSize: '2.2vw', fontWeight: '500', marginTop: '2vh' }}
-                        variant="h4"
-                        gutterBottom
-                    >
-                        Token Metadata
-                        <Tooltip title="This metadata is used for listing your project and generating insights on the token's page.">
-                            <InfoOutlinedIcon sx={{ marginLeft: '1vh' }} fontSize="small" />
-                        </Tooltip>
-                    </Typography>
-
+                <Typography
+                    sx={{ fontSize: '2.2vw', fontWeight: '500', marginTop: '2vh' }}
+                    variant="h4"
+                    gutterBottom
+                >
+                    Token Metadata
+                    <Tooltip title="This metadata is used for listing your project and generating insights on the token's page.">
+                        <InfoOutlinedIcon sx={{ marginLeft: '1vh' }} fontSize="small" />
+                    </Tooltip>
+                </Typography>
+                <form id="tokenMetadataForm" onSubmit={handleSubmitTokenMetadata}>
                     <Grid container spacing={2}>
                         <Grid item xs={6}>
                             <TextInfo
@@ -600,7 +684,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 fullWidth
                                 value={github}
                                 onChange={(e) => setGithub(e.target.value)}
-                                placeholder="GitHub link"
+                                placeholder="GitHub Repository link"
                             />
                         </Grid>
                         <Grid item xs={6}>
@@ -748,31 +832,60 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     {hasErrors(formErrors, 'banner') && (
                         <Info className="error">{'File type must be image and size must be less than 50MB'}</Info>
                     )}
-
-                    <Button
-                        sx={{
-                            width: '100%',
-                            marginTop: '1vh',
-                        }}
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        className="button"
-                    >
-                        Review
-                    </Button>
                 </form>
+
+                <Grid container spacing={2} sx={{ marginTop: '1vh' }}>
+                    <Grid item xs={6}>
+                        <Tooltip title={!walletConnected ? 'Please connect your wallet to mint a token' : ''}>
+                            <span>
+                                <Button
+                                    type="submit"
+                                    form="tokenKrc20Form"
+                                    variant="contained"
+                                    color="primary"
+                                    className="button"
+                                    fullWidth
+                                    disabled={!walletConnected}
+                                >
+                                    Review Token
+                                </Button>
+                            </span>
+                        </Tooltip>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Button
+                            type="submit"
+                            form="tokenMetadataForm"
+                            variant="contained"
+                            color="primary"
+                            className="button"
+                            fullWidth
+                            disabled={!isTokenDeployed} // isTokenDeployed should be set to true after deployment
+                        >
+                            List Token
+                        </Button>
+                    </Grid>
+                </Grid>
                 <Info>
                     Note: Each deployment costs 1000 $KAS. This cannot be undone, check the ticker and the details
-                    before you deploy.
+                    before\ you deploy.
                 </Info>
             </DeployForm>
-            {showDeployDialog && tokenDetails && (
+            {showDeployDialog && tokenKRC20Details && (
                 <DeployDialog
                     open={showDeployDialog}
                     onClose={() => setShowDeployDialog(false)}
                     onDeploy={() => handleDeploy()}
                     tokenData={reviewTokenData}
+                    isDeploying={isDeploying}
+                />
+            )}
+            {showReviewListTokenDialog && tokenMetadataDetails && (
+                <ReviewListTokenDialog
+                    open={showDeployDialog}
+                    onClose={() => setShowReviewListTokenDialog(false)}
+                    onList={() => handleTokenListing()}
+                    tokenMetadata={tokenMetadataDetails}
                 />
             )}
         </Container>

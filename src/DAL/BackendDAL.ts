@@ -43,13 +43,13 @@ export async function fetchTokenByTicker(
     refresh = false,
 ): Promise<BackendTokenResponse> {
     const params = {};
-
+    const capitalTicker = ticker.toUpperCase();
     if (refresh) {
         params['refresh'] = true;
     }
 
     try {
-        const response = await backendService.get<BackendTokenResponse>(`/${KRC20CONTROLLER}/${ticker}`, {
+        const response = await backendService.get<BackendTokenResponse>(`/${KRC20CONTROLLER}/${capitalTicker}`, {
             headers: { wallet },
             params,
         });

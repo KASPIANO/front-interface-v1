@@ -5,6 +5,7 @@ import { getCurrentAccount, mintKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { fetchTokenByTicker } from '../../../DAL/BackendDAL';
 import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
+import { setWalletBalanceUtil } from '../../../utils/Utils';
 
 interface MintingComponentProps {
     tokenInfo: BackendTokenResponse;
@@ -58,7 +59,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
             const account = await getCurrentAccount();
             const updatedTokenData = await fetchTokenByTicker(ticker, walletAddress, true);
             const balance = await fetchWalletBalance(account);
-            setWalletBalance(balance);
+            setWalletBalance(setWalletBalanceUtil(balance));
             setTokenInfo(updatedTokenData);
         } catch (error) {
             showGlobalSnackbar({
