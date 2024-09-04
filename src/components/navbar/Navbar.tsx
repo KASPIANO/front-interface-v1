@@ -1,7 +1,8 @@
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
+import MenuIcon from '@mui/icons-material/Menu';
 import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
-import { Avatar, IconButton, Tooltip, Typography } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import { Avatar, Drawer, IconButton, List, ListItem, ListItemText, Tooltip, Typography } from '@mui/material';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../../main';
 import { ThemeModes } from '../../utils/Utils';
@@ -19,16 +20,17 @@ interface NavbarProps {
     setBackgroundBlur: (isFocused: boolean) => void;
     backgroundBlur: boolean;
 }
-
 const Navbar: React.FC<NavbarProps> = (props) => {
     const { walletBalance, walletConnected, disconnectWallet, connectWallet, setBackgroundBlur, backgroundBlur } =
         props;
     const [activePage, setActivePage] = useState('/');
+    const [drawerOpen, setDrawerOpen] = useState(false);
 
     const themeContext = useContext(ThemeContext);
     const navigate = useNavigate();
 
     const darkmode = themeContext.themeMode === ThemeModes.DARK;
+
     useEffect(() => {
         setActivePage(window.location.pathname);
     }, []);
@@ -36,6 +38,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
     const handleNavButtonClick = (page: string) => {
         setActivePage(page);
         navigate(page);
+        setDrawerOpen(false); // Close the drawer when a menu item is clicked
     };
 
     const formatNumberWithCommas = (value: number) => {
@@ -51,6 +54,24 @@ const Navbar: React.FC<NavbarProps> = (props) => {
         }
     };
 
+    const toggleDrawer = (open) => {
+        setDrawerOpen(open);
+    };
+
+    const menuItems = (
+        <List>
+            <ListItem button onClick={() => handleNavButtonClick('/')}>
+                <ListItemText primary="KRC-20" />
+            </ListItem>
+            <ListItem button onClick={() => handleNavButtonClick('/deploy')}>
+                <ListItemText primary="Deploy" />
+            </ListItem>
+            <ListItem button onClick={() => handleNavButtonClick('/portfolio')}>
+                <ListItemText primary="Portfolio" />
+            </ListItem>
+        </List>
+    );
+
     return (
         <NavbarContainer sx={{ height: backgroundBlur ? '9vh' : '7vh' }}>
             <Logo onClick={() => handleNavButtonClick('/')} sx={{ display: 'flex', alignContent: 'center' }}>
@@ -65,7 +86,16 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                 />
                 Kaspiano
             </Logo>
-            <NavCenter>
+            <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                sx={{ display: { xs: 'block', md: 'none' }, marginLeft: 'auto' }}
+                onClick={() => toggleDrawer(true)}
+            >
+                <MenuIcon />
+            </IconButton>
+            <NavCenter sx={{ display: { xs: 'none', md: 'flex' } }}>
                 <NavButton isActive={activePage === '/'} onClick={() => handleNavButtonClick('/')}>
                     KRC-20
                 </NavButton>
@@ -110,7 +140,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                         {formatNumberWithCommas(walletBalance)} KAS
                     </Typography>
                 </WalletBalance>
-                <ConnectButton onClick={() => handleConnectButton()}>
+                <ConnectButton onClick={handleConnectButton}>
                     {walletConnected ? 'Disconnect' : 'Connect'}
                 </ConnectButton>
                 {/* <FormControl variant="outlined" size="small" sx={{ marginLeft: '1vw' }}>
@@ -143,6 +173,9 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                     </Tooltip>
                 )}
             </div>
+            <Drawer anchor="left" open={drawerOpen} onClose={() => toggleDrawer(false)}>
+                {menuItems}
+            </Drawer>
         </NavbarContainer>
     );
 };
