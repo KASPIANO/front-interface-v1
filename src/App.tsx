@@ -3,15 +3,20 @@ import { ThemeProvider } from '@mui/material/styles';
 import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { showGlobalSnackbar } from './components/alert-context/AlertContext';
+import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
 import { fetchWalletBalance } from './DAL/KaspaApiDal';
 import { ThemeContext } from './main';
+import PrivacyPolicy from './pages/compliance/PrivacyPolicy';
+import TermsOfService from './pages/compliance/TermsOfService';
+import TrustSafety from './pages/compliance/TrustSafety';
 import DeployPage from './pages/deploy-page/DeployPage';
 import GridPage from './pages/krc-20/GridPage';
 import PortfolioPage from './pages/portfolio-page/PortfolioPage';
 import TokenPage from './pages/token-page/TokenPage';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
+import { UserVerfication } from './types/Types';
 import { disconnect, isKasWareInstalled, requestAccounts, signMessage, switchNetwork } from './utils/KaswareUtils';
 import {
     generateNonce,
@@ -20,11 +25,6 @@ import {
     setWalletBalanceUtil,
     ThemeModes,
 } from './utils/Utils';
-import Footer from './components/footer/Footer';
-import PrivacyPolicy from './pages/compliance/PrivacyPolicy';
-import TermsOfService from './pages/compliance/TermsOfService';
-import TrustSafety from './pages/compliance/TrustSafety';
-import { UserVerfication } from './types/Types';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -203,55 +203,60 @@ Request ID: ${requestId}
                             setBackgroundBlur={setBackgroundBlur}
                             backgroundBlur={backgroundBlur}
                         />
-                        <Routes>
-                            <Route
-                                path="/"
-                                element={
-                                    <GridPage
-                                        backgroundBlur={backgroundBlur}
-                                        walletConnected={walletConnected}
-                                        walletAddress={walletAddress}
-                                        walletBalance={walletBalance}
-                                    />
-                                }
-                            />
-                            <Route
-                                path="/token/:ticker"
-                                element={
-                                    <TokenPage
-                                        backgroundBlur={backgroundBlur}
-                                        network={network}
-                                        walletAddress={walletAddress}
-                                        connectWallet={requestAccounts}
-                                        handleNetworkChange={handleNetworkChange}
-                                        setWalletBalance={setWalletBalance}
-                                        walletBalance={walletBalance}
-                                        walletConnected={walletConnected}
-                                    />
-                                }
-                            />
-                            <Route
-                                path="/deploy"
-                                element={
-                                    <DeployPage walletBalance={walletBalance} backgroundBlur={backgroundBlur} />
-                                }
-                            />
-                            <Route
-                                path="/portfolio"
-                                element={
-                                    <PortfolioPage
-                                        walletAddress={walletAddress}
-                                        backgroundBlur={backgroundBlur}
-                                        walletConnected={walletConnected}
-                                    />
-                                }
-                            />
-                            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                            <Route path="/terms-service" element={<TermsOfService />} />
-                            <Route path="/trust-safety" element={<TrustSafety />} />
-                            {/* Handle 404 - Not Found */}
-                            <Route path="*" element={<div>404 - Not Found</div>} />
-                        </Routes>
+                        <div style={{ padding: '20px' }}>
+                            <Routes>
+                                <Route
+                                    path="/"
+                                    element={
+                                        <GridPage
+                                            backgroundBlur={backgroundBlur}
+                                            walletConnected={walletConnected}
+                                            walletAddress={walletAddress}
+                                            walletBalance={walletBalance}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/token/:ticker"
+                                    element={
+                                        <TokenPage
+                                            backgroundBlur={backgroundBlur}
+                                            network={network}
+                                            walletAddress={walletAddress}
+                                            connectWallet={requestAccounts}
+                                            handleNetworkChange={handleNetworkChange}
+                                            setWalletBalance={setWalletBalance}
+                                            walletBalance={walletBalance}
+                                            walletConnected={walletConnected}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/deploy"
+                                    element={
+                                        <DeployPage
+                                            walletBalance={walletBalance}
+                                            backgroundBlur={backgroundBlur}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/portfolio"
+                                    element={
+                                        <PortfolioPage
+                                            walletAddress={walletAddress}
+                                            backgroundBlur={backgroundBlur}
+                                            walletConnected={walletConnected}
+                                        />
+                                    }
+                                />
+                                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                                <Route path="/terms-service" element={<TermsOfService />} />
+                                <Route path="/trust-safety" element={<TrustSafety />} />
+                                {/* Handle 404 - Not Found */}
+                                <Route path="*" element={<div>404 - Not Found</div>} />
+                            </Routes>
+                        </div>
                         <Footer />
                     </BrowserRouter>
                 </ThemeProvider>
