@@ -25,7 +25,6 @@ import PrivacyPolicy from './pages/compliance/PrivacyPolicy';
 import TermsOfService from './pages/compliance/TermsOfService';
 import TrustSafety from './pages/compliance/TrustSafety';
 import { UserVerfication } from './types/Types';
-import { set } from 'lodash';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
