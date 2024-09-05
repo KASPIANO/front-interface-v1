@@ -18,6 +18,7 @@ import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import TokenInfoDialog from '../../../dialogs/token-info/TokenInfoDialog';
 import { AddBanner, AddBox, AddText } from './token-sidebar-socials-bar/TokenSidebarSocialsBar.s';
 import SuccessModal from '../../../modals/sent-token-info-success/SuccessModal';
+import { formatNumberWithCommas, simplifyNumber } from '../../../../utils/Utils';
 import { updateWalletSentiment } from '../../../../DAL/BackendDAL';
 
 export type SentimentButtonsConfig = {
@@ -37,7 +38,7 @@ interface TokenSideBarInfoProps {
 //     'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Full-Color.png';
 
 const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
-    const { tokenInfo, setTokenInfo, priceInfo } = props;
+    const { tokenInfo, setTokenInfo, priceInfo, walletAddress, walletConnected } = props;
     const [showTokenInfoDialog, setShowTokenInfoDialog] = useState(false);
     const [showSentimentLoader, setShowSentimentLoader] = useState(false);
     const [selectedSentiment, setSelectedSentiment] = useState<string>(null);
@@ -53,7 +54,17 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         { key: 'warning', icon: <WarningAmberRoundedIcon sx={{ fontSize: '1.4vw' }} color="warning" /> },
     ];
     useEffect(() => {
-        setSocials((tokenInfo.metadata?.socials || {}) as TokenSidebarSocialsBarOptions);
+        setSocials((prevSocials) => {
+            if (tokenInfo.metadata?.socials) {
+                return {
+                    telegram: tokenInfo.metadata.socials.telegram || '',
+                    website: tokenInfo.metadata.socials.website || '',
+                    x: tokenInfo.metadata.socials.x || '',
+                };
+            }
+            return prevSocials;
+        });
+
         setSentimentValues(
             tokenInfo.metadata?.sentiment || {
                 love: 0,
@@ -71,7 +82,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         sentimentValues ? sentimentValues[key] || '0' : '---';
 
     const onSentimentButtonClick = async (key: keyof TokenSentiment) => {
-        if (!props.walletConnected) {
+        if (!walletConnected) {
             return;
         }
 
@@ -79,7 +90,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
 
         try {
             const sentimentToSet = tokenInfo.metadata?.selectedSentiment === key ? null : key;
-            const result = await updateWalletSentiment(tokenInfo.ticker, props.walletAddress, sentimentToSet);
+            const result = await updateWalletSentiment(tokenInfo.ticker, walletAddress, sentimentToSet);
 
             setTokenInfo({ ...tokenInfo, metadata: result });
         } catch (error) {
@@ -114,7 +125,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         setOpenModal(true);
     };
 
-    const tokenMax = tokenInfo.totalSupply;
+    const preMintedSupplyPercentage = (tokenInfo.preMintedSupply / tokenInfo.totalSupply) * 100;
 
     return (
         <Box
@@ -130,7 +141,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                 {tokenInfo.metadata?.bannerUrl ? (
                     <Box
                         component="img"
-                        alt={props.tokenInfo.ticker}
+                        alt={tokenInfo.ticker}
                         src={tokenInfo.metadata?.bannerUrl}
                         sx={{
                             height: '19vh',
@@ -179,16 +190,18 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                         <Typography variant="body2" align="center" color="text.secondary">
                             SUPPLY
                         </Typography>
-                        <Typography variant="body2" align="center">
-                            {tokenMax}
-                        </Typography>
+                        <Tooltip title={formatNumberWithCommas(tokenInfo.totalSupply)}>
+                            <Typography variant="body2" align="center">
+                                {simplifyNumber(tokenInfo.totalSupply)}
+                            </Typography>
+                        </Tooltip>
                     </StatCard>
                     <StatCard>
                         <Typography variant="body2" align="center" color="text.secondary">
-                            LIQUIDITY
+                            PREMINTED
                         </Typography>
                         <Typography variant="body2" align="center">
-                            {priceInfo ? priceInfo.liquidity : '90K'}
+                            {preMintedSupplyPercentage.toFixed(2)}%
                         </Typography>
                     </StatCard>
                     <StatCard>
@@ -228,9 +241,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                         sentimentButtonsConfig.map((button) => (
                             <Tooltip
                                 key={`${button.key}tooltip`}
-                                title={
-                                    props.walletConnected ? '' : 'Please connect your wallet to choose a sentiment'
-                                }
+                                title={walletConnected ? '' : 'Please connect your wallet to choose a sentiment'}
                             >
                                 <SentimentButton
                                     variant="outlined"

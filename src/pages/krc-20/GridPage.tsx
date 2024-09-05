@@ -17,7 +17,7 @@ interface GridPageProps {
 const PAGE_TOKENS_COUNT = 50;
 
 const GridPage: FC<GridPageProps> = (props) => {
-    const { walletBalance, walletConnected, backgroundBlur } = props;
+    const { walletBalance, walletConnected, backgroundBlur, walletAddress } = props;
 
     const [totalTokensDeployed, setTotalTokensDeployed] = useState(0);
     const [sortParams, setSortParams] = useState({ field: '', asc: false });
@@ -48,7 +48,7 @@ const GridPage: FC<GridPageProps> = (props) => {
                     tokensList={flatten(tokenListPages?.pages || [])}
                     fetchNextPage={fetchNextPage}
                     sortBy={onSortBy}
-                    walletAddress={props.walletAddress}
+                    walletAddress={walletAddress}
                 />
             </StyledDataGridContainer>
             {/* {showNotification && walletAddress && (

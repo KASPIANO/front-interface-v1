@@ -13,33 +13,31 @@ interface OptionSelectionProps {
 }
 
 const OptionSelection: FC<OptionSelectionProps> = (props) => {
+    const { options, value, onChange } = props;
     const [currentOptions, setCurrentOptions] = useState([]);
 
     useEffect(() => {
         let optionsMapped: OptionSelectionItem[] = [];
 
-        if (
-            Array.isArray(props.options) &&
-            (typeof props.options[0] === 'string' || typeof props.options[0] === 'number')
-        ) {
-            optionsMapped = props.options.map((item) => ({
+        if (Array.isArray(options) && (typeof options[0] === 'string' || typeof options[0] === 'number')) {
+            optionsMapped = options.map((item) => ({
                 label: item.toString(),
                 value: item,
             }));
         } else {
-            optionsMapped = props.options as OptionSelectionItem[];
+            optionsMapped = options as OptionSelectionItem[];
         }
 
         setCurrentOptions(optionsMapped);
-    }, [props.options]);
+    }, [options]);
 
     return (
         <OptionSelectionGroup>
             {currentOptions.map((item) => (
                 <OptionSelectionButton
                     key={item.value}
-                    className={item.value === props.value ? 'selected' : ''}
-                    onClick={() => props.onChange(item.value)}
+                    className={item.value === value ? 'selected' : ''}
+                    onClick={() => onChange(item.value)}
                 >
                     {item.label || item.value}
                 </OptionSelectionButton>

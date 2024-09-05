@@ -47,7 +47,15 @@ const fieldToSortProp = {
 };
 
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
-    const { tokensList, fetchNextPage, totalTokensDeployed, walletBalance, walletConnected } = props;
+    const {
+        tokensList,
+        fetchNextPage,
+        totalTokensDeployed,
+        walletBalance,
+        walletConnected,
+        sortBy,
+        walletAddress,
+    } = props;
     const [activeHeader, setActiveHeader] = useState<string>('');
     const navigate = useNavigate();
 
@@ -57,9 +65,9 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
 
     const headerFunction = (field: string, filterState: FilterState) => {
         if (filterState === FilterState.NONE) {
-            props.sortBy(null, null);
+            sortBy(null, null);
         } else {
-            props.sortBy(field, filterState === FilterState.UP);
+            sortBy(field, filterState === FilterState.UP);
         }
     };
 
@@ -131,7 +139,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                                 tokenKey={tokenKey}
                                 handleItemClick={handleItemClick}
                                 token={token}
-                                walletAddress={props.walletAddress}
+                                walletAddress={walletAddress}
                             />
                         );
                     })}

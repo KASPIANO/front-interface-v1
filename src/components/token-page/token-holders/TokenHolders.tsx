@@ -20,17 +20,18 @@ interface TokenHoldersProps {
 }
 
 const TokenHolders: FC<TokenHoldersProps> = (props) => {
+    const { tokenInfo } = props;
     const [limit, setLimit] = useState(10);
     const [tokenHolders, setTokenHolders] = useState<BackendTokenHolder[]>([]);
 
     useEffect(() => {
-        setTokenHolders(props.tokenInfo?.topHolders || []);
+        setTokenHolders(tokenInfo?.topHolders || []);
 
-        // const tokenHoldersDuplicated = [...props.tokenInfo?.topHolders || []].flatMap((holder) =>
+        // const tokenHoldersDuplicated = [...tokenInfo?.topHolders || []].flatMap((holder) =>
         //     Array(20).fill(holder)
         // );
         // setTokenHolders(tokenHoldersDuplicated);
-    }, [props.tokenInfo?.topHolders]);
+    }, [tokenInfo?.topHolders]);
 
     const handleLimitChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setLimit(Number(event.target.value));
@@ -95,8 +96,7 @@ const TokenHolders: FC<TokenHoldersProps> = (props) => {
                                         </Tooltip>
                                     </TableCell>
                                     <TableCell>
-                                        {((holder.balance / (props.tokenInfo?.totalMinted || 0)) * 100).toFixed(2)}
-                                        %
+                                        {((holder.balance / (tokenInfo?.totalMinted || 0)) * 100).toFixed(2)}%
                                     </TableCell>
                                     <TableCell>{holder.balance}</TableCell>
                                 </TableRow>
