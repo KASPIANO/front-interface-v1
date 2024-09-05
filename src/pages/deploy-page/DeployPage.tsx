@@ -72,9 +72,9 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const [limitSupplyError, setLimitSupplyError] = useState(false);
     const [preAllocationError, setPreAllocationError] = useState(false);
     const [reviewTokenData, setReviewTokenData] = useState<TokenKRC20Deploy>(null);
-    const [isTokenDeployed, setIsTokenDeployed] = useState(false);
     const [showReviewListTokenDialog, setShowReviewListTokenDialog] = useState(false);
     const [isDeploying, setIsDeploying] = useState(false);
+    const [waitingForTokenConfirmation, setWaitingForTokenConfirmation] = useState(false);
 
     const validateTokenFullName = (name: string) => {
         const regex = /^[A-Za-z]{4,6}$/;
@@ -205,17 +205,19 @@ const DeployPage: FC<DeployPageProps> = (props) => {
 
     const handleSubmitTokenMetadata = (event: React.FormEvent) => {
         event.preventDefault();
-        const twitterUrlPattern = /^(https?:\/\/)?(www\.)?twitter\.com\/[a-zA-Z0-9_]{1,15}$/;
+        const twitterUrlPattern = /^(https?:\/\/)?(www\.)?x\.com\/[a-zA-Z0-9_]{1,15}$/;
 
-        if (x && !twitterUrlPattern.test(x)) {
+        if (!x && !twitterUrlPattern.test(x)) {
             setErrorToField(
                 formErrors,
                 setFormErrors,
                 'x',
-                'Please enter a valid Twitter URL (e.g., https://twitter.com/username, twitter.com/username)',
+                'Please enter a valid X/Twitter URL (e.g., https://x.com/username, x.com/username)',
             );
             return;
         }
+        setFormErrors({});
+
         const tokenMetadata: TokenKRC20DeployMetadata = {
             description,
             website,
@@ -233,12 +235,15 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         };
 
         setTokenMetadataDetails(tokenMetadata);
+        console.log('Token metadata:', tokenMetadata);
         setShowReviewListTokenDialog(true);
     };
 
     const handleTokenListing = async () => {
         if (!tokenMetadataDetails) return;
-        if (walletBalance < VERIFICATION_FEE_SOMPI) {
+        console.log('Token metadata:', tokenMetadataDetails);
+        console.log('VERIFICATION_FEE_KAS', VERIFICATION_FEE_KAS);
+        if (walletBalance < VERIFICATION_FEE_KAS) {
             showGlobalSnackbar({
                 message: 'Insufficient funds to list token',
                 severity: 'error',
@@ -256,6 +261,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             });
             // Token listing request to backend
             console.log('Token listing request to backend:', tokenMetadataDetails);
+
             setShowReviewListTokenDialog(false);
         } else {
             showGlobalSnackbar({
@@ -288,7 +294,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             mintLimit: convertToProtocolFormat(mintLimit),
             preAllocation: preAllocation ? convertToProtocolFormat(preAllocation) : '',
         };
-        console.log(tokenData);
         const preAllocationChecker = preAllocation ? preAllocation : '0';
         const reviewTokenData: TokenKRC20Deploy = {
             ticker: validatedTokenName,
@@ -296,7 +301,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             mintLimit,
             preAllocation: `${preAllocationChecker} (${preAllocationPercentage}%)`,
         };
-        console.log(reviewTokenData);
 
         setReviewTokenData(reviewTokenData);
         setTokenKRC20Details(tokenData);
@@ -357,20 +361,22 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             const txid = await deployKRC20Token(inscribeJsonString);
 
             if (txid) {
+                setIsDeploying(false);
+                setWaitingForTokenConfirmation(true);
                 await delay(14000);
                 const token = await fetchTokenInfo(tokenKRC20Details.ticker, true);
 
                 if (token.state === 'deployed') {
+                    setWaitingForTokenConfirmation(false);
+                    setShowDeployDialog(false);
+                    setIsDeploying(false);
                     showGlobalSnackbar({
                         message: 'Token deployed successfully',
                         severity: 'success',
                     });
-                    setShowDeployDialog(false);
-                    setIsDeploying(false);
                     const balance = await fetchWalletBalance(walletAddress);
                     setWalletBalance(setWalletBalanceUtil(balance));
                     console.log('token', token);
-                    setIsTokenDeployed(true);
 
                     console.log(inscribeJsonString);
                     console.log('Deployment successful, txid:', txid);
@@ -405,7 +411,12 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             console.error('Failed to deploy KRC20 token:', error);
             setShowDeployDialog(false);
             setIsDeploying(false);
-            // Handle error (e.g., show an error message)
+            setWaitingForTokenConfirmation(false);
+            showGlobalSnackbar({
+                message: 'Failed to deploy token',
+                severity: 'error',
+                // Handle error (e.g., show an error message)
+            });
         }
     };
 
@@ -679,7 +690,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                             <TextInfo
-                                label="GitHub"
+                                label="GitHub Repository"
                                 variant="outlined"
                                 fullWidth
                                 value={github}
@@ -703,6 +714,9 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 label="Founders X Handles"
                                 variant="outlined"
                                 fullWidth
+                                multiline // Enables multiline input
+                                minRows={1} // Minimum number of rows when the input is not filled
+                                maxRows={6}
                                 value={foundersHandles}
                                 onChange={(e) => setFoundersHandles(e.target.value)}
                                 placeholder="Founder handles"
@@ -713,7 +727,13 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                             placement="left"
                                             title="List founder's X/Twitter handles. Separate multiple handles using commas."
                                         >
-                                            <IconButton>
+                                            <IconButton
+                                                sx={{
+                                                    '&.MuiIconButton-root': {
+                                                        padding: '0px',
+                                                    },
+                                                }}
+                                            >
                                                 <InfoOutlinedIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>
@@ -726,6 +746,9 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 label="Contact"
                                 variant="outlined"
                                 fullWidth
+                                multiline // Enables multiline input
+                                minRows={1} // Minimum number of rows when the input is not filled
+                                maxRows={6}
                                 value={contact}
                                 onChange={(e) => setContact(e.target.value)}
                                 placeholder="Contact information"
@@ -741,7 +764,13 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                             placement="left"
                                             title="Provide multiple contact methods separated by commas, such as Twitter handles, emails, or Telegram handles."
                                         >
-                                            <IconButton>
+                                            <IconButton
+                                                sx={{
+                                                    '&.MuiIconButton-root': {
+                                                        padding: '0px',
+                                                    },
+                                                }}
+                                            >
                                                 <InfoOutlinedIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>
@@ -860,7 +889,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                             color="primary"
                             className="button"
                             fullWidth
-                            disabled={!isTokenDeployed} // isTokenDeployed should be set to true after deployment
+                            // disabled={!isTokenDeployed} // isTokenDeployed should be set to true after deployment
                         >
                             List Token
                         </Button>
@@ -878,11 +907,12 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     onDeploy={() => handleDeploy()}
                     tokenData={reviewTokenData}
                     isDeploying={isDeploying}
+                    waitingForTokenConfirmation={waitingForTokenConfirmation}
                 />
             )}
             {showReviewListTokenDialog && tokenMetadataDetails && (
                 <ReviewListTokenDialog
-                    open={showDeployDialog}
+                    open={showReviewListTokenDialog}
                     onClose={() => setShowReviewListTokenDialog(false)}
                     onList={() => handleTokenListing()}
                     tokenMetadata={tokenMetadataDetails}

@@ -9,6 +9,7 @@ interface DeployDialogProps {
     onDeploy: () => void;
     tokenData: TokenKRC20Deploy;
     isDeploying?: boolean;
+    waitingForTokenConfirmation: boolean;
 }
 
 const spin = keyframes`
@@ -31,13 +32,27 @@ const Spinner = styled('div')(({ theme }) => ({
 }));
 
 const DeployDialog: React.FC<DeployDialogProps> = (props) => {
-    const { open, onClose, onDeploy, tokenData, isDeploying } = props;
+    const { open, onClose, onDeploy, tokenData, isDeploying, waitingForTokenConfirmation } = props;
+    const [disableDeploy, setDisableDeploy] = React.useState(false);
+    const handleDeploy = () => {
+        onDeploy();
+        setDisableDeploy(true);
+    };
+
     return (
         <Dialog open={open} onClose={onClose}>
-            <DialogTitle>Review Token Deployment</DialogTitle>
+            <DialogTitle sx={{ fontWeight: 'bold' }}>Review Token Deployment</DialogTitle>
             <DialogContent>
                 {isDeploying ? (
-                    <Spinner />
+                    <>
+                        <Spinner />
+                        <Typography variant="body1">Waiting for wallet transaction approval...</Typography>
+                    </>
+                ) : waitingForTokenConfirmation ? (
+                    <>
+                        <Spinner />
+                        <Typography variant="body1">Verifying token deployment...</Typography>
+                    </>
                 ) : (
                     <>
                         {Object.entries(tokenData).map(([key, value]) => (
@@ -55,7 +70,7 @@ const DeployDialog: React.FC<DeployDialogProps> = (props) => {
                 <Box sx={{ flexGrow: 1 }}>
                     <Button onClick={onClose}>Cancel</Button>
                 </Box>
-                <Button onClick={onDeploy} variant="contained">
+                <Button onClick={handleDeploy} variant="contained" disabled={disableDeploy}>
                     Deploy
                 </Button>
             </DialogActions>
