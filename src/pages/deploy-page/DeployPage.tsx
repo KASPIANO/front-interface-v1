@@ -75,6 +75,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const [showReviewListTokenDialog, setShowReviewListTokenDialog] = useState(false);
     const [isDeploying, setIsDeploying] = useState(false);
     const [waitingForTokenConfirmation, setWaitingForTokenConfirmation] = useState(false);
+    const [isTokenDeployed, setIsTokenDeployed] = useState(false);
 
     const validateTokenFullName = (name: string) => {
         const regex = /^[A-Za-z]{4,6}$/;
@@ -262,7 +263,13 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             // Token listing request to backend
             console.log('Token listing request to backend:', tokenMetadataDetails);
 
+            showGlobalSnackbar({
+                message: 'Token listed successfully',
+                severity: 'success',
+            });
             setShowReviewListTokenDialog(false);
+
+            setIsTokenDeployed(false);
         } else {
             showGlobalSnackbar({
                 message: 'Payment failed',
@@ -370,6 +377,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     setWaitingForTokenConfirmation(false);
                     setShowDeployDialog(false);
                     setIsDeploying(false);
+                    setIsTokenDeployed(true);
                     showGlobalSnackbar({
                         message: 'Token deployed successfully',
                         severity: 'success',
@@ -874,7 +882,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                     color="primary"
                                     className="button"
                                     fullWidth
-                                    disabled={!walletConnected}
+                                    disabled={!walletConnected || isTokenDeployed}
                                 >
                                     Review Token
                                 </Button>
@@ -889,7 +897,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                             color="primary"
                             className="button"
                             fullWidth
-                            // disabled={!isTokenDeployed} // isTokenDeployed should be set to true after deployment
+                            disabled={!isTokenDeployed} // isTokenDeployed should be set to true after deployment
                         >
                             List Token
                         </Button>
