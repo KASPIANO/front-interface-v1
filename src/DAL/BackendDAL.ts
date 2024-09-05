@@ -91,26 +91,26 @@ export async function updateWalletSentiment(
     return result.data;
 }
 
-export async function updateTokenMetadataAfterDeploy(
+export async function updateTokenMetadata(
     tokenDetails: FormData, // TokenDeploy
 ): Promise<AxiosResponse<any> | null> {
     // eslint-disable-next-line no-return-await
-    return await makeUpdateTokenMetadataAfterDeployRequest(tokenDetails, false);
+    return await makeUpdateTokenMetadataRequest(tokenDetails, false);
 }
 
-export async function validateFormDetailsForUpdateTokenMetadataAfterDeploy(
+export async function validateFormDetailsForUpdateTokenMetadata(
     tokenDetails: FormData, // TokenDeploy
 ): Promise<AxiosResponse<any> | null> {
     // eslint-disable-next-line no-return-await
-    return await makeUpdateTokenMetadataAfterDeployRequest(tokenDetails, true);
+    return await makeUpdateTokenMetadataRequest(tokenDetails, true);
 }
 
-export async function makeUpdateTokenMetadataAfterDeployRequest(
+export async function makeUpdateTokenMetadataRequest(
     tokenDetails: FormData, // TokenDeploy
     validateOnly = false,
 ): Promise<AxiosResponse<any> | null> {
     try {
-        let url = `/${KRC20METADATA_CONTROLLER}/after-deploy`;
+        let url = `/${KRC20METADATA_CONTROLLER}/update`;
 
         if (validateOnly) {
             url += '-validate';
@@ -141,6 +141,10 @@ export async function sendServerRequestAndSetErrorsIfNeeded<T>(
 
     if (response.status === 400) {
         setErrors(response.data as BackendValidationErrorsType);
+        return null;
+    }
+
+    if (!response || ![200, 201].includes(response.status)) {
         return null;
     }
 
