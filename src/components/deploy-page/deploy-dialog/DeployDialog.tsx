@@ -51,7 +51,7 @@ const DeployDialog: React.FC<DeployDialogProps> = (props) => {
                 ) : waitingForTokenConfirmation ? (
                     <>
                         <Spinner />
-                        <Typography variant="body1">Verifying token deployment...</Typography>
+                        <Typography variant="body1">Verifying Token Deployment...</Typography>
                     </>
                 ) : (
                     <>

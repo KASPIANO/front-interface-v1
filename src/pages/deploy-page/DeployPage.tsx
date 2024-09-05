@@ -240,6 +240,34 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         setShowReviewListTokenDialog(true);
     };
 
+    const handleCleanAllFields = () => {
+        setTokenName('');
+        setValidatedTokenName('');
+        setTotalSupply('');
+        setMintLimit('');
+        setPreAllocation('');
+        setPreAllocationPercentage('');
+        setDescription('');
+        setWebsite('');
+        setX('');
+        setDiscord('');
+        setTelegram('');
+        setWhitepaper('');
+        setMedium('');
+        setGithub('');
+        setAudit('');
+        setFoundersHandles('');
+        setContact('');
+        setLogo(null);
+        setBanner(null);
+        setFormErrors({});
+        setTotalSupplyError(false);
+        setMintLimitError(false);
+        setPreAllocationError(false);
+        setPreAllocationPercentage('');
+        setTickerMessage('');
+    };
+
     const handleTokenListing = async () => {
         if (!tokenMetadataDetails) return;
         console.log('Token metadata:', tokenMetadataDetails);
@@ -270,6 +298,10 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             setShowReviewListTokenDialog(false);
 
             setIsTokenDeployed(false);
+            handleCleanAllFields();
+            setTokenMetadataDetails(null);
+            setReviewTokenData(null);
+            setTokenKRC20Details(null);
         } else {
             showGlobalSnackbar({
                 message: 'Payment failed',
@@ -395,6 +427,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     });
                     setShowDeployDialog(false);
                     setIsDeploying(false);
+                    setWaitingForTokenConfirmation(false);
                 }
             }
 
@@ -468,7 +501,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     <Grid container spacing={2}>
                         <Grid item xs={6}>
                             <TextInfoTicker
-                                label="Name of the token"
+                                label="Token Name"
                                 variant="outlined"
                                 fullWidth
                                 value={tokenName}
@@ -476,7 +509,10 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 placeholder="e.g. KASP"
                                 InputProps={{
                                     endAdornment: (
-                                        <Tooltip placement="left" title="Token name must be 4-6 letters.">
+                                        <Tooltip
+                                            placement="left"
+                                            title="Ticker or Token Name must be 4-6 letters."
+                                        >
                                             <IconButton>
                                                 <InfoOutlinedIcon fontSize="small" />
                                             </IconButton>
@@ -489,7 +525,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                         ? 'success'
                                         : null
                                 }
-                                focused
                                 helperText={getErrorMessage(formErrors, 'ticker') || tickerMessage}
                             />
                         </Grid>
@@ -905,7 +940,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 </Grid>
                 <Info>
                     Note: Each deployment costs 1000 $KAS. This cannot be undone, check the ticker and the details
-                    before\ you deploy.
+                    before you deploy.
                 </Info>
             </DeployForm>
             {showDeployDialog && tokenKRC20Details && (

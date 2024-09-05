@@ -22,6 +22,17 @@ export const TextInfo = styled(TextField)(({ theme }) => ({
     '& .MuiFormHelperText-root': {
         color: theme.palette.success.secondary,
     },
+    '& .MuiOutlinedInput-root': {
+        '& input::placeholder': {
+            color: theme.palette.text.secondary, // Default placeholder color
+        },
+        '&:hover input::placeholder': {
+            color: theme.palette.text.secondary, // Placeholder color on hover
+        },
+        '&.Mui-focused input::placeholder': {
+            color: theme.palette.primary.secondary, // Placeholder color when focused
+        },
+    },
 }));
 
 export const TextInfoTicker = styled(TextField)(({ theme }) => ({
@@ -30,6 +41,17 @@ export const TextInfoTicker = styled(TextField)(({ theme }) => ({
 
     '& .MuiFormHelperText-root': {
         color: theme.palette.success.main,
+    },
+    '& .MuiOutlinedInput-root': {
+        '& input::placeholder': {
+            color: theme.palette.text.secondary, // Default placeholder color
+        },
+        '&:hover input::placeholder': {
+            color: theme.palette.text.secondary, // Placeholder color on hover
+        },
+        '&.Mui-focused input::placeholder': {
+            color: theme.palette.primary.secondary, // Placeholder color when focused
+        },
     },
 }));
 

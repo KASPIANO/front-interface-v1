@@ -66,6 +66,7 @@ const App = () => {
                 await handleUserVerification(accounts, setUserVerified, showGlobalSnackbar);
             }
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [updateWalletState, resetWalletState],
     );
 
@@ -219,10 +220,11 @@ Request ID: ${requestId}
         } catch (error) {
             console.error('Error verifying user:', error);
             showGlobalSnackbar({
-                message: 'Failed to verify user',
+                message: 'Failed to verify user - Connect Again',
                 severity: 'error',
                 details: error.message,
             });
+            resetWalletState();
             return null;
         }
     };
