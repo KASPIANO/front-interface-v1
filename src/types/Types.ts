@@ -44,8 +44,10 @@ export interface BackendTokenMetadata {
     description: string;
     socials: TokenSocials;
     sentiment: TokenSentiment;
+    selectedSentiment: keyof TokenSentiment | null;
     contacts: string[];
     rugScore: number;
+    founders?: string[];
 }
 
 export interface TokenListItemResponse {
@@ -115,11 +117,13 @@ export interface NavItemProps {
     isActive: boolean;
 }
 
-export interface TokenDeploy {
+export interface TokenKRC20Deploy {
     ticker: string;
     totalSupply: string;
     mintLimit: string;
     preAllocation?: string;
+}
+export interface TokenKRC20DeployMetadata {
     description?: string;
     website?: string;
     x?: string;
@@ -127,7 +131,6 @@ export interface TokenDeploy {
     telegram?: string;
     logo?: File;
     banner?: File;
-    transactionHash?: string;
     whitepaper?: string;
     medium?: string;
     audit?: string;
@@ -184,4 +187,12 @@ export interface TokenRowPortfolioItem {
     totalValue?: string;
     oneDayChange?: string;
     logoUrl?: string;
+}
+
+export interface UserVerfication {
+    userWalletAddress: string;
+    userSignedMessageTxId: string;
+    requestId: string;
+    requestNonce: string;
+    requestTimestamp: string;
 }

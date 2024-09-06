@@ -12,12 +12,19 @@ import PortfolioPage from './pages/portfolio-page/PortfolioPage';
 import TokenPage from './pages/token-page/TokenPage';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
-import { disconnect, isKasWareInstalled, requestAccounts, switchNetwork } from './utils/KaswareUtils';
-import { getLocalThemeMode, setWalletBalanceUtil, ThemeModes } from './utils/Utils';
+import { disconnect, isKasWareInstalled, requestAccounts, signMessage, switchNetwork } from './utils/KaswareUtils';
+import {
+    generateNonce,
+    generateRequestId,
+    getLocalThemeMode,
+    setWalletBalanceUtil,
+    ThemeModes,
+} from './utils/Utils';
 import Footer from './components/footer/Footer';
 import PrivacyPolicy from './pages/compliance/PrivacyPolicy';
 import TermsOfService from './pages/compliance/TermsOfService';
 import TrustSafety from './pages/compliance/TrustSafety';
+import { UserVerfication } from './types/Types';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -27,6 +34,7 @@ const App = () => {
     const [network, setNetwork] = useState<string>('mainnet'); // New state for network
     const [, setIsConnecting] = useState<boolean>(false);
     const [backgroundBlur, setBackgroundBlur] = useState(false);
+    const [, setUserVerified] = useState<UserVerfication>(null);
 
     const toggleThemeMode = () => {
         const newMode = themeMode === ThemeModes.DARK ? ThemeModes.LIGHT : ThemeModes.DARK;
@@ -45,14 +53,17 @@ const App = () => {
         setWalletAddress(null);
         setWalletBalance(0);
         setWalletConnected(false);
+        setUserVerified(null);
     }, []);
 
     const handleAccountsChanged = useCallback(
         async (accounts) => {
+            setUserVerified(null);
             if (accounts.length === 0) {
                 resetWalletState();
             } else {
                 await updateWalletState(accounts[0]);
+                await handleUserVerification(accounts, setUserVerified, showGlobalSnackbar);
             }
         },
         [updateWalletState, resetWalletState],
@@ -92,18 +103,50 @@ const App = () => {
     const handleConnectWallet = async () => {
         setIsConnecting(true);
         try {
+            // Check if KasWare is installed
             if (isKasWareInstalled()) {
+                // Request accounts from the wallet
                 const accounts = await requestAccounts();
+
+                // Check if any accounts were returned
                 if (accounts.length > 0) {
+                    // Update wallet state with the first account
                     await updateWalletState(accounts[0]);
+
+                    // Show a success message with part of the wallet address
                     showGlobalSnackbar({
                         message: 'Wallet connected successfully',
                         severity: 'success',
                         details: `Connected to wallet ${accounts[0].substring(0, 9)}....${accounts[0].substring(accounts[0].length - 4)}`,
                     });
+
+                    // Perform user verification
+                    const userVerification = await handleUserVerification(
+                        accounts,
+                        setUserVerified,
+                        showGlobalSnackbar,
+                    );
+
+                    // Log the verification result
+                    console.log('User Verification:', userVerification, accounts[0]);
+                } else {
+                    // If no accounts, show error message and disconnect
+                    showGlobalSnackbar({
+                        message: 'No accounts found in the wallet',
+                        severity: 'error',
+                    });
+                    await handleDisconnect();
                 }
+            } else {
+                // KasWare not installed
+                showGlobalSnackbar({
+                    message: 'KasWare not installed',
+                    severity: 'error',
+                    kasware: true,
+                });
             }
         } catch (error) {
+            // Handle any errors during the wallet connection process
             console.error('Error connecting to wallet:', error);
             showGlobalSnackbar({
                 message: 'Failed to connect wallet',
@@ -111,6 +154,7 @@ const App = () => {
                 details: error.message,
             });
         } finally {
+            // Reset the connecting state
             setIsConnecting(false);
         }
     };
@@ -129,6 +173,57 @@ const App = () => {
                     details: error.message,
                 });
             }
+        }
+    };
+    // Utility function to handle user verification
+    const handleUserVerification = async (accounts: string[], setUserVerified: any, showGlobalSnackbar: any) => {
+        try {
+            const nonce = generateNonce();
+            const requestId = generateRequestId();
+            const requestDate = new Date().toISOString();
+
+            const userVerificationMessage = `
+kaspiano.com wants you to sign in with your Kaspa account:
+
+${accounts[0]}
+
+Welcome to Kaspiano. Signing is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give Kaspiano permission to perform any transactions with your wallet.
+
+URI: https://kaspiano.com
+
+Version: 1
+
+Nonce: ${nonce}
+
+Issued At: ${requestDate}
+
+Request ID: ${requestId}
+        `;
+
+            const userVerification = await signMessage(userVerificationMessage);
+            if (userVerification) {
+                setUserVerified({
+                    userWalletAddress: accounts[0],
+                    userSignedMessageTxId: userVerification,
+                    requestId,
+                    requestNonce: nonce,
+                    requestTimestamp: requestDate,
+                });
+
+                showGlobalSnackbar({
+                    message: 'User verified successfully',
+                    severity: 'success',
+                });
+                return userVerification;
+            }
+        } catch (error) {
+            console.error('Error verifying user:', error);
+            showGlobalSnackbar({
+                message: 'Failed to verify user',
+                severity: 'error',
+                details: error.message,
+            });
+            return null;
         }
     };
 
@@ -181,7 +276,13 @@ const App = () => {
                             <Route
                                 path="/deploy"
                                 element={
-                                    <DeployPage walletBalance={walletBalance} backgroundBlur={backgroundBlur} />
+                                    <DeployPage
+                                        walletBalance={walletBalance}
+                                        backgroundBlur={backgroundBlur}
+                                        walletConnected={walletConnected}
+                                        setWalletBalance={setWalletBalance}
+                                        walletAddress={walletAddress}
+                                    />
                                 }
                             />
                             <Route

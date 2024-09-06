@@ -1,5 +1,8 @@
 import { Stack } from '@chakra-ui/react';
-import { styled, Box, Button, Card } from '@mui/material';
+import { styled, Box, Button, Card, CircularProgress, alpha } from '@mui/material';
+
+const SENTIMENT_BUTTONS_HEIGHT = '7.5vh';
+const SENTIMENT_BUTTONS_PADDING = '10px';
 
 export const DataRow = styled(Box)({
     display: 'flex',
@@ -15,6 +18,7 @@ export const SentimentsContainerBox = styled(Stack)({
     padding: '20px',
     paddingTop: '0',
     justifyContent: 'center',
+    height: `calc(${SENTIMENT_BUTTONS_HEIGHT} + 20px)`,
 });
 
 export const SentimentButton = styled(Button)(({ theme }) => ({
@@ -22,17 +26,25 @@ export const SentimentButton = styled(Button)(({ theme }) => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '7.5vh',
+    height: SENTIMENT_BUTTONS_HEIGHT,
+
+    '&.MuiButton-root': {
+        padding: SENTIMENT_BUTTONS_PADDING,
+        minWidth: '2vw',
+        border: 'transparent',
+    },
 
     '&.selected': {
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.primary.contrastText,
-    },
-    '&:hover': {
-        backgroundColor: theme.palette.primary.main,
+        backgroundColor: alpha(theme.palette.primary.main, 0.4),
         color: theme.palette.primary.contrastText,
     },
 }));
+
+export const SentimentLoader = styled(CircularProgress)({
+    height: SENTIMENT_BUTTONS_HEIGHT,
+    padding: SENTIMENT_BUTTONS_PADDING,
+    width: '100%',
+});
 
 export const TokenProfileContainer = styled(Box)({
     width: '100%',

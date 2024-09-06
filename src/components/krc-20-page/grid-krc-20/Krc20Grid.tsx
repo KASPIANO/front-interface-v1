@@ -12,11 +12,11 @@ import { TokenRow } from '../token-row-grid/TokenRow';
 
 interface TokenDataGridProps {
     tokensList: TokenListItemResponse[];
-    setNextPage: (value: number) => void;
+    fetchNextPage: () => void;
     totalTokensDeployed: number;
-    nextPage: number;
     walletBalance: number;
     walletConnected: boolean;
+    walletAddress: string | null;
     sortBy: (field: string, asc: boolean) => void;
 }
 
@@ -47,7 +47,15 @@ const fieldToSortProp = {
 };
 
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
-    const { tokensList, setNextPage, totalTokensDeployed, nextPage, walletBalance, walletConnected } = props;
+    const {
+        tokensList,
+        fetchNextPage,
+        totalTokensDeployed,
+        walletBalance,
+        walletConnected,
+        sortBy,
+        walletAddress,
+    } = props;
     const [activeHeader, setActiveHeader] = useState<string>('');
     const navigate = useNavigate();
 
@@ -57,9 +65,9 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
 
     const headerFunction = (field: string, filterState: FilterState) => {
         if (filterState === FilterState.NONE) {
-            props.sortBy(null, null);
+            sortBy(null, null);
         } else {
-            props.sortBy(field, filterState === FilterState.UP);
+            sortBy(field, filterState === FilterState.UP);
         }
     };
 
@@ -108,7 +116,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
             >
                 <InfiniteScroll
                     dataLength={tokensList.length}
-                    next={() => setNextPage(nextPage + 1)}
+                    next={() => fetchNextPage()}
                     hasMore={tokensList.length < totalTokensDeployed}
                     loader={[...Array(10)].map((_, index) => (
                         <Skeleton key={index} width={'100%'} height={'12vh'} />
@@ -131,6 +139,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                                 tokenKey={tokenKey}
                                 handleItemClick={handleItemClick}
                                 token={token}
+                                walletAddress={walletAddress}
                             />
                         );
                     })}

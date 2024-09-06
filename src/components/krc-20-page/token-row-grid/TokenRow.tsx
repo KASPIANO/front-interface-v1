@@ -25,6 +25,7 @@ interface TokenRowProps {
     tokenKey: string;
     walletBalance: number;
     walletConnected: boolean;
+    walletAddress: string | null;
 }
 
 export const TokenRow: FC<TokenRowProps> = (props) => {
@@ -161,7 +162,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     />
                     <Stat maxWidth="14%" display="flex" justifyContent="flex-start">
                         <StatNumber style={{ fontSize: '1vw' }} margin="0">
-                            {token.totalMintedPercent?.toFixed(2)}%
+                            {(token.totalMintedPercent * 100).toFixed(2)}%
                         </StatNumber>
                         <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
                             <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />

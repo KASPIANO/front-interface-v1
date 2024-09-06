@@ -15,7 +15,7 @@ interface ScoreLineProps {
 }
 
 const ScoreLine: FC<ScoreLineProps> = (props) => {
-    const { value } = props;
+    const { value, config } = props;
     const theme = useTheme();
 
     const generateGradient = (colorRanges) => {
@@ -52,8 +52,9 @@ const ScoreLine: FC<ScoreLineProps> = (props) => {
     const [thumbColor, setThumbColor] = useState(null);
 
     useEffect(() => {
-        const color = getColorByValue(value, props.config);
+        const color = getColorByValue(value, config);
         setThumbColor(color);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value]);
 
     return (
@@ -71,7 +72,7 @@ const ScoreLine: FC<ScoreLineProps> = (props) => {
                     },
                     '& .MuiSlider-rail': {
                         opacity: 1,
-                        background: generateGradient(props.config),
+                        background: generateGradient(config),
                         border: `1px solid ${theme.palette.primary.main}`,
                         borderRadius: '8px',
                     },

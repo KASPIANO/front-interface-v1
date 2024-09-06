@@ -10,10 +10,12 @@ import { GlobalStyleTokenSideBar } from '../../../utils/GlobalStyleScrollBar';
 interface TokenSideBarProps {
     tokenInfo: BackendTokenResponse;
     setTokenInfo: (tokenInfo: BackendTokenResponse) => void;
+    walletAddress: string | null;
+    walletConnected: boolean;
 }
 
 const TokenSideBar: FC<TokenSideBarProps> = (props) => {
-    const { setTokenInfo, tokenInfo } = props;
+    const { setTokenInfo, tokenInfo, walletAddress, walletConnected } = props;
     const [selectedSideActionTab, setSelectedSideActionTab] = useState('1');
 
     const handleTabChage = (_event: SyntheticEvent, newValue: string) => {
@@ -52,7 +54,12 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                         }}
                         value="1"
                     >
-                        <TokenSideBarInfo tokenInfo={tokenInfo} setTokenInfo={setTokenInfo} />
+                        <TokenSideBarInfo
+                            tokenInfo={tokenInfo}
+                            setTokenInfo={setTokenInfo}
+                            walletConnected={walletConnected}
+                            walletAddress={walletAddress}
+                        />
                     </TabPanel>
                     <TabPanel value="2">Buy The Token</TabPanel>
                     <TabPanel value="3">Sell The Token</TabPanel>

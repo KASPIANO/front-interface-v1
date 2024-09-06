@@ -17,7 +17,7 @@ const Footer: React.FC = () => (
         <Container maxWidth="lg">
             <FooterContent container>
                 {/* Social Media Icons Section */}
-                <Grid item container xs={4} md={4} sm={4} lg={4} direction="column" rowGap={6}>
+                <Grid item container xs={4} md={4} sm={4} lg={4} direction="column" rowGap={1}>
                     <Grid item xs={12} md={12} sm={12} lg={12}>
                         <SocialMediaIcons>
                             <IconButton
@@ -34,6 +34,16 @@ const Footer: React.FC = () => (
                                 <TelegramIcon fontSize="small" />
                             </IconButton>
                         </SocialMediaIcons>
+                    </Grid>
+                    <Grid item xs={12} md={12} sm={12} lg={12}>
+                        <FooterLink
+                            gutterBottom
+                            href="https://chromewebstore.google.com/detail/kasware-wallet/hklhheigdmpoolooomdihmhlpjjdbklf"
+                            target="_blank"
+                            sx={{ fontSize: '0.9vw', color: '#49EACB' }}
+                        >
+                            Kasware Wallet Extension
+                        </FooterLink>
                     </Grid>
                     <Grid item xs={12} md={12} sm={12} lg={12}>
                         <RightsReserved gutterBottom sx={{ fontSize: '0.9vw' }}>

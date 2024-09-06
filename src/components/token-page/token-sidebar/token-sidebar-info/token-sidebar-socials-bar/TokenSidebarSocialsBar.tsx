@@ -5,7 +5,9 @@ import LanguageIcon from '@mui/icons-material/Language';
 import XIcon from '@mui/icons-material/X';
 
 export type TokenSidebarSocialsBarOptions = {
-    [socialName: string]: string;
+    telegram?: string;
+    website?: string;
+    x?: string;
 };
 
 const socialIcons: { [key: string]: JSX.Element } = {
@@ -18,6 +20,7 @@ interface TokenSidebarSocialsBarProps {
 }
 
 const TokenSidebarSocialsBar: FC<TokenSidebarSocialsBarProps> = (props) => {
+    const { options } = props;
     const openLink = (link: string) => {
         window.open(link, '_blank', 'noopener,noreferrer');
     };
@@ -26,8 +29,8 @@ const TokenSidebarSocialsBar: FC<TokenSidebarSocialsBarProps> = (props) => {
 
     return (
         <TokenSidebarSocialsBarGroup>
-            {Object.keys(props.options).map((key) => (
-                <TokenSidebarSocialsBarButton key={key} onClick={() => openLink(props.options[key])}>
+            {Object.keys(options).map((key) => (
+                <TokenSidebarSocialsBarButton key={key} onClick={() => openLink(options[key])}>
                     {socialIcons[key]}
                     {capitalizeFirstLetter(key) === 'X' ? '' : capitalizeFirstLetter(key)}
                 </TokenSidebarSocialsBarButton>

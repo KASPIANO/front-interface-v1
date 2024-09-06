@@ -24,16 +24,15 @@ interface TokenPageProps {
 }
 
 const TokenPage: FC<TokenPageProps> = (props) => {
-    const { walletConnected, walletBalance } = props;
+    const { walletConnected, walletBalance, walletAddress, setWalletBalance, backgroundBlur } = props;
     const { ticker } = useParams();
-    const { backgroundBlur, setWalletBalance } = props;
     const [tokenInfo, setTokenInfo] = useState<BackendTokenResponse>(null);
     const [tokenXHandle, setTokenXHandle] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await fetchTokenByTicker(ticker);
+                const data = await fetchTokenByTicker(ticker, walletAddress);
                 setTokenInfo(data);
             } catch (error) {
                 console.error('Error fetching token info:', error);
@@ -41,7 +40,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         };
 
         fetchData();
-    }, [ticker]);
+    }, [ticker, walletAddress]);
 
     useEffect(() => {
         if (tokenInfo) {
@@ -62,11 +61,15 @@ const TokenPage: FC<TokenPageProps> = (props) => {
                     tokenInfo={tokenInfo}
                     walletBalance={walletBalance}
                     walletConnected={walletConnected}
+                    walletAddress={walletAddress}
+                    setTokenInfo={setTokenInfo}
+                    setWalletBalance={setWalletBalance}
                 />,
             )}
             {getComponentToShow(
                 <RugScore
                     score={tokenInfo?.metadata?.rugScore}
+                    // eslint-disable-next-line @typescript-eslint/no-empty-function
                     onRecalculate={() => {}}
                     xHandle={tokenXHandle}
                     setWalletBalance={setWalletBalance}
@@ -75,7 +78,15 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             )}
             {getComponentToShow(<TopHolders tokenInfo={tokenInfo} />, '19vh')}
             {/* {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)} */}
-            {getComponentToShow(<TokenSideBar tokenInfo={tokenInfo} setTokenInfo={setTokenInfo} />, '91vh')}
+            {getComponentToShow(
+                <TokenSideBar
+                    tokenInfo={tokenInfo}
+                    setTokenInfo={setTokenInfo}
+                    walletConnected={walletConnected}
+                    walletAddress={walletAddress}
+                />,
+                '91vh',
+            )}
 
             {/* {showNotification && walletAddress && (
                 <NotificationComponent

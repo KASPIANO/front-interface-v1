@@ -1,7 +1,13 @@
 import { FC, useEffect, useState } from 'react';
 import { BackendTokenMetadata, BackendTokenResponse, TokenSentiment } from '../../../../types/Types';
-import { Box, Typography } from '@mui/material';
-import { SentimentButton, SentimentsContainerBox, TokenProfileContainer, StatCard } from './TokenSideBarInfo.s';
+import { Box, Tooltip, Typography } from '@mui/material';
+import {
+    SentimentButton,
+    SentimentsContainerBox,
+    TokenProfileContainer,
+    StatCard,
+    SentimentLoader,
+} from './TokenSideBarInfo.s';
 import { RocketLaunchRounded, SentimentNeutralRounded, TrendingDownRounded } from '@mui/icons-material';
 import TokenSidebarSocialsBar, {
     TokenSidebarSocialsBarOptions,
@@ -12,9 +18,11 @@ import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import TokenInfoDialog from '../../../dialogs/token-info/TokenInfoDialog';
 import { AddBanner, AddBox, AddText } from './token-sidebar-socials-bar/TokenSidebarSocialsBar.s';
 import SuccessModal from '../../../modals/sent-token-info-success/SuccessModal';
+import { formatNumberWithCommas, simplifyNumber } from '../../../../utils/Utils';
+import { updateWalletSentiment } from '../../../../DAL/BackendDAL';
 
 export type SentimentButtonsConfig = {
-    key: string;
+    key: keyof TokenSentiment;
     icon: any;
 };
 
@@ -22,14 +30,17 @@ interface TokenSideBarInfoProps {
     tokenInfo: BackendTokenResponse;
     setTokenInfo: (tokenInfo: any) => void;
     priceInfo?: any;
+    walletAddress: string | null;
+    walletConnected: boolean;
 }
 
 // const mockBanner =
 //     'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Full-Color.png';
 
 const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
-    const { tokenInfo, setTokenInfo, priceInfo } = props;
+    const { tokenInfo, setTokenInfo, priceInfo, walletAddress, walletConnected } = props;
     const [showTokenInfoDialog, setShowTokenInfoDialog] = useState(false);
+    const [showSentimentLoader, setShowSentimentLoader] = useState(false);
     const [selectedSentiment, setSelectedSentiment] = useState<string>(null);
     const [sentimentValues, setSentimentValues] = useState<TokenSentiment | null>(null);
     const [socials, setSocials] = useState<TokenSidebarSocialsBarOptions>(null);
@@ -43,7 +54,17 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         { key: 'warning', icon: <WarningAmberRoundedIcon sx={{ fontSize: '1.4vw' }} color="warning" /> },
     ];
     useEffect(() => {
-        setSocials((tokenInfo.metadata?.socials || {}) as TokenSidebarSocialsBarOptions);
+        setSocials((prevSocials) => {
+            if (tokenInfo.metadata?.socials) {
+                return {
+                    telegram: tokenInfo.metadata.socials.telegram || '',
+                    website: tokenInfo.metadata.socials.website || '',
+                    x: tokenInfo.metadata.socials.x || '',
+                };
+            }
+            return prevSocials;
+        });
+
         setSentimentValues(
             tokenInfo.metadata?.sentiment || {
                 love: 0,
@@ -53,15 +74,32 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                 warning: 0,
             },
         );
+
+        setSelectedSentiment(tokenInfo.metadata?.selectedSentiment);
     }, [tokenInfo]);
+
     const getSentimentIconValueToDisplay = (key: string): string =>
         sentimentValues ? sentimentValues[key] || '0' : '---';
 
-    const onSentimentButtonClick = (key: string) => {
-        setSelectedSentiment(key);
-        setSentimentValues({ ...sentimentValues, [key]: sentimentValues[key] + 1 });
+    const onSentimentButtonClick = async (key: keyof TokenSentiment) => {
+        if (!walletConnected) {
+            return;
+        }
 
-        // TODO: Implement sentiment button click on backend
+        setShowSentimentLoader(true);
+
+        try {
+            const sentimentToSet = tokenInfo.metadata?.selectedSentiment === key ? null : key;
+            const result = await updateWalletSentiment(tokenInfo.ticker, walletAddress, sentimentToSet);
+
+            setTokenInfo({ ...tokenInfo, metadata: result });
+        } catch (error) {
+            console.error('Error updating sentiment:', error);
+        } finally {
+            // For smother change
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            setShowSentimentLoader(false);
+        }
     };
 
     const handleShowTokenInfoDialog = () => {
@@ -87,7 +125,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         setOpenModal(true);
     };
 
-    const tokenMax = tokenInfo.totalSupply;
+    const preMintedSupplyPercentage = (tokenInfo.preMintedSupply / tokenInfo.totalSupply) * 100;
 
     return (
         <Box
@@ -103,7 +141,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                 {tokenInfo.metadata?.bannerUrl ? (
                     <Box
                         component="img"
-                        alt={props.tokenInfo.ticker}
+                        alt={tokenInfo.ticker}
                         src={tokenInfo.metadata?.bannerUrl}
                         sx={{
                             height: '19vh',
@@ -152,16 +190,18 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                         <Typography variant="body2" align="center" color="text.secondary">
                             SUPPLY
                         </Typography>
-                        <Typography variant="body2" align="center">
-                            {tokenMax}
-                        </Typography>
+                        <Tooltip title={formatNumberWithCommas(tokenInfo.totalSupply)}>
+                            <Typography variant="body2" align="center">
+                                {simplifyNumber(tokenInfo.totalSupply)}
+                            </Typography>
+                        </Tooltip>
                     </StatCard>
                     <StatCard>
                         <Typography variant="body2" align="center" color="text.secondary">
-                            LIQUIDITY
+                            PREMINTED
                         </Typography>
                         <Typography variant="body2" align="center">
-                            {priceInfo ? priceInfo.liquidity : '90K'}
+                            {preMintedSupplyPercentage.toFixed(2)}%
                         </Typography>
                     </StatCard>
                     <StatCard>
@@ -195,32 +235,33 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                     Community Sentiments
                 </Typography>
                 <SentimentsContainerBox>
-                    {sentimentButtonsConfig.map((button) => (
-                        <SentimentButton
-                            sx={{
-                                '&.MuiButton-root': {
-                                    padding: '10px',
-                                    minWidth: '2vw',
-                                    border: 'transparent',
-                                },
-                            }}
-                            variant="outlined"
-                            key={button.key}
-                            onClick={() => onSentimentButtonClick(button.key)}
-                            disabled={selectedSentiment !== null}
-                            className={button.key === selectedSentiment ? 'selected' : ''}
-                        >
-                            {button.icon}
-                            <Typography
-                                sx={{ fontSize: '1vw' }}
-                                variant="body2"
-                                align="center"
-                                color="text.secondary"
+                    {showSentimentLoader ? (
+                        <SentimentLoader />
+                    ) : (
+                        sentimentButtonsConfig.map((button) => (
+                            <Tooltip
+                                key={`${button.key}tooltip`}
+                                title={walletConnected ? '' : 'Please connect your wallet to choose a sentiment'}
                             >
-                                {getSentimentIconValueToDisplay(button.key)}
-                            </Typography>
-                        </SentimentButton>
-                    ))}
+                                <SentimentButton
+                                    variant="outlined"
+                                    key={button.key}
+                                    onClick={() => onSentimentButtonClick(button.key)}
+                                    className={button.key === selectedSentiment ? ' selected' : ''}
+                                >
+                                    {button.icon}
+                                    <Typography
+                                        sx={{ fontSize: '1vw' }}
+                                        variant="body2"
+                                        align="center"
+                                        color="text.secondary"
+                                    >
+                                        {getSentimentIconValueToDisplay(button.key)}
+                                    </Typography>
+                                </SentimentButton>
+                            </Tooltip>
+                        ))
+                    )}
                 </SentimentsContainerBox>
             </Box>
 

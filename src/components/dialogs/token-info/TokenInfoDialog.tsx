@@ -20,8 +20,8 @@ interface TokenInfoDialogProps {
     onSave: (tokenInfo: Partial<BackendTokenMetadata>) => void;
 }
 
-const TokenInfoDialog: React.FC<TokenInfoDialogProps> = ({ open, onClose, onSave }) => {
-    const [tokenName, setTokenName] = useState('');
+const TokenInfoDialog: React.FC<TokenInfoDialogProps> = (props) => {
+    const { open, onClose, onSave } = props;
     const [description, setDescription] = useState('');
     const [website, setWebsite] = useState('');
     const [x, setX] = useState('');
@@ -29,19 +29,52 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = ({ open, onClose, onSave
     const [contacts, setContacts] = useState<string>('');
     const [logo, setLogo] = useState('');
     const [banner, setBanner] = useState('');
+    const [discord, setDiscord] = useState('');
+    const [medium, setMedium] = useState('');
+    const [github, setGithub] = useState('');
+    const [audit, setAudit] = useState('');
+    const [whitepaper, setWhitepaper] = useState('');
+    const [foundersHandles, setFoundersHandles] = useState('');
+
+    const [descriptionError, setDescriptionError] = useState('');
+    const [xError, setXError] = useState('');
+
+    const handleDescriptionChange = (value: string) => {
+        if (value.length > 200) {
+            setDescriptionError('Description should not exceed 200 characters.');
+        } else {
+            setDescriptionError('');
+        }
+        setDescription(value);
+    };
 
     const handleSave = () => {
         const contactsArr = contacts.split(',');
+        const twitterUrlPattern = /^(https?:\/\/)?(www\.)?twitter\.com\/[a-zA-Z0-9_]{1,15}$/;
+
+        // Check if the Twitter (x) URL is valid
+        if (x && !twitterUrlPattern.test(x)) {
+            setXError(
+                'Please enter a valid Twitter URL (e.g., https://twitter.com/username, twitter.com/username)',
+            );
+            return;
+        }
         const tokenMetadata: Partial<BackendTokenMetadata> = {
             description,
             socials: {
                 telegram,
                 website,
                 x,
+                discord,
+                medium,
+                github,
+                audit,
+                whitepaper,
             },
             logoUrl: logo,
             bannerUrl: banner,
             contacts: contactsArr,
+            founders: foundersHandles.split(','),
         };
 
         onSave(tokenMetadata);
@@ -55,20 +88,15 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = ({ open, onClose, onSave
                 <DialogTitle>Add Token Information</DialogTitle>
                 <DialogContent>
                     <TextField
-                        label="Ticker"
-                        value={tokenName}
-                        onChange={(e) => setTokenName(e.target.value)}
-                        fullWidth
-                        margin="normal"
-                    />
-                    <TextField
                         label="Description"
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        onChange={(e) => handleDescriptionChange(e.target.value)}
                         fullWidth
                         margin="normal"
                         multiline
                         rows={4}
+                        error={!!descriptionError}
+                        helperText={descriptionError}
                     />
                     <TextField
                         label="Website"
@@ -78,11 +106,13 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = ({ open, onClose, onSave
                         margin="normal"
                     />
                     <TextField
-                        label="X/Former Twitter"
+                        label="X (Twitter)"
                         value={x}
                         onChange={(e) => setX(e.target.value)}
                         fullWidth
                         margin="normal"
+                        error={!!xError}
+                        helperText={xError}
                     />
                     <TextField
                         label="Telegram"
@@ -90,6 +120,59 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = ({ open, onClose, onSave
                         onChange={(e) => setTelegram(e.target.value)}
                         fullWidth
                         margin="normal"
+                    />
+                    <TextField
+                        label="Discord"
+                        value={discord}
+                        onChange={(e) => setDiscord(e.target.value)}
+                        fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        label="Medium"
+                        value={medium}
+                        onChange={(e) => setMedium(e.target.value)}
+                        fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        label="GitHub"
+                        value={github}
+                        onChange={(e) => setGithub(e.target.value)}
+                        fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        label="Audit Report"
+                        value={audit}
+                        onChange={(e) => setAudit(e.target.value)}
+                        fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        label="Whitepaper"
+                        value={whitepaper}
+                        onChange={(e) => setWhitepaper(e.target.value)}
+                        fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        label="Founders X Handles"
+                        value={foundersHandles}
+                        onChange={(e) => setFoundersHandles(e.target.value)}
+                        fullWidth
+                        margin="normal"
+                        helperText="Separate multiple handles with a comma (e.g., @founder1, @founder2)"
+                    />
+                    <TextField
+                        label="Contacts"
+                        value={contacts}
+                        onChange={(e) => setContacts(e.target.value)}
+                        fullWidth
+                        margin="normal"
+                        multiline
+                        rows={2}
+                        helperText="Separate contacts with commas, any form of communication."
                     />
                     <UploadContainer>
                         {logo ? (
@@ -115,7 +198,7 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = ({ open, onClose, onSave
                         <Button
                             sx={{ width: '1vw', height: '2vw' }}
                             onClick={() => {
-                                setLogo(null);
+                                setLogo('');
                             }}
                             disabled={!logo}
                             color="primary"
@@ -145,39 +228,28 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = ({ open, onClose, onSave
                             <Button variant="text" color="primary" component="span">
                                 Choose File or Drag
                             </Button>
-                            <Button
-                                sx={{ width: '1vw', height: '2vw' }}
-                                onClick={() => {
-                                    setBanner(null);
-                                }}
-                                disabled={!banner}
-                                color="primary"
-                                variant="contained"
-                            >
-                                Clear
-                            </Button>
                         </UploadButton>
+                        <Button
+                            sx={{ width: '1vw', height: '2vw' }}
+                            onClick={() => {
+                                setBanner('');
+                            }}
+                            disabled={!banner}
+                            color="primary"
+                            variant="contained"
+                        >
+                            Clear
+                        </Button>
                     </UploadContainer>
-                    <TextField
-                        label="Contacts"
-                        value={contacts}
-                        onChange={(e) => setContacts(e.target.value)}
-                        fullWidth
-                        margin="normal"
-                        multiline
-                        rows={4}
-                        helperText="Separate contacts with commas, any form of comunication."
-                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={onClose}>Cancel</Button>
-                    <Button onClick={handleSave} color="primary">
-                        Save
+                    <Button onClick={handleSave} color="primary" variant="contained">
+                        Save & Pay
                     </Button>
                 </DialogActions>
             </DialogContainer>
         </Dialog>
     );
 };
-
 export default TokenInfoDialog;
