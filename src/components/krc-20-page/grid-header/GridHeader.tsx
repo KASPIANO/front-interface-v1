@@ -30,24 +30,22 @@ const marginLeft = {
 
 const disableSort = (name) => name === 'Ticker' || name === 'Age' || name === 'Minted' || name === 'Holders';
 
-export const GridHeader: FC<GridHeaderProps> = ({ name, headerFunction, activeHeader, setActiveHeader }) => {
-    return (
-        <th
-            style={{
-                display: 'flex',
-                justifyContent: 'flex-start',
-                minWidth: marginMapperByHeader[name],
-                marginLeft: marginLeft[name],
-            }}
-        >
-            <Typography sx={{ fontWeight: 600, fontSize: '1.2vw' }}>{name}</Typography>
-            {disableSort(name) && (
-                <FilterButton
-                    onFilterClick={headerFunction}
-                    isActive={activeHeader === name}
-                    setActiveHeader={() => setActiveHeader(name)}
-                />
-            )}
-        </th>
-    );
-};
+export const GridHeader: FC<GridHeaderProps> = ({ name, headerFunction, activeHeader, setActiveHeader }) => (
+    <th
+        style={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            minWidth: marginMapperByHeader[name],
+            marginLeft: marginLeft[name],
+        }}
+    >
+        <Typography sx={{ fontWeight: 600, fontSize: '1.2vw' }}>{name}</Typography>
+        {disableSort(name) && (
+            <FilterButton
+                onFilterClick={headerFunction}
+                isActive={activeHeader === name}
+                setActiveHeader={() => setActiveHeader(name)}
+            />
+        )}
+    </th>
+);
