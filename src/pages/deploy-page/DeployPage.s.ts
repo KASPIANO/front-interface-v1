@@ -1,5 +1,6 @@
 import { Box, TextField, Typography } from '@mui/material';
 import { styled } from '@mui/system';
+import { keyframes } from '@mui/material/styles';
 
 export const DeployForm = styled(Box)({
     marginTop: '20px',
@@ -63,3 +64,22 @@ export const ImagePreview = styled('img')({
 export const UploadButton = styled('label')({
     cursor: 'pointer',
 });
+
+const spin = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+`;
+
+export const DeployPageSpinner = styled('div')(({ theme }) => ({
+    margin: '20px auto',
+    width: '40px',
+    height: '40px',
+    border: `4px solid ${theme.palette.grey[500]}`, // Info color
+    borderTop: `4px solid ${theme.palette.primary.main}`, // Primary color
+    borderRadius: '50%',
+    animation: `${spin} 1s linear infinite`,
+}));
