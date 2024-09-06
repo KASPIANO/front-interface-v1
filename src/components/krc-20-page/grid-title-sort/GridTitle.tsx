@@ -1,6 +1,6 @@
 import { Typography, IconButton, Box, Tooltip } from '@mui/material';
 import React, { useState } from 'react';
-import WhatshotIcon from '@mui/icons-material/Whatshot'; // Fire icon from MUI
+import WhatshotRoundedIcon from '@mui/icons-material/WhatshotRounded';
 import {
     HeaderContainer,
     NextPageButton,
@@ -59,7 +59,11 @@ const GridTitle: React.FC = () => {
                     sx={{ marginLeft: 'auto' }}
                     aria-label="sort by minting rate"
                 >
-                    <WhatshotIcon sx={{ color: 'red' }} />
+                    <WhatshotRoundedIcon
+                        sx={{
+                            color: '#ff0000',
+                        }}
+                    />
                 </IconButton>
             </Tooltip>
 
