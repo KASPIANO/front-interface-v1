@@ -14,11 +14,13 @@ export const fetchAllTokens = async (
     skip = 0,
     order: string | null = null,
     direction: string | null = null,
+    timeInterval:string
 ): Promise<TokenListItemResponse[]> => {
     try {
         const urlParams = new URLSearchParams();
         urlParams.append('skip', skip.toString());
         urlParams.append('limit', limit.toString());
+        urlParams.append('timeInterval', timeInterval.toString());
 
         if (order) {
             urlParams.append('order', order);
