@@ -18,13 +18,14 @@ const PAGE_TOKENS_COUNT = 50;
 
 const GridPage: FC<GridPageProps> = (props) => {
     const { walletBalance, walletConnected, backgroundBlur, walletAddress } = props;
-
+    const [timeInterval, setTimeInterval] = useState<string>('10m');
     const [totalTokensDeployed, setTotalTokensDeployed] = useState(0);
     const [sortParams, setSortParams] = useState({ field: '', asc: false });
     const { data: tokenListPages, fetchNextPage } = useFetchAllTokens(
         PAGE_TOKENS_COUNT,
         sortParams.field,
         sortParams.field ? (sortParams.asc ? 'asc' : 'desc') : null,
+        timeInterval
     );
 
     const onSortBy = (field: string, asc: boolean) => {
@@ -36,10 +37,14 @@ const GridPage: FC<GridPageProps> = (props) => {
             setTotalTokensDeployed(result);
         });
     }, []);
+    
 
     return (
         <GridLayout backgroundBlur={backgroundBlur}>
-            <GridTitle />
+            <GridTitle
+             timeInterval={timeInterval}
+             setTimeInterval={setTimeInterval}
+              />
             <StyledDataGridContainer>
                 <TokenDataGrid
                     walletConnected={walletConnected}
@@ -49,6 +54,7 @@ const GridPage: FC<GridPageProps> = (props) => {
                     fetchNextPage={fetchNextPage}
                     sortBy={onSortBy}
                     walletAddress={walletAddress}
+                    timeInterval={timeInterval}
                 />
             </StyledDataGridContainer>
             {/* {showNotification && walletAddress && (

@@ -18,6 +18,7 @@ interface TokenDataGridProps {
     walletConnected: boolean;
     walletAddress: string | null;
     sortBy: (field: string, asc: boolean) => void;
+    timeInterval?: string,
 }
 
 enum GridHeaders {

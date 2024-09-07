@@ -60,6 +60,8 @@ export interface TokenListItemResponse {
     preMintedSupply: number;
     logoUrl: string;
     bannerUrl: string;
+    changeTotalMints: number,
+    changeTotalHolders: number
 }
 export interface TokenSearchItems {
     ticker: string;
