@@ -1,5 +1,5 @@
-import { Typography, IconButton, Box, Tooltip } from '@mui/material';
-import { FC } from 'react';
+import { Typography, IconButton, Box, Tooltip, CircularProgress } from '@mui/material';
+import React, { FC, useEffect, useState } from 'react';
 import WhatshotRoundedIcon from '@mui/icons-material/WhatshotRounded';
 import {
     HeaderContainer,
@@ -17,20 +17,25 @@ interface TokenGridTitleProps {
     currentPage: number;
     totalPages?: number;
     onPageChange?: (newPage: number) => void;
+    onSortBy: (field: string, asc: boolean) => void;
+    isLoading: boolean;
 }
 
 const GridTitle: FC<TokenGridTitleProps> = (props) => {
-    const { timeInterval, setTimeInterval, currentPage, totalPages, onPageChange } = props;
+    const { timeInterval, setTimeInterval, onSortBy, onPageChange, currentPage, totalPages } = props;
+
+    const [changeTotalMintsDisabled, sethCangeTotalMintsActive] = useState(true);
 
     const handleSortChange = (sortOption: string) => {
         setTimeInterval(sortOption);
-        // Call function to sort by time
-        console.log('Sort by:', sortOption);
     };
 
     const handleMintingRateSort = () => {
         // Handle sorting by minting rate
-        console.log('Sort by minting rate');
+
+        const orderedBy = changeTotalMintsDisabled ? 'changeTotalMints' : 'ticker';
+        sethCangeTotalMintsActive(!changeTotalMintsDisabled);
+        onSortBy(orderedBy, true);
     };
 
     const handleNextPage = () => {
@@ -63,7 +68,10 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
             <Tooltip title="Sort by the pace and change of minting activity. Mint heat-map.">
                 <IconButton
                     onClick={handleMintingRateSort}
-                    sx={{ marginLeft: 'auto' }}
+                    sx={{
+                        marginLeft: 'auto',
+                        backgroundColor: changeTotalMintsDisabled ? 'transparent' : '#ffcccc',
+                    }}
                     aria-label="sort by minting rate"
                 >
                     <WhatshotRoundedIcon
