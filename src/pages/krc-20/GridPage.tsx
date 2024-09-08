@@ -21,7 +21,7 @@ const GridPage: FC<GridPageProps> = (props) => {
     const [timeInterval, setTimeInterval] = useState<string>('10m');
     const [totalTokensDeployed, setTotalTokensDeployed] = useState(0);
     const [sortParams, setSortParams] = useState({ field: '', asc: false });
-    const { data: tokenListPages, fetchNextPage, refetch  } = useFetchAllTokens(
+    const { data: tokenListPages, fetchNextPage, refetch, isLoading  } = useFetchAllTokens(
         PAGE_TOKENS_COUNT,
         sortParams.field,
         sortParams.field ? (sortParams.asc ? 'asc' : 'desc') : null,
@@ -46,6 +46,7 @@ const GridPage: FC<GridPageProps> = (props) => {
              timeInterval={timeInterval}
              setTimeInterval={setTimeInterval}
              onSortBy={onSortBy}
+             isLoading={isLoading}
               />
             <StyledDataGridContainer>
                 <TokenDataGrid
