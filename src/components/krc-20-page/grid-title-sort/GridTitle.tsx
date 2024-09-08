@@ -1,6 +1,8 @@
 import { Typography, IconButton, Box, Tooltip } from '@mui/material';
 import { FC, useState } from 'react';
 import WhatshotRoundedIcon from '@mui/icons-material/WhatshotRounded';
+import { FaFire } from 'react-icons/fa';
+import { IconContext } from 'react-icons';
 import {
     HeaderContainer,
     NextPageButton,
@@ -10,6 +12,7 @@ import {
     SortLastButton,
     SortMiddleButton,
 } from './GridTitle.s';
+import { FireIcon } from './FireIcon';
 
 interface TokenGridTitleProps {
     timeInterval: string;
@@ -35,9 +38,10 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
     const handleMintingRateSort = () => {
         // Handle sorting by minting rate
         const orderedBy = changeTotalMintsDisabled ? 'changeTotalMints' : 'ticker';
+        const orderedByAsc = orderedBy !== 'ticker';
         sethCangeTotalMintsActive((prev) => !prev);
         setActiveHeader('');
-        onSortBy(orderedBy, true);
+        onSortBy(orderedBy, orderedByAsc);
     };
 
     const handleNextPage = () => {
@@ -47,7 +51,7 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
     };
 
     const handlePrevPage = () => {
-        if (currentPage > 1) {
+        if (currentPage > 0) {
             onPageChange(currentPage - 1);
         }
     };
@@ -60,7 +64,7 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
 
             {/* Pagination Buttons */}
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <PrevPageButton onClick={handlePrevPage} disabled={currentPage === 1}>
+                <PrevPageButton onClick={handlePrevPage} disabled={currentPage === 0}>
                     Prev
                 </PrevPageButton>
                 <NextPageButton onClick={handleNextPage}>Next</NextPageButton>
@@ -72,15 +76,17 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
                     onClick={handleMintingRateSort}
                     sx={{
                         marginLeft: 'auto',
-                        backgroundColor: changeTotalMintsDisabled ? 'transparent' : '#ffcccc',
                     }}
                     aria-label="sort by minting rate"
                 >
-                    <WhatshotRoundedIcon
+                    <FireIcon selected={!changeTotalMintsDisabled} />
+                    {/* <WhatshotRoundedIcon
                         sx={{
                             color: '#ff0000',
+                            borderRadius: '12px',
+                            backgroundColor: changeTotalMintsDisabled ? 'transparent' : 'rgba(255, 0, 0, 0.35)',
                         }}
-                    />
+                    /> */}
                 </IconButton>
             </Tooltip>
 

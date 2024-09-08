@@ -165,8 +165,8 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             {(token.totalMintedPercent * 100).toFixed(2)}%
                         </StatNumber>
                         <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
-                            <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
-                            {token.changeTotalMints}
+                            Mints: {token.changeTotalMints}
+                            <StatArrow sx={{ color: 'green', marginLeft: '2px' }} type="increase" />
                         </StatHelpText>
                     </Stat>
 
@@ -174,21 +174,15 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         <StatNumber style={{ fontSize: '1vw' }} margin="0">
                             {token.totalHolders || 0}
                         </StatNumber>
+
                         <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
-                            <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
+                            <StatArrow
+                                sx={{ color: token.changeTotalHolders >= 0 ? 'green' : 'red', marginRight: '2px' }}
+                                type={token.changeTotalHolders >= 0 ? 'increase' : 'decrease'}
+                            />
                             {token.changeTotalHolders}
                         </StatHelpText>
                     </Stat>
-
-                    {/* <ListItemText
-                        sx={{ width: '9.5vw' }}
-                        primary={
-                            <Typography
-                            component={'span'} variant="body2" style={{ fontSize: '1.1vw' }}>
-                                {token.transferTotal ? token.transferTotal : 0}
-                            </Typography>
-                        }
-                    /> */}
 
                     <ListItemText
                         sx={{ maxWidth: '13%' }}

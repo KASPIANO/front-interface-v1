@@ -22,19 +22,6 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
         setHolderTitle(value);
     };
 
-    // useEffect(() => {
-    //     useEffect(() => {
-    //         const getTopHoldersPercentage = async () => {
-    //             const result = await sendTokenHoldersRequest(tokenInfo.ticker, tokenHoldersToShow);
-    //             // Handle result if necessary to make it similar to the one in the snippet  under it
-    //         };
-
-    //         getTopHoldersPercentage();
-    //     }, [tokenHoldersToShow, tokenInfo]);
-
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [tokenHoldersToShow, tokenInfo]);
-
     useEffect(() => {
         const calculatePercentages = async () => {
             const holdersToCalculate = tokenHolders.slice(0, tokenHoldersToShow);

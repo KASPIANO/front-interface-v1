@@ -94,3 +94,10 @@ export const NextPageButton = styled(Button)({
         backgroundColor: 'rgba(111, 199, 186, 0.7)', // Stronger opacity on hover
     },
 });
+
+export const fireColors = {
+    primary: '#FF6600',
+    secondary: '#FF9933',
+    tertiary: '#FFCC00',
+    glow: '#FF3300',
+};
