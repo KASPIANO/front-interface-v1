@@ -5,7 +5,6 @@ import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FilterState, TokenListItemResponse } from '../../../types/Types';
 import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
-import { GridHeader } from '../grid-header/GridHeader';
 import { TokenRow } from '../token-row-grid/TokenRow';
 import { GridHeadersComponent } from '../grid-header/GridHeaders';
 
@@ -20,31 +19,31 @@ interface TokenDataGridProps {
     error: any;
 }
 
-enum GridHeaders {
-    TICKER = 'TICKER',
-    AGE = 'AGE',
-    SUPPLY = 'SUPPLY',
-    MINTED = 'MINTED',
-    HOLDERS = 'HOLDERS',
-    FAIR_MINT = 'FAIR_MINT',
-}
+// enum GridHeaders {
+//     TICKER = 'TICKER',
+//     AGE = 'AGE',
+//     SUPPLY = 'SUPPLY',
+//     MINTED = 'MINTED',
+//     HOLDERS = 'HOLDERS',
+//     FAIR_MINT = 'FAIR_MINT',
+// }
 
-const headersMapper: Record<GridHeaders, { name: string; headerFunction?: boolean }> = {
-    [GridHeaders.TICKER]: { name: 'Ticker', headerFunction: true },
-    [GridHeaders.AGE]: { name: 'Age', headerFunction: true },
-    [GridHeaders.SUPPLY]: { name: 'Supply' },
-    [GridHeaders.HOLDERS]: { name: 'Holders', headerFunction: true },
-    [GridHeaders.MINTED]: { name: 'Minted', headerFunction: true },
-    // [GridHeaders.TOTAL_TXNS]: { name: 'Market Cap', headerFunction: () => {} },
-    [GridHeaders.FAIR_MINT]: { name: 'Fair Mint' },
-};
+// const headersMapper: Record<GridHeaders, { name: string; headerFunction?: boolean }> = {
+//     [GridHeaders.TICKER]: { name: 'Ticker', headerFunction: true },
+//     [GridHeaders.AGE]: { name: 'Age', headerFunction: true },
+//     [GridHeaders.SUPPLY]: { name: 'Supply' },
+//     [GridHeaders.HOLDERS]: { name: 'Holders', headerFunction: true },
+//     [GridHeaders.MINTED]: { name: 'Minted', headerFunction: true },
+//     // [GridHeaders.TOTAL_TXNS]: { name: 'Market Cap', headerFunction: () => {} },
+//     [GridHeaders.FAIR_MINT]: { name: 'Fair Mint' },
+// };
 
-const fieldToSortProp = {
-    [GridHeaders.TICKER]: 'ticker',
-    [GridHeaders.AGE]: 'creationDate',
-    [GridHeaders.MINTED]: 'totalMintedPercent',
-    [GridHeaders.HOLDERS]: 'totalHolders',
-};
+// const fieldToSortProp = {
+//     [GridHeaders.TICKER]: 'ticker',
+//     [GridHeaders.AGE]: 'creationDate',
+//     [GridHeaders.MINTED]: 'totalMintedPercent',
+//     [GridHeaders.HOLDERS]: 'totalHolders',
+// };
 
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     const { tokensList, walletBalance, walletConnected, sortBy, walletAddress, isLoading, error } = props;

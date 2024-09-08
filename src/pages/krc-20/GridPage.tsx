@@ -5,7 +5,6 @@ import { StyledDataGridContainer } from '../../components/krc-20-page/grid-krc-2
 import GridTitle from '../../components/krc-20-page/grid-title-sort/GridTitle';
 import { countTokens } from '../../DAL/BackendDAL';
 import { useFetchTokens } from '../../DAL/UseQueriesBackend';
-import { flatten } from 'lodash';
 
 interface GridPageProps {
     walletAddress: string | null;
