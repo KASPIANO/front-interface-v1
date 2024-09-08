@@ -12,11 +12,16 @@ interface FilterButtonProps {
     onFilterClick: (filterState: FilterState) => void;
     isActive: boolean;
     setActiveHeader: () => void;
+    currentFilterState: FilterState;
 }
 
 export const FilterButton: FC<FilterButtonProps> = (props) => {
-    const { onFilterClick, isActive, setActiveHeader } = props;
-    const [filterState, setFilterState] = useState(FilterState.NONE);
+    const { onFilterClick, isActive, setActiveHeader, currentFilterState } = props;
+    const [filterState, setFilterState] = useState(currentFilterState);
+
+    useEffect(() => {
+        setFilterState(currentFilterState);
+    }, [currentFilterState]);
 
     useEffect(() => {
         if (!isActive) {
@@ -25,43 +30,45 @@ export const FilterButton: FC<FilterButtonProps> = (props) => {
     }, [isActive]);
 
     const toggleFilterIcon = () => {
+        let newState: FilterState;
         if (filterState === FilterState.UP) {
-            setFilterState(FilterState.DOWN);
-            return FilterState.DOWN;
+            newState = FilterState.DOWN;
         } else if (filterState === FilterState.DOWN) {
-            setFilterState(FilterState.NONE);
-            return FilterState.NONE;
+            newState = FilterState.NONE;
         } else {
-            setFilterState(FilterState.UP);
-            return FilterState.UP;
+            newState = FilterState.UP;
         }
+        return newState;
     };
 
     const handleOnFilterClick = () => {
-        const currentState = toggleFilterIcon();
-        setActiveHeader();
-        onFilterClick(currentState);
+        const newState = toggleFilterIcon();
+        if (newState !== filterState) {
+            setFilterState(newState);
+            setActiveHeader();
+            onFilterClick(newState);
+        }
     };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            {filterState === FilterState.UP || filterState === FilterState.NONE ? (
-                <DisabledIconButton size="small" onClick={handleOnFilterClick}>
-                    <StyledExpandLessRoundedIcon />
-                </DisabledIconButton>
-            ) : (
+            {filterState === FilterState.UP ? (
                 <ActiveIconButton size="small" onClick={handleOnFilterClick}>
                     <StyledExpandLessRoundedIcon />
                 </ActiveIconButton>
+            ) : (
+                <DisabledIconButton size="small" onClick={handleOnFilterClick}>
+                    <StyledExpandLessRoundedIcon />
+                </DisabledIconButton>
             )}
-            {filterState === FilterState.DOWN || filterState === FilterState.NONE ? (
-                <DisabledIconButton size="small" onClick={handleOnFilterClick}>
-                    <StyledExpandMoreRoundedIcon />
-                </DisabledIconButton>
-            ) : (
+            {filterState === FilterState.DOWN ? (
                 <ActiveIconButton size="small" onClick={handleOnFilterClick}>
                     <StyledExpandMoreRoundedIcon />
                 </ActiveIconButton>
+            ) : (
+                <DisabledIconButton size="small" onClick={handleOnFilterClick}>
+                    <StyledExpandMoreRoundedIcon />
+                </DisabledIconButton>
             )}
         </Box>
     );
