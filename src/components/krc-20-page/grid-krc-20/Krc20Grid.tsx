@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Box, List } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import { FC, useCallback, useState } from 'react';
+import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FilterState, TokenListItemResponse } from '../../../types/Types';
+import { TokenListItemResponse } from '../../../types/Types';
 import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 import { TokenRow } from '../token-row-grid/TokenRow';
 import { GridHeadersComponent } from '../grid-header/GridHeaders';
@@ -17,96 +17,27 @@ interface TokenDataGridProps {
     timeInterval?: string;
     isLoading: boolean;
     error: any;
+    setActiveHeader: (value: string) => void;
+    activeHeader: string;
 }
 
-// enum GridHeaders {
-//     TICKER = 'TICKER',
-//     AGE = 'AGE',
-//     SUPPLY = 'SUPPLY',
-//     MINTED = 'MINTED',
-//     HOLDERS = 'HOLDERS',
-//     FAIR_MINT = 'FAIR_MINT',
-// }
-
-// const headersMapper: Record<GridHeaders, { name: string; headerFunction?: boolean }> = {
-//     [GridHeaders.TICKER]: { name: 'Ticker', headerFunction: true },
-//     [GridHeaders.AGE]: { name: 'Age', headerFunction: true },
-//     [GridHeaders.SUPPLY]: { name: 'Supply' },
-//     [GridHeaders.HOLDERS]: { name: 'Holders', headerFunction: true },
-//     [GridHeaders.MINTED]: { name: 'Minted', headerFunction: true },
-//     // [GridHeaders.TOTAL_TXNS]: { name: 'Market Cap', headerFunction: () => {} },
-//     [GridHeaders.FAIR_MINT]: { name: 'Fair Mint' },
-// };
-
-// const fieldToSortProp = {
-//     [GridHeaders.TICKER]: 'ticker',
-//     [GridHeaders.AGE]: 'creationDate',
-//     [GridHeaders.MINTED]: 'totalMintedPercent',
-//     [GridHeaders.HOLDERS]: 'totalHolders',
-// };
-
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
-    const { tokensList, walletBalance, walletConnected, sortBy, walletAddress, isLoading, error } = props;
-    const [activeHeader, setActiveHeader] = useState<string>('');
-    const [filterStates, setFilterStates] = useState<Record<string, FilterState>>({});
+    const {
+        tokensList,
+        walletBalance,
+        walletConnected,
+        sortBy,
+        walletAddress,
+        isLoading,
+        error,
+        setActiveHeader,
+        activeHeader,
+    } = props;
     const navigate = useNavigate();
 
     const handleItemClick = (token) => {
         navigate(`/token/${token.ticker}`);
     };
-    const headerFunction = useCallback(
-        (field: string, filterState: FilterState) => {
-            setFilterStates((prev) => {
-                const newFilterStates = { ...prev };
-                Object.keys(newFilterStates).forEach((key) => {
-                    newFilterStates[key] = key === field ? filterState : FilterState.NONE;
-                });
-                return newFilterStates;
-            });
-
-            if (
-                filterState === FilterState.NONE ||
-                (activeHeader === field && filterState === filterStates[field])
-            ) {
-                setActiveHeader('');
-                sortBy(null, null);
-            } else {
-                setActiveHeader(field);
-                sortBy(field, filterState === FilterState.UP);
-            }
-        },
-        [sortBy, activeHeader, filterStates],
-    );
-    // const tableHeader = (
-    //     <Box
-    //         sx={{
-    //             height: '8vh',
-    //             alignContent: 'center',
-    //             borderBottom: '0.1px solid  rgba(111, 199, 186, 0.3)',
-    //         }}
-    //     >
-    //         <table style={{ width: '100%' }}>
-    //             <thead>
-    //                 <tr style={{ display: 'flex' }}>
-    //                     {Object.keys(GridHeaders).map((header: GridHeaders) => (
-    //                         <GridHeader
-    //                             key={header}
-    //                             name={headersMapper[header].name}
-    //                             headerFunction={
-    //                                 headersMapper[header].headerFunction
-    //                                     ? (filterState) => headerFunction(fieldToSortProp[header], filterState)
-    //                                     : null
-    //                             }
-    //                             activeHeader={activeHeader}
-    //                             setActiveHeader={() => {}} // This is now handled in headerFunction
-    //                             currentFilterState={filterStates[fieldToSortProp[header]] || FilterState.NONE}
-    //                         />
-    //                     ))}
-    //                 </tr>
-    //             </thead>
-    //         </table>
-    //     </Box>
-    // );
 
     const renderContent = () => {
         if (isLoading) {
@@ -140,10 +71,9 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         <>
             <GlobalStyle />
             <GridHeadersComponent
-                headerFunction={headerFunction}
-                activeHeader={activeHeader}
+                onSortBy={sortBy}
                 setActiveHeader={setActiveHeader}
-                filterStates={filterStates}
+                activeHeader={activeHeader}
             />
             <List
                 id="scrollableList"

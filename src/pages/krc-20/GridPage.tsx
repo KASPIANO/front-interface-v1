@@ -20,12 +20,12 @@ const GridPage: FC<GridPageProps> = (props) => {
     const [timeInterval, setTimeInterval] = useState<string>('10m');
     const [totalTokensDeployed, setTotalTokensDeployed] = useState(0);
     const [sortParams, setSortParams] = useState({ field: '', asc: false });
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(0);
+    const [activeHeader, setActiveHeader] = useState<string>('');
     const {
         data: tokenList,
         isLoading,
         error,
-        refetch,
     } = useFetchTokens(
         PAGE_TOKENS_COUNT,
         sortParams.field,
@@ -35,9 +35,8 @@ const GridPage: FC<GridPageProps> = (props) => {
     );
 
     const onSortBy = (field: string, asc: boolean) => {
+        setPage(0); // Reset to first page when sorting
         setSortParams({ field, asc });
-        setPage(1); // Reset to first page when sorting
-        refetch(); // Explicitly refetch data when sorting changes
     };
 
     useEffect(() => {
@@ -48,13 +47,11 @@ const GridPage: FC<GridPageProps> = (props) => {
 
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
-        refetch(); // Explicitly refetch data when page changes
     };
 
     const handleTimeIntervalChange = (newInterval: string) => {
+        setPage(0); // Reset to first page when time interval changes
         setTimeInterval(newInterval);
-        setPage(1); // Reset to first page when time interval changes
-        refetch(); // Explicitly refetch data when time interval changes
     };
     const totalPages = Math.ceil(totalTokensDeployed / PAGE_TOKENS_COUNT);
     return (
@@ -67,9 +64,12 @@ const GridPage: FC<GridPageProps> = (props) => {
                 onPageChange={handlePageChange}
                 onSortBy={onSortBy}
                 isLoading={isLoading}
+                setActiveHeader={setActiveHeader}
             />
             <StyledDataGridContainer>
                 <TokenDataGrid
+                    setActiveHeader={setActiveHeader}
+                    activeHeader={activeHeader}
                     walletConnected={walletConnected}
                     walletBalance={walletBalance}
                     tokensList={tokenList || []}

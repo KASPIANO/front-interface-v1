@@ -1,5 +1,5 @@
-import { Typography, IconButton, Box, Tooltip, CircularProgress } from '@mui/material';
-import React, { FC, useEffect, useState } from 'react';
+import { Typography, IconButton, Box, Tooltip } from '@mui/material';
+import { FC, useState } from 'react';
 import WhatshotRoundedIcon from '@mui/icons-material/WhatshotRounded';
 import {
     HeaderContainer,
@@ -19,10 +19,12 @@ interface TokenGridTitleProps {
     onPageChange?: (newPage: number) => void;
     onSortBy: (field: string, asc: boolean) => void;
     isLoading: boolean;
+    setActiveHeader: (value: string) => void;
 }
 
 const GridTitle: FC<TokenGridTitleProps> = (props) => {
-    const { timeInterval, setTimeInterval, onSortBy, onPageChange, currentPage, totalPages } = props;
+    const { timeInterval, setTimeInterval, onSortBy, onPageChange, currentPage, totalPages, setActiveHeader } =
+        props;
 
     const [changeTotalMintsDisabled, sethCangeTotalMintsActive] = useState(true);
 
@@ -32,9 +34,9 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
 
     const handleMintingRateSort = () => {
         // Handle sorting by minting rate
-
         const orderedBy = changeTotalMintsDisabled ? 'changeTotalMints' : 'ticker';
-        sethCangeTotalMintsActive(!changeTotalMintsDisabled);
+        sethCangeTotalMintsActive((prev) => !prev);
+        setActiveHeader('');
         onSortBy(orderedBy, true);
     };
 
