@@ -10,29 +10,38 @@ import {
     SortLastButton,
     SortMiddleButton,
 } from './GridTitle.s';
+import { RefetchOptions, QueryObserverResult, InfiniteData } from '@tanstack/react-query';
+import { TokenListItemResponse } from '../../../types/Types';
 
 interface TokenGridTitleProps {
     timeInterval: string,
     setTimeInterval: (timeInterval: string) => void;
+    onSortBy: (field: string, asc: boolean) => void;
+    refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<InfiniteData<TokenListItemResponse[], unknown>, Error>>
 }
 
 const GridTitle: FC<TokenGridTitleProps> = (props) => {
     const {
         timeInterval,
-        setTimeInterval
+        setTimeInterval,
+        refetch,
+        onSortBy
     } = props;
 
     const [page, setPage] = useState<number>(1);
+    const [changeTotalMintsDisabled, sethCangeTotalMintsActive] = useState(true);
 
     const handleSortChange = (sortOption: string) => {
         setTimeInterval(sortOption);
-        // Call function to sort by time
-        console.log('Sort by:', sortOption);
+        refetch()
     };
 
     const handleMintingRateSort = () => {
         // Handle sorting by minting rate
-        console.log('Sort by minting rate');
+        sethCangeTotalMintsActive(!changeTotalMintsDisabled)
+        const orederBy = changeTotalMintsDisabled ? "changeTotalMints" : "ticker"
+        onSortBy(orederBy, true)
+        refetch()
     };
 
     const handleNextPage = () => {
@@ -65,12 +74,15 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
             <Tooltip title="Sort by the pace and change of minting activity. Mint heat-map.">
                 <IconButton
                     onClick={handleMintingRateSort}
-                    sx={{ marginLeft: 'auto' }}
+                    sx={{
+                        marginLeft: 'auto',
+                        backgroundColor: changeTotalMintsDisabled ? 'transparent' : '#ffcccc'  // Change background color when active
+                    }}
                     aria-label="sort by minting rate"
                 >
                     <WhatshotRoundedIcon
                         sx={{
-                            color: '#ff0000',
+                            color: changeTotalMintsDisabled ? '#000000' : '#ff0000' // Change icon color when active
                         }}
                     />
                 </IconButton>
@@ -82,7 +94,7 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
                     sx={{
                         '&.MuiButtonGroup-firstButton': {
                             backgroundColor:
-                            timeInterval === '10m' ? 'rgba(111, 199, 186, 0.8)' : 'rgba(111, 199, 186, 0.25)',
+                                timeInterval === '10m' ? 'rgba(111, 199, 186, 0.8)' : 'rgba(111, 199, 186, 0.25)',
                         },
                     }}
                     onClick={() => handleSortChange('10m')}
