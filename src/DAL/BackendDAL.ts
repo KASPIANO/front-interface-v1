@@ -14,7 +14,7 @@ export const fetchAllTokens = async (
     skip = 0,
     order: string | null = null,
     direction: string | null = null,
-    timeInterval:string
+    timeInterval: string,
 ): Promise<TokenListItemResponse[]> => {
     try {
         const urlParams = new URLSearchParams();

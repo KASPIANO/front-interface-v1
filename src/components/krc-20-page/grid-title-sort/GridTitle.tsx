@@ -1,5 +1,5 @@
 import { Typography, IconButton, Box, Tooltip } from '@mui/material';
-import React, { FC, useState } from 'react';
+import { FC, useState } from 'react';
 import WhatshotRoundedIcon from '@mui/icons-material/WhatshotRounded';
 import {
     HeaderContainer,
@@ -12,17 +12,15 @@ import {
 } from './GridTitle.s';
 
 interface TokenGridTitleProps {
-    timeInterval: string,
+    timeInterval: string;
     setTimeInterval: (timeInterval: string) => void;
+    currentPage: number;
+    totalPages?: number;
+    onPageChange?: (newPage: number) => void;
 }
 
 const GridTitle: FC<TokenGridTitleProps> = (props) => {
-    const {
-        timeInterval,
-        setTimeInterval
-    } = props;
-
-    const [page, setPage] = useState<number>(1);
+    const { timeInterval, setTimeInterval, currentPage, totalPages, onPageChange } = props;
 
     const handleSortChange = (sortOption: string) => {
         setTimeInterval(sortOption);
@@ -36,14 +34,14 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
     };
 
     const handleNextPage = () => {
-        setPage((prevPage) => prevPage + 1);
-        console.log('Next Page:', page + 1);
+        if (currentPage < totalPages) {
+            onPageChange(currentPage + 1);
+        }
     };
 
     const handlePrevPage = () => {
-        if (page > 1) {
-            setPage((prevPage) => prevPage - 1);
-            console.log('Previous Page:', page - 1);
+        if (currentPage > 1) {
+            onPageChange(currentPage - 1);
         }
     };
 
@@ -55,7 +53,7 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
 
             {/* Pagination Buttons */}
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <PrevPageButton onClick={handlePrevPage} disabled={page === 1}>
+                <PrevPageButton onClick={handlePrevPage} disabled={currentPage === 1}>
                     Prev
                 </PrevPageButton>
                 <NextPageButton onClick={handleNextPage}>Next</NextPageButton>
@@ -82,7 +80,7 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
                     sx={{
                         '&.MuiButtonGroup-firstButton': {
                             backgroundColor:
-                            timeInterval === '10m' ? 'rgba(111, 199, 186, 0.8)' : 'rgba(111, 199, 186, 0.25)',
+                                timeInterval === '10m' ? 'rgba(111, 199, 186, 0.8)' : 'rgba(111, 199, 186, 0.25)',
                         },
                     }}
                     onClick={() => handleSortChange('10m')}
