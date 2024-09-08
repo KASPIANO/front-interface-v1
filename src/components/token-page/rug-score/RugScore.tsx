@@ -122,6 +122,18 @@ const RugScore: FC<RugScoreProps> = (props) => {
                     </Button>
                 </Box>
             )}
+            {xHandle && score === null ? (
+                <Typography
+                    sx={{
+                        fontWeight: 'bold',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        mt: '3vh',
+                    }}
+                >
+                    Send New Request by Clicking Refresh Button
+                </Typography>
+            ) : null}
             {xHandle && score !== null ? <ScoreLine value={score} config={scoreLineRanges} /> : null}
 
             <RugScoreDialog
