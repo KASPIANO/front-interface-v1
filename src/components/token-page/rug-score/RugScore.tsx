@@ -2,19 +2,26 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { Box, Button, Card, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
-import { FC, useCallback, useState } from 'react';
+import { FC, useState } from 'react';
 import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
 import { getCurrentAccount, sendKaspa } from '../../../utils/KaswareUtils';
 import { setWalletBalanceUtil } from '../../../utils/Utils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
-import RugScoreDialog from './dialog/RugScoreDialog';
 import ScoreLine, { ScoreLineConfig } from './score-line/ScoreLine';
+import TokenInfoDialog from '../../dialogs/token-info/TokenInfoDialog';
+import ReviewListTokenDialog from '../../dialogs/token-info/review-list-token/ReviewListTokenDialog';
+import { TokenKRC20DeployMetadata } from '../../../types/Types';
+import { useNavigate } from 'react-router-dom';
+import { updateTokenMetadata } from '../../../DAL/BackendDAL';
 
 interface RugScoreProps {
     score: number | null;
     xHandle: boolean;
     onRecalculate: () => void;
     setWalletBalance: (balance: number) => void;
+    walletBalance: number;
+    ticker: string;
+    walletConnected: boolean;
 }
 
 const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
@@ -22,9 +29,16 @@ const VERIFICATION_FEE_KAS = 1250;
 const VERIFICATION_FEE_SOMPI = VERIFICATION_FEE_KAS * KASPA_TO_SOMPI;
 
 const RugScore: FC<RugScoreProps> = (props) => {
-    const { score, xHandle, onRecalculate, setWalletBalance } = props;
+    const { score, xHandle, onRecalculate, setWalletBalance, walletBalance, ticker, walletConnected } = props;
     const theme = useTheme();
-    const [openDialog, setOpenDialog] = useState(false);
+    const navigate = useNavigate();
+    const [showInfoForm, setShowInfoForm] = useState(false);
+    const [showReviewListTokenDialog, setShowReviewListTokenDialog] = useState(false);
+    const [tokenMetadataDetails, setTokenMetadataDetails] = useState<TokenKRC20DeployMetadata>({});
+    const [updateMetadataPaymentTransactionId, setUpdateMetadataPaymentTransactionId] = useState<string | null>(
+        null,
+    );
+    const [isUpadteMetadataLoading, setIsUpdateMetadataLoading] = useState(false);
 
     const scoreLineRanges: ScoreLineConfig = {
         [theme.palette.error.main]: { start: 0, end: 30 },
@@ -32,61 +46,109 @@ const RugScore: FC<RugScoreProps> = (props) => {
         [theme.palette.success.main]: { start: 72, end: 100 },
     };
 
-    const onAddTwitterHandle = useCallback(
-        async (twitterHandle: string, instantVerification: boolean) => {
-            try {
-                if (instantVerification) {
-                    // Replace 'YOUR_KASPA_ADDRESS' with the actual address to receive the verification fee
-                    const txid = await sendKaspa(
-                        'kaspatest:qrzsn5eu6s28evw0k26qahjn0nwwzwjgn0qp3p37zl7z5lvx64h923agfaskv',
-                        VERIFICATION_FEE_SOMPI,
-                    );
-
-                    // Get the current account's address
-                    const account = await getCurrentAccount();
-
-                    showGlobalSnackbar({ message: 'Instant verification successful', severity: 'success' });
-                    setTimeout(() => {
-                        fetchWalletBalance(account).then((balance) =>
-                            setWalletBalance(setWalletBalanceUtil(balance)),
-                        );
-                        console.log('Sending to backend:', { twitterHandle, instantVerification: true, txid });
-                    }, 5000);
-                } else {
-                    // For manual verification, just log the information
-                    console.log('Sending to backend:', { twitterHandle, instantVerification: false });
-
-                    showGlobalSnackbar({
-                        message: 'Twitter handle submitted for manual review',
-                        severity: 'success',
-                    });
-                }
-
-                // Update the xHandle state or other relevant states here
-                console.log('Twitter handle added successfully');
-            } catch (error) {
-                console.error('Error processing Twitter handle:', error);
-                showGlobalSnackbar({
-                    message: 'Failed to process Twitter handle',
-                    severity: 'error',
-                    details: error.message,
-                });
-            }
-        },
-        [setWalletBalance],
-    );
-
     const handleOpenDialog = () => {
-        setOpenDialog(true);
+        setShowInfoForm(true);
     };
 
     const handleCloseDialog = () => {
-        setOpenDialog(false);
+        setShowInfoForm(false);
     };
 
-    const handleAddTwitterHandle = (twitterHandle: string, instantVerification: boolean) => {
-        onAddTwitterHandle(twitterHandle, instantVerification);
-        handleCloseDialog();
+    const onSaveTokenMetadata = async (tokenMetadata: any) => {
+        setTokenMetadataDetails(tokenMetadata);
+        setShowReviewListTokenDialog(true);
+    };
+
+    const handleTokenListing = async (): Promise<boolean> => {
+        if (!tokenMetadataDetails) return;
+        console.log('Token metadata:', tokenMetadataDetails);
+        console.log('VERIFICATION_FEE_KAS', VERIFICATION_FEE_KAS);
+
+        let currentMetadataPaymentTransactionId = updateMetadataPaymentTransactionId;
+
+        if (!currentMetadataPaymentTransactionId) {
+            if (walletBalance < VERIFICATION_FEE_KAS) {
+                showGlobalSnackbar({
+                    message: 'Insufficient funds to list token',
+                    severity: 'error',
+                });
+                return false;
+            }
+
+            const metadataUpdateFeeTransactionId = await sendKaspa(
+                'kaspatest:qrzsn5eu6s28evw0k26qahjn0nwwzwjgn0qp3p37zl7z5lvx64h923agfaskv',
+                VERIFICATION_FEE_SOMPI,
+            );
+
+            if (metadataUpdateFeeTransactionId) {
+                setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId);
+                currentMetadataPaymentTransactionId = metadataUpdateFeeTransactionId;
+
+                showGlobalSnackbar({
+                    message: 'Payment successful',
+                    severity: 'success',
+                });
+
+                const account = await getCurrentAccount();
+                const balance = await fetchWalletBalance(account);
+                setWalletBalance(setWalletBalanceUtil(balance));
+            } else {
+                showGlobalSnackbar({
+                    message: 'Payment failed',
+                    severity: 'error',
+                });
+
+                return false;
+            }
+        }
+
+        if (currentMetadataPaymentTransactionId) {
+            setIsUpdateMetadataLoading(true);
+
+            // Token listing request to backend
+            const tokenDetailsForm = new FormData();
+
+            tokenDetailsForm.append('ticker', ticker.toUpperCase());
+            tokenDetailsForm.append('transactionHash', updateMetadataPaymentTransactionId);
+
+            for (const [key, value] of Object.entries(tokenMetadataDetails)) {
+                tokenDetailsForm.append(key, value as string);
+            }
+
+            try {
+                const result = await updateTokenMetadata(tokenDetailsForm);
+
+                if (!result) {
+                    throw new Error('Failed to save token metadata');
+                }
+
+                showGlobalSnackbar({
+                    message: 'Token listed successfully',
+                    severity: 'success',
+                });
+                setShowReviewListTokenDialog(false);
+
+                setTimeout(() => {
+                    navigate(`/token/${ticker}`);
+                }, 0);
+
+                return true;
+            } catch (error) {
+                showGlobalSnackbar({
+                    message: 'Error listing token, Please check the data or try again later',
+                    severity: 'error',
+                });
+                console.error(error);
+
+                return false;
+            } finally {
+                setIsUpdateMetadataLoading(false);
+                setUpdateMetadataPaymentTransactionId(null);
+                setTokenMetadataDetails({});
+            }
+        }
+
+        return false;
     };
 
     return (
@@ -122,13 +184,34 @@ const RugScore: FC<RugScoreProps> = (props) => {
                     </Button>
                 </Box>
             )}
+            {xHandle && score === null ? (
+                <Typography
+                    sx={{
+                        fontWeight: 'bold',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        mt: '3vh',
+                    }}
+                >
+                    Send New Request by Clicking Refresh Button
+                </Typography>
+            ) : null}
             {xHandle && score !== null ? <ScoreLine value={score} config={scoreLineRanges} /> : null}
 
-            <RugScoreDialog
-                open={openDialog}
-                onClose={handleCloseDialog}
-                onAddTwitterHandle={handleAddTwitterHandle}
-            />
+            {showInfoForm && (
+                <TokenInfoDialog open={showInfoForm} onClose={handleCloseDialog} onSave={onSaveTokenMetadata} />
+            )}
+            {showReviewListTokenDialog && tokenMetadataDetails && (
+                <ReviewListTokenDialog
+                    walletConnected={walletConnected}
+                    open={showReviewListTokenDialog}
+                    onClose={() => setShowReviewListTokenDialog(false)}
+                    onList={handleTokenListing}
+                    tokenMetadata={tokenMetadataDetails}
+                    isPaid={updateMetadataPaymentTransactionId !== null}
+                    isSavingData={isUpadteMetadataLoading}
+                />
+            )}
         </Card>
     );
 };

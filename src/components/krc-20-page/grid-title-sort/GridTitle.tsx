@@ -1,8 +1,5 @@
 import { Typography, IconButton, Box, Tooltip } from '@mui/material';
 import { FC, useState } from 'react';
-import WhatshotRoundedIcon from '@mui/icons-material/WhatshotRounded';
-import { FaFire } from 'react-icons/fa';
-import { IconContext } from 'react-icons';
 import {
     HeaderContainer,
     NextPageButton,
