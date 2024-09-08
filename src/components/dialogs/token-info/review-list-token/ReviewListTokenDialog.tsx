@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box } from '@mui/material';
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button,
+    Typography,
+    Box,
+    Tooltip,
+} from '@mui/material';
 import { TokenKRC20DeployMetadata } from '../../../../types/Types';
 import { DeployPageSpinner } from '../../../../pages/deploy-page/DeployPage.s';
 
@@ -10,10 +19,11 @@ interface ReviewListTokenDialogProps {
     tokenMetadata: TokenKRC20DeployMetadata;
     isPaid: boolean;
     isSavingData: boolean;
+    walletConnected: boolean;
 }
 
 const ReviewListTokenDialog: React.FC<ReviewListTokenDialogProps> = (props) => {
-    const { open, onClose, onList, tokenMetadata, isPaid, isSavingData } = props;
+    const { open, onClose, onList, tokenMetadata, isPaid, isSavingData, walletConnected } = props;
     const [disableList, setDisableList] = useState(false);
 
     const handleList = async () => {
@@ -52,7 +62,7 @@ const ReviewListTokenDialog: React.FC<ReviewListTokenDialogProps> = (props) => {
                             prevent spam and fraudulent activity.
                         </Typography>
                         {Object.entries(tokenMetadata).map(([key, value]) => (
-                            <Typography key={key} variant="body1">
+                            <Typography key={key} variant="body1" sx={{ wordWrap: 'break-word' }}>
                                 <span>
                                     {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}:{' '}
                                 </span>
@@ -66,9 +76,18 @@ const ReviewListTokenDialog: React.FC<ReviewListTokenDialogProps> = (props) => {
                 <Box sx={{ flexGrow: 1 }}>
                     <Button onClick={onClose}>Cancel</Button>
                 </Box>
-                <Button disabled={disableList} onClick={handleList} variant="contained" color="primary">
-                    {isSavingData ? 'Listing Token...' : isPaid ? 'List Token' : 'List Token & Pay'}
-                </Button>
+                <Tooltip title={!walletConnected ? 'Please connect your wallet to List' : ''}>
+                    <span>
+                        <Button
+                            disabled={disableList || !walletConnected}
+                            onClick={handleList}
+                            variant="contained"
+                            color="primary"
+                        >
+                            {isSavingData ? 'Listing Token...' : isPaid ? 'List Token' : 'List Token & Pay'}
+                        </Button>
+                    </span>
+                </Tooltip>
             </DialogActions>
         </Dialog>
     );

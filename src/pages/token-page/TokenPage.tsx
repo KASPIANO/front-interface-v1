@@ -68,6 +68,9 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             )}
             {getComponentToShow(
                 <RugScore
+                    walletConnected={walletConnected}
+                    ticker={ticker}
+                    walletBalance={walletBalance}
                     score={rugScoreParse}
                     // eslint-disable-next-line @typescript-eslint/no-empty-function
                     onRecalculate={() => {}}
