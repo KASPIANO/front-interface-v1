@@ -66,6 +66,8 @@ const GridPage: FC<GridPageProps> = (props) => {
                 currentPage={page}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
+                onSortBy={onSortBy}
+                isLoading={isLoading}
             />
             <StyledDataGridContainer>
                 <TokenDataGrid
