@@ -1,13 +1,15 @@
-import { Typography } from '@mui/material';
+import { Typography, Box } from '@mui/material';
 import { FC } from 'react';
-import { FilterButton } from '../filter-button/FilterButton';
 import { FilterState } from '../../../types/Types';
+import { DownButton } from '../filter-button/down-button/DownButton';
+import { UpButton } from '../filter-button/up-button/UpButton';
 
 interface GridHeaderProps {
     name: string;
     headerFunction: (filterState: FilterState) => void;
     activeHeader: string;
     setActiveHeader: (value: string) => void;
+    currentFilterState: FilterState;
 }
 
 const marginMapperByHeader = {
@@ -28,9 +30,16 @@ const marginLeft = {
     'Fair Mint': '0',
 };
 
-const disableSort = (name) => name === 'Ticker' || name === 'Age' || name === 'Minted' || name === 'Holders';
+const disableSort = (name: string) =>
+    name === 'Ticker' || name === 'Age' || name === 'Minted' || name === 'Holders';
 
-export const GridHeader: FC<GridHeaderProps> = ({ name, headerFunction, activeHeader, setActiveHeader }) => (
+export const GridHeader: FC<GridHeaderProps> = ({
+    name,
+    headerFunction,
+    activeHeader,
+    setActiveHeader,
+    currentFilterState,
+}) => (
     <th
         style={{
             display: 'flex',
@@ -41,11 +50,22 @@ export const GridHeader: FC<GridHeaderProps> = ({ name, headerFunction, activeHe
     >
         <Typography sx={{ fontWeight: 600, fontSize: '1.2vw' }}>{name}</Typography>
         {disableSort(name) && (
-            <FilterButton
-                onFilterClick={headerFunction}
-                isActive={activeHeader === name}
-                setActiveHeader={() => setActiveHeader(name)}
-            />
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <UpButton
+                    onClick={() => {
+                        setActiveHeader(name);
+                        headerFunction(FilterState.UP);
+                    }}
+                    isActive={activeHeader === name && currentFilterState === FilterState.UP}
+                />
+                <DownButton
+                    onClick={() => {
+                        setActiveHeader(name);
+                        headerFunction(FilterState.DOWN);
+                    }}
+                    isActive={activeHeader === name && currentFilterState === FilterState.DOWN}
+                />
+            </Box>
         )}
     </th>
 );

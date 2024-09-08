@@ -7,6 +7,7 @@ import { FilterState, TokenListItemResponse } from '../../../types/Types';
 import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 import { GridHeader } from '../grid-header/GridHeader';
 import { TokenRow } from '../token-row-grid/TokenRow';
+import { GridHeadersComponent } from '../grid-header/GridHeaders';
 
 interface TokenDataGridProps {
     tokensList: TokenListItemResponse[];
@@ -54,51 +55,59 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     const handleItemClick = (token) => {
         navigate(`/token/${token.ticker}`);
     };
-
     const headerFunction = useCallback(
         (field: string, filterState: FilterState) => {
-            setFilterStates((prev) => ({ ...prev, [field]: filterState }));
-            setActiveHeader(filterState === FilterState.NONE ? '' : field);
+            setFilterStates((prev) => {
+                const newFilterStates = { ...prev };
+                Object.keys(newFilterStates).forEach((key) => {
+                    newFilterStates[key] = key === field ? filterState : FilterState.NONE;
+                });
+                return newFilterStates;
+            });
 
-            if (filterState === FilterState.NONE) {
+            if (
+                filterState === FilterState.NONE ||
+                (activeHeader === field && filterState === filterStates[field])
+            ) {
+                setActiveHeader('');
                 sortBy(null, null);
             } else {
+                setActiveHeader(field);
                 sortBy(field, filterState === FilterState.UP);
             }
         },
-        [sortBy],
+        [sortBy, activeHeader, filterStates],
     );
-
-    const tableHeader = (
-        <Box
-            sx={{
-                height: '8vh',
-                alignContent: 'center',
-                borderBottom: '0.1px solid  rgba(111, 199, 186, 0.3)',
-            }}
-        >
-            <table style={{ width: '100%' }}>
-                <thead>
-                    <tr style={{ display: 'flex' }}>
-                        {Object.keys(GridHeaders).map((header: GridHeaders) => (
-                            <GridHeader
-                                key={header}
-                                name={headersMapper[header].name}
-                                headerFunction={
-                                    headersMapper[header].headerFunction
-                                        ? (filterState) => headerFunction(fieldToSortProp[header], filterState)
-                                        : null
-                                }
-                                activeHeader={activeHeader}
-                                setActiveHeader={setActiveHeader}
-                                currentFilterState={filterStates[fieldToSortProp[header]] || FilterState.NONE}
-                            />
-                        ))}
-                    </tr>
-                </thead>
-            </table>
-        </Box>
-    );
+    // const tableHeader = (
+    //     <Box
+    //         sx={{
+    //             height: '8vh',
+    //             alignContent: 'center',
+    //             borderBottom: '0.1px solid  rgba(111, 199, 186, 0.3)',
+    //         }}
+    //     >
+    //         <table style={{ width: '100%' }}>
+    //             <thead>
+    //                 <tr style={{ display: 'flex' }}>
+    //                     {Object.keys(GridHeaders).map((header: GridHeaders) => (
+    //                         <GridHeader
+    //                             key={header}
+    //                             name={headersMapper[header].name}
+    //                             headerFunction={
+    //                                 headersMapper[header].headerFunction
+    //                                     ? (filterState) => headerFunction(fieldToSortProp[header], filterState)
+    //                                     : null
+    //                             }
+    //                             activeHeader={activeHeader}
+    //                             setActiveHeader={() => {}} // This is now handled in headerFunction
+    //                             currentFilterState={filterStates[fieldToSortProp[header]] || FilterState.NONE}
+    //                         />
+    //                     ))}
+    //                 </tr>
+    //             </thead>
+    //         </table>
+    //     </Box>
+    // );
 
     const renderContent = () => {
         if (isLoading) {
@@ -131,7 +140,12 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     return (
         <>
             <GlobalStyle />
-            {tableHeader}
+            <GridHeadersComponent
+                headerFunction={headerFunction}
+                activeHeader={activeHeader}
+                setActiveHeader={setActiveHeader}
+                filterStates={filterStates}
+            />
             <List
                 id="scrollableList"
                 dense
