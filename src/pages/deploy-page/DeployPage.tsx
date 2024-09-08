@@ -15,7 +15,12 @@ import DeployDialog from '../../components/deploy-page/deploy-dialog/DeployDialo
 import debounce from 'lodash/debounce';
 import { fetchTokenInfo } from '../../DAL/Krc20DAL';
 import { deployKRC20Token, sendKaspa } from '../../utils/KaswareUtils';
-import { BackendValidationErrorsType } from '../../DAL/BackendDAL';
+import {
+    BackendValidationErrorsType,
+    fetchTokenByTicker,
+    sendServerRequestAndSetErrorsIfNeeded,
+    updateTokenMetadata,
+} from '../../DAL/BackendDAL';
 import {
     setErrorToField,
     clearFieldErrors,
@@ -28,6 +33,7 @@ import { convertToProtocolFormat, delay, setWalletBalanceUtil } from '../../util
 import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
 import ReviewListTokenDialog from '../../components/dialogs/token-info/review-list-token/ReviewListTokenDialog';
 import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
+import { useNavigate } from 'react-router-dom';
 
 interface DeployPageProps {
     walletBalance: number;
@@ -63,7 +69,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const [logo, setLogo] = useState<File | null>(null);
     const [banner, setBanner] = useState<File | null>(null);
     const [showDeployDialog, setShowDeployDialog] = useState(false);
-    const [tokenKRC20Details, setTokenKRC20Details] = useState<TokenKRC20Deploy | null>(null);
+    const [tokenKRC20Details, setTokenKRC20Details] = useState<TokenKRC20Deploy | null>();
     const [tokenMetadataDetails, setTokenMetadataDetails] = useState<TokenKRC20DeployMetadata | null>(null);
     const [tickerMessage, setTickerMessage] = useState('');
     const [formErrors, setFormErrors] = useState<BackendValidationErrorsType>({});
@@ -76,6 +82,11 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const [isDeploying, setIsDeploying] = useState(false);
     const [waitingForTokenConfirmation, setWaitingForTokenConfirmation] = useState(false);
     const [isTokenDeployed, setIsTokenDeployed] = useState(false);
+    const [updateMetadataPaymentTransactionId, setUpdateMetadataPaymentTransactionId] = useState<string | null>(
+        null,
+    );
+    const [isUpadteMetadataLoading, setIsUpdateMetadataLoading] = useState(false);
+    const navigate = useNavigate();
 
     const validateTokenFullName = (name: string) => {
         const regex = /^[A-Za-z]{4,6}$/;
@@ -240,42 +251,95 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         setShowReviewListTokenDialog(true);
     };
 
-    const handleTokenListing = async () => {
+    const handleTokenListing = async (): Promise<boolean> => {
         if (!tokenMetadataDetails) return;
         console.log('Token metadata:', tokenMetadataDetails);
         console.log('VERIFICATION_FEE_KAS', VERIFICATION_FEE_KAS);
-        if (walletBalance < VERIFICATION_FEE_KAS) {
-            showGlobalSnackbar({
-                message: 'Insufficient funds to list token',
-                severity: 'error',
-            });
-            return;
+
+        let currentMetadataPaymentTransactionId = updateMetadataPaymentTransactionId;
+
+        if (!currentMetadataPaymentTransactionId) {
+            if (walletBalance < VERIFICATION_FEE_KAS) {
+                showGlobalSnackbar({
+                    message: 'Insufficient funds to list token',
+                    severity: 'error',
+                });
+                return false;
+            }
+
+            const metadataUpdateFeeTransactionId = await sendKaspa(
+                'kaspatest:qrzsn5eu6s28evw0k26qahjn0nwwzwjgn0qp3p37zl7z5lvx64h923agfaskv',
+                VERIFICATION_FEE_SOMPI,
+            );
+
+            if (metadataUpdateFeeTransactionId) {
+                setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId);
+                currentMetadataPaymentTransactionId = metadataUpdateFeeTransactionId;
+
+                showGlobalSnackbar({
+                    message: 'Payment successful',
+                    severity: 'success',
+                });
+            } else {
+                showGlobalSnackbar({
+                    message: 'Payment failed',
+                    severity: 'error',
+                });
+
+                return false;
+            }
         }
-        const txid = await sendKaspa(
-            'kaspatest:qrzsn5eu6s28evw0k26qahjn0nwwzwjgn0qp3p37zl7z5lvx64h923agfaskv',
-            VERIFICATION_FEE_SOMPI,
-        );
-        if (txid) {
-            showGlobalSnackbar({
-                message: 'Payment successful',
-                severity: 'success',
-            });
+
+        if (currentMetadataPaymentTransactionId) {
+            setIsUpdateMetadataLoading(true);
+
             // Token listing request to backend
-            console.log('Token listing request to backend:', tokenMetadataDetails);
+            const tokenDetailsForm = new FormData();
 
-            showGlobalSnackbar({
-                message: 'Token listed successfully',
-                severity: 'success',
-            });
-            setShowReviewListTokenDialog(false);
+            tokenDetailsForm.append('ticker', tokenKRC20Details.ticker.toUpperCase());
+            tokenDetailsForm.append('transactionHash', updateMetadataPaymentTransactionId);
 
-            setIsTokenDeployed(false);
-        } else {
-            showGlobalSnackbar({
-                message: 'Payment failed',
-                severity: 'error',
-            });
+            for (const [key, value] of Object.entries(tokenMetadataDetails)) {
+                tokenDetailsForm.append(key, value as string);
+            }
+
+            try {
+                const result = await sendServerRequestAndSetErrorsIfNeeded<boolean>(
+                    async () => updateTokenMetadata(tokenDetailsForm),
+                    setFormErrors,
+                );
+
+                if (!result) {
+                    throw new Error('Failed to save token metadata');
+                }
+
+                showGlobalSnackbar({
+                    message: 'Token listed successfully',
+                    severity: 'success',
+                });
+                setShowReviewListTokenDialog(false);
+
+                setIsTokenDeployed(false);
+
+                setTimeout(() => {
+                    navigate(`/token/${tokenKRC20Details.ticker}`);
+                }, 0);
+
+                return true;
+            } catch (error) {
+                showGlobalSnackbar({
+                    message: 'Error listing token, Please check the data or try again later',
+                    severity: 'error',
+                });
+                console.error(error);
+
+                return false;
+            } finally {
+                setIsUpdateMetadataLoading(false);
+            }
         }
+
+        return false;
     };
 
     const handleSubmitKRC20 = (event: React.FormEvent) => {
@@ -351,19 +415,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         // }
 
         try {
-            // You add this GILAD I do not get it lol
-            // const validateResults = await sendServerRequestAndSetErrorsIfNeeded<boolean>(
-            //     () => validateFormDetailsForUpdateTokenMetadataAfterDeploy(tokenDetailsForm),
-            //     setFormErrors,
-            // );
-
-            // if (!validateResults) {
-            //     // User need to fix errors
-
-            //     setShowDeployDialog(false);
-            //     return;
-            // }
-
             setIsDeploying(true);
             const txid = await deployKRC20Token(inscribeJsonString);
 
@@ -374,6 +425,11 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 const token = await fetchTokenInfo(tokenKRC20Details.ticker, true);
 
                 if (token.state === 'deployed') {
+                    try {
+                        await fetchTokenByTicker(tokenKRC20Details.ticker, walletAddress, true);
+                    } catch (error) {
+                        console.error('Failed to refresh token data:', error);
+                    }
                     setWaitingForTokenConfirmation(false);
                     setShowDeployDialog(false);
                     setIsDeploying(false);
@@ -397,24 +453,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     setIsDeploying(false);
                 }
             }
-
-            // const result = await sendServerRequestAndSetErrorsIfNeeded<boolean>(
-            //     () => updateTokenMetadataAfterDeploy(tokenDetailsForm),
-            //     setFormErrors,
-            // );
-
-            // if (!result) {
-            //     // TODO: Show error to the user
-            //     throw new Error('Failed to save token metadata');
-            // } else {
-            //     // TODO: Show success to the user
-            // }
-
-            // setShowDeployDialog(false);
-            // } else {
-            //     console.error('Insufficient funds to deploy KRC20 token');
-            // }
-            // Handle successful deployment (e.g., show a success message, navigate to a different page, etc.)
         } catch (error) {
             console.error('Failed to deploy KRC20 token:', error);
             setShowDeployDialog(false);
@@ -922,8 +960,10 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 <ReviewListTokenDialog
                     open={showReviewListTokenDialog}
                     onClose={() => setShowReviewListTokenDialog(false)}
-                    onList={() => handleTokenListing()}
+                    onList={handleTokenListing}
                     tokenMetadata={tokenMetadataDetails}
+                    isPaid={updateMetadataPaymentTransactionId !== null}
+                    isSavingData={isUpadteMetadataLoading}
                 />
             )}
         </Container>
