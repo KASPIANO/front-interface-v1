@@ -91,7 +91,6 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                                 }
                                 activeHeader={activeHeader}
                                 setActiveHeader={setActiveHeader}
-                                currentFilterState={filterStates[fieldToSortProp[header]] || FilterState.NONE}
                             />
                         ))}
                     </tr>

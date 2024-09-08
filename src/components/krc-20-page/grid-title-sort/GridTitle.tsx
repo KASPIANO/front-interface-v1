@@ -1,5 +1,5 @@
 import { Typography, IconButton, Box, Tooltip, CircularProgress } from '@mui/material';
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import WhatshotRoundedIcon from '@mui/icons-material/WhatshotRounded';
 import {
     HeaderContainer,
