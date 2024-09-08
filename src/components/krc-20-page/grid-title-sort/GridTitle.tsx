@@ -1,4 +1,4 @@
-import { Typography, IconButton, Box, Tooltip, CircularProgress } from '@mui/material';
+import { Typography, IconButton, Box, Tooltip } from '@mui/material';
 import { FC, useState } from 'react';
 import WhatshotRoundedIcon from '@mui/icons-material/WhatshotRounded';
 import {
@@ -19,10 +19,12 @@ interface TokenGridTitleProps {
     onPageChange?: (newPage: number) => void;
     onSortBy: (field: string, asc: boolean) => void;
     isLoading: boolean;
+    setActiveHeader: (value: string) => void;
 }
 
 const GridTitle: FC<TokenGridTitleProps> = (props) => {
-    const { timeInterval, setTimeInterval, onSortBy, isLoading, onPageChange, currentPage, totalPages } = props;
+    const { timeInterval, setTimeInterval, onSortBy, onPageChange, currentPage, totalPages, setActiveHeader } =
+        props;
 
     const [changeTotalMintsDisabled, sethCangeTotalMintsActive] = useState(true);
 
@@ -32,10 +34,10 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
 
     const handleMintingRateSort = () => {
         // Handle sorting by minting rate
-
-        const orederBy = changeTotalMintsDisabled ? 'changeTotalMints' : 'ticker';
-        sethCangeTotalMintsActive(!changeTotalMintsDisabled);
-        onSortBy(orederBy, true);
+        const orderedBy = changeTotalMintsDisabled ? 'changeTotalMints' : 'ticker';
+        sethCangeTotalMintsActive((prev) => !prev);
+        setActiveHeader('');
+        onSortBy(orderedBy, true);
     };
 
     const handleNextPage = () => {
@@ -66,24 +68,20 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
 
             {/* Sort Time Period Buttons */}
             <Tooltip title="Sort by the pace and change of minting activity. Mint heat-map.">
-                {isLoading ? (
-                    <CircularProgress sx={{ marginLeft: 'auto' }} />
-                ) : (
-                    <IconButton
-                        onClick={handleMintingRateSort}
+                <IconButton
+                    onClick={handleMintingRateSort}
+                    sx={{
+                        marginLeft: 'auto',
+                        backgroundColor: changeTotalMintsDisabled ? 'transparent' : '#ffcccc',
+                    }}
+                    aria-label="sort by minting rate"
+                >
+                    <WhatshotRoundedIcon
                         sx={{
-                            marginLeft: 'auto',
-                            backgroundColor: changeTotalMintsDisabled ? 'transparent' : '#ffcccc',
+                            color: '#ff0000',
                         }}
-                        aria-label="sort by minting rate"
-                    >
-                        <WhatshotRoundedIcon
-                            sx={{
-                                color: changeTotalMintsDisabled ? '#000000' : '#ff0000',
-                            }}
-                        />
-                    </IconButton>
-                )}
+                    />
+                </IconButton>
             </Tooltip>
 
             <SortButtonGroup variant="contained" sx={{ marginLeft: '1vw' }}>
