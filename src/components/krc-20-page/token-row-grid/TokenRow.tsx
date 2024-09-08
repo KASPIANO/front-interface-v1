@@ -166,7 +166,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         </StatNumber>
                         <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
                             <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
-                            23.36%
+                            {token.changeTotalMints}
                         </StatHelpText>
                     </Stat>
 
@@ -176,7 +176,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         </StatNumber>
                         <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
                             <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
-                            10.36%
+                            {token.changeTotalHolders}
                         </StatHelpText>
                     </Stat>
 
