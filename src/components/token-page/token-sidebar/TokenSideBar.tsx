@@ -12,10 +12,12 @@ interface TokenSideBarProps {
     setTokenInfo: (tokenInfo: BackendTokenResponse) => void;
     walletAddress: string | null;
     walletConnected: boolean;
+    walletBalance: number;
+    setWalletBalance: (balance: number) => void;
 }
 
 const TokenSideBar: FC<TokenSideBarProps> = (props) => {
-    const { setTokenInfo, tokenInfo, walletAddress, walletConnected } = props;
+    const { setTokenInfo, tokenInfo, walletAddress, walletConnected, walletBalance, setWalletBalance } = props;
     const [selectedSideActionTab, setSelectedSideActionTab] = useState('1');
 
     const handleTabChage = (_event: SyntheticEvent, newValue: string) => {
@@ -59,6 +61,8 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                             setTokenInfo={setTokenInfo}
                             walletConnected={walletConnected}
                             walletAddress={walletAddress}
+                            walletBalance={walletBalance}
+                            setWalletBalance={setWalletBalance}
                         />
                     </TabPanel>
                     <TabPanel value="2">Buy The Token</TabPanel>

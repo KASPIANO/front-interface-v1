@@ -321,6 +321,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     severity: 'success',
                 });
                 setShowReviewListTokenDialog(false);
+                setUpdateMetadataPaymentTransactionId(null);
 
                 setIsTokenDeployed(false);
 

@@ -89,6 +89,8 @@ const TokenPage: FC<TokenPageProps> = (props) => {
                     setTokenInfo={setTokenInfo}
                     walletConnected={walletConnected}
                     walletAddress={walletAddress}
+                    walletBalance={walletBalance}
+                    setWalletBalance={setWalletBalance}
                 />,
                 '91vh',
             )}
