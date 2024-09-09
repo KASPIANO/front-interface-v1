@@ -48,6 +48,7 @@ const App = () => {
         setWalletConnected(true);
         const balance = await fetchWalletBalance(address);
         setWalletBalance(setWalletBalanceUtil(balance));
+        localStorage.setItem('walletAddress', address);
     }, []);
 
     const resetWalletState = useCallback(() => {
@@ -55,6 +56,7 @@ const App = () => {
         setWalletBalance(0);
         setWalletConnected(false);
         setUserVerified(null);
+        localStorage.removeItem('walletAddress');
     }, []);
 
     const handleAccountsChanged = useCallback(
@@ -101,6 +103,27 @@ const App = () => {
         }
     }, [walletAddress, walletBalance]);
 
+    useEffect(() => {
+        const checkExistingConnection = async () => {
+            const storedAddress = localStorage.getItem('walletAddress');
+            if (storedAddress && isKasWareInstalled()) {
+                try {
+                    const accounts = await requestAccounts();
+                    if (accounts.length > 0 && accounts[0].toLowerCase() === storedAddress.toLowerCase()) {
+                        await updateWalletState(accounts[0]);
+                    } else {
+                        localStorage.removeItem('walletAddress');
+                    }
+                } catch (error) {
+                    console.error('Error checking existing connection:', error);
+                    localStorage.removeItem('walletAddress');
+                }
+            }
+        };
+
+        checkExistingConnection();
+    }, [updateWalletState]);
+
     const handleConnectWallet = async () => {
         setIsConnecting(true);
         try {
@@ -122,14 +145,19 @@ const App = () => {
                     });
 
                     // Perform user verification
-                    const userVerification = await handleUserVerification(
-                        accounts,
-                        setUserVerified,
-                        showGlobalSnackbar,
-                    );
+                    const storedAddress = localStorage.getItem('walletAddress');
+                    if (!storedAddress && storedAddress !== accounts[0]) {
+                        const userVerification = await handleUserVerification(
+                            accounts,
+                            setUserVerified,
+                            showGlobalSnackbar,
+                        );
+
+                        // Log the verification result
+                        console.log('User Verification:', userVerification, accounts[0]);
+                    }
 
                     // Log the verification result
-                    console.log('User Verification:', userVerification, accounts[0]);
                 } else {
                     // If no accounts, show error message and disconnect
                     showGlobalSnackbar({

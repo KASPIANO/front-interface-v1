@@ -5,6 +5,7 @@ import { TabPanelContainer, TabPanelStyled, TabStyled } from './PortfolioPanel.s
 // import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import PortfolioTokenGrid from '../portfolio-token-grid/PortfolioTokenGrid';
 import { TokenRowPortfolioItem } from '../../../types/Types';
+import PortfolioActivityTokenGrid from '../portfolio-activity-grid/PortfolioActivityTokenGrid';
 
 interface PortfolioPanelProps {
     kasPrice: number;
@@ -63,7 +64,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                     />
                 </TabPanelStyled>
                 <TabPanelStyled value="2">
-                    <PortfolioTokenGrid
+                    <PortfolioActivityTokenGrid
                         walletBalance={walletBalance}
                         isLoading={isLoading}
                         tokensList={tokenList}

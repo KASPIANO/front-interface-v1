@@ -191,6 +191,17 @@ export interface TokenRowPortfolioItem {
     logoUrl?: string;
     state?: string;
 }
+export interface TokenRowActivityItem {
+    ticker: string;
+    amount: string;
+    type: string;
+    time: string;
+    price?: string;
+    totalValue?: string;
+    oneDayChange?: string;
+    logoUrl?: string;
+    state?: string;
+}
 
 export interface UserVerfication {
     userWalletAddress: string;

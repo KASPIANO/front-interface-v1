@@ -2,64 +2,41 @@ import {
     Avatar,
     Box,
     Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
     Divider,
     ListItem,
     ListItemAvatar,
     ListItemButton,
     ListItemText,
-    TextField,
     Tooltip,
     Typography,
 } from '@mui/material';
 import { FC, useState } from 'react';
 import { mintKRC20Token, transferKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
-import { TokenRowPortfolioItem } from '../../../types/Types';
+import { TokenRowActivityItem } from '../../../types/Types';
 import { capitalizeFirstLetter } from '../../../utils/Utils';
 
-interface TokenRowPortfolioProps {
-    token: TokenRowPortfolioItem;
+interface TokenRowActivityProps {
+    token: TokenRowActivityItem;
     walletConnected: boolean;
     kasPrice: number;
     walletBalance: number;
 }
 
-const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
+const TokenRowActivity: FC<TokenRowActivityProps> = (props) => {
     const { token, walletConnected, walletBalance } = props;
-    const [openTransferDialog, setOpenTransferDialog] = useState(false);
-    const [destAddress, setDestAddress] = useState('');
-    const [currentTicker, setCurrentTicker] = useState('');
-    const [amount, setAmount] = useState('');
-    const [error, setError] = useState('');
+    const [destAddress] = useState<string>('');
 
-    const validatePositiveNumber = (value) => {
-        // This regex allows positive numbers, including decimals, but not zero
-        const regex = /^(?!0+\.?0*$)(\d+\.?\d*|\.\d+)$/;
-        return regex.test(value);
-    };
-    const handleTransferDialogClose = () => {
-        setOpenTransferDialog(false);
-        setDestAddress('');
-    };
-
-    const handleTransferClick = (event, ticker: string) => {
+    const handleTranfer = async (event, ticker: string) => {
         event.stopPropagation();
         if (!walletConnected) {
             showGlobalSnackbar({
                 message: 'Please connect your wallet to transfer a token',
                 severity: 'error',
             });
+
             return;
         }
-        setCurrentTicker(ticker);
-        setOpenTransferDialog(true);
-    };
-
-    const handleTransfer = async () => {
         if (destAddress === '') {
             showGlobalSnackbar({
                 message: 'Please enter destination address',
@@ -70,20 +47,18 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
         const inscribeJsonString = JSON.stringify({
             p: 'KRC-20',
             op: 'transfer',
-            tick: currentTicker,
-            amt: (parseInt(amount) * 100000000).toString(),
+            tick: ticker,
         });
         try {
             const mint = await transferKRC20Token(inscribeJsonString, destAddress);
             if (mint) {
                 const { commit, reveal } = JSON.parse(mint);
                 showGlobalSnackbar({
-                    message: 'Token transferred successfully',
+                    message: 'Token transfered successfully',
                     severity: 'success',
                     commit,
                     reveal,
                 });
-                handleTransferDialogClose();
             }
         } catch (error) {
             showGlobalSnackbar({
@@ -136,26 +111,6 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
         }
     };
 
-    const handleSetAmount = (value) => {
-        // Allow empty string for clearing the input
-        if (value === '') {
-            setAmount('');
-            setError('');
-            return;
-        }
-
-        // Replace comma with dot for decimal separator consistency
-
-        if (validatePositiveNumber(value)) {
-            setAmount(value);
-            setError('');
-        } else {
-            setError('Please enter a valid number greater than 0 and ONLY NUMBERS');
-            // Optionally, you can choose to not update the amount when there's an error
-            // setAmount(value);
-        }
-    };
-
     return (
         <div key={token.ticker}>
             <ListItem disablePadding sx={{ height: '12vh' }}>
@@ -201,14 +156,14 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                                     justifyContent: 'start',
                                 }}
                             >
-                                {token.balance}
+                                {token.amount}
                             </Typography>
                         }
                     />
 
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: '2vw', width: '30vw' }}>
                         <Button
-                            onClick={(event) => handleTransferClick(event, token.ticker)}
+                            onClick={(event) => handleTranfer(event, token.ticker)}
                             variant="contained"
                             color="primary"
                             sx={{
@@ -256,49 +211,8 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                 </ListItemButton>
             </ListItem>
             <Divider />
-            <Dialog
-                PaperProps={{
-                    sx: {
-                        width: '40vw',
-                    },
-                }}
-                open={openTransferDialog}
-                onClose={handleTransferDialogClose}
-            >
-                <DialogTitle>Transfer Token</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="address"
-                        label="Destination Address"
-                        type="text"
-                        fullWidth
-                        variant="outlined"
-                        value={destAddress}
-                        onChange={(e) => setDestAddress(e.target.value)}
-                    />
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="amount"
-                        label="Amount"
-                        type="text"
-                        fullWidth
-                        variant="outlined"
-                        error={!!error}
-                        helperText={error}
-                        value={amount}
-                        onChange={(e) => handleSetAmount(e.target.value)}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleTransferDialogClose}>Cancel</Button>
-                    <Button onClick={handleTransfer}>Transfer</Button>
-                </DialogActions>
-            </Dialog>
         </div>
     );
 };
 
-export default TokenRowPortfolio;
+export default TokenRowActivity;
