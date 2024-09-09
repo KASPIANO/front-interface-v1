@@ -20,8 +20,19 @@ const DeployDialog: React.FC<DeployDialogProps> = (props) => {
         setDisableDeploy(true);
     };
 
+    const handleClose = (event, reason: 'backdropClick' | 'escapeKeyDown') => {
+        if (isDeploying || waitingForTokenConfirmation) {
+            return; // Prevent closing if deploying or waiting for confirmation
+        }
+        onClose();
+    };
+
     return (
-        <Dialog open={open} onClose={onClose}>
+        <Dialog
+            open={open}
+            onClose={handleClose}
+            disableEscapeKeyDown={isDeploying || waitingForTokenConfirmation}
+        >
             <DialogTitle sx={{ fontWeight: 'bold' }}>Review Token Deployment</DialogTitle>
             <DialogContent>
                 {isDeploying ? (
@@ -49,7 +60,9 @@ const DeployDialog: React.FC<DeployDialogProps> = (props) => {
             </DialogContent>
             <DialogActions>
                 <Box sx={{ flexGrow: 1 }}>
-                    <Button onClick={onClose}>Cancel</Button>
+                    <Button onClick={onClose} disabled={isDeploying || waitingForTokenConfirmation}>
+                        Cancel
+                    </Button>
                 </Box>
                 <Button onClick={handleDeploy} variant="contained" disabled={disableDeploy}>
                     Deploy

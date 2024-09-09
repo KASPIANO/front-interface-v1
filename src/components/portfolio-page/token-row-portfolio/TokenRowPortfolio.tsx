@@ -1,16 +1,22 @@
 import {
     Avatar,
+    Box,
     Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
     Divider,
     ListItem,
     ListItemAvatar,
     ListItemButton,
     ListItemText,
+    TextField,
     Tooltip,
     Typography,
 } from '@mui/material';
 import { FC, useState } from 'react';
-import { transferKRC20Token } from '../../../utils/KaswareUtils';
+import { mintKRC20Token, transferKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { TokenRowPortfolioItem } from '../../../types/Types';
 import { capitalizeFirstLetter } from '../../../utils/Utils';
@@ -19,22 +25,41 @@ interface TokenRowPortfolioProps {
     token: TokenRowPortfolioItem;
     walletConnected: boolean;
     kasPrice: number;
+    walletBalance: number;
 }
 
 const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
-    const { token, walletConnected, kasPrice } = props;
-    const [destAddress] = useState<string>('');
+    const { token, walletConnected, walletBalance } = props;
+    const [openTransferDialog, setOpenTransferDialog] = useState(false);
+    const [destAddress, setDestAddress] = useState('');
+    const [currentTicker, setCurrentTicker] = useState('');
+    const [amount, setAmount] = useState('');
+    const [error, setError] = useState('');
 
-    const handleTranfer = async (event, ticker: string) => {
+    const validatePositiveNumber = (value) => {
+        // This regex allows positive numbers, including decimals, but not zero
+        const regex = /^(?!0+\.?0*$)(\d+\.?\d*|\.\d+)$/;
+        return regex.test(value);
+    };
+    const handleTransferDialogClose = () => {
+        setOpenTransferDialog(false);
+        setDestAddress('');
+    };
+
+    const handleTransferClick = (event, ticker: string) => {
         event.stopPropagation();
         if (!walletConnected) {
             showGlobalSnackbar({
-                message: 'Please connect your wallet to mint a token',
+                message: 'Please connect your wallet to transfer a token',
                 severity: 'error',
             });
-
             return;
         }
+        setCurrentTicker(ticker);
+        setOpenTransferDialog(true);
+    };
+
+    const handleTransfer = async () => {
         if (destAddress === '') {
             showGlobalSnackbar({
                 message: 'Please enter destination address',
@@ -44,19 +69,21 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
         }
         const inscribeJsonString = JSON.stringify({
             p: 'KRC-20',
-            op: 'trasnfer',
-            tick: ticker,
+            op: 'transfer',
+            tick: currentTicker,
+            amt: (parseInt(amount) * 100000000).toString(),
         });
         try {
             const mint = await transferKRC20Token(inscribeJsonString, destAddress);
             if (mint) {
                 const { commit, reveal } = JSON.parse(mint);
                 showGlobalSnackbar({
-                    message: 'Token transfered successfully',
+                    message: 'Token transferred successfully',
                     severity: 'success',
                     commit,
                     reveal,
                 });
+                handleTransferDialogClose();
             }
         } catch (error) {
             showGlobalSnackbar({
@@ -67,6 +94,68 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
         }
     };
 
+    const handleMint = async (event, ticker: string) => {
+        event.stopPropagation();
+        if (!walletConnected) {
+            showGlobalSnackbar({
+                message: 'Please connect your wallet to mint a token',
+                severity: 'error',
+            });
+
+            return;
+        }
+        if (walletBalance < 1) {
+            showGlobalSnackbar({
+                message: 'You need at least 1 KAS to mint a token',
+                severity: 'error',
+            });
+            return;
+        }
+        const inscribeJsonString = JSON.stringify({
+            p: 'KRC-20',
+            op: 'mint',
+            tick: ticker,
+        });
+        try {
+            const mint = await mintKRC20Token(inscribeJsonString);
+            if (mint) {
+                const { commit, reveal } = JSON.parse(mint);
+                showGlobalSnackbar({
+                    message: 'Token Mint successfully',
+                    severity: 'success',
+                    commit,
+                    reveal,
+                });
+            }
+        } catch (error) {
+            showGlobalSnackbar({
+                message: 'Failed to Mint Token',
+                severity: 'error',
+                details: error.message,
+            });
+        }
+    };
+
+    const handleSetAmount = (value) => {
+        // Allow empty string for clearing the input
+        if (value === '') {
+            setAmount('');
+            setError('');
+            return;
+        }
+
+        // Replace comma with dot for decimal separator consistency
+
+        if (validatePositiveNumber(value)) {
+            setAmount(value);
+            setError('');
+        } else {
+            setError('Please enter a valid number greater than 0 and ONLY NUMBERS');
+            // Optionally, you can choose to not update the amount when there's an error
+            // setAmount(value);
+        }
+    };
+
     return (
         <div key={token.ticker}>
             <ListItem disablePadding sx={{ height: '12vh' }}>
@@ -74,8 +163,8 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                     <ListItemAvatar>
                         <Avatar
                             sx={{
-                                width: '6vh',
-                                height: '6vh',
+                                width: '7vh',
+                                height: '7vh',
                             }}
                             style={{
                                 marginLeft: '0.1vw',
@@ -89,11 +178,11 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
 
                     <ListItemText
                         sx={{
-                            maxWidth: '11vw',
+                            width: '16vw',
                         }}
                         primary={
                             <Tooltip title={token.ticker}>
-                                <Typography variant="body1" style={{ fontSize: '1.2vw' }}>
+                                <Typography variant="body1" sx={{ fontSize: '1.2vw' }}>
                                     {capitalizeFirstLetter(token.ticker)}
                                 </Typography>
                             </Tooltip>
@@ -101,63 +190,113 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                     />
 
                     <ListItemText
-                        sx={{ maxWidth: '12vw' }}
+                        sx={{ width: '15vw' }}
                         primary={
                             <Typography
-                                variant="body2"
-                                style={{ fontSize: '1.1vw', display: 'flex', justifyContent: 'center' }}
+                                variant="body1"
+                                style={{
+                                    fontSize: '1.2vw',
+                                    fontWeight: 'bold',
+                                    display: 'flex',
+                                    justifyContent: 'start',
+                                }}
                             >
-                                {token.price}/Sompi
-                            </Typography>
-                        }
-                        secondary={
-                            <Typography
-                                variant="body2"
-                                style={{ fontSize: '0.8vw', display: 'flex', justifyContent: 'center' }}
-                            >
-                                ${parseInt(token.price) * kasPrice}
+                                {token.balance}
                             </Typography>
                         }
                     />
-                    <ListItemText
-                        sx={{ maxWidth: '12vw' }}
-                        primary={
-                            <Typography
-                                variant="body2"
-                                style={{ fontSize: '1.1vw', display: 'flex', justifyContent: 'center' }}
-                            >
-                                {token.totalValue} KAS
-                            </Typography>
-                        }
-                        secondary={
-                            <Typography
-                                variant="body2"
-                                style={{ fontSize: '0.8vw', display: 'flex', justifyContent: 'center' }}
-                            >
-                                ${parseInt(token.totalValue) * kasPrice}
-                            </Typography>
-                        }
-                    />
-                    <ListItemText
-                        sx={{ maxWidth: '11vw', display: 'flex', justifyContent: 'center' }}
-                        primary={
+
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '2vw', width: '30vw' }}>
+                        <Button
+                            onClick={(event) => handleTransferClick(event, token.ticker)}
+                            variant="contained"
+                            color="primary"
+                            sx={{
+                                minWidth: '2vw',
+                                width: '4vw',
+                                fontSize: '0.8vw',
+                            }}
+                        >
+                            Transfer
+                        </Button>
+                        {token.state !== 'finished' && (
                             <Button
-                                onClick={(event) => handleTranfer(event, token.ticker)}
+                                onClick={(event) => handleMint(event, token.ticker)}
                                 variant="contained"
                                 color="primary"
-                                style={{
+                                sx={{
                                     minWidth: '2vw',
                                     width: '3vw',
                                     fontSize: '0.8vw',
                                 }}
                             >
-                                Transfer
+                                Mint
                             </Button>
-                        }
-                    />
+                        )}
+                    </Box>
+                    {/* {token.state !== 'finished' && (
+                        <ListItemText
+                            sx={{ maxWidth: '10%', display: 'flex', justifyContent: 'center' }}
+                            primary={
+                                <Button
+                                    onClick={(event) => handleMint(event, token.ticker)}
+                                    variant="contained"
+                                    color="primary"
+                                    style={{
+                                        minWidth: '2vw',
+                                        width: '3vw',
+                                        fontSize: '0.8vw',
+                                    }}
+                                >
+                                    Mint
+                                </Button>
+                            }
+                        />
+                    )} */}
                 </ListItemButton>
             </ListItem>
             <Divider />
+            <Dialog
+                PaperProps={{
+                    sx: {
+                        width: '40vw',
+                    },
+                }}
+                open={openTransferDialog}
+                onClose={handleTransferDialogClose}
+            >
+                <DialogTitle>Transfer Token</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="address"
+                        label="Destination Address"
+                        type="text"
+                        fullWidth
+                        variant="outlined"
+                        value={destAddress}
+                        onChange={(e) => setDestAddress(e.target.value)}
+                    />
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="amount"
+                        label="Amount"
+                        type="text"
+                        fullWidth
+                        variant="outlined"
+                        error={!!error}
+                        helperText={error}
+                        value={amount}
+                        onChange={(e) => handleSetAmount(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleTransferDialogClose}>Cancel</Button>
+                    <Button onClick={handleTransfer}>Transfer</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };

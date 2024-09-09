@@ -2,7 +2,7 @@
 
 // Utility to detect if KasWare Wallet is installed
 export const isKasWareInstalled = (): boolean => typeof window.kasware !== 'undefined';
-
+const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 // Method to request account connection
 export const requestAccounts = async (): Promise<string[]> => {
     try {
@@ -113,6 +113,15 @@ export const sendKaspa = async (
         throw error;
     }
 };
+export const sendKaspaToKaspiano = async (sompi: number, options?: { feeRate?: number }): Promise<any> => {
+    try {
+        const txid = await window.kasware.sendKaspa(KASPIANO_WALLET, sompi, options);
+        const parsedTxid = JSON.parse(txid);
+        return parsedTxid;
+    } catch (error) {
+        throw error;
+    }
+};
 
 // Method to sign message
 export const signMessage = async (msg: string, type: 'ecdsa' | 'bip322-simple' = 'ecdsa'): Promise<string> => {
@@ -188,4 +197,18 @@ export const onNetworkChanged = (handler: (network: string) => void) => {
 
 export const removeNetworkChangedListener = (handler: (network: string) => void) => {
     window.kasware.removeListener('networkChanged', handler);
+};
+
+// Utility function to sign a KRC20 batch transfer transaction
+export const signKRC20BatchTransfer = async (inscribeJsonString: string, toAddrs: string[]): Promise<string> => {
+    if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
+
+    try {
+        // Calling the KasWare method to sign the batch transfer transaction
+        const txid = await window.kasware.signKRC20BatchTransferTransaction(inscribeJsonString, 4, toAddrs);
+        return txid;
+    } catch (error) {
+        console.error('Failed to execute batch KRC20 token transfer:', error);
+        throw error;
+    }
 };
