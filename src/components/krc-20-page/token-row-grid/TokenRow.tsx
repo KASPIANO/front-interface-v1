@@ -178,14 +178,14 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             </StatNumber>
 
                             <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
+                                {token.changeTotalHolders}
                                 <StatArrow
                                     sx={{
                                         color: token.changeTotalHolders >= 0 ? 'green' : 'red',
-                                        marginRight: '2px',
+                                        marginLeft: '2px',
                                     }}
                                     type={token.changeTotalHolders >= 0 ? 'increase' : 'decrease'}
                                 />
-                                {token.changeTotalHolders}
                             </StatHelpText>
                         </Stat>
                     </Tooltip>

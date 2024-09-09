@@ -14,7 +14,7 @@ import { TokenKRC20Deploy, TokenKRC20DeployMetadata } from '../../types/Types';
 import DeployDialog from '../../components/deploy-page/deploy-dialog/DeployDialog';
 import debounce from 'lodash/debounce';
 import { fetchTokenInfo } from '../../DAL/Krc20DAL';
-import { deployKRC20Token, sendKaspa } from '../../utils/KaswareUtils';
+import { deployKRC20Token, sendKaspaToKaspiano } from '../../utils/KaswareUtils';
 import {
     BackendValidationErrorsType,
     fetchTokenByTicker,
@@ -94,7 +94,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     };
 
     const validateNumbersOnly = (value: string) => {
-        const regex = /^[0-9]*$/;
+        const regex = /^(?!0+\.?0*$)((\d+\.?\d*|\.\d+)|)$/;
         return regex.test(value);
     };
 
@@ -267,10 +267,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 return false;
             }
 
-            const metadataUpdateFeeTransactionId = await sendKaspa(
-                'kaspatest:qrzsn5eu6s28evw0k26qahjn0nwwzwjgn0qp3p37zl7z5lvx64h923agfaskv',
-                VERIFICATION_FEE_SOMPI,
-            );
+            const metadataUpdateFeeTransactionId = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
 
             if (metadataUpdateFeeTransactionId) {
                 setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId);
@@ -299,6 +296,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             const tokenDetailsForm = new FormData();
 
             tokenDetailsForm.append('ticker', tokenKRC20Details.ticker.toUpperCase());
+            tokenDetailsForm.append('walletAddress', walletAddress);
             tokenDetailsForm.append('transactionHash', updateMetadataPaymentTransactionId);
 
             for (const [key, value] of Object.entries(tokenMetadataDetails)) {
@@ -320,6 +318,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     severity: 'success',
                 });
                 setShowReviewListTokenDialog(false);
+                setUpdateMetadataPaymentTransactionId(null);
 
                 setIsTokenDeployed(false);
 

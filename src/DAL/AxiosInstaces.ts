@@ -1,10 +1,14 @@
 import axios from 'axios';
 
 export const KRC20InfoService = axios.create({
-    baseURL: 'https://tn10api.kasplex.org/v1',
+    baseURL: import.meta.env.VITE_API_KRC20,
 });
 
 export const kasInfoService = axios.create({
+    baseURL: import.meta.env.VITE_KASPA_API,
+});
+
+export const kasInfoMainnetService = axios.create({
     baseURL: 'https://api.kaspa.org/',
 });
 

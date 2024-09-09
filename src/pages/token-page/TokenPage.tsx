@@ -76,6 +76,8 @@ const TokenPage: FC<TokenPageProps> = (props) => {
                     onRecalculate={() => {}}
                     xHandle={tokenXHandle}
                     setWalletBalance={setWalletBalance}
+                    walletAddress={walletAddress}
+                    setTokenInfo={setTokenInfo}
                 />,
                 '19vh',
             )}
@@ -87,6 +89,8 @@ const TokenPage: FC<TokenPageProps> = (props) => {
                     setTokenInfo={setTokenInfo}
                     walletConnected={walletConnected}
                     walletAddress={walletAddress}
+                    walletBalance={walletBalance}
+                    setWalletBalance={setWalletBalance}
                 />,
                 '91vh',
             )}
