@@ -25,7 +25,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     const [recipientAddresses, setRecipientAddresses] = useState('');
     const [txid, setTxid] = useState('');
     const [paymentMade, setPaymentMade] = useState(false); // Track if payment is made
-    const [csvFile, setCsvFile] = useState<File | null>(null);
+    // const [csvFile, setCsvFile] = useState<File | null>(null);
     const [paymentTxnId, setPaymentTxnId] = useState<string | null>(null);
 
     // Example CSV header: "address"

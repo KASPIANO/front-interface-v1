@@ -20,7 +20,7 @@ const DeployDialog: React.FC<DeployDialogProps> = (props) => {
         setDisableDeploy(true);
     };
 
-    const handleClose = (event, reason: 'backdropClick' | 'escapeKeyDown') => {
+    const handleClose = () => {
         if (isDeploying || waitingForTokenConfirmation) {
             return; // Prevent closing if deploying or waiting for confirmation
         }
