@@ -3,8 +3,8 @@ import { PortfolioLayout } from './PortfolioPageLayout';
 import UserProfile from '../../components/portfolio-page/user-profile/UserProfile';
 import PortfolioPanel from '../../components/portfolio-page/portfolio-tab-panel/PortfolioPanel';
 import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
-import { PortfolioValue, TokenRowPortfolioItem } from '../../types/Types';
-import { fetchWalletKRC20Balance } from '../../DAL/Krc20DAL';
+import { PortfolioValue, TokenRowActivityItem, TokenRowPortfolioItem } from '../../types/Types';
+import { fetchWalletActivity, fetchWalletKRC20Balance } from '../../DAL/Krc20DAL';
 import { fetchTokenPortfolio } from '../../DAL/BackendDAL';
 
 interface PortfolioPageProps {
@@ -45,9 +45,14 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
     const { walletAddress, backgroundBlur, walletConnected, walletBalance } = props;
     const [kasPrice, setkasPrice] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoadingActivity, setIsLoadingActivity] = useState<boolean>(false);
     const [portfolioAssetTickers, setPortfolioAssetTickers] = useState<string[]>([]);
-    // const [portfolioAssetsActivity, setPortfolioAssetsActivity] = useState<string[]>([]);
+    const [portfolioAssetsActivity, setPortfolioAssetsActivity] = useState<TokenRowActivityItem[]>([]);
     const [portfolioTokenInfo, setPortfolioTokenInfo] = useState<TokenRowPortfolioItem[]>([]);
+    const [paginationKey, setPaginationKey] = useState<string | null>(null);
+    const [paginationDirection, setPaginationDirection] = useState<'next' | 'prev' | null>(null);
+    const [activityNext, setActivityNext] = useState<string | null>(null);
+    const [activityPrev, setActivityPrev] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchPrice = async () => {
@@ -101,16 +106,44 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
         }
     }, [walletAddress, walletConnected]);
 
+    useEffect(() => {
+        const fetchActivity = async () => {
+            setIsLoadingActivity(true);
+            try {
+                const activityData = await fetchWalletActivity(walletAddress, paginationKey, paginationDirection);
+                setPortfolioAssetsActivity(activityData.activityItems);
+                setActivityNext(activityData.next); // Save the 'next' key for further requests
+                setActivityPrev(activityData.prev); // Save the 'prev' key for further requests
+            } catch (error) {
+                console.error('Error fetching activity data:', error);
+            } finally {
+                setIsLoadingActivity(false);
+            }
+        };
+
+        if (walletConnected) {
+            fetchActivity();
+        }
+    }, [walletAddress, walletConnected, paginationKey, paginationDirection]);
+
+    const handleActivityPagination = (direction: 'next' | 'prev') => {
+        setPaginationDirection(direction);
+        setPaginationKey(direction === 'next' ? activityNext : activityPrev);
+    };
+
     return (
         <PortfolioLayout backgroundBlur={backgroundBlur}>
             <UserProfile walletAddress={walletAddress} portfolioValue={portfolioValue} kasPrice={kasPrice} />
             <PortfolioPanel
+                handleActivityPagination={handleActivityPagination}
                 walletBalance={walletBalance}
                 isLoading={isLoading}
-                tickers={portfolioAssetTickers}
+                isLoadingActivity={isLoadingActivity}
                 kasPrice={kasPrice}
                 walletConnected={walletConnected}
                 tokenList={portfolioTokenInfo}
+                tokensActivityList={portfolioAssetsActivity}
+                tickers={portfolioAssetTickers}
             />
         </PortfolioLayout>
     );

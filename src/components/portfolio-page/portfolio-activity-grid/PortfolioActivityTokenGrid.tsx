@@ -1,17 +1,19 @@
 import { Box, List, Table, TableCell, TableHead, TableRow } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import { FC } from 'react';
-import { TokenRowPortfolioItem } from '../../../types/Types';
+import { TokenRowActivityItem } from '../../../types/Types';
 import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
-import TokenRowPortfolio from '../token-row-portfolio/TokenRowPortfolio';
 import { StyledPortfolioGridContainer } from './PortfolioActivityTokenGrid.s';
+import TokenRowActivity from '../token-row-activity/TokenRowActivity';
 
 interface PortfolioActivityTokenGridProps {
-    tokensList: TokenRowPortfolioItem[];
+    tokensActivityList: TokenRowActivityItem[];
     kasPrice: number;
     walletConnected: boolean;
     isLoading: boolean;
     walletBalance: number;
+    tickers: string[];
+    handleActivityPagination: (direction: 'next' | 'prev') => void;
 }
 
 enum GridHeaders {
@@ -22,7 +24,7 @@ enum GridHeaders {
 }
 
 const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) => {
-    const { tokensList, kasPrice, walletConnected, walletBalance } = props;
+    const { kasPrice, walletConnected, walletBalance, tokensActivityList, handleActivityPagination } = props;
 
     const tableHeader = (
         <Box
@@ -32,7 +34,7 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
                 borderBottom: '0.1px solid rgba(111, 199, 186, 0.3)',
             }}
         >
-            <Table style={{ width: '90%', marginLeft: '0.9vw' }}>
+            <Table style={{ width: '60%' }}>
                 <TableHead>
                     <TableRow>
                         <TableCell sx={{ width: '33%', borderBottom: 0 }}>{GridHeaders.TICKER}</TableCell>
@@ -61,13 +63,13 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
                         overflowX: 'hidden',
                     }}
                 >
-                    {tokensList.length > 0
-                        ? tokensList.map((token) => (
-                              <TokenRowPortfolio
-                                  walletBalance={walletBalance}
-                                  key={token.ticker}
+                    {tokensActivityList.length > 0
+                        ? tokensActivityList.map((token) => (
+                              <TokenRowActivity
                                   token={token}
+                                  key={token.ticker}
                                   walletConnected={walletConnected}
+                                  walletBalance={walletBalance}
                                   kasPrice={kasPrice}
                               />
                           ))
@@ -75,7 +77,7 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
                           [...Array(5)].map((_, index) => <Skeleton key={index} width={'100%'} height={'12vh'} />)}
                 </List>
             )}
-            {tokensList.length === 0 && walletConnected && (
+            {tokensActivityList.length === 0 && walletConnected && (
                 <p style={{ textAlign: 'center', fontSize: '1vw' }}>
                     <b>End of list</b>
                 </p>

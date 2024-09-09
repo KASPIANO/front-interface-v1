@@ -1,4 +1,9 @@
-import { Krc20ApiTokenResponse, TokenRowPortfolioItem } from '../types/Types';
+import {
+    FetchWalletActivityResponse,
+    Krc20ApiTokenResponse,
+    TokenRowActivityItem,
+    TokenRowPortfolioItem,
+} from '../types/Types';
 import { KRC20InfoService } from './AxiosInstaces';
 
 export const fetchReceivingBalance = async (address: string, tokenSymbol: string): Promise<number> => {
@@ -75,5 +80,55 @@ export async function fetchWalletKRC20Balance(address: string): Promise<TokenRow
     } catch (error) {
         console.error('Error fetching wallet balance:', error);
         return [];
+    }
+}
+
+export async function fetchWalletActivity(
+    address: string,
+    paginationKey: string | null = null,
+    direction: 'next' | 'prev' | null = null,
+): Promise<FetchWalletActivityResponse> {
+    try {
+        // Append pagination direction and key (next/prev) if applicable
+        let queryParam = '';
+        if (paginationKey && direction) {
+            queryParam = `&${direction}=${paginationKey}`;
+        }
+        const response = await KRC20InfoService.get<any>(`krc20/oplist?address=${address}${queryParam}`);
+        const operations = response.data.result;
+
+        const activityItems: TokenRowActivityItem[] = operations.map((op: any) => {
+            let type: string;
+            switch (op.op) {
+                case 'transfer':
+                    type = 'Transfer';
+                    break;
+                case 'mint':
+                    type = 'Mint';
+                    break;
+                case 'deploy':
+                    type = 'Deploy';
+                    break;
+                default:
+                    type = 'Unknown';
+                    break;
+            }
+            const amount = op.amt ? (parseInt(op.amt) / 100000000).toFixed(2) : '---';
+            return {
+                ticker: op.tick,
+                amount,
+                type,
+                time: new Date(parseInt(op.mtsAdd)).toLocaleString(),
+            };
+        });
+
+        return {
+            activityItems,
+            next: response.data.next || null, // 'next' page key
+            prev: response.data.prev || null, // 'prev' page key
+        };
+    } catch (error) {
+        console.error('Error fetching wallet activity:', error);
+        return { activityItems: [], next: null, prev: null };
     }
 }

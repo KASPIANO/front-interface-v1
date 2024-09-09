@@ -199,8 +199,6 @@ export interface TokenRowActivityItem {
     price?: string;
     totalValue?: string;
     oneDayChange?: string;
-    logoUrl?: string;
-    state?: string;
 }
 
 export interface UserVerfication {
@@ -222,4 +220,10 @@ export interface TickerPortfolioBackend {
     ticker: string;
     logo: string;
     state?: string;
+}
+
+export interface FetchWalletActivityResponse {
+    activityItems: TokenRowActivityItem[];
+    next: string | null;
+    prev: string | null;
 }

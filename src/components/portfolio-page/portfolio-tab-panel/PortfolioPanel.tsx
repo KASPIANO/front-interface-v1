@@ -4,20 +4,33 @@ import TabContext from '@mui/lab/TabContext';
 import { TabPanelContainer, TabPanelStyled, TabStyled } from './PortfolioPanel.s';
 // import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import PortfolioTokenGrid from '../portfolio-token-grid/PortfolioTokenGrid';
-import { TokenRowPortfolioItem } from '../../../types/Types';
+import { TokenRowActivityItem, TokenRowPortfolioItem } from '../../../types/Types';
 import PortfolioActivityTokenGrid from '../portfolio-activity-grid/PortfolioActivityTokenGrid';
 
 interface PortfolioPanelProps {
     kasPrice: number;
     walletConnected: boolean;
     tokenList: TokenRowPortfolioItem[];
-    tickers?: string[];
     isLoading: boolean;
     walletBalance: number;
+    tokensActivityList: TokenRowActivityItem[];
+    tickers: string[];
+    isLoadingActivity: boolean;
+    handleActivityPagination: (direction: 'next' | 'prev') => void;
 }
 
 const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
-    const { tokenList, kasPrice, walletConnected, isLoading, walletBalance } = props;
+    const {
+        tokenList,
+        kasPrice,
+        walletConnected,
+        isLoading,
+        walletBalance,
+        tickers,
+        tokensActivityList,
+        isLoadingActivity,
+        handleActivityPagination,
+    } = props;
     const [value, setValue] = useState('1');
     // const [paidUser] = useState(false);
 
@@ -65,9 +78,11 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                 </TabPanelStyled>
                 <TabPanelStyled value="2">
                     <PortfolioActivityTokenGrid
+                        handleActivityPagination={handleActivityPagination}
+                        isLoading={isLoadingActivity}
+                        tickers={tickers}
+                        tokensActivityList={tokensActivityList}
                         walletBalance={walletBalance}
-                        isLoading={isLoading}
-                        tokensList={tokenList}
                         kasPrice={kasPrice}
                         walletConnected={walletConnected}
                     />
