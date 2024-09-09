@@ -121,7 +121,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             maxWidth: '17%',
                         }}
                         primary={
-                            <Tooltip title={token.ticker}>
+                            <Tooltip title="">
                                 <Typography component={'span'} variant="body1" style={{ fontSize: '1vw' }}>
                                     {capitalizeFirstLetter(token.ticker)}
                                 </Typography>

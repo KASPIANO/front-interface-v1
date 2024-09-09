@@ -296,6 +296,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             const tokenDetailsForm = new FormData();
 
             tokenDetailsForm.append('ticker', tokenKRC20Details.ticker.toUpperCase());
+            tokenDetailsForm.append('walletAddress', walletAddress);
             tokenDetailsForm.append('transactionHash', updateMetadataPaymentTransactionId);
 
             for (const [key, value] of Object.entries(tokenMetadataDetails)) {
@@ -317,6 +318,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     severity: 'success',
                 });
                 setShowReviewListTokenDialog(false);
+                setUpdateMetadataPaymentTransactionId(null);
 
                 setIsTokenDeployed(false);
 
