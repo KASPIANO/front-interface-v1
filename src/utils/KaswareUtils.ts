@@ -113,10 +113,11 @@ export const sendKaspa = async (
         throw error;
     }
 };
-export const sendKaspaToKaspiano = async (sompi: number, options?: { feeRate?: number }): Promise<string> => {
+export const sendKaspaToKaspiano = async (sompi: number, options?: { feeRate?: number }): Promise<any> => {
     try {
         const txid = await window.kasware.sendKaspa(KASPIANO_WALLET, sompi, options);
-        return txid;
+        const parsedTxid = JSON.parse(txid);
+        return parsedTxid;
     } catch (error) {
         throw error;
     }

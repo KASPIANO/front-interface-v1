@@ -329,6 +329,8 @@ Request ID: ${requestId}
                                 path="/batch-transfer"
                                 element={
                                     <BatchTransferPage
+                                        walletBalance={walletBalance}
+                                        setWalletBalance={setWalletBalance}
                                         walletAddress={walletAddress}
                                         backgroundBlur={backgroundBlur}
                                         walletConnected={walletConnected}

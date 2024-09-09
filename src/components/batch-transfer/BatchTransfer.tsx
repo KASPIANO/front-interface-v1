@@ -5,18 +5,21 @@ import { TransferObj } from '../../types/Types';
 import { parse } from 'papaparse'; // For CSV parsing
 import { showGlobalSnackbar } from '../alert-context/AlertContext';
 import FileDownloadIconRounded from '@mui/icons-material/FileDownloadRounded';
-import { verifyPaymentTransaction } from '../../utils/Utils';
+import { setWalletBalanceUtil, verifyPaymentTransaction } from '../../utils/Utils';
+import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
 
 export interface BatchTransferProps {
-    walletConnected?: boolean;
-    walletAddres: string | null;
+    walletConnected: boolean;
+    walletAddress: string | null;
+    setWalletBalance: (balance: number) => void;
+    walletBalance: number;
 }
 
 const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
 const VERIFICATION_FEE_KAS = 500;
 const VERIFICATION_FEE_SOMPI = VERIFICATION_FEE_KAS * KASPA_TO_SOMPI;
 const BatchTransfer: FC<BatchTransferProps> = (props) => {
-    const { walletAddres } = props;
+    const { walletAddress, setWalletBalance, walletConnected, walletBalance } = props;
     const [ticker, setTicker] = useState<string>('');
     const [amount, setAmount] = useState<string>('');
     const [recipientAddresses, setRecipientAddresses] = useState('');
@@ -72,7 +75,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             });
             return;
         }
-        const verification = await verifyPaymentTransaction(paymentTxnId, walletAddres, VERIFICATION_FEE_SOMPI);
+        const verification = await verifyPaymentTransaction(paymentTxnId, walletAddress, VERIFICATION_FEE_SOMPI);
         if (!verification) {
             showGlobalSnackbar({
                 message: 'Payment required',
@@ -100,8 +103,30 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     };
 
     const handlePayment = async () => {
-        const paymentId = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
-        if (!paymentId) {
+        if (!walletConnected) {
+            showGlobalSnackbar({
+                message: 'Please connect your wallet',
+                severity: 'error',
+            });
+            return;
+        }
+        if (walletBalance < VERIFICATION_FEE_KAS) {
+            showGlobalSnackbar({
+                message: 'Insufficient funds',
+                severity: 'error',
+            });
+            return;
+        }
+        const paymentTxn = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
+        let paymentTxnId = '';
+        if (paymentTxn?.['inputs']) {
+            paymentTxnId = paymentTxn['inputs'][0].transactionId;
+            console.log('Transaction ID:', paymentTxnId);
+        } else {
+            console.error('No inputs found in transaction');
+        }
+
+        if (!paymentTxnId) {
             showGlobalSnackbar({
                 message: 'Payment failed',
                 severity: 'error',
@@ -112,10 +137,13 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 message: 'Payment successful',
                 severity: 'success',
             });
-            setPaymentTxnId(paymentId);
+            setPaymentTxnId(paymentTxnId);
             setPaymentMade(true);
         }
-        const verification = await verifyPaymentTransaction(paymentId, walletAddres, VERIFICATION_FEE_SOMPI);
+
+        const balance = await fetchWalletBalance(walletAddress);
+        setWalletBalance(setWalletBalanceUtil(balance));
+        const verification = await verifyPaymentTransaction(paymentTxnId, walletAddress, VERIFICATION_FEE_SOMPI);
     };
 
     const validateNumbersOnly = (value: string) => {

@@ -69,7 +69,6 @@ export const verifyPaymentTransaction = async (
     receiverAddr = KASPIANO_WALLET,
 ): Promise<boolean> => {
     const txnInfo = await getTxnInfo(txnId);
-    debugger;
     if (!txnInfo) {
         console.error('Transaction info not found.');
         return false;

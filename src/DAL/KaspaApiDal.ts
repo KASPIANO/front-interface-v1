@@ -33,7 +33,7 @@ export const kaspaLivePrice = async (): Promise<number> => {
 export const getTxnInfo = async (txnId: string): Promise<any> => {
     try {
         const response = await kasInfoService.get<any>(
-            `transactions/${txnId}inputs=true&outputs=true&resolve_previous_outpoints=light`,
+            `transactions/${txnId}?inputs=true&outputs=true&resolve_previous_outpoints=light`,
         );
         return response.data;
     } catch (error) {
