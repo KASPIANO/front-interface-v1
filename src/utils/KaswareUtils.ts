@@ -2,7 +2,7 @@
 
 // Utility to detect if KasWare Wallet is installed
 export const isKasWareInstalled = (): boolean => typeof window.kasware !== 'undefined';
-
+const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 // Method to request account connection
 export const requestAccounts = async (): Promise<string[]> => {
     try {
@@ -108,6 +108,14 @@ export const sendKaspa = async (
 ): Promise<string> => {
     try {
         const txid = await window.kasware.sendKaspa(toAddress, sompi, options);
+        return txid;
+    } catch (error) {
+        throw error;
+    }
+};
+export const sendKaspaToKaspiano = async (sompi: number, options?: { feeRate?: number }): Promise<string> => {
+    try {
+        const txid = await window.kasware.sendKaspa(KASPIANO_WALLET, sompi, options);
         return txid;
     } catch (error) {
         throw error;

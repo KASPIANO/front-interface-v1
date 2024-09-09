@@ -4,7 +4,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { Box, Button, Card, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import { FC, useState } from 'react';
 import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
-import { getCurrentAccount, sendKaspa } from '../../../utils/KaswareUtils';
+import { getCurrentAccount, sendKaspaToKaspiano } from '../../../utils/KaswareUtils';
 import { setWalletBalanceUtil } from '../../../utils/Utils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import ScoreLine, { ScoreLineConfig } from './score-line/ScoreLine';
@@ -75,10 +75,7 @@ const RugScore: FC<RugScoreProps> = (props) => {
                 return false;
             }
 
-            const metadataUpdateFeeTransactionId = await sendKaspa(
-                'kaspatest:qrzsn5eu6s28evw0k26qahjn0nwwzwjgn0qp3p37zl7z5lvx64h923agfaskv',
-                VERIFICATION_FEE_SOMPI,
-            );
+            const metadataUpdateFeeTransactionId = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
 
             if (metadataUpdateFeeTransactionId) {
                 setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId);

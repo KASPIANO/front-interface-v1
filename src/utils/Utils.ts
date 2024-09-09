@@ -1,9 +1,11 @@
 import moment from 'moment';
+import { getTxnInfo } from '../DAL/KaspaApiDal';
 
 export enum ThemeModes {
     DARK = 'dark',
     LIGHT = 'light',
 }
+const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 
 export const getLocalThemeMode = () =>
     localStorage.getItem('theme_mode') ? (localStorage.getItem('theme_mode') as ThemeModes) : ThemeModes.DARK;
@@ -59,3 +61,38 @@ export function generateRequestId() {
 }
 
 export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const verifyPaymentTransaction = async (
+    txnId: string,
+    senderAddr: string,
+    amount: number,
+    receiverAddr = KASPIANO_WALLET,
+): Promise<boolean> => {
+    const txnInfo = await getTxnInfo(txnId);
+    debugger;
+    if (!txnInfo) {
+        console.error('Transaction info not found.');
+        return false;
+    }
+
+    // 1. Verify sender address
+    const input = txnInfo.inputs.find((input: any) => input.previous_outpoint_address === senderAddr);
+
+    if (!input) {
+        console.error('Sender address not found in the inputs.');
+        return false;
+    }
+
+    // 2. Verify the output amount and receiver address
+    const output = txnInfo.outputs.find(
+        (output: any) => output.amount === amount && output.script_public_key_address === receiverAddr,
+    );
+
+    if (!output) {
+        console.error('Receiver address or amount mismatch in the outputs.');
+        return false;
+    }
+
+    // If both checks pass
+    return true;
+};

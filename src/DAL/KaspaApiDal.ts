@@ -29,3 +29,15 @@ export const kaspaLivePrice = async (): Promise<number> => {
         return 0;
     }
 };
+
+export const getTxnInfo = async (txnId: string): Promise<any> => {
+    try {
+        const response = await kasInfoService.get<any>(
+            `transactions/${txnId}inputs=true&outputs=true&resolve_previous_outpoints=light`,
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching transaction info:', error);
+        return {};
+    }
+};
