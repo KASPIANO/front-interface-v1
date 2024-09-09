@@ -18,7 +18,7 @@ import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import { AddBanner, AddBox, AddText } from './token-sidebar-socials-bar/TokenSidebarSocialsBar.s';
 import { formatNumberWithCommas, simplifyNumber } from '../../../../utils/Utils';
 import { updateWalletSentiment } from '../../../../DAL/BackendDAL';
-import { UpdateMetadataDialog } from '../../update-metadata-dialog/update-metadata-dialog';
+import { UpdateMetadataDialog } from '../../update-metadata-dialog/UpdateMetadataDialog';
 
 export type SentimentButtonsConfig = {
     key: keyof TokenSentiment;

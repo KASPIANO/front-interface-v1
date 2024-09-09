@@ -3,7 +3,7 @@ import { BackendTokenMetadata, BackendTokenResponse, TokenKRC20DeployMetadata } 
 import ReviewListTokenDialog from '../../dialogs/token-info/review-list-token/ReviewListTokenDialog';
 import TokenInfoDialog from '../../dialogs/token-info/TokenInfoDialog';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
-import { getCurrentAccount, sendKaspa } from '../../../utils/KaswareUtils';
+import { getCurrentAccount, sendKaspa, sendKaspaToKaspiano } from '../../../utils/KaswareUtils';
 import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
 import { isEmptyStringOrArray, setWalletBalanceUtil } from '../../../utils/Utils';
 import { sendServerRequestAndSetErrorsIfNeeded, updateTokenMetadata } from '../../../DAL/BackendDAL';
@@ -48,7 +48,7 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
                 setShowInfoForm(props.open);
             }
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.open]);
 
     const handleTokenListing = async (): Promise<boolean> => {
@@ -66,14 +66,10 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
                 });
                 return false;
             }
-
             let metadataUpdateFeeTransactionId = null;
 
             try {
-                metadataUpdateFeeTransactionId = await sendKaspa(
-                    'kaspatest:qrzsn5eu6s28evw0k26qahjn0nwwzwjgn0qp3p37zl7z5lvx64h923agfaskv',
-                    VERIFICATION_FEE_SOMPI,
-                );
+                metadataUpdateFeeTransactionId = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
             } catch (error) {
                 console.log(error);
                 showGlobalSnackbar({
@@ -95,11 +91,9 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
                     severity: 'success',
                 });
 
-                const account = await getCurrentAccount();
-                const balance = await fetchWalletBalance(account);
+                const balance = await fetchWalletBalance(walletAddress);
                 setWalletBalance(setWalletBalanceUtil(balance));
             } else {
-                console.log('FAILED');
                 showGlobalSnackbar({
                     message: 'Payment failed',
                     severity: 'error',
