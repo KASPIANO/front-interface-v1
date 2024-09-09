@@ -3,7 +3,7 @@ import { BackendTokenMetadata, BackendTokenResponse, TokenKRC20DeployMetadata } 
 import ReviewListTokenDialog from '../../dialogs/token-info/review-list-token/ReviewListTokenDialog';
 import TokenInfoDialog from '../../dialogs/token-info/TokenInfoDialog';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
-import { getCurrentAccount, sendKaspa, sendKaspaToKaspiano } from '../../../utils/KaswareUtils';
+import { sendKaspaToKaspiano } from '../../../utils/KaswareUtils';
 import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
 import { isEmptyStringOrArray, setWalletBalanceUtil } from '../../../utils/Utils';
 import { sendServerRequestAndSetErrorsIfNeeded, updateTokenMetadata } from '../../../DAL/BackendDAL';
