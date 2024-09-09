@@ -143,7 +143,6 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
 
         const balance = await fetchWalletBalance(walletAddress);
         setWalletBalance(setWalletBalanceUtil(balance));
-        const verification = await verifyPaymentTransaction(paymentTxnId, walletAddress, VERIFICATION_FEE_SOMPI);
     };
 
     const validateNumbersOnly = (value: string) => {
