@@ -2,7 +2,7 @@ import { FC, useState } from 'react';
 import { Tabs } from '@mui/material';
 import TabContext from '@mui/lab/TabContext';
 import { TabPanelContainer, TabPanelStyled, TabStyled } from './PortfolioPanel.s';
-import LockRoundedIcon from '@mui/icons-material/LockRounded';
+// import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import PortfolioTokenGrid from '../portfolio-token-grid/PortfolioTokenGrid';
 import { TokenRowPortfolioItem } from '../../../types/Types';
 
@@ -10,12 +10,15 @@ interface PortfolioPanelProps {
     kasPrice: number;
     walletConnected: boolean;
     tokenList: TokenRowPortfolioItem[];
+    tickers?: string[];
+    isLoading: boolean;
+    walletBalance: number;
 }
 
 const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
-    const { tokenList, kasPrice, walletConnected } = props;
+    const { tokenList, kasPrice, walletConnected, isLoading, walletBalance } = props;
     const [value, setValue] = useState('1');
-    const [paidUser] = useState(false);
+    // const [paidUser] = useState(false);
 
     const handleChange = (_event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
@@ -37,7 +40,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                 >
                     <TabStyled label="Overview" value="1" />
                     <TabStyled label="Activity" value="2" />
-                    <TabStyled
+                    {/* <TabStyled
                         label="Insights"
                         icon={!paidUser && <LockRoundedIcon sx={{ marginBottom: '3px' }} />}
                         iconPosition="end"
@@ -48,16 +51,26 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                         icon={!paidUser && <LockRoundedIcon sx={{ marginBottom: '3px' }} />}
                         iconPosition="end"
                         value="4"
-                    />
+                    /> */}
                 </Tabs>
                 <TabPanelStyled value="1">
                     <PortfolioTokenGrid
+                        walletBalance={walletBalance}
+                        isLoading={isLoading}
                         tokensList={tokenList}
                         kasPrice={kasPrice}
                         walletConnected={walletConnected}
                     />
                 </TabPanelStyled>
-                <TabPanelStyled value="2">Activity</TabPanelStyled>
+                <TabPanelStyled value="2">
+                    <PortfolioTokenGrid
+                        walletBalance={walletBalance}
+                        isLoading={isLoading}
+                        tokensList={tokenList}
+                        kasPrice={kasPrice}
+                        walletConnected={walletConnected}
+                    />
+                </TabPanelStyled>
                 <TabPanelStyled value="3">Portfolio Insights </TabPanelStyled>
                 <TabPanelStyled value="4">Wallet Tracking </TabPanelStyled>
             </TabContext>

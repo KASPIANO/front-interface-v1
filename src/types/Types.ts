@@ -189,6 +189,7 @@ export interface TokenRowPortfolioItem {
     totalValue?: string;
     oneDayChange?: string;
     logoUrl?: string;
+    state?: string;
 }
 
 export interface UserVerfication {
@@ -197,4 +198,17 @@ export interface UserVerfication {
     requestId: string;
     requestNonce: string;
     requestTimestamp: string;
+}
+
+export interface TransferObj {
+    p: string;
+    op: string;
+    tick: string;
+    amt: string;
+}
+
+export interface TickerPortfolioBackend {
+    ticker: string;
+    logo: string;
+    state?: string;
 }

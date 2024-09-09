@@ -1,4 +1,4 @@
-import { Krc20ApiTokenResponse } from '../types/Types';
+import { Krc20ApiTokenResponse, TokenRowPortfolioItem } from '../types/Types';
 import { KRC20InfoService } from './AxiosInstaces';
 
 export const fetchReceivingBalance = async (address: string, tokenSymbol: string): Promise<number> => {
@@ -57,4 +57,23 @@ export async function fetchDevWalletBalance(ticker: string, devWallet: string): 
     const balance = response.data.result[0].balance || '0';
 
     return parseFloat(balance) / 1e8;
+}
+
+export async function fetchWalletKRC20Balance(address: string): Promise<TokenRowPortfolioItem[]> {
+    try {
+        const response = await KRC20InfoService.get<any>(`krc20/address/${address}/tokenlist`);
+        const { result } = response.data;
+
+        // Map the result to fit TokenRowPortfolioItem structure
+        const portfolioItems = result.map((item: any) => ({
+            ticker: item.tick,
+            balance: parseInt(item.balance) / 1e8,
+            logoUrl: '', // Metadata request will fill this later
+        }));
+
+        return portfolioItems;
+    } catch (error) {
+        console.error('Error fetching wallet balance:', error);
+        return [];
+    }
 }

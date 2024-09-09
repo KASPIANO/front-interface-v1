@@ -25,6 +25,7 @@ import PrivacyPolicy from './pages/compliance/PrivacyPolicy';
 import TermsOfService from './pages/compliance/TermsOfService';
 import TrustSafety from './pages/compliance/TrustSafety';
 import { UserVerfication } from './types/Types';
+import BatchTransferPage from './pages/batch-transfer-page/BatchTransferPage';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -289,6 +290,17 @@ Request ID: ${requestId}
                                 path="/portfolio"
                                 element={
                                     <PortfolioPage
+                                        walletBalance={walletBalance}
+                                        walletAddress={walletAddress}
+                                        backgroundBlur={backgroundBlur}
+                                        walletConnected={walletConnected}
+                                    />
+                                }
+                            />
+                            <Route
+                                path="/batch-transfer"
+                                element={
+                                    <BatchTransferPage
                                         walletAddress={walletAddress}
                                         backgroundBlur={backgroundBlur}
                                         walletConnected={walletConnected}

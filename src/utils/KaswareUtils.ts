@@ -189,3 +189,17 @@ export const onNetworkChanged = (handler: (network: string) => void) => {
 export const removeNetworkChangedListener = (handler: (network: string) => void) => {
     window.kasware.removeListener('networkChanged', handler);
 };
+
+// Utility function to sign a KRC20 batch transfer transaction
+export const signKRC20BatchTransfer = async (inscribeJsonString: string, toAddrs: string[]): Promise<string> => {
+    if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
+
+    try {
+        // Calling the KasWare method to sign the batch transfer transaction
+        const txid = await window.kasware.signKRC20BatchTransferTransaction(inscribeJsonString, 4, toAddrs);
+        return txid;
+    } catch (error) {
+        console.error('Failed to execute batch KRC20 token transfer:', error);
+        throw error;
+    }
+};

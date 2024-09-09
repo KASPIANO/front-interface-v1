@@ -1,5 +1,11 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
-import { BackendTokenResponse, TokenListItemResponse, TokenSearchItems, TokenSentiment } from '../types/Types';
+import {
+    BackendTokenResponse,
+    TickerPortfolioBackend,
+    TokenListItemResponse,
+    TokenSearchItems,
+    TokenSentiment,
+} from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
@@ -164,4 +170,19 @@ export async function searchToken(query: string, cancelToken: CancelToken = null
 
     const response = await backendService.get<TokenSearchItems[]>(`/${KRC20CONTROLLER}/search`, requestOptions);
     return response.data;
+}
+
+export async function fetchTokenPortfolio(tickers: string[]): Promise<TickerPortfolioBackend[]> {
+    const tickersString = tickers.length > 0 ? tickers.join(',') : '';
+    try {
+        const response = await backendService.get<TickerPortfolioBackend[]>(
+            `/${KRC20METADATA_CONTROLLER}/portfolio?tickers=${tickersString}`,
+        );
+
+        // Assuming response.data contains the actual array of logo URLs
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching token logo URL:', error);
+        return [];
+    }
 }
