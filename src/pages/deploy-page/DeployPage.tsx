@@ -94,7 +94,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     };
 
     const validateNumbersOnly = (value: string) => {
-        const regex = /^[0-9]*$/;
+        const regex = /^(?!0+\.?0*$)((\d+\.?\d*|\.\d+)|)$/;
         return regex.test(value);
     };
 
