@@ -82,10 +82,11 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
 
                 // Update tokenData with logo URLs
                 const updatedTokenData = tokenData.map((token) => {
-                    const logoInfo = tickersPortfolio.find((item) => item.ticker === token.ticker);
+                    const tokenInfo = tickersPortfolio.find((item) => item.ticker === token.ticker);
                     return {
                         ...token,
-                        logoUrl: logoInfo ? logoInfo.logo : null,
+                        state: tokenInfo ? tokenInfo.state : null,
+                        logoUrl: tokenInfo ? tokenInfo.logo : null,
                     };
                 });
 

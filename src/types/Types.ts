@@ -189,7 +189,7 @@ export interface TokenRowPortfolioItem {
     totalValue?: string;
     oneDayChange?: string;
     logoUrl?: string;
-    state?: string;
+    state: string;
 }
 export interface TokenRowActivityItem {
     ticker: string;

@@ -176,7 +176,7 @@ export async function fetchTokenPortfolio(tickers: string[]): Promise<TickerPort
     const tickersString = tickers.length > 0 ? tickers.join(',') : '';
     try {
         const response = await backendService.get<TickerPortfolioBackend[]>(
-            `/${KRC20METADATA_CONTROLLER}/portfolio?tickers=${tickersString}`,
+            `/${KRC20CONTROLLER}/portfolio?tickers=${tickersString}`,
         );
 
         // Assuming response.data contains the actual array of logo URLs

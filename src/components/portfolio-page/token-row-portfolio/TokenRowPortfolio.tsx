@@ -219,7 +219,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                         >
                             Transfer
                         </Button>
-                        {true && (
+                        {token.state !== 'finished' && (
                             <Button
                                 onClick={(event) => handleMint(event, token.ticker)}
                                 variant="contained"

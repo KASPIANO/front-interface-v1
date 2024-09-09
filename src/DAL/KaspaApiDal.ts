@@ -1,5 +1,5 @@
 import { getBalance } from '../utils/KaswareUtils';
-import { kasInfoService } from './AxiosInstaces';
+import { kasInfoMainnetService, kasInfoService } from './AxiosInstaces';
 
 export const fetchWalletBalance = async (address: string): Promise<number> => {
     try {
@@ -22,7 +22,7 @@ export const fetchWalletBalance = async (address: string): Promise<number> => {
 
 export const kaspaLivePrice = async (): Promise<number> => {
     try {
-        const response = await kasInfoService.get<any>('info/price');
+        const response = await kasInfoMainnetService.get<any>('info/price');
         return response.data.price;
     } catch (error) {
         console.error('Error fetching kaspa live price:', error);
