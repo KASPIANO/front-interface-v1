@@ -4,7 +4,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { Box, Button, Card, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import { FC, useState } from 'react';
 import ScoreLine, { ScoreLineConfig } from './score-line/ScoreLine';
-import { UpdateMetadataDialog } from '../update-metadata-dialog/update-metadata-dialog';
+import { UpdateMetadataDialog } from '../update-metadata-dialog/UpdateMetadataDialog';
 
 interface RugScoreProps {
     score: number | null;

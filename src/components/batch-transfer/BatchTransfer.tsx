@@ -7,6 +7,7 @@ import { showGlobalSnackbar } from '../alert-context/AlertContext';
 import FileDownloadIconRounded from '@mui/icons-material/FileDownloadRounded';
 import { setWalletBalanceUtil, verifyPaymentTransaction } from '../../utils/Utils';
 import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
+import { UploadButton } from '../../pages/deploy-page/DeployPage.s';
 
 export interface BatchTransferProps {
     walletConnected: boolean;
@@ -25,7 +26,6 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     const [recipientAddresses, setRecipientAddresses] = useState('');
     const [txid, setTxid] = useState('');
     const [paymentMade, setPaymentMade] = useState(false); // Track if payment is made
-    // const [csvFile, setCsvFile] = useState<File | null>(null);
     const [paymentTxnId, setPaymentTxnId] = useState<string | null>(null);
 
     // Example CSV header: "address"
@@ -54,7 +54,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     const handleBatchTransfer = async () => {
         const addresses = recipientAddresses.split(',').map((addr) => addr.trim());
 
-        if (addresses.length === 0 || !ticker || !amount) {
+        if (addresses.length === 0) {
             showGlobalSnackbar({
                 message: 'Missing destination addresses ',
                 severity: 'error',
@@ -94,12 +94,19 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         const jsonStr = JSON.stringify(transferObj);
 
         try {
+            console.log('Signing batch transfer:', jsonStr, addresses);
             const txid = await signKRC20BatchTransfer(jsonStr, addresses);
             setTxid(txid);
+            clearFields();
         } catch (e) {
             console.error('Error in batch transfer:', e);
             setTxid('Error in transaction');
         }
+    };
+    const clearFields = () => {
+        setTicker('');
+        setAmount('');
+        setRecipientAddresses('');
     };
 
     const handlePayment = async () => {
@@ -118,13 +125,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             return;
         }
         const paymentTxn = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
-        let paymentTxnId = '';
-        if (paymentTxn?.['inputs']) {
-            paymentTxnId = paymentTxn['inputs'][0].transactionId;
-            console.log('Transaction ID:', paymentTxnId);
-        } else {
-            console.error('No inputs found in transaction');
-        }
+        const paymentTxnId = paymentTxn.id;
 
         if (!paymentTxnId) {
             showGlobalSnackbar({
@@ -205,12 +206,23 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                     value={recipientAddresses}
                     onChange={(e) => setRecipientAddresses(e.target.value)}
                     fullWidth
+                    multiline
                     placeholder="Enter recipient addresses"
                 />
             </Box>
             <Box sx={{ marginBottom: '1.3vh' }}>
                 <Typography variant="body2">Or Upload a CSV File:</Typography>
-                <Input type="file" onChange={handleCSVUpload} fullWidth />
+                <UploadButton>
+                    <Input
+                        sx={{ display: 'none' }}
+                        inputProps={{ accept: '.csv' }}
+                        type="file"
+                        onChange={handleCSVUpload}
+                    />
+                    <Button variant="contained" color="primary" component="span">
+                        Choose File or Drag
+                    </Button>
+                </UploadButton>
                 <Typography variant="caption" sx={{ marginTop: '5px', display: 'block' }}>
                     CSV format: One column header named "address" with wallet addresses in each row.
                 </Typography>
