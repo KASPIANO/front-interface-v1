@@ -18,8 +18,8 @@ import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import TokenInfoDialog from '../../../dialogs/token-info/TokenInfoDialog';
 import { AddBanner, AddBox, AddText } from './token-sidebar-socials-bar/TokenSidebarSocialsBar.s';
 import SuccessModal from '../../../modals/sent-token-info-success/SuccessModal';
-import { formatNumberWithCommas, simplifyNumber } from '../../../../utils/Utils';
-import { updateWalletSentiment } from '../../../../DAL/BackendDAL';
+import { formatNumberWithCommas, isEmptyStringOrArray, simplifyNumber } from '../../../../utils/Utils';
+import { updateTokenMetadata, updateWalletSentiment } from '../../../../DAL/BackendDAL';
 
 export type SentimentButtonsConfig = {
     key: keyof TokenSentiment;
@@ -106,23 +106,47 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         setShowTokenInfoDialog(true);
     };
 
-    const handleSaveTokenInfo = (newTokenInfo: Partial<BackendTokenMetadata>) => {
+    const handleSaveTokenInfo = async (newTokenInfo: Partial<BackendTokenMetadata>) => {
         // Here you would typically update the token info in your backend
-        console.log('New token info:', newTokenInfo);
+        const tokenDetailsForm = new FormData();
 
-        // Merge the new token info with the existing token info
-        setTokenInfo((prevInfo: BackendTokenResponse) => {
-            const updatedInfo: BackendTokenResponse = {
-                ...prevInfo,
-                metadata: {
-                    ...prevInfo.metadata,
-                    ...newTokenInfo,
-                },
-            };
+        console.log(newTokenInfo);
 
-            return updatedInfo;
-        });
-        setOpenModal(true);
+        for (const [key, value] of Object.entries(newTokenInfo)) {
+            if (value instanceof File || !isEmptyStringOrArray(value as any)) {
+                tokenDetailsForm.append(key, value as string);
+            }
+        }
+
+        tokenDetailsForm.append('ticker', tokenInfo.ticker.toUpperCase());
+        tokenDetailsForm.append('walletAddress', walletAddress);
+
+        // Todo: add transaction hash for the payment
+        tokenDetailsForm.append('transactionHash', 'Not implemented yet');
+
+        try {
+            const result = await updateTokenMetadata(tokenDetailsForm);
+
+            if (!result) {
+                throw new Error('Failed to save token metadata');
+            }
+
+            // Merge the new token info with the existing token info
+            setTokenInfo((prevInfo: BackendTokenResponse) => {
+                const updatedInfo: BackendTokenResponse = {
+                    ...prevInfo,
+                    metadata: {
+                        ...prevInfo.metadata,
+                        ...result.data,
+                    },
+                };
+
+                return updatedInfo;
+            });
+            setOpenModal(true);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const preMintedSupplyPercentage = (tokenInfo.preMintedSupply / tokenInfo.totalSupply) * 100;

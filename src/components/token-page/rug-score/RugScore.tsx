@@ -5,12 +5,12 @@ import { Box, Button, Card, IconButton, Tooltip, Typography, useTheme } from '@m
 import { FC, useState } from 'react';
 import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
 import { getCurrentAccount, sendKaspa } from '../../../utils/KaswareUtils';
-import { setWalletBalanceUtil } from '../../../utils/Utils';
+import { isEmptyStringOrArray, setWalletBalanceUtil } from '../../../utils/Utils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import ScoreLine, { ScoreLineConfig } from './score-line/ScoreLine';
 import TokenInfoDialog from '../../dialogs/token-info/TokenInfoDialog';
 import ReviewListTokenDialog from '../../dialogs/token-info/review-list-token/ReviewListTokenDialog';
-import { TokenKRC20DeployMetadata } from '../../../types/Types';
+import { BackendTokenResponse, TokenKRC20DeployMetadata } from '../../../types/Types';
 import { useNavigate } from 'react-router-dom';
 import { updateTokenMetadata } from '../../../DAL/BackendDAL';
 
@@ -22,6 +22,8 @@ interface RugScoreProps {
     walletBalance: number;
     ticker: string;
     walletConnected: boolean;
+    walletAddress: string | null;
+    setTokenInfo: (tokenInfo: any) => void;
 }
 
 const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
@@ -29,7 +31,17 @@ const VERIFICATION_FEE_KAS = 1250;
 const VERIFICATION_FEE_SOMPI = VERIFICATION_FEE_KAS * KASPA_TO_SOMPI;
 
 const RugScore: FC<RugScoreProps> = (props) => {
-    const { score, xHandle, onRecalculate, setWalletBalance, walletBalance, ticker, walletConnected } = props;
+    const {
+        score,
+        xHandle,
+        onRecalculate,
+        setWalletBalance,
+        walletBalance,
+        ticker,
+        walletConnected,
+        walletAddress,
+        setTokenInfo,
+    } = props;
     const theme = useTheme();
     const navigate = useNavigate();
     const [showInfoForm, setShowInfoForm] = useState(false);
@@ -109,10 +121,13 @@ const RugScore: FC<RugScoreProps> = (props) => {
             const tokenDetailsForm = new FormData();
 
             tokenDetailsForm.append('ticker', ticker.toUpperCase());
+            tokenDetailsForm.append('walletAddress', walletAddress);
             tokenDetailsForm.append('transactionHash', updateMetadataPaymentTransactionId);
 
             for (const [key, value] of Object.entries(tokenMetadataDetails)) {
-                tokenDetailsForm.append(key, value as string);
+                if (value instanceof File || !isEmptyStringOrArray(value as any)) {
+                    tokenDetailsForm.append(key, value as string);
+                }
             }
 
             try {
@@ -128,9 +143,17 @@ const RugScore: FC<RugScoreProps> = (props) => {
                 });
                 setShowReviewListTokenDialog(false);
 
-                setTimeout(() => {
-                    navigate(`/token/${ticker}`);
-                }, 0);
+                setTokenInfo((prevInfo: BackendTokenResponse) => {
+                    const updatedInfo: BackendTokenResponse = {
+                        ...prevInfo,
+                        metadata: {
+                            ...prevInfo.metadata,
+                            ...result.data,
+                        },
+                    };
+
+                    return updatedInfo;
+                });
 
                 return true;
             } catch (error) {
