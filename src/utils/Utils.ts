@@ -59,3 +59,17 @@ export function generateRequestId() {
 }
 
 export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const isEmptyString = (value: string): boolean => !value || value.trim() === '';
+
+export const isEmptyArray = <T>(value: T[]): boolean => !value || value.length === 0;
+
+export const isEmptyStringOrArray = <T>(value: T | T[] | string): boolean => {
+    if (Array.isArray(value)) {
+        return isEmptyArray(value);
+    }
+    if (typeof value === 'string') {
+        return isEmptyString(value);
+    }
+    return !value;
+};

@@ -13,6 +13,7 @@ import { DialogContainer } from './TokenDialogInfo.s';
 import { UploadContainer, ImagePreview, UploadButton } from '../../../pages/deploy-page/DeployPage.s';
 import { TokenKRC20DeployMetadata } from '../../../types/Types';
 import { GlobalStyleDialog } from '../../../utils/GlobalStyleScrollBar';
+import { isEmptyString } from '../../../utils/Utils';
 
 interface TokenInfoDialogProps {
     open: boolean;
@@ -68,8 +69,10 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = (props) => {
             medium,
             github,
             audit,
-            contacts: contacts.split(',').map((contact) => contact.trim()),
-            founders: foundersHandles.split(',').map((handle) => handle.trim()),
+            contacts: isEmptyString(contacts) ? [] : contacts.split(',').map((contact) => contact.trim()),
+            founders: isEmptyString(foundersHandles)
+                ? []
+                : foundersHandles.split(',').map((handle) => handle.trim()),
         };
 
         onSave(tokenMetadata);
