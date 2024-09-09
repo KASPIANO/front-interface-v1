@@ -219,7 +219,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         event.preventDefault();
         const twitterUrlPattern = /^(https?:\/\/)?(www\.)?x\.com\/[a-zA-Z0-9_]{1,15}$/;
 
-        if (!x && !twitterUrlPattern.test(x)) {
+        if (!x || !twitterUrlPattern.test(x)) {
             setErrorToField(
                 formErrors,
                 setFormErrors,
@@ -280,6 +280,8 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     message: 'Payment successful',
                     severity: 'success',
                 });
+                const balance = await fetchWalletBalance(walletAddress);
+                setWalletBalance(setWalletBalanceUtil(balance));
             } else {
                 showGlobalSnackbar({
                     message: 'Payment failed',
@@ -958,6 +960,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             )}
             {showReviewListTokenDialog && tokenMetadataDetails && (
                 <ReviewListTokenDialog
+                    walletConnected={walletConnected}
                     open={showReviewListTokenDialog}
                     onClose={() => setShowReviewListTokenDialog(false)}
                     onList={handleTokenListing}

@@ -50,7 +50,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
 
     const getComponentToShow = (component: JSX.Element, height?: string, width?: string) =>
         tokenInfo ? component : <Skeleton variant="rectangular" height={height} width={width} />;
-
+    const rugScoreParse = tokenInfo?.metadata?.rugScore === 0 ? null : tokenInfo?.metadata?.rugScore;
     return (
         <TokenPageLayout backgroundBlur={backgroundBlur}>
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '11.5vh')}
@@ -68,7 +68,10 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             )}
             {getComponentToShow(
                 <RugScore
-                    score={tokenInfo?.metadata?.rugScore}
+                    walletConnected={walletConnected}
+                    ticker={ticker}
+                    walletBalance={walletBalance}
+                    score={rugScoreParse}
                     // eslint-disable-next-line @typescript-eslint/no-empty-function
                     onRecalculate={() => {}}
                     xHandle={tokenXHandle}
