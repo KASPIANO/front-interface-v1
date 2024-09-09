@@ -96,37 +96,44 @@ export async function fetchWalletActivity(
         }
         const response = await KRC20InfoService.get<any>(`krc20/oplist?address=${address}${queryParam}`);
         const operations = response.data.result;
+        if (operations.length !== 0) {
+            const activityItems: TokenRowActivityItem[] = operations.map((op: any) => {
+                let type: string;
+                switch (op.op) {
+                    case 'transfer':
+                        type = 'Transfer';
+                        break;
+                    case 'mint':
+                        type = 'Mint';
+                        break;
+                    case 'deploy':
+                        type = 'Deploy';
+                        break;
+                    default:
+                        type = 'Unknown';
+                        break;
+                }
+                const amount = op.amt ? (parseInt(op.amt) / 100000000).toFixed(2) : '---';
+                return {
+                    ticker: op.tick,
+                    amount,
+                    type,
+                    time: new Date(parseInt(op.mtsAdd)).toLocaleString(),
+                };
+            });
 
-        const activityItems: TokenRowActivityItem[] = operations.map((op: any) => {
-            let type: string;
-            switch (op.op) {
-                case 'transfer':
-                    type = 'Transfer';
-                    break;
-                case 'mint':
-                    type = 'Mint';
-                    break;
-                case 'deploy':
-                    type = 'Deploy';
-                    break;
-                default:
-                    type = 'Unknown';
-                    break;
-            }
-            const amount = op.amt ? (parseInt(op.amt) / 100000000).toFixed(2) : '---';
             return {
-                ticker: op.tick,
-                amount,
-                type,
-                time: new Date(parseInt(op.mtsAdd)).toLocaleString(),
+                activityItems,
+                next: response.data.next || null, // 'next' page key
+                prev: response.data.prev || null, // 'prev' page key
             };
-        });
-
-        return {
-            activityItems,
-            next: response.data.next || null, // 'next' page key
-            prev: response.data.prev || null, // 'prev' page key
-        };
+        } else {
+            return {
+                activityItems: [],
+                next: null,
+                prev: null,
+            };
+        }
     } catch (error) {
         console.error('Error fetching wallet activity:', error);
         return { activityItems: [], next: null, prev: null };

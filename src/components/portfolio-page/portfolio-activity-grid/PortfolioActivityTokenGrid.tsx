@@ -1,10 +1,11 @@
 import { Box, List, Table, TableCell, TableHead, TableRow } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { TokenRowActivityItem } from '../../../types/Types';
 import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 import { StyledPortfolioGridContainer } from './PortfolioActivityTokenGrid.s';
 import TokenRowActivity from '../token-row-activity/TokenRowActivity';
+import { PrevPageButton, NextPageButton } from '../../krc-20-page/grid-title-sort/GridTitle.s';
 
 interface PortfolioActivityTokenGridProps {
     tokensActivityList: TokenRowActivityItem[];
@@ -14,6 +15,7 @@ interface PortfolioActivityTokenGridProps {
     walletBalance: number;
     tickers: string[];
     handleActivityPagination: (direction: 'next' | 'prev') => void;
+    lastActivityPage: boolean;
 }
 
 enum GridHeaders {
@@ -24,14 +26,33 @@ enum GridHeaders {
 }
 
 const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) => {
-    const { kasPrice, walletConnected, walletBalance, tokensActivityList, handleActivityPagination } = props;
+    const {
+        kasPrice,
+        walletConnected,
+        walletBalance,
+        tokensActivityList,
+        handleActivityPagination,
+        lastActivityPage,
+    } = props;
+    const [currentPage, setCurrentPage] = useState<number>(1);
 
+    const handlePrevPage = () => {
+        setCurrentPage(currentPage - 1);
+        handleActivityPagination('prev');
+    };
+
+    const handleNextPage = () => {
+        setCurrentPage(currentPage + 1);
+        handleActivityPagination('next');
+    };
     const tableHeader = (
         <Box
             sx={{
                 height: '8vh',
                 alignContent: 'center',
                 borderBottom: '0.1px solid rgba(111, 199, 186, 0.3)',
+                display: 'flex',
+                justifyContent: 'space-between',
             }}
         >
             <Table style={{ width: '60%' }}>
@@ -44,6 +65,14 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
                     </TableRow>
                 </TableHead>
             </Table>
+            <Box sx={{ display: 'flex', alignItems: 'center', mr: '2vw' }}>
+                <PrevPageButton onClick={handlePrevPage} disabled={currentPage === 1}>
+                    Prev
+                </PrevPageButton>
+                <NextPageButton onClick={handleNextPage} disabled={lastActivityPage}>
+                    Next
+                </NextPageButton>
+            </Box>
         </Box>
     );
 

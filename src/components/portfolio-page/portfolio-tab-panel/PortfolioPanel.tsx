@@ -17,6 +17,7 @@ interface PortfolioPanelProps {
     tickers: string[];
     isLoadingActivity: boolean;
     handleActivityPagination: (direction: 'next' | 'prev') => void;
+    lastActivityPage: boolean;
 }
 
 const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
@@ -30,6 +31,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
         tokensActivityList,
         isLoadingActivity,
         handleActivityPagination,
+        lastActivityPage,
     } = props;
     const [value, setValue] = useState('1');
     // const [paidUser] = useState(false);
@@ -78,6 +80,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                 </TabPanelStyled>
                 <TabPanelStyled value="2">
                     <PortfolioActivityTokenGrid
+                        lastActivityPage={lastActivityPage}
                         handleActivityPagination={handleActivityPagination}
                         isLoading={isLoadingActivity}
                         tickers={tickers}

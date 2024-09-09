@@ -53,6 +53,7 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
     const [paginationDirection, setPaginationDirection] = useState<'next' | 'prev' | null>(null);
     const [activityNext, setActivityNext] = useState<string | null>(null);
     const [activityPrev, setActivityPrev] = useState<string | null>(null);
+    const [lastActivityPage, setLastActivityPage] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchPrice = async () => {
@@ -115,6 +116,12 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
                 setPortfolioAssetsActivity(activityData.activityItems);
                 setActivityNext(activityData.next); // Save the 'next' key for further requests
                 setActivityPrev(activityData.prev); // Save the 'prev' key for further requests
+                const checkNext = await fetchWalletActivity(walletAddress, activityData.next, 'next');
+                if (checkNext.activityItems.length === 0) {
+                    setLastActivityPage(true);
+                } else {
+                    setLastActivityPage(false);
+                }
             } catch (error) {
                 console.error('Error fetching activity data:', error);
             } finally {
@@ -125,7 +132,9 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
         if (walletConnected) {
             fetchActivity();
         }
-    }, [walletAddress, walletConnected, paginationKey, paginationDirection]);
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [walletAddress, walletConnected, paginationKey]);
 
     const handleActivityPagination = (direction: 'next' | 'prev') => {
         setPaginationDirection(direction);
@@ -137,6 +146,7 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
             <UserProfile walletAddress={walletAddress} portfolioValue={portfolioValue} kasPrice={kasPrice} />
             <PortfolioPanel
                 handleActivityPagination={handleActivityPagination}
+                lastActivityPage={lastActivityPage}
                 walletBalance={walletBalance}
                 isLoading={isLoading}
                 isLoadingActivity={isLoadingActivity}
