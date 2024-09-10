@@ -16,6 +16,7 @@ interface RugScoreProps {
     walletConnected: boolean;
     walletAddress: string | null;
     setTokenInfo: (tokenInfo: any) => void;
+    isLoadingRugScore: boolean;
 }
 
 const RugScore: FC<RugScoreProps> = (props) => {
@@ -29,6 +30,7 @@ const RugScore: FC<RugScoreProps> = (props) => {
         walletConnected,
         walletAddress,
         setTokenInfo,
+        isLoadingRugScore,
     } = props;
     const theme = useTheme();
     const [showInfoForm, setShowInfoForm] = useState(false);
@@ -63,7 +65,11 @@ const RugScore: FC<RugScoreProps> = (props) => {
                 </Box>
                 {xHandle && (
                     <Tooltip title="Click to recalculate the Rug Score.">
-                        <IconButton onClick={onRecalculate} aria-label="recalculate score" sx={{ padding: 0 }}>
+                        <IconButton
+                            onClick={isLoadingRugScore ? null : onRecalculate}
+                            aria-label="recalculate score"
+                            sx={{ padding: 0 }}
+                        >
                             <RefreshIcon />
                         </IconButton>
                     </Tooltip>
