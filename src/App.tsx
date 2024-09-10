@@ -26,6 +26,7 @@ import TermsOfService from './pages/compliance/TermsOfService';
 import TrustSafety from './pages/compliance/TrustSafety';
 import { UserVerfication } from './types/Types';
 import BatchTransferPage from './pages/batch-transfer-page/BatchTransferPage';
+import ContactUs from './pages/compliance/ContactUs';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -340,6 +341,7 @@ Request ID: ${requestId}
                             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                             <Route path="/terms-service" element={<TermsOfService />} />
                             <Route path="/trust-safety" element={<TrustSafety />} />
+                            <Route path="/contact-us" element={<ContactUs />} />
                             {/* Handle 404 - Not Found */}
                             <Route path="*" element={<div>404 - Not Found</div>} />
                         </Routes>
