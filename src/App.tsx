@@ -154,28 +154,16 @@ const App = () => {
 
                 // Check if any accounts were returned
                 if (accounts.length > 0) {
-                    // Update wallet state with the first account
-                    await updateWalletState(accounts[0]);
-
-                    // Show a success message with part of the wallet address
-                    showGlobalSnackbar({
-                        message: 'Wallet connected successfully',
-                        severity: 'success',
-                        details: `Connected to wallet ${accounts[0].substring(0, 9)}....${accounts[0].substring(accounts[0].length - 4)}`,
-                    });
-
                     // Perform user verification
-                    const storedAddress = localStorage.getItem('walletAddress');
-                    if (!storedAddress && storedAddress !== accounts[0]) {
-                        const userVerification = await handleUserVerification(
-                            accounts,
-                            setUserVerified,
-                            showGlobalSnackbar,
-                        );
 
-                        // Log the verification result
-                        console.log('User Verification:', userVerification, accounts[0]);
-                    }
+                    const userVerification = await handleUserVerification(
+                        accounts,
+                        setUserVerified,
+                        showGlobalSnackbar,
+                    );
+
+                    // Log the verification result
+                    console.log('User Verification:', userVerification, accounts[0]);
 
                     // Log the verification result
                 } else {
@@ -263,6 +251,15 @@ Request ID: ${requestId}
                 showGlobalSnackbar({
                     message: 'User verified successfully',
                     severity: 'success',
+                });
+                // Update wallet state with the first account
+                await updateWalletState(accounts[0]);
+
+                // Show a success message with part of the wallet address
+                showGlobalSnackbar({
+                    message: 'Wallet connected successfully',
+                    severity: 'success',
+                    details: `Connected to wallet ${accounts[0].substring(0, 9)}....${accounts[0].substring(accounts[0].length - 4)}`,
                 });
                 return verifiedUser;
             }
