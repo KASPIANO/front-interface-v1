@@ -1,5 +1,6 @@
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
+import Cookies from 'js-cookie';
 import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { showGlobalSnackbar } from './components/alert-context/AlertContext';
@@ -21,6 +22,7 @@ import { lightTheme } from './theme/LightTheme';
 import { UserVerfication } from './types/Types';
 import { disconnect, isKasWareInstalled, requestAccounts, signMessage, switchNetwork } from './utils/KaswareUtils';
 import {
+    checkTokenExpiration,
     generateNonce,
     generateRequestId,
     getLocalThemeMode,
@@ -37,6 +39,23 @@ const App = () => {
     const [, setIsConnecting] = useState<boolean>(false);
     const [backgroundBlur, setBackgroundBlur] = useState(false);
     const [, setUserVerified] = useState<UserVerfication>(null);
+    useEffect(() => {
+        const token = Cookies.get('userVerifiedToken');
+        if (token) {
+            const isExpired = checkTokenExpiration(token);
+            if (isExpired) {
+                alert(
+                    'For security reasons, you have been automatically disconnected due to prolonged inactivity. Please log in again to continue using the system.',
+                );
+                handleDisconnect();
+            }
+        } else {
+            alert(
+                'For security reasons, you have been automatically disconnected due to prolonged inactivity. Please log in again to continue using the system.',
+            );
+            handleDisconnect();
+        }
+    }, []);
 
     const toggleThemeMode = () => {
         const newMode = themeMode === ThemeModes.DARK ? ThemeModes.LIGHT : ThemeModes.DARK;

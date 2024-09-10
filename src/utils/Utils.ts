@@ -1,3 +1,4 @@
+import { jwtDecode } from 'jwt-decode';
 import moment from 'moment';
 import { getTxnInfo } from '../DAL/KaspaApiDal';
 
@@ -107,4 +108,15 @@ export const isEmptyStringOrArray = <T>(value: T | T[] | string): boolean => {
         return isEmptyString(value);
     }
     return !value;
+};
+
+export const checkTokenExpiration = (token) => {
+    try {
+        const decoded = jwtDecode(token);
+        const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+        return decoded.exp < currentTime;
+    } catch (error) {
+        console.error('Failed to decode token:', error);
+        return true; // Consider token expired if decoding fails
+    }
 };
