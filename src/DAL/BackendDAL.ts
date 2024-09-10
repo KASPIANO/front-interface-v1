@@ -78,6 +78,16 @@ export async function countTokens(): Promise<number> {
     }
 }
 
+export async function recalculateRugScore(ticker: string): Promise<number> {
+    const response = await backendService.post<{ rugScore: number }>(
+        `/${KRC20METADATA_CONTROLLER}/update-rug-score`,
+        {
+            ticker,
+        },
+    );
+    return response.data.rugScore;
+}
+
 export async function updateWalletSentiment(
     ticker: string,
     wallet: string,
