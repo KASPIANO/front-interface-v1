@@ -1,6 +1,30 @@
-import React, { useState, useCallback, FC } from 'react';
-import { Button, Container, Typography, Tooltip, IconButton, Input, Grid } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { Button, Container, Grid, IconButton, Input, Tooltip, Typography } from '@mui/material';
+import debounce from 'lodash/debounce';
+import React, { FC, useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
+import DeployDialog from '../../components/deploy-page/deploy-dialog/DeployDialog';
+import ReviewListTokenDialog from '../../components/dialogs/token-info/review-list-token/ReviewListTokenDialog';
+import {
+    BackendValidationErrorsType,
+    fetchTokenByTicker,
+    sendServerRequestAndSetErrorsIfNeeded,
+    updateTokenMetadata,
+} from '../../DAL/BackendDAL';
+import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
+import { fetchTokenInfo } from '../../DAL/Krc20DAL';
+import { TokenKRC20Deploy, TokenKRC20DeployMetadata } from '../../types/Types';
+import {
+    clearFieldErrors,
+    clearFieldErrorsAndSetFieldValue,
+    clearFormErrors,
+    getErrorMessage,
+    hasErrors,
+    setErrorToField,
+} from '../../utils/BackendValidationErrorsHandler';
+import { deployKRC20Token, sendKaspaToKaspiano } from '../../utils/KaswareUtils';
+import { convertToProtocolFormat, delay, setWalletBalanceUtil } from '../../utils/Utils';
 import {
     DeployForm,
     ImagePreview,
@@ -10,30 +34,6 @@ import {
     UploadButton,
     UploadContainer,
 } from './DeployPage.s';
-import { TokenKRC20Deploy, TokenKRC20DeployMetadata } from '../../types/Types';
-import DeployDialog from '../../components/deploy-page/deploy-dialog/DeployDialog';
-import debounce from 'lodash/debounce';
-import { fetchTokenInfo } from '../../DAL/Krc20DAL';
-import { deployKRC20Token, sendKaspaToKaspiano } from '../../utils/KaswareUtils';
-import {
-    BackendValidationErrorsType,
-    fetchTokenByTicker,
-    sendServerRequestAndSetErrorsIfNeeded,
-    updateTokenMetadata,
-} from '../../DAL/BackendDAL';
-import {
-    setErrorToField,
-    clearFieldErrors,
-    clearFieldErrorsAndSetFieldValue,
-    clearFormErrors,
-    getErrorMessage,
-    hasErrors,
-} from '../../utils/BackendValidationErrorsHandler';
-import { convertToProtocolFormat, delay, setWalletBalanceUtil } from '../../utils/Utils';
-import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
-import ReviewListTokenDialog from '../../components/dialogs/token-info/review-list-token/ReviewListTokenDialog';
-import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
-import { useNavigate } from 'react-router-dom';
 
 interface DeployPageProps {
     walletBalance: number;
