@@ -128,7 +128,8 @@ export interface TokenKRC20Deploy {
 export interface TokenKRC20DeployMetadata {
     description?: string;
     website?: string;
-    x?: string;
+    x: string;
+    email: string;
     discord?: string;
     telegram?: string;
     logo?: File;

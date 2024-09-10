@@ -29,11 +29,12 @@ import {
     getErrorMessage,
     hasErrors,
 } from '../../utils/BackendValidationErrorsHandler';
-import { convertToProtocolFormat, delay, setWalletBalanceUtil } from '../../utils/Utils';
+import { convertToProtocolFormat, delay, isEmptyString, setWalletBalanceUtil } from '../../utils/Utils';
 import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
 import ReviewListTokenDialog from '../../components/dialogs/token-info/review-list-token/ReviewListTokenDialog';
 import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
 import { useNavigate } from 'react-router-dom';
+import SuccessModal from '../../components/modals/sent-token-info-success/SuccessModal';
 
 interface DeployPageProps {
     walletBalance: number;
@@ -65,7 +66,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const [github, setGithub] = useState('');
     const [audit, setAudit] = useState('');
     const [foundersHandles, setFoundersHandles] = useState('');
-    const [contact, setContact] = useState('');
+    const [contacts, setContacts] = useState('');
     const [logo, setLogo] = useState<File | null>(null);
     const [banner, setBanner] = useState<File | null>(null);
     const [showDeployDialog, setShowDeployDialog] = useState(false);
@@ -82,6 +83,9 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const [isDeploying, setIsDeploying] = useState(false);
     const [waitingForTokenConfirmation, setWaitingForTokenConfirmation] = useState(false);
     const [isTokenDeployed, setIsTokenDeployed] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [email, setEmail] = useState('');
+    const [emailError, setEmailError] = useState('');
     const [updateMetadataPaymentTransactionId, setUpdateMetadataPaymentTransactionId] = useState<string | null>(
         null,
     );
@@ -215,6 +219,16 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         }
     };
 
+    const checkIfEmailExists = (email: string): boolean => {
+        if (!email) {
+            return false;
+        }
+
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+        return emailPattern.test(email);
+    };
+
     const handleSubmitTokenMetadata = (event: React.FormEvent) => {
         event.preventDefault();
         const twitterUrlPattern = /^(https?:\/\/)?(www\.)?x\.com\/[a-zA-Z0-9_]{1,15}$/;
@@ -228,7 +242,13 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             );
             return;
         }
+
+        if (!checkIfEmailExists(email)) {
+            setEmailError('At least one valid email is required.');
+            return;
+        }
         setFormErrors({});
+        setEmailError('');
 
         const tokenMetadata: TokenKRC20DeployMetadata = {
             description,
@@ -242,8 +262,11 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             medium,
             github,
             audit,
-            contacts: contact.split(',').map((contact) => contact.trim()),
-            founders: foundersHandles.split(',').map((handle) => handle.trim()),
+            email,
+            contacts: isEmptyString(contacts) ? [] : contacts.split(',').map((contact) => contact.trim()),
+            founders: isEmptyString(foundersHandles)
+                ? []
+                : foundersHandles.split(',').map((handle) => handle.trim()),
         };
 
         setTokenMetadataDetails(tokenMetadata);
@@ -322,9 +345,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
 
                 setIsTokenDeployed(false);
 
-                setTimeout(() => {
-                    navigate(`/token/${tokenKRC20Details.ticker}`);
-                }, 0);
+                setShowSuccessModal(true);
 
                 return true;
             } catch (error) {
@@ -387,6 +408,11 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         } else {
             return '';
         }
+    };
+
+    const handleCloseSuccessModal = () => {
+        setShowSuccessModal(false);
+        navigate(`/token/${tokenKRC20Details.ticker}`);
     };
 
     const handleDeploy = async () => {
@@ -685,20 +711,19 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                             <TextInfo
-                                label="Discord"
+                                label="Email"
                                 variant="outlined"
                                 fullWidth
-                                value={discord}
-                                onChange={(e) =>
-                                    clearFieldErrorsAndSetFieldValue(formErrors, setFormErrors, 'discord', () =>
-                                        setDiscord(e.target.value),
-                                    )
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Enter Email"
+                                helperText={
+                                    emailError ? emailError : 'Email is required to send the listing confirmation'
                                 }
-                                placeholder="Discord link"
-                                error={hasErrors(formErrors, 'discord')}
-                                helperText={getErrorMessage(formErrors, 'discord')}
+                                error={!!emailError}
                             />
                         </Grid>
+
                         <Grid item xs={6}>
                             <TextInfo
                                 label="Telegram"
@@ -713,6 +738,22 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 placeholder="Telegram link"
                                 error={hasErrors(formErrors, 'telegram')}
                                 helperText={getErrorMessage(formErrors, 'telegram')}
+                            />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <TextInfo
+                                label="Discord"
+                                variant="outlined"
+                                fullWidth
+                                value={discord}
+                                onChange={(e) =>
+                                    clearFieldErrorsAndSetFieldValue(formErrors, setFormErrors, 'discord', () =>
+                                        setDiscord(e.target.value),
+                                    )
+                                }
+                                placeholder="Discord link"
+                                error={hasErrors(formErrors, 'discord')}
+                                helperText={getErrorMessage(formErrors, 'discord')}
                             />
                         </Grid>
                         <Grid item xs={6}>
@@ -790,15 +831,15 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                             <TextInfo
-                                label="Contact"
+                                label="Contacts"
                                 variant="outlined"
                                 fullWidth
                                 multiline // Enables multiline input
                                 minRows={1} // Minimum number of rows when the input is not filled
                                 maxRows={6}
-                                value={contact}
-                                onChange={(e) => setContact(e.target.value)}
-                                placeholder="Contact information"
+                                value={contacts}
+                                onChange={(e) => setContacts(e.target.value)}
+                                placeholder="Contacts information (e.g., email, Twitter handle)"
                                 helperText="Example: @twitter_handle, email@example.com, @telegram_handle (separate with commas)"
                                 FormHelperTextProps={{
                                     sx: {
@@ -809,7 +850,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                     endAdornment: (
                                         <Tooltip
                                             placement="left"
-                                            title="Provide multiple contact methods separated by commas, such as Twitter handles, emails, or Telegram handles."
+                                            title="Provide multiple Contacts methods separated by commas, such as Twitter handles, emails, or Telegram handles."
                                         >
                                             <IconButton
                                                 sx={{
@@ -968,6 +1009,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     isSavingData={isUpadteMetadataLoading}
                 />
             )}
+            {showSuccessModal && <SuccessModal open={showSuccessModal} onClose={handleCloseSuccessModal} />}
         </Container>
     );
 };
