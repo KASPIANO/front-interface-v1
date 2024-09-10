@@ -10,6 +10,7 @@ interface GridHeaderProps {
     activeHeader: string;
     setActiveHeader: (value: string) => void;
     onSortBy: (field: string, asc: boolean) => void;
+    setChangeTotalMintsActive: (value: boolean) => void;
 }
 
 const marginMapperByHeader = {
@@ -34,19 +35,21 @@ const disableSort = (name: string) =>
     name === 'Ticker' || name === 'Age' || name === 'Minted' || name === 'Holders';
 
 export const GridHeader: FC<GridHeaderProps> = (props) => {
-    const { name, activeHeader, setActiveHeader, onSortBy, sortField } = props;
+    const { name, activeHeader, setActiveHeader, onSortBy, sortField, setChangeTotalMintsActive } = props;
     const [currentFilterState, setCurrentFilterState] = useState<FilterState>(FilterState.NONE);
 
     const handleUpClick = () => {
         setActiveHeader(name);
         setCurrentFilterState(FilterState.UP);
         onSortBy(sortField, true);
+        setChangeTotalMintsActive(true);
     };
 
     const handleDownClick = () => {
         setActiveHeader(name);
         setCurrentFilterState(FilterState.DOWN);
         onSortBy(sortField, false);
+        setChangeTotalMintsActive(true);
     };
 
     return (

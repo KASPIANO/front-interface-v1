@@ -20,13 +20,22 @@ interface TokenGridTitleProps {
     onSortBy: (field: string, asc: boolean) => void;
     isLoading: boolean;
     setActiveHeader: (value: string) => void;
+    changeTotalMintsDisabled: boolean;
+    setChangeTotalMintsActive: (value: boolean) => void;
 }
 
 const GridTitle: FC<TokenGridTitleProps> = (props) => {
-    const { timeInterval, setTimeInterval, onSortBy, onPageChange, currentPage, totalPages, setActiveHeader } =
-        props;
-
-    const [changeTotalMintsDisabled, sethCangeTotalMintsActive] = useState(true);
+    const {
+        timeInterval,
+        setTimeInterval,
+        onSortBy,
+        onPageChange,
+        currentPage,
+        totalPages,
+        setActiveHeader,
+        changeTotalMintsDisabled,
+        setChangeTotalMintsActive,
+    } = props;
 
     const handleSortChange = (sortOption: string) => {
         setTimeInterval(sortOption);
@@ -36,7 +45,7 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
         // Handle sorting by minting rate
         const orderedBy = changeTotalMintsDisabled ? 'changeTotalMints' : 'ticker';
         const orderedByAsc = orderedBy !== 'ticker';
-        sethCangeTotalMintsActive((prev) => !prev);
+        setChangeTotalMintsActive(!changeTotalMintsDisabled);
         setActiveHeader('');
         onSortBy(orderedBy, orderedByAsc);
     };
