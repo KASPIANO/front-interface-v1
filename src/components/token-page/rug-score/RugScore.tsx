@@ -1,7 +1,7 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { Box, Button, Card, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Box, Button, Card, CircularProgress, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import { FC, useState } from 'react';
 import ScoreLine, { ScoreLineConfig } from './score-line/ScoreLine';
 import { UpdateMetadataDialog } from '../update-metadata-dialog/UpdateMetadataDialog';
@@ -65,13 +65,25 @@ const RugScore: FC<RugScoreProps> = (props) => {
                 </Box>
                 {xHandle && (
                     <Tooltip title="Click to recalculate the Rug Score.">
-                        <IconButton
-                            onClick={isLoadingRugScore ? null : onRecalculate}
-                            aria-label="recalculate score"
-                            sx={{ padding: 0 }}
-                        >
-                            <RefreshIcon />
-                        </IconButton>
+                        {isLoadingRugScore ? (
+                            <CircularProgress
+                                size={24}
+                                thickness={5}
+                                sx={{
+                                    padding: 0,
+                                }}
+                            />
+                        ) : (
+                            <IconButton
+                                onClick={onRecalculate}
+                                aria-label="recalculate score"
+                                sx={{
+                                    padding: 0,
+                                }}
+                            >
+                                <RefreshIcon />
+                            </IconButton>
+                        )}
                     </Tooltip>
                 )}
             </Box>
