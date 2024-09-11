@@ -56,7 +56,7 @@ const SuccessModal: FC<SuccessModalProps> = (props) => {
                     <Typography variant="body2" sx={{ mb: 1 }}>
                         For more insight, information, or collaborations, please contact us at:
                         <br />
-                        <strong>info@mockemail.com</strong>
+                        <strong>listings@kaspiano.com</strong>
                     </Typography>
                     <Typography variant="body1" sx={{ mb: 1 }}>
                         Thank you for your patience!

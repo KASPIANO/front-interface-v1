@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Snackbar, Slide, SlideProps, Box, Typography, IconButton } from '@mui/material';
@@ -43,12 +42,9 @@ const autoHideDuration = {
     loading: null,
 };
 
-function SlideTransition(props: SlideProps) {
-    return <Slide {...props} direction="left" />;
-}
-
 let showSnackbar: (options: AlertOptions) => void;
 
+// eslint-disable-next-line react-refresh/only-export-components
 const SnackbarComponent: React.FC = () => {
     const [alert, setAlert] = React.useState<(AlertOptions & { open: boolean }) | null>(null);
     const [copied, setCopied] = React.useState(false);
@@ -57,6 +53,7 @@ const SnackbarComponent: React.FC = () => {
         setAlert({ ...options, open: true });
     };
 
+    const SlideTransition = (props: SlideProps) => <Slide {...props} direction="left" />;
     const handleClose = () => setAlert(null);
 
     const copyToClipboard = (text: string) => {
