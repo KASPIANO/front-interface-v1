@@ -12,7 +12,14 @@ import PortfolioPage from './pages/portfolio-page/PortfolioPage';
 import TokenPage from './pages/token-page/TokenPage';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
-import { disconnect, isKasWareInstalled, requestAccounts, signMessage, switchNetwork } from './utils/KaswareUtils';
+import {
+    disconnect,
+    getNetwork,
+    isKasWareInstalled,
+    requestAccounts,
+    signMessage,
+    switchNetwork,
+} from './utils/KaswareUtils';
 import {
     generateNonce,
     generateRequestId,
@@ -137,7 +144,17 @@ const App = () => {
                 if (accounts.length > 0) {
                     // Update wallet state with the first account
                     await updateWalletState(accounts[0]);
+                    const currentEnv = import.meta.env.VITE_ENV === 'prod' ? 'kaspa_mainnet' : 'kaspa_testnet_10';
+                    const getCurrentNetwork = await getNetwork();
+                    if (currentEnv !== getCurrentNetwork) {
+                        showGlobalSnackbar({
+                            message: 'Please switch to the correct network',
+                            severity: 'error',
+                        });
 
+                        await switchNetwork(currentEnv);
+                        setNetwork(currentEnv);
+                    }
                     // Show a success message with part of the wallet address
                     showGlobalSnackbar({
                         message: 'Wallet connected successfully',
