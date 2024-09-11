@@ -1,6 +1,25 @@
-import React, { useState, useCallback, FC } from 'react';
-import { Button, Container, Typography, Tooltip, IconButton, Input, Grid } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { Button, Container, Grid, IconButton, Input, Tooltip, Typography } from '@mui/material';
+import React, { FC, useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
+import ReviewListTokenDialog from '../../components/dialogs/token-info/review-list-token/ReviewListTokenDialog';
+import {
+    BackendValidationErrorsType,
+    fetchTokenByTicker,
+    sendServerRequestAndSetErrorsIfNeeded,
+    updateTokenMetadata,
+} from '../../DAL/BackendDAL';
+import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
+import {
+    clearFieldErrors,
+    clearFieldErrorsAndSetFieldValue,
+    clearFormErrors,
+    getErrorMessage,
+    hasErrors,
+    setErrorToField,
+} from '../../utils/BackendValidationErrorsHandler';
+import { convertToProtocolFormat, delay, isEmptyString, setWalletBalanceUtil } from '../../utils/Utils';
 import {
     DeployForm,
     ImagePreview,
@@ -15,25 +34,7 @@ import DeployDialog from '../../components/deploy-page/deploy-dialog/DeployDialo
 import debounce from 'lodash/debounce';
 import { fetchTokenInfo } from '../../DAL/Krc20DAL';
 import { deployKRC20Token, sendKaspaToKaspiano } from '../../utils/KaswareUtils';
-import {
-    BackendValidationErrorsType,
-    fetchTokenByTicker,
-    sendServerRequestAndSetErrorsIfNeeded,
-    updateTokenMetadata,
-} from '../../DAL/BackendDAL';
-import {
-    setErrorToField,
-    clearFieldErrors,
-    clearFieldErrorsAndSetFieldValue,
-    clearFormErrors,
-    getErrorMessage,
-    hasErrors,
-} from '../../utils/BackendValidationErrorsHandler';
-import { convertToProtocolFormat, delay, isEmptyString, setWalletBalanceUtil } from '../../utils/Utils';
-import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
-import ReviewListTokenDialog from '../../components/dialogs/token-info/review-list-token/ReviewListTokenDialog';
-import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
-import { useNavigate } from 'react-router-dom';
+
 import SuccessModal from '../../components/modals/sent-token-info-success/SuccessModal';
 
 interface DeployPageProps {

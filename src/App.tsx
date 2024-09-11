@@ -3,9 +3,14 @@ import { ThemeProvider } from '@mui/material/styles';
 import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { showGlobalSnackbar } from './components/alert-context/AlertContext';
+import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
 import { fetchWalletBalance } from './DAL/KaspaApiDal';
 import { ThemeContext } from './main';
+import BatchTransferPage from './pages/batch-transfer-page/BatchTransferPage';
+import PrivacyPolicy from './pages/compliance/PrivacyPolicy';
+import TermsOfService from './pages/compliance/TermsOfService';
+import TrustSafety from './pages/compliance/TrustSafety';
 import DeployPage from './pages/deploy-page/DeployPage';
 import GridPage from './pages/krc-20/GridPage';
 import PortfolioPage from './pages/portfolio-page/PortfolioPage';
@@ -27,12 +32,7 @@ import {
     setWalletBalanceUtil,
     ThemeModes,
 } from './utils/Utils';
-import Footer from './components/footer/Footer';
-import PrivacyPolicy from './pages/compliance/PrivacyPolicy';
-import TermsOfService from './pages/compliance/TermsOfService';
-import TrustSafety from './pages/compliance/TrustSafety';
 import { UserVerfication } from './types/Types';
-import BatchTransferPage from './pages/batch-transfer-page/BatchTransferPage';
 import ContactUs from './pages/compliance/ContactUs';
 
 const App = () => {
