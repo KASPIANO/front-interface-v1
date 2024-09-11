@@ -167,7 +167,9 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             </StatNumber>
                             <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
                                 Mints: {token.changeTotalMints}
-                                <StatArrow sx={{ color: 'green', marginLeft: '2px' }} type="increase" />
+                                {token.changeTotalMints !== 0 && (
+                                    <StatArrow sx={{ color: 'green', marginLeft: '2px' }} type="increase" />
+                                )}
                             </StatHelpText>
                         </Stat>
                     </Tooltip>
@@ -176,17 +178,19 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             <StatNumber style={{ fontSize: '1vw' }} margin="0">
                                 {token.totalHolders || 0}
                             </StatNumber>
+                            {token.changeTotalHolders !== 0 && (
+                                <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
+                                    {token.changeTotalHolders}
 
-                            <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
-                                {token.changeTotalHolders}
-                                <StatArrow
-                                    sx={{
-                                        color: token.changeTotalHolders >= 0 ? 'green' : 'red',
-                                        marginLeft: '2px',
-                                    }}
-                                    type={token.changeTotalHolders >= 0 ? 'increase' : 'decrease'}
-                                />
-                            </StatHelpText>
+                                    <StatArrow
+                                        sx={{
+                                            color: token.changeTotalHolders >= 0 ? 'green' : 'red',
+                                            marginLeft: '2px',
+                                        }}
+                                        type={token.changeTotalHolders >= 0 ? 'increase' : 'decrease'}
+                                    />
+                                </StatHelpText>
+                            )}
                         </Stat>
                     </Tooltip>
 
