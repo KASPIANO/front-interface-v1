@@ -119,6 +119,7 @@ const App = () => {
                     const accounts = await requestAccounts();
                     if (accounts.length > 0 && accounts[0].toLowerCase() === storedAddress.toLowerCase()) {
                         await updateWalletState(accounts[0]);
+                        await handleNetworkByEnvironment();
                     } else {
                         localStorage.removeItem('walletAddress');
                     }
@@ -130,6 +131,7 @@ const App = () => {
         };
 
         checkExistingConnection();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [updateWalletState]);
 
     const handleConnectWallet = async () => {
@@ -144,17 +146,7 @@ const App = () => {
                 if (accounts.length > 0) {
                     // Update wallet state with the first account
                     await updateWalletState(accounts[0]);
-                    const currentEnv = import.meta.env.VITE_ENV === 'prod' ? 'kaspa_mainnet' : 'kaspa_testnet_10';
-                    const getCurrentNetwork = await getNetwork();
-                    if (currentEnv !== getCurrentNetwork) {
-                        showGlobalSnackbar({
-                            message: 'Please switch to the correct network',
-                            severity: 'error',
-                        });
-
-                        await switchNetwork(currentEnv);
-                        setNetwork(currentEnv);
-                    }
+                    await handleNetworkByEnvironment();
                     // Show a success message with part of the wallet address
                     showGlobalSnackbar({
                         message: 'Wallet connected successfully',
@@ -206,11 +198,29 @@ const App = () => {
         }
     };
 
+    const handleNetworkByEnvironment = async () => {
+        const currentEnv = import.meta.env.VITE_ENV === 'prod' ? 'kaspa_mainnet' : 'kaspa_testnet_10';
+        const getCurrentNetwork = await getNetwork();
+        if (currentEnv !== getCurrentNetwork) {
+            showGlobalSnackbar({
+                message: 'Please switch to the correct network',
+                severity: 'error',
+            });
+            const reject = await switchNetwork(currentEnv);
+            if (!reject) {
+                await handleDisconnect();
+            } else {
+                setNetwork(currentEnv);
+            }
+        }
+    };
+
     const handleNetworkChange = async (newNetwork) => {
         if (network !== newNetwork) {
             try {
                 await switchNetwork(newNetwork);
                 setNetwork(newNetwork);
+                await handleNetworkByEnvironment();
                 showGlobalSnackbar({ message: `Switched to ${newNetwork}`, severity: 'success' });
             } catch (error) {
                 console.error('Error switching network:', error);
