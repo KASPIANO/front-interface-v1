@@ -103,7 +103,7 @@ const RugScore: FC<RugScoreProps> = (props) => {
                         mt: '3vh',
                     }}
                 >
-                    Send New Request by Clicking Refresh Button
+                    NO SCORE - Send New Request
                 </Typography>
             ) : null}
             {xHandle && score !== null ? <ScoreLine value={score} config={scoreLineRanges} /> : null}

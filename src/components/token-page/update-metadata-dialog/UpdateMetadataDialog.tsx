@@ -29,7 +29,10 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
 
     const [showInfoForm, setShowInfoForm] = useState(false);
     const [showReviewListTokenDialog, setShowReviewListTokenDialog] = useState(false);
-    const [tokenMetadataDetails, setTokenMetadataDetails] = useState<TokenKRC20DeployMetadata>({});
+    const [tokenMetadataDetails, setTokenMetadataDetails] = useState<TokenKRC20DeployMetadata>({
+        x: '',
+        email: '',
+    });
     const [updateMetadataPaymentTransactionId, setUpdateMetadataPaymentTransactionId] = useState<string | null>(
         null,
     );

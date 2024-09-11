@@ -17,8 +17,14 @@ import PortfolioPage from './pages/portfolio-page/PortfolioPage';
 import TokenPage from './pages/token-page/TokenPage';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
-import { UserVerfication } from './types/Types';
-import { disconnect, isKasWareInstalled, requestAccounts, signMessage, switchNetwork } from './utils/KaswareUtils';
+import {
+    disconnect,
+    getNetwork,
+    isKasWareInstalled,
+    requestAccounts,
+    signMessage,
+    switchNetwork,
+} from './utils/KaswareUtils';
 import {
     generateNonce,
     generateRequestId,
@@ -26,6 +32,8 @@ import {
     setWalletBalanceUtil,
     ThemeModes,
 } from './utils/Utils';
+import { UserVerfication } from './types/Types';
+import ContactUs from './pages/compliance/ContactUs';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -111,6 +119,7 @@ const App = () => {
                     const accounts = await requestAccounts();
                     if (accounts.length > 0 && accounts[0].toLowerCase() === storedAddress.toLowerCase()) {
                         await updateWalletState(accounts[0]);
+                        await handleNetworkByEnvironment();
                     } else {
                         localStorage.removeItem('walletAddress');
                     }
@@ -122,6 +131,7 @@ const App = () => {
         };
 
         checkExistingConnection();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [updateWalletState]);
 
     const handleConnectWallet = async () => {
@@ -136,7 +146,7 @@ const App = () => {
                 if (accounts.length > 0) {
                     // Update wallet state with the first account
                     await updateWalletState(accounts[0]);
-
+                    await handleNetworkByEnvironment();
                     // Show a success message with part of the wallet address
                     showGlobalSnackbar({
                         message: 'Wallet connected successfully',
@@ -188,11 +198,29 @@ const App = () => {
         }
     };
 
+    const handleNetworkByEnvironment = async () => {
+        const currentEnv = import.meta.env.VITE_ENV === 'prod' ? 'kaspa_mainnet' : 'kaspa_testnet_10';
+        const getCurrentNetwork = await getNetwork();
+        if (currentEnv !== getCurrentNetwork) {
+            showGlobalSnackbar({
+                message: 'Please switch to the correct network',
+                severity: 'error',
+            });
+            const reject = await switchNetwork(currentEnv);
+            if (!reject) {
+                await handleDisconnect();
+            } else {
+                setNetwork(currentEnv);
+            }
+        }
+    };
+
     const handleNetworkChange = async (newNetwork) => {
         if (network !== newNetwork) {
             try {
                 await switchNetwork(newNetwork);
                 setNetwork(newNetwork);
+                await handleNetworkByEnvironment();
                 showGlobalSnackbar({ message: `Switched to ${newNetwork}`, severity: 'success' });
             } catch (error) {
                 console.error('Error switching network:', error);
@@ -340,6 +368,7 @@ Request ID: ${requestId}
                             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                             <Route path="/terms-service" element={<TermsOfService />} />
                             <Route path="/trust-safety" element={<TrustSafety />} />
+                            <Route path="/contact-us" element={<ContactUs />} />
                             {/* Handle 404 - Not Found */}
                             <Route path="*" element={<div>404 - Not Found</div>} />
                         </Routes>
