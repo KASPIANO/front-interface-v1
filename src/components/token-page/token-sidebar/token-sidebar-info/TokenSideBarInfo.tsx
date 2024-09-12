@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { BackendTokenMetadata, BackendTokenResponse, TokenSentiment } from '../../../../types/Types';
+import { BackendTokenResponse, TokenSentiment } from '../../../../types/Types';
 import { Box, Tooltip, Typography } from '@mui/material';
 import {
     SentimentButton,
@@ -15,11 +15,10 @@ import TokenSidebarSocialsBar, {
 import { Stack } from '@chakra-ui/react';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
-import TokenInfoDialog from '../../../dialogs/token-info/TokenInfoDialog';
 import { AddBanner, AddBox, AddText } from './token-sidebar-socials-bar/TokenSidebarSocialsBar.s';
-import SuccessModal from '../../../modals/sent-token-info-success/SuccessModal';
 import { formatNumberWithCommas, simplifyNumber } from '../../../../utils/Utils';
 import { updateWalletSentiment } from '../../../../DAL/BackendDAL';
+import { UpdateMetadataDialog } from '../../update-metadata-dialog/UpdateMetadataDialog';
 
 export type SentimentButtonsConfig = {
     key: keyof TokenSentiment;
@@ -32,19 +31,21 @@ interface TokenSideBarInfoProps {
     priceInfo?: any;
     walletAddress: string | null;
     walletConnected: boolean;
+    walletBalance: number;
+    setWalletBalance: (balance: number) => void;
 }
 
 // const mockBanner =
 //     'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Full-Color.png';
 
 const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
-    const { tokenInfo, setTokenInfo, priceInfo, walletAddress, walletConnected } = props;
+    const { tokenInfo, setTokenInfo, priceInfo, walletAddress, walletConnected, walletBalance, setWalletBalance } =
+        props;
     const [showTokenInfoDialog, setShowTokenInfoDialog] = useState(false);
     const [showSentimentLoader, setShowSentimentLoader] = useState(false);
     const [selectedSentiment, setSelectedSentiment] = useState<string>(null);
     const [sentimentValues, setSentimentValues] = useState<TokenSentiment | null>(null);
     const [socials, setSocials] = useState<TokenSidebarSocialsBarOptions>(null);
-    const [openModal, setOpenModal] = useState(false);
 
     const sentimentButtonsConfig: SentimentButtonsConfig[] = [
         { key: 'love', icon: <FavoriteBorderRoundedIcon sx={{ fontSize: '1.4vw' }} color="success" /> },
@@ -106,25 +107,6 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         setShowTokenInfoDialog(true);
     };
 
-    const handleSaveTokenInfo = (newTokenInfo: Partial<BackendTokenMetadata>) => {
-        // Here you would typically update the token info in your backend
-        console.log('New token info:', newTokenInfo);
-
-        // Merge the new token info with the existing token info
-        setTokenInfo((prevInfo: BackendTokenResponse) => {
-            const updatedInfo: BackendTokenResponse = {
-                ...prevInfo,
-                metadata: {
-                    ...prevInfo.metadata,
-                    ...newTokenInfo,
-                },
-            };
-
-            return updatedInfo;
-        });
-        setOpenModal(true);
-    };
-
     const preMintedSupplyPercentage = (tokenInfo.preMintedSupply / tokenInfo.totalSupply) * 100;
 
     return (
@@ -138,16 +120,32 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
             }}
         >
             <TokenProfileContainer>
-                {tokenInfo.metadata?.bannerUrl ? (
-                    <Box
-                        component="img"
-                        alt={tokenInfo.ticker}
-                        src={tokenInfo.metadata?.bannerUrl}
-                        sx={{
-                            height: '19vh',
-                            width: '100%',
-                        }}
-                    />
+                {tokenInfo.metadata?.bannerUrl || tokenInfo.metadata?.socials?.x ? (
+                    tokenInfo.metadata?.bannerUrl ? (
+                        <Box
+                            component="img"
+                            alt={tokenInfo.ticker}
+                            src={tokenInfo.metadata?.bannerUrl}
+                            sx={{
+                                height: '19vh',
+                                width: '100%',
+                            }}
+                        />
+                    ) : (
+                        <Box
+                            sx={{
+                                height: '19vh',
+                                width: '100%',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <Typography variant="body1" color="textSecondary">
+                                No banner
+                            </Typography>
+                        </Box>
+                    )
                 ) : (
                     <AddBanner
                         onClick={handleShowTokenInfoDialog}
@@ -215,7 +213,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                 </Stack>
             </Box>
             <Box padding={'10px'}>
-                {tokenInfo.metadata?.description ? (
+                {tokenInfo.metadata?.description || tokenInfo.metadata?.socials?.x ? (
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                         <Typography variant="body2" fontWeight={500}>
                             Description:
@@ -265,12 +263,16 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                 </SentimentsContainerBox>
             </Box>
 
-            <TokenInfoDialog
+            <UpdateMetadataDialog
                 open={showTokenInfoDialog}
                 onClose={() => setShowTokenInfoDialog(false)}
-                onSave={handleSaveTokenInfo}
+                walletConnected={walletConnected}
+                setTokenInfo={setTokenInfo}
+                setWalletBalance={setWalletBalance}
+                walletBalance={walletBalance}
+                walletAddress={walletAddress}
+                ticker={tokenInfo.ticker}
             />
-            <SuccessModal open={openModal} onClose={() => setOpenModal(false)} />
         </Box>
     );
 };

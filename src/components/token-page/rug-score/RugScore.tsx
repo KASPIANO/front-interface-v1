@@ -1,30 +1,39 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { Box, Button, Card, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
-import { FC, useCallback, useState } from 'react';
-import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
-import { getCurrentAccount, sendKaspa } from '../../../utils/KaswareUtils';
-import { setWalletBalanceUtil } from '../../../utils/Utils';
-import { showGlobalSnackbar } from '../../alert-context/AlertContext';
-import RugScoreDialog from './dialog/RugScoreDialog';
+import { Box, Button, Card, CircularProgress, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import { FC, useState } from 'react';
 import ScoreLine, { ScoreLineConfig } from './score-line/ScoreLine';
+import { UpdateMetadataDialog } from '../update-metadata-dialog/UpdateMetadataDialog';
 
 interface RugScoreProps {
     score: number | null;
     xHandle: boolean;
     onRecalculate: () => void;
     setWalletBalance: (balance: number) => void;
+    walletBalance: number;
+    ticker: string;
+    walletConnected: boolean;
+    walletAddress: string | null;
+    setTokenInfo: (tokenInfo: any) => void;
+    isLoadingRugScore: boolean;
 }
 
-const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
-const VERIFICATION_FEE_KAS = 1250;
-const VERIFICATION_FEE_SOMPI = VERIFICATION_FEE_KAS * KASPA_TO_SOMPI;
-
 const RugScore: FC<RugScoreProps> = (props) => {
-    const { score, xHandle, onRecalculate, setWalletBalance } = props;
+    const {
+        score,
+        xHandle,
+        onRecalculate,
+        setWalletBalance,
+        walletBalance,
+        ticker,
+        walletConnected,
+        walletAddress,
+        setTokenInfo,
+        isLoadingRugScore,
+    } = props;
     const theme = useTheme();
-    const [openDialog, setOpenDialog] = useState(false);
+    const [showInfoForm, setShowInfoForm] = useState(false);
 
     const scoreLineRanges: ScoreLineConfig = {
         [theme.palette.error.main]: { start: 0, end: 30 },
@@ -32,61 +41,8 @@ const RugScore: FC<RugScoreProps> = (props) => {
         [theme.palette.success.main]: { start: 72, end: 100 },
     };
 
-    const onAddTwitterHandle = useCallback(
-        async (twitterHandle: string, instantVerification: boolean) => {
-            try {
-                if (instantVerification) {
-                    // Replace 'YOUR_KASPA_ADDRESS' with the actual address to receive the verification fee
-                    const txid = await sendKaspa(
-                        'kaspatest:qrzsn5eu6s28evw0k26qahjn0nwwzwjgn0qp3p37zl7z5lvx64h923agfaskv',
-                        VERIFICATION_FEE_SOMPI,
-                    );
-
-                    // Get the current account's address
-                    const account = await getCurrentAccount();
-
-                    showGlobalSnackbar({ message: 'Instant verification successful', severity: 'success' });
-                    setTimeout(() => {
-                        fetchWalletBalance(account).then((balance) =>
-                            setWalletBalance(setWalletBalanceUtil(balance)),
-                        );
-                        console.log('Sending to backend:', { twitterHandle, instantVerification: true, txid });
-                    }, 5000);
-                } else {
-                    // For manual verification, just log the information
-                    console.log('Sending to backend:', { twitterHandle, instantVerification: false });
-
-                    showGlobalSnackbar({
-                        message: 'Twitter handle submitted for manual review',
-                        severity: 'success',
-                    });
-                }
-
-                // Update the xHandle state or other relevant states here
-                console.log('Twitter handle added successfully');
-            } catch (error) {
-                console.error('Error processing Twitter handle:', error);
-                showGlobalSnackbar({
-                    message: 'Failed to process Twitter handle',
-                    severity: 'error',
-                    details: error.message,
-                });
-            }
-        },
-        [setWalletBalance],
-    );
-
     const handleOpenDialog = () => {
-        setOpenDialog(true);
-    };
-
-    const handleCloseDialog = () => {
-        setOpenDialog(false);
-    };
-
-    const handleAddTwitterHandle = (twitterHandle: string, instantVerification: boolean) => {
-        onAddTwitterHandle(twitterHandle, instantVerification);
-        handleCloseDialog();
+        setShowInfoForm(true);
     };
 
     return (
@@ -109,9 +65,25 @@ const RugScore: FC<RugScoreProps> = (props) => {
                 </Box>
                 {xHandle && (
                     <Tooltip title="Click to recalculate the Rug Score.">
-                        <IconButton onClick={onRecalculate} aria-label="recalculate score" sx={{ padding: 0 }}>
-                            <RefreshIcon />
-                        </IconButton>
+                        {isLoadingRugScore ? (
+                            <CircularProgress
+                                size={24}
+                                thickness={5}
+                                sx={{
+                                    padding: 0,
+                                }}
+                            />
+                        ) : (
+                            <IconButton
+                                onClick={onRecalculate}
+                                aria-label="recalculate score"
+                                sx={{
+                                    padding: 0,
+                                }}
+                            >
+                                <RefreshIcon />
+                            </IconButton>
+                        )}
                     </Tooltip>
                 )}
             </Box>
@@ -122,12 +94,29 @@ const RugScore: FC<RugScoreProps> = (props) => {
                     </Button>
                 </Box>
             )}
+            {xHandle && score === null ? (
+                <Typography
+                    sx={{
+                        fontWeight: 'bold',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        mt: '3vh',
+                    }}
+                >
+                    NO SCORE - Send New Request
+                </Typography>
+            ) : null}
             {xHandle && score !== null ? <ScoreLine value={score} config={scoreLineRanges} /> : null}
 
-            <RugScoreDialog
-                open={openDialog}
-                onClose={handleCloseDialog}
-                onAddTwitterHandle={handleAddTwitterHandle}
+            <UpdateMetadataDialog
+                open={showInfoForm}
+                onClose={() => setShowInfoForm(false)}
+                walletConnected={walletConnected}
+                setTokenInfo={setTokenInfo}
+                setWalletBalance={setWalletBalance}
+                walletBalance={walletBalance}
+                walletAddress={walletAddress}
+                ticker={ticker}
             />
         </Card>
     );

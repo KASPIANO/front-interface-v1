@@ -3,16 +3,28 @@ import { ThemeProvider } from '@mui/material/styles';
 import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { showGlobalSnackbar } from './components/alert-context/AlertContext';
+import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
 import { fetchWalletBalance } from './DAL/KaspaApiDal';
 import { ThemeContext } from './main';
+import BatchTransferPage from './pages/batch-transfer-page/BatchTransferPage';
+import PrivacyPolicy from './pages/compliance/PrivacyPolicy';
+import TermsOfService from './pages/compliance/TermsOfService';
+import TrustSafety from './pages/compliance/TrustSafety';
 import DeployPage from './pages/deploy-page/DeployPage';
 import GridPage from './pages/krc-20/GridPage';
 import PortfolioPage from './pages/portfolio-page/PortfolioPage';
 import TokenPage from './pages/token-page/TokenPage';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
-import { disconnect, isKasWareInstalled, requestAccounts, signMessage, switchNetwork } from './utils/KaswareUtils';
+import {
+    disconnect,
+    getNetwork,
+    isKasWareInstalled,
+    requestAccounts,
+    signMessage,
+    switchNetwork,
+} from './utils/KaswareUtils';
 import {
     generateNonce,
     generateRequestId,
@@ -20,11 +32,8 @@ import {
     setWalletBalanceUtil,
     ThemeModes,
 } from './utils/Utils';
-import Footer from './components/footer/Footer';
-import PrivacyPolicy from './pages/compliance/PrivacyPolicy';
-import TermsOfService from './pages/compliance/TermsOfService';
-import TrustSafety from './pages/compliance/TrustSafety';
 import { UserVerfication } from './types/Types';
+import ContactUs from './pages/compliance/ContactUs';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -47,6 +56,7 @@ const App = () => {
         setWalletConnected(true);
         const balance = await fetchWalletBalance(address);
         setWalletBalance(setWalletBalanceUtil(balance));
+        localStorage.setItem('walletAddress', address);
     }, []);
 
     const resetWalletState = useCallback(() => {
@@ -54,6 +64,7 @@ const App = () => {
         setWalletBalance(0);
         setWalletConnected(false);
         setUserVerified(null);
+        localStorage.removeItem('walletAddress');
     }, []);
 
     const handleAccountsChanged = useCallback(
@@ -101,6 +112,29 @@ const App = () => {
         }
     }, [walletAddress, walletBalance]);
 
+    useEffect(() => {
+        const checkExistingConnection = async () => {
+            const storedAddress = localStorage.getItem('walletAddress');
+            if (storedAddress && isKasWareInstalled()) {
+                try {
+                    const accounts = await requestAccounts();
+                    if (accounts.length > 0 && accounts[0].toLowerCase() === storedAddress.toLowerCase()) {
+                        await updateWalletState(accounts[0]);
+                        await handleNetworkByEnvironment();
+                    } else {
+                        localStorage.removeItem('walletAddress');
+                    }
+                } catch (error) {
+                    console.error('Error checking existing connection:', error);
+                    localStorage.removeItem('walletAddress');
+                }
+            }
+        };
+
+        checkExistingConnection();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [updateWalletState]);
+
     const handleConnectWallet = async () => {
         setIsConnecting(true);
         try {
@@ -113,7 +147,7 @@ const App = () => {
                 if (accounts.length > 0) {
                     // Update wallet state with the first account
                     await updateWalletState(accounts[0]);
-
+                    await handleNetworkByEnvironment();
                     // Show a success message with part of the wallet address
                     showGlobalSnackbar({
                         message: 'Wallet connected successfully',
@@ -122,14 +156,19 @@ const App = () => {
                     });
 
                     // Perform user verification
-                    const userVerification = await handleUserVerification(
-                        accounts,
-                        setUserVerified,
-                        showGlobalSnackbar,
-                    );
+                    const storedAddress = localStorage.getItem('walletAddress');
+                    if (!storedAddress && storedAddress !== accounts[0]) {
+                        const userVerification = await handleUserVerification(
+                            accounts,
+                            setUserVerified,
+                            showGlobalSnackbar,
+                        );
+
+                        // Log the verification result
+                        console.log('User Verification:', userVerification, accounts[0]);
+                    }
 
                     // Log the verification result
-                    console.log('User Verification:', userVerification, accounts[0]);
                 } else {
                     // If no accounts, show error message and disconnect
                     showGlobalSnackbar({
@@ -160,11 +199,29 @@ const App = () => {
         }
     };
 
+    const handleNetworkByEnvironment = async () => {
+        const currentEnv = import.meta.env.VITE_ENV === 'prod' ? 'kaspa_mainnet' : 'kaspa_testnet_10';
+        const getCurrentNetwork = await getNetwork();
+        if (currentEnv !== getCurrentNetwork) {
+            showGlobalSnackbar({
+                message: 'Please switch to the correct network',
+                severity: 'error',
+            });
+            const reject = await switchNetwork(currentEnv);
+            if (!reject) {
+                await handleDisconnect();
+            } else {
+                setNetwork(currentEnv);
+            }
+        }
+    };
+
     const handleNetworkChange = async (newNetwork) => {
         if (network !== newNetwork) {
             try {
                 await switchNetwork(newNetwork);
                 setNetwork(newNetwork);
+                await handleNetworkByEnvironment();
                 showGlobalSnackbar({ message: `Switched to ${newNetwork}`, severity: 'success' });
             } catch (error) {
                 console.error('Error switching network:', error);
@@ -291,6 +348,19 @@ Request ID: ${requestId}
                                 path="/portfolio"
                                 element={
                                     <PortfolioPage
+                                        walletBalance={walletBalance}
+                                        walletAddress={walletAddress}
+                                        backgroundBlur={backgroundBlur}
+                                        walletConnected={walletConnected}
+                                    />
+                                }
+                            />
+                            <Route
+                                path="/batch-transfer"
+                                element={
+                                    <BatchTransferPage
+                                        walletBalance={walletBalance}
+                                        setWalletBalance={setWalletBalance}
                                         walletAddress={walletAddress}
                                         backgroundBlur={backgroundBlur}
                                         walletConnected={walletConnected}
@@ -300,6 +370,7 @@ Request ID: ${requestId}
                             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                             <Route path="/terms-service" element={<TermsOfService />} />
                             <Route path="/trust-safety" element={<TrustSafety />} />
+                            <Route path="/contact-us" element={<ContactUs />} />
                             {/* Handle 404 - Not Found */}
                             <Route path="*" element={<div>404 - Not Found</div>} />
                         </Routes>

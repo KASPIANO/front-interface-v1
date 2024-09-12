@@ -65,3 +65,39 @@ export const SortLastButton = styled(Button)<{ selected: boolean }>(({ selected 
         backgroundColor: 'rgba(111, 199, 186, 0.7)', // Stronger opacity on hover
     },
 }));
+
+export const PrevPageButton = styled(Button)({
+    '&.MuiButton-root': {
+        marginLeft: '1.4vw',
+        padding: '4px 4px',
+        borderRadius: '4px 0 0 4px',
+        fontSize: '0.8vw',
+        minWidth: '0',
+        width: '3vw',
+        backgroundColor: 'rgba(111, 199, 186, 0.25)', // Primary color with less opacity
+    },
+    '&:hover': {
+        backgroundColor: 'rgba(111, 199, 186, 0.7)', // Stronger opacity on hover
+    },
+});
+
+export const NextPageButton = styled(Button)({
+    '&.MuiButton-root': {
+        padding: '4px 4px',
+        borderRadius: '0 4px 4px 0',
+        fontSize: '0.8vw',
+        minWidth: '0',
+        width: '3vw',
+        backgroundColor: 'rgba(111, 199, 186, 0.25)', // Primary color with less opacity
+    },
+    '&:hover': {
+        backgroundColor: 'rgba(111, 199, 186, 0.7)', // Stronger opacity on hover
+    },
+});
+
+export const fireColors = {
+    primary: '#FF6600',
+    secondary: '#FF9933',
+    tertiary: '#FFCC00',
+    glow: '#FF3300',
+};

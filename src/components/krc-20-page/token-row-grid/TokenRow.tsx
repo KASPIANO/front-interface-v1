@@ -121,7 +121,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             maxWidth: '17%',
                         }}
                         primary={
-                            <Tooltip title={token.ticker}>
+                            <Tooltip title="">
                                 <Typography component={'span'} variant="body1" style={{ fontSize: '1vw' }}>
                                     {capitalizeFirstLetter(token.ticker)}
                                 </Typography>
@@ -160,35 +160,35 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             </Tooltip>
                         }
                     />
-                    <Stat maxWidth="14%" display="flex" justifyContent="flex-start">
-                        <StatNumber style={{ fontSize: '1vw' }} margin="0">
-                            {(token.totalMintedPercent * 100).toFixed(2)}%
-                        </StatNumber>
-                        <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
-                            <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
-                            23.36%
-                        </StatHelpText>
-                    </Stat>
+                    <Tooltip title="This shows the percentage of tokens minted, along with the number of mints made in the selected time interval.">
+                        <Stat maxWidth="14%" display="flex" justifyContent="flex-start">
+                            <StatNumber style={{ fontSize: '1vw' }} margin="0">
+                                {(token.totalMintedPercent * 100).toFixed(2)}%
+                            </StatNumber>
+                            <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
+                                Mints: {token.changeTotalMints}
+                                <StatArrow sx={{ color: 'green', marginLeft: '2px' }} type="increase" />
+                            </StatHelpText>
+                        </Stat>
+                    </Tooltip>
+                    <Tooltip title="This displays the total number of token holders and the change in the holder amount during the selected time interval.">
+                        <Stat maxWidth="16.5%">
+                            <StatNumber style={{ fontSize: '1vw' }} margin="0">
+                                {token.totalHolders || 0}
+                            </StatNumber>
 
-                    <Stat maxWidth="16.5%">
-                        <StatNumber style={{ fontSize: '1vw' }} margin="0">
-                            {token.totalHolders || 0}
-                        </StatNumber>
-                        <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
-                            <StatArrow sx={{ color: 'green', marginRight: '2px' }} type="increase" />
-                            10.36%
-                        </StatHelpText>
-                    </Stat>
-
-                    {/* <ListItemText
-                        sx={{ width: '9.5vw' }}
-                        primary={
-                            <Typography
-                            component={'span'} variant="body2" style={{ fontSize: '1.1vw' }}>
-                                {token.transferTotal ? token.transferTotal : 0}
-                            </Typography>
-                        }
-                    /> */}
+                            <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
+                                {token.changeTotalHolders}
+                                <StatArrow
+                                    sx={{
+                                        color: token.changeTotalHolders >= 0 ? 'green' : 'red',
+                                        marginLeft: '2px',
+                                    }}
+                                    type={token.changeTotalHolders >= 0 ? 'increase' : 'decrease'}
+                                />
+                            </StatHelpText>
+                        </Stat>
+                    </Tooltip>
 
                     <ListItemText
                         sx={{ maxWidth: '13%' }}

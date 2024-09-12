@@ -10,7 +10,9 @@ import { TokenPageLayout } from './TokenPageLayout';
 import TokenGraph from '../../components/token-page/token-graph/TokenGraph';
 import RugScore from '../../components/token-page/rug-score/RugScore';
 import MintingComponent from '../../components/token-page/minting-status/MintingStatus';
-import { fetchTokenByTicker } from '../../DAL/BackendDAL';
+import { fetchTokenByTicker, recalculateRugScore } from '../../DAL/BackendDAL';
+import { AxiosError } from 'axios';
+import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
 
 interface TokenPageProps {
     walletAddress: string | null;
@@ -28,6 +30,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const { ticker } = useParams();
     const [tokenInfo, setTokenInfo] = useState<BackendTokenResponse>(null);
     const [tokenXHandle, setTokenXHandle] = useState(false);
+    const [recalculateRugScoreLoading, setRecalculateRugScoreLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -50,7 +53,35 @@ const TokenPage: FC<TokenPageProps> = (props) => {
 
     const getComponentToShow = (component: JSX.Element, height?: string, width?: string) =>
         tokenInfo ? component : <Skeleton variant="rectangular" height={height} width={width} />;
+    const rugScoreParse = tokenInfo?.metadata?.rugScore === 0 ? null : tokenInfo?.metadata?.rugScore;
 
+    const recalculateRugScoreAndShow = async () => {
+        setRecalculateRugScoreLoading(true);
+
+        try {
+            const result = await recalculateRugScore(tokenInfo.ticker);
+
+            if (result) {
+                setTokenInfo({ ...tokenInfo, metadata: { ...tokenInfo.metadata, rugScore: result } });
+            }
+        } catch (error) {
+            console.error('Error recalculating rug score:', error);
+
+            if (error instanceof AxiosError && error.response?.status === 400) {
+                showGlobalSnackbar({
+                    message: 'Please wait 3 hours before recalculation of the rug score',
+                    severity: 'error',
+                });
+            } else {
+                showGlobalSnackbar({
+                    message: 'Error recalculating rug score, Please try again later',
+                    severity: 'error',
+                });
+            }
+        } finally {
+            setRecalculateRugScoreLoading(false);
+        }
+    };
     return (
         <TokenPageLayout backgroundBlur={backgroundBlur}>
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '11.5vh')}
@@ -68,11 +99,17 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             )}
             {getComponentToShow(
                 <RugScore
-                    score={tokenInfo?.metadata?.rugScore}
+                    walletConnected={walletConnected}
+                    ticker={ticker}
+                    walletBalance={walletBalance}
+                    score={rugScoreParse}
                     // eslint-disable-next-line @typescript-eslint/no-empty-function
-                    onRecalculate={() => {}}
+                    onRecalculate={recalculateRugScoreAndShow}
                     xHandle={tokenXHandle}
                     setWalletBalance={setWalletBalance}
+                    walletAddress={walletAddress}
+                    setTokenInfo={setTokenInfo}
+                    isLoadingRugScore={recalculateRugScoreLoading}
                 />,
                 '19vh',
             )}
@@ -84,6 +121,8 @@ const TokenPage: FC<TokenPageProps> = (props) => {
                     setTokenInfo={setTokenInfo}
                     walletConnected={walletConnected}
                     walletAddress={walletAddress}
+                    walletBalance={walletBalance}
+                    setWalletBalance={setWalletBalance}
                 />,
                 '91vh',
             )}

@@ -1,5 +1,11 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
-import { BackendTokenResponse, TokenListItemResponse, TokenSearchItems, TokenSentiment } from '../types/Types';
+import {
+    BackendTokenResponse,
+    TickerPortfolioBackend,
+    TokenListItemResponse,
+    TokenSearchItems,
+    TokenSentiment,
+} from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
@@ -14,11 +20,13 @@ export const fetchAllTokens = async (
     skip = 0,
     order: string | null = null,
     direction: string | null = null,
+    timeInterval: string,
 ): Promise<TokenListItemResponse[]> => {
     try {
         const urlParams = new URLSearchParams();
         urlParams.append('skip', skip.toString());
         urlParams.append('limit', limit.toString());
+        urlParams.append('timeInterval', timeInterval.toString());
 
         if (order) {
             urlParams.append('order', order);
@@ -70,6 +78,16 @@ export async function countTokens(): Promise<number> {
     }
 }
 
+export async function recalculateRugScore(ticker: string): Promise<number> {
+    const response = await backendService.post<{ rugScore: number }>(
+        `/${KRC20METADATA_CONTROLLER}/update-rug-score`,
+        {
+            ticker,
+        },
+    );
+    return response.data.rugScore;
+}
+
 export async function updateWalletSentiment(
     ticker: string,
     wallet: string,
@@ -91,26 +109,26 @@ export async function updateWalletSentiment(
     return result.data;
 }
 
-export async function updateTokenMetadataAfterDeploy(
+export async function updateTokenMetadata(
     tokenDetails: FormData, // TokenDeploy
 ): Promise<AxiosResponse<any> | null> {
     // eslint-disable-next-line no-return-await
-    return await makeUpdateTokenMetadataAfterDeployRequest(tokenDetails, false);
+    return await makeUpdateTokenMetadataRequest(tokenDetails, false);
 }
 
-export async function validateFormDetailsForUpdateTokenMetadataAfterDeploy(
+export async function validateFormDetailsForUpdateTokenMetadata(
     tokenDetails: FormData, // TokenDeploy
 ): Promise<AxiosResponse<any> | null> {
     // eslint-disable-next-line no-return-await
-    return await makeUpdateTokenMetadataAfterDeployRequest(tokenDetails, true);
+    return await makeUpdateTokenMetadataRequest(tokenDetails, true);
 }
 
-export async function makeUpdateTokenMetadataAfterDeployRequest(
+export async function makeUpdateTokenMetadataRequest(
     tokenDetails: FormData, // TokenDeploy
     validateOnly = false,
 ): Promise<AxiosResponse<any> | null> {
     try {
-        let url = `/${KRC20METADATA_CONTROLLER}/after-deploy`;
+        let url = `/${KRC20METADATA_CONTROLLER}/update`;
 
         if (validateOnly) {
             url += '-validate';
@@ -144,6 +162,10 @@ export async function sendServerRequestAndSetErrorsIfNeeded<T>(
         return null;
     }
 
+    if (!response || ![200, 201].includes(response.status)) {
+        return null;
+    }
+
     return response.data;
 }
 
@@ -158,4 +180,19 @@ export async function searchToken(query: string, cancelToken: CancelToken = null
 
     const response = await backendService.get<TokenSearchItems[]>(`/${KRC20CONTROLLER}/search`, requestOptions);
     return response.data;
+}
+
+export async function fetchTokenPortfolio(tickers: string[]): Promise<TickerPortfolioBackend[]> {
+    const tickersString = tickers.length > 0 ? tickers.join(',') : '';
+    try {
+        const response = await backendService.get<TickerPortfolioBackend[]>(
+            `/${KRC20CONTROLLER}/portfolio?tickers=${tickersString}`,
+        );
+
+        // Assuming response.data contains the actual array of logo URLs
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching token logo URL:', error);
+        return [];
+    }
 }

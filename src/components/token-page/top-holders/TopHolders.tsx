@@ -15,25 +15,17 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
     const [topHoldersPercentage, setTopHoldersPercentage] = useState('---');
     const [devWalletPercentage, setDevWalletPercentage] = useState('---');
     const [tokenHolders] = useState(tokenInfo.topHolders || []);
+    const [holderTitle, setHolderTitle] = useState(numberOfHoldersToSelect[0]);
 
     const updateTokenHoldersToShow = (value: number) => {
         setTokenHoldersToShow(value);
+        setHolderTitle(value);
     };
 
     useEffect(() => {
         const calculatePercentages = async () => {
             const holdersToCalculate = tokenHolders.slice(0, tokenHoldersToShow);
             const { totalSupply } = tokenInfo;
-
-            try {
-                // Fetch dev wallet balance
-                const devWalletBalance = await fetchDevWalletBalance(tokenInfo.ticker, tokenInfo.devWallet);
-
-                const devWalletPercent = devWalletBalance === 0 ? 0 : (devWalletBalance / totalSupply) * 100;
-                setDevWalletPercentage(`${devWalletPercent.toFixed(2)}%`);
-            } catch (error) {
-                console.error('Error fetching dev wallet balance:', error);
-            }
 
             // Calculate top holders percentage
             const totalHolding = holdersToCalculate.map((h) => h.balance).reduce((acc, curr) => acc + curr, 0);
@@ -49,12 +41,24 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tokenHoldersToShow, tokenInfo]);
 
+    useEffect(() => {
+        const fetchDevWalletPercentage = async () => {
+            const devWalletBalance = await fetchDevWalletBalance(tokenInfo.ticker, tokenInfo.devWallet);
+            const devWalletPercent = devWalletBalance === 0 ? 0 : (devWalletBalance / tokenInfo.totalSupply) * 100;
+            setDevWalletPercentage(`${devWalletPercent.toFixed(2)}%`);
+        };
+
+        fetchDevWalletPercentage();
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tokenInfo]);
+
     return (
         <Card sx={{ height: '18vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold', mr: 1 }}>
-                        TOP HOLDERS
+                        TOP HOLDERS {holderTitle}
                     </Typography>
 
                     <Tooltip title="Top holders represent the amount of tokens held by the top X holders combined. This metric helps understand token distribution, potential whale dominance, and the risk of market manipulation. A large concentration of tokens among few holders might be a red flag.">

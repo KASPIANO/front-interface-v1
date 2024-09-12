@@ -1,6 +1,25 @@
-import React, { useState, useCallback, FC } from 'react';
-import { Button, Container, Typography, Tooltip, IconButton, Input, Grid } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { Button, Container, Grid, IconButton, Input, Tooltip, Typography } from '@mui/material';
+import React, { FC, useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
+import ReviewListTokenDialog from '../../components/dialogs/token-info/review-list-token/ReviewListTokenDialog';
+import {
+    BackendValidationErrorsType,
+    fetchTokenByTicker,
+    sendServerRequestAndSetErrorsIfNeeded,
+    updateTokenMetadata,
+} from '../../DAL/BackendDAL';
+import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
+import {
+    clearFieldErrors,
+    clearFieldErrorsAndSetFieldValue,
+    clearFormErrors,
+    getErrorMessage,
+    hasErrors,
+    setErrorToField,
+} from '../../utils/BackendValidationErrorsHandler';
+import { convertToProtocolFormat, delay, isEmptyString, setWalletBalanceUtil } from '../../utils/Utils';
 import {
     DeployForm,
     ImagePreview,
@@ -14,20 +33,9 @@ import { TokenKRC20Deploy, TokenKRC20DeployMetadata } from '../../types/Types';
 import DeployDialog from '../../components/deploy-page/deploy-dialog/DeployDialog';
 import debounce from 'lodash/debounce';
 import { fetchTokenInfo } from '../../DAL/Krc20DAL';
-import { deployKRC20Token, sendKaspa } from '../../utils/KaswareUtils';
-import { BackendValidationErrorsType } from '../../DAL/BackendDAL';
-import {
-    setErrorToField,
-    clearFieldErrors,
-    clearFieldErrorsAndSetFieldValue,
-    clearFormErrors,
-    getErrorMessage,
-    hasErrors,
-} from '../../utils/BackendValidationErrorsHandler';
-import { convertToProtocolFormat, delay, setWalletBalanceUtil } from '../../utils/Utils';
-import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
-import ReviewListTokenDialog from '../../components/dialogs/token-info/review-list-token/ReviewListTokenDialog';
-import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
+import { deployKRC20Token, sendKaspaToKaspiano } from '../../utils/KaswareUtils';
+
+import SuccessModal from '../../components/modals/sent-token-info-success/SuccessModal';
 
 interface DeployPageProps {
     walletBalance: number;
@@ -59,11 +67,11 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const [github, setGithub] = useState('');
     const [audit, setAudit] = useState('');
     const [foundersHandles, setFoundersHandles] = useState('');
-    const [contact, setContact] = useState('');
+    const [contacts, setContacts] = useState('');
     const [logo, setLogo] = useState<File | null>(null);
     const [banner, setBanner] = useState<File | null>(null);
     const [showDeployDialog, setShowDeployDialog] = useState(false);
-    const [tokenKRC20Details, setTokenKRC20Details] = useState<TokenKRC20Deploy | null>(null);
+    const [tokenKRC20Details, setTokenKRC20Details] = useState<TokenKRC20Deploy | null>();
     const [tokenMetadataDetails, setTokenMetadataDetails] = useState<TokenKRC20DeployMetadata | null>(null);
     const [tickerMessage, setTickerMessage] = useState('');
     const [formErrors, setFormErrors] = useState<BackendValidationErrorsType>({});
@@ -76,6 +84,14 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     const [isDeploying, setIsDeploying] = useState(false);
     const [waitingForTokenConfirmation, setWaitingForTokenConfirmation] = useState(false);
     const [isTokenDeployed, setIsTokenDeployed] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [email, setEmail] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [updateMetadataPaymentTransactionId, setUpdateMetadataPaymentTransactionId] = useState<string | null>(
+        null,
+    );
+    const [isUpadteMetadataLoading, setIsUpdateMetadataLoading] = useState(false);
+    const navigate = useNavigate();
 
     const validateTokenFullName = (name: string) => {
         const regex = /^[A-Za-z]{4,6}$/;
@@ -83,7 +99,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
     };
 
     const validateNumbersOnly = (value: string) => {
-        const regex = /^[0-9]*$/;
+        const regex = /^(?!0+\.?0*$)((\d+\.?\d*|\.\d+)|)$/;
         return regex.test(value);
     };
 
@@ -204,11 +220,21 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         }
     };
 
+    const checkIfEmailExists = (email: string): boolean => {
+        if (!email) {
+            return false;
+        }
+
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+        return emailPattern.test(email);
+    };
+
     const handleSubmitTokenMetadata = (event: React.FormEvent) => {
         event.preventDefault();
         const twitterUrlPattern = /^(https?:\/\/)?(www\.)?x\.com\/[a-zA-Z0-9_]{1,15}$/;
 
-        if (!x && !twitterUrlPattern.test(x)) {
+        if (!x || !twitterUrlPattern.test(x)) {
             setErrorToField(
                 formErrors,
                 setFormErrors,
@@ -217,7 +243,13 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             );
             return;
         }
+
+        if (!checkIfEmailExists(email)) {
+            setEmailError('At least one valid email is required.');
+            return;
+        }
         setFormErrors({});
+        setEmailError('');
 
         const tokenMetadata: TokenKRC20DeployMetadata = {
             description,
@@ -231,8 +263,11 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             medium,
             github,
             audit,
-            contacts: contact.split(',').map((contact) => contact.trim()),
-            founders: foundersHandles.split(',').map((handle) => handle.trim()),
+            email,
+            contacts: isEmptyString(contacts) ? [] : contacts.split(',').map((contact) => contact.trim()),
+            founders: isEmptyString(foundersHandles)
+                ? []
+                : foundersHandles.split(',').map((handle) => handle.trim()),
         };
 
         setTokenMetadataDetails(tokenMetadata);
@@ -257,7 +292,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         setGithub('');
         setAudit('');
         setFoundersHandles('');
-        setContact('');
+        setContacts('');
         setLogo(null);
         setBanner(null);
         setFormErrors({});
@@ -268,46 +303,98 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         setTickerMessage('');
     };
 
-    const handleTokenListing = async () => {
+    const handleTokenListing = async (): Promise<boolean> => {
         if (!tokenMetadataDetails) return;
         console.log('Token metadata:', tokenMetadataDetails);
         console.log('VERIFICATION_FEE_KAS', VERIFICATION_FEE_KAS);
-        if (walletBalance < VERIFICATION_FEE_KAS) {
-            showGlobalSnackbar({
-                message: 'Insufficient funds to list token',
-                severity: 'error',
-            });
-            return;
+
+        let currentMetadataPaymentTransactionId = updateMetadataPaymentTransactionId;
+
+        if (!currentMetadataPaymentTransactionId) {
+            if (walletBalance < VERIFICATION_FEE_KAS) {
+                showGlobalSnackbar({
+                    message: 'Insufficient funds to list token',
+                    severity: 'error',
+                });
+                return false;
+            }
+
+            const metadataUpdateFeeTransactionId = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
+
+            if (metadataUpdateFeeTransactionId) {
+                setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId);
+                currentMetadataPaymentTransactionId = metadataUpdateFeeTransactionId;
+
+                showGlobalSnackbar({
+                    message: 'Payment successful',
+                    severity: 'success',
+                });
+                const balance = await fetchWalletBalance(walletAddress);
+                setWalletBalance(setWalletBalanceUtil(balance));
+            } else {
+                showGlobalSnackbar({
+                    message: 'Payment failed',
+                    severity: 'error',
+                });
+
+                return false;
+            }
         }
-        const txid = await sendKaspa(
-            'kaspatest:qrzsn5eu6s28evw0k26qahjn0nwwzwjgn0qp3p37zl7z5lvx64h923agfaskv',
-            VERIFICATION_FEE_SOMPI,
-        );
-        if (txid) {
-            showGlobalSnackbar({
-                message: 'Payment successful',
-                severity: 'success',
-            });
+
+        if (currentMetadataPaymentTransactionId) {
+            setIsUpdateMetadataLoading(true);
+
             // Token listing request to backend
-            console.log('Token listing request to backend:', tokenMetadataDetails);
+            const tokenDetailsForm = new FormData();
 
-            showGlobalSnackbar({
-                message: 'Token listed successfully',
-                severity: 'success',
-            });
-            setShowReviewListTokenDialog(false);
+            tokenDetailsForm.append('ticker', tokenKRC20Details.ticker.toUpperCase());
+            tokenDetailsForm.append('walletAddress', walletAddress);
+            tokenDetailsForm.append('transactionHash', updateMetadataPaymentTransactionId);
 
-            setIsTokenDeployed(false);
-            handleCleanAllFields();
-            setTokenMetadataDetails(null);
-            setReviewTokenData(null);
-            setTokenKRC20Details(null);
-        } else {
-            showGlobalSnackbar({
-                message: 'Payment failed',
-                severity: 'error',
-            });
+            for (const [key, value] of Object.entries(tokenMetadataDetails)) {
+                tokenDetailsForm.append(key, value as string);
+            }
+
+            try {
+                const result = await sendServerRequestAndSetErrorsIfNeeded<boolean>(
+                    async () => updateTokenMetadata(tokenDetailsForm),
+                    setFormErrors,
+                );
+
+                if (!result) {
+                    throw new Error('Failed to save token metadata');
+                }
+
+                showGlobalSnackbar({
+                    message: 'Token listed successfully',
+                    severity: 'success',
+                });
+                setShowReviewListTokenDialog(false);
+                setUpdateMetadataPaymentTransactionId(null);
+
+                setIsTokenDeployed(false);
+
+                setShowSuccessModal(true);
+                setIsTokenDeployed(false);
+                handleCleanAllFields();
+                setTokenMetadataDetails(null);
+                setReviewTokenData(null);
+                setTokenKRC20Details(null);
+                return true;
+            } catch (error) {
+                showGlobalSnackbar({
+                    message: 'Error listing token, Please check the data or try again later',
+                    severity: 'error',
+                });
+                console.error(error);
+
+                return false;
+            } finally {
+                setIsUpdateMetadataLoading(false);
+            }
         }
+
+        return false;
     };
 
     const handleSubmitKRC20 = (event: React.FormEvent) => {
@@ -356,6 +443,11 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         }
     };
 
+    const handleCloseSuccessModal = () => {
+        setShowSuccessModal(false);
+        navigate(`/token/${tokenKRC20Details.ticker}`);
+    };
+
     const handleDeploy = async () => {
         if (!tokenKRC20Details) return;
 
@@ -383,19 +475,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         // }
 
         try {
-            // You add this GILAD I do not get it lol
-            // const validateResults = await sendServerRequestAndSetErrorsIfNeeded<boolean>(
-            //     () => validateFormDetailsForUpdateTokenMetadataAfterDeploy(tokenDetailsForm),
-            //     setFormErrors,
-            // );
-
-            // if (!validateResults) {
-            //     // User need to fix errors
-
-            //     setShowDeployDialog(false);
-            //     return;
-            // }
-
             setIsDeploying(true);
             const txid = await deployKRC20Token(inscribeJsonString);
 
@@ -406,6 +485,11 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 const token = await fetchTokenInfo(tokenKRC20Details.ticker, true);
 
                 if (token.state === 'deployed') {
+                    try {
+                        await fetchTokenByTicker(tokenKRC20Details.ticker, walletAddress, true);
+                    } catch (error) {
+                        console.error('Failed to refresh token data:', error);
+                    }
                     setWaitingForTokenConfirmation(false);
                     setShowDeployDialog(false);
                     setIsDeploying(false);
@@ -430,24 +514,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     setWaitingForTokenConfirmation(false);
                 }
             }
-
-            // const result = await sendServerRequestAndSetErrorsIfNeeded<boolean>(
-            //     () => updateTokenMetadataAfterDeploy(tokenDetailsForm),
-            //     setFormErrors,
-            // );
-
-            // if (!result) {
-            //     // TODO: Show error to the user
-            //     throw new Error('Failed to save token metadata');
-            // } else {
-            //     // TODO: Show success to the user
-            // }
-
-            // setShowDeployDialog(false);
-            // } else {
-            //     console.error('Insufficient funds to deploy KRC20 token');
-            // }
-            // Handle successful deployment (e.g., show a success message, navigate to a different page, etc.)
         } catch (error) {
             console.error('Failed to deploy KRC20 token:', error);
             setShowDeployDialog(false);
@@ -681,20 +747,19 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                             <TextInfo
-                                label="Discord"
+                                label="Email"
                                 variant="outlined"
                                 fullWidth
-                                value={discord}
-                                onChange={(e) =>
-                                    clearFieldErrorsAndSetFieldValue(formErrors, setFormErrors, 'discord', () =>
-                                        setDiscord(e.target.value),
-                                    )
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Enter Email"
+                                helperText={
+                                    emailError ? emailError : 'Email is required to send the listing confirmation'
                                 }
-                                placeholder="Discord link"
-                                error={hasErrors(formErrors, 'discord')}
-                                helperText={getErrorMessage(formErrors, 'discord')}
+                                error={!!emailError}
                             />
                         </Grid>
+
                         <Grid item xs={6}>
                             <TextInfo
                                 label="Telegram"
@@ -709,6 +774,22 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 placeholder="Telegram link"
                                 error={hasErrors(formErrors, 'telegram')}
                                 helperText={getErrorMessage(formErrors, 'telegram')}
+                            />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <TextInfo
+                                label="Discord"
+                                variant="outlined"
+                                fullWidth
+                                value={discord}
+                                onChange={(e) =>
+                                    clearFieldErrorsAndSetFieldValue(formErrors, setFormErrors, 'discord', () =>
+                                        setDiscord(e.target.value),
+                                    )
+                                }
+                                placeholder="Discord link"
+                                error={hasErrors(formErrors, 'discord')}
+                                helperText={getErrorMessage(formErrors, 'discord')}
                             />
                         </Grid>
                         <Grid item xs={6}>
@@ -786,15 +867,15 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                             <TextInfo
-                                label="Contact"
+                                label="Contacts"
                                 variant="outlined"
                                 fullWidth
                                 multiline // Enables multiline input
                                 minRows={1} // Minimum number of rows when the input is not filled
                                 maxRows={6}
-                                value={contact}
-                                onChange={(e) => setContact(e.target.value)}
-                                placeholder="Contact information"
+                                value={contacts}
+                                onChange={(e) => setContacts(e.target.value)}
+                                placeholder="Contacts information (e.g., email, Twitter handle)"
                                 helperText="Example: @twitter_handle, email@example.com, @telegram_handle (separate with commas)"
                                 FormHelperTextProps={{
                                     sx: {
@@ -805,7 +886,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                     endAdornment: (
                                         <Tooltip
                                             placement="left"
-                                            title="Provide multiple contact methods separated by commas, such as Twitter handles, emails, or Telegram handles."
+                                            title="Provide multiple Contacts methods separated by commas, such as Twitter handles, emails, or Telegram handles."
                                         >
                                             <IconButton
                                                 sx={{
@@ -955,12 +1036,16 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             )}
             {showReviewListTokenDialog && tokenMetadataDetails && (
                 <ReviewListTokenDialog
+                    walletConnected={walletConnected}
                     open={showReviewListTokenDialog}
                     onClose={() => setShowReviewListTokenDialog(false)}
-                    onList={() => handleTokenListing()}
+                    onList={handleTokenListing}
                     tokenMetadata={tokenMetadataDetails}
+                    isPaid={updateMetadataPaymentTransactionId !== null}
+                    isSavingData={isUpadteMetadataLoading}
                 />
             )}
+            {showSuccessModal && <SuccessModal open={showSuccessModal} onClose={handleCloseSuccessModal} />}
         </Container>
     );
 };

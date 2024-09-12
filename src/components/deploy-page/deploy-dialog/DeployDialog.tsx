@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box } from '@mui/material';
 import { TokenKRC20Deploy } from '../../../types/Types';
-import { styled, keyframes } from '@mui/material/styles';
+import { DeployPageSpinner } from '../../../pages/deploy-page/DeployPage.s';
 
 interface DeployDialogProps {
     open: boolean;
@@ -12,25 +12,6 @@ interface DeployDialogProps {
     waitingForTokenConfirmation: boolean;
 }
 
-const spin = keyframes`
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-`;
-
-const Spinner = styled('div')(({ theme }) => ({
-    margin: '20px auto',
-    width: '40px',
-    height: '40px',
-    border: `4px solid ${theme.palette.grey[500]}`, // Info color
-    borderTop: `4px solid ${theme.palette.primary.main}`, // Primary color
-    borderRadius: '50%',
-    animation: `${spin} 1s linear infinite`,
-}));
-
 const DeployDialog: React.FC<DeployDialogProps> = (props) => {
     const { open, onClose, onDeploy, tokenData, isDeploying, waitingForTokenConfirmation } = props;
     const [disableDeploy, setDisableDeploy] = React.useState(false);
@@ -39,18 +20,29 @@ const DeployDialog: React.FC<DeployDialogProps> = (props) => {
         setDisableDeploy(true);
     };
 
+    const handleClose = () => {
+        if (isDeploying || waitingForTokenConfirmation) {
+            return; // Prevent closing if deploying or waiting for confirmation
+        }
+        onClose();
+    };
+
     return (
-        <Dialog open={open} onClose={onClose}>
+        <Dialog
+            open={open}
+            onClose={handleClose}
+            disableEscapeKeyDown={isDeploying || waitingForTokenConfirmation}
+        >
             <DialogTitle sx={{ fontWeight: 'bold' }}>Review Token Deployment</DialogTitle>
             <DialogContent>
                 {isDeploying ? (
                     <>
-                        <Spinner />
+                        <DeployPageSpinner />
                         <Typography variant="body1">Waiting for wallet transaction approval...</Typography>
                     </>
                 ) : waitingForTokenConfirmation ? (
                     <>
-                        <Spinner />
+                        <DeployPageSpinner />
                         <Typography variant="body1">Verifying Token Deployment...</Typography>
                     </>
                 ) : (
@@ -68,7 +60,9 @@ const DeployDialog: React.FC<DeployDialogProps> = (props) => {
             </DialogContent>
             <DialogActions>
                 <Box sx={{ flexGrow: 1 }}>
-                    <Button onClick={onClose}>Cancel</Button>
+                    <Button onClick={onClose} disabled={isDeploying || waitingForTokenConfirmation}>
+                        Cancel
+                    </Button>
                 </Box>
                 <Button onClick={handleDeploy} variant="contained" disabled={disableDeploy}>
                     Deploy

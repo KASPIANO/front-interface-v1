@@ -60,6 +60,8 @@ export interface TokenListItemResponse {
     preMintedSupply: number;
     logoUrl: string;
     bannerUrl: string;
+    changeTotalMints: number;
+    changeTotalHolders: number;
 }
 export interface TokenSearchItems {
     ticker: string;
@@ -126,7 +128,8 @@ export interface TokenKRC20Deploy {
 export interface TokenKRC20DeployMetadata {
     description?: string;
     website?: string;
-    x?: string;
+    x: string;
+    email: string;
     discord?: string;
     telegram?: string;
     logo?: File;
@@ -187,6 +190,16 @@ export interface TokenRowPortfolioItem {
     totalValue?: string;
     oneDayChange?: string;
     logoUrl?: string;
+    state: string;
+}
+export interface TokenRowActivityItem {
+    ticker: string;
+    amount: string;
+    type: string;
+    time: string;
+    price?: string;
+    totalValue?: string;
+    oneDayChange?: string;
 }
 
 export interface UserVerfication {
@@ -195,4 +208,23 @@ export interface UserVerfication {
     requestId: string;
     requestNonce: string;
     requestTimestamp: string;
+}
+
+export interface TransferObj {
+    p: string;
+    op: string;
+    tick: string;
+    amt: string;
+}
+
+export interface TickerPortfolioBackend {
+    ticker: string;
+    logo: string;
+    state?: string;
+}
+
+export interface FetchWalletActivityResponse {
+    activityItems: TokenRowActivityItem[];
+    next: string | null;
+    prev: string | null;
 }
