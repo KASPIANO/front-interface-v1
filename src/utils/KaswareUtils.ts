@@ -1,5 +1,7 @@
 // Ensure the WebSocket is available globally
 
+import { KaswareSendKaspaResult } from '../types/Types';
+
 // Utility to detect if KasWare Wallet is installed
 export const isKasWareInstalled = (): boolean => typeof window.kasware !== 'undefined';
 const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
@@ -111,17 +113,20 @@ export const sendKaspa = async (
     options?: { feeRate?: number },
 ): Promise<string> => {
     try {
-        const txid = await window.kasware.sendKaspa(toAddress, sompi, options);
-        return txid;
+        const txData = await window.kasware.sendKaspa(toAddress, sompi, options);
+        return txData;
     } catch (error) {
         throw error;
     }
 };
-export const sendKaspaToKaspiano = async (sompi: number, options?: { feeRate?: number }): Promise<any> => {
+export const sendKaspaToKaspiano = async (
+    sompi: number,
+    options?: { feeRate?: number },
+): Promise<KaswareSendKaspaResult> => {
     try {
-        const txid = await window.kasware.sendKaspa(KASPIANO_WALLET, sompi, options);
-        const parsedTxid = JSON.parse(txid);
-        return parsedTxid;
+        const txData = await window.kasware.sendKaspa(KASPIANO_WALLET, sompi, options);
+        const parsedTxData = JSON.parse(txData);
+        return parsedTxData;
     } catch (error) {
         throw error;
     }

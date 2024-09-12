@@ -291,7 +291,22 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 return false;
             }
 
-            const metadataUpdateFeeTransactionId = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
+            let metadataUpdateFeeTransactionId = null;
+
+            try {
+                const metadataFeeTransaction = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
+
+                // TODO: GET REAL TRANSACTION ID FROM RESPONSE
+                metadataUpdateFeeTransactionId = metadataFeeTransaction.id;
+            } catch (error) {
+                console.log(error);
+                showGlobalSnackbar({
+                    message: 'Payment failed',
+                    severity: 'error',
+                });
+
+                return false;
+            }
 
             if (metadataUpdateFeeTransactionId) {
                 setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId);
@@ -321,7 +336,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
 
             tokenDetailsForm.append('ticker', tokenKRC20Details.ticker.toUpperCase());
             tokenDetailsForm.append('walletAddress', walletAddress);
-            tokenDetailsForm.append('transactionHash', updateMetadataPaymentTransactionId);
+            tokenDetailsForm.append('transactionHash', currentMetadataPaymentTransactionId);
 
             for (const [key, value] of Object.entries(tokenMetadataDetails)) {
                 tokenDetailsForm.append(key, value as string);
