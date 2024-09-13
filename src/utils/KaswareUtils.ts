@@ -174,10 +174,10 @@ export const mintKRC20Token = async (inscribeJsonString: string): Promise<string
 };
 
 // Method to transfer KRC20 token
-export const transferKRC20Token = async (inscribeJsonString: string, destAddr: string): Promise<string> => {
+export const transferKRC20Token = async (inscribeJsonString: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4, destAddr);
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4);
         return txid;
     } catch (error) {
         console.error('Failed to transfer KRC20 token:', error);
@@ -204,12 +204,12 @@ export const removeNetworkChangedListener = (handler: (network: string) => void)
 };
 
 // Utility function to sign a KRC20 batch transfer transaction
-export const signKRC20BatchTransfer = async (inscribeJsonString: string, toAddrs: string[]): Promise<string> => {
+export const signKRC20BatchTransfer = async (inscribeJsonString: string, addresses: string[]): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
 
     try {
         // Calling the KasWare method to sign the batch transfer transaction
-        const txid = await window.kasware.signKRC20BatchTransferTransaction(inscribeJsonString, 4, toAddrs);
+        const txid = await window.kasware.signKRC20BatchTransferTransaction(inscribeJsonString, 4, addresses);
         return txid;
     } catch (error) {
         console.error('Failed to execute batch KRC20 token transfer:', error);

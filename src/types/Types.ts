@@ -215,6 +215,7 @@ export interface TransferObj {
     op: string;
     tick: string;
     amt: string;
+    to?: string[] | string;
 }
 
 export interface TickerPortfolioBackend {

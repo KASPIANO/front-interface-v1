@@ -64,7 +64,7 @@ export async function fetchDevWalletBalance(ticker: string, devWallet: string): 
     return parseFloat(balance) / 1e8;
 }
 
-export async function fetchWalletKRC20Balance(address: string): Promise<TokenRowPortfolioItem[]> {
+export async function fetchWalletKRC20TokensBalance(address: string): Promise<TokenRowPortfolioItem[]> {
     try {
         const response = await KRC20InfoService.get<any>(`krc20/address/${address}/tokenlist`);
         const { result } = response.data;
@@ -80,6 +80,16 @@ export async function fetchWalletKRC20Balance(address: string): Promise<TokenRow
     } catch (error) {
         console.error('Error fetching wallet balance:', error);
         return [];
+    }
+}
+export async function fetchWalletKRC20Balance(address: string, ticker: string): Promise<number> {
+    try {
+        const response = await KRC20InfoService.get<any>(`krc20/address/${address}/token/${ticker}`);
+        const { result } = response.data;
+        return result.length > 0 ? parseInt(result[0].balance) / 1e8 : 0;
+    } catch (error) {
+        console.error('Error fetching wallet balance:', error);
+        return 0;
     }
 }
 

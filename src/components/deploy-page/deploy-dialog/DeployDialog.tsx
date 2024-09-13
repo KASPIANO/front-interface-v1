@@ -38,12 +38,16 @@ const DeployDialog: React.FC<DeployDialogProps> = (props) => {
                 {isDeploying ? (
                     <>
                         <DeployPageSpinner />
-                        <Typography variant="body1">Waiting for wallet transaction approval...</Typography>
+                        <Typography variant="body1" sx={{ fontWeight: 700 }}>
+                            Waiting for wallet transaction approval...
+                        </Typography>
                     </>
                 ) : waitingForTokenConfirmation ? (
                     <>
                         <DeployPageSpinner />
-                        <Typography variant="body1">Verifying Token Deployment...</Typography>
+                        <Typography variant="body1" sx={{ fontWeight: 700 }}>
+                            Verifying Token Deployment...
+                        </Typography>
                     </>
                 ) : (
                     <>

@@ -12,6 +12,7 @@ interface PortfolioTokenGridProps {
     walletConnected: boolean;
     isLoading: boolean;
     walletBalance: number;
+    handleChange: () => void;
 }
 
 enum GridHeaders {
@@ -21,7 +22,7 @@ enum GridHeaders {
 }
 
 const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
-    const { tokensList, kasPrice, walletConnected, walletBalance } = props;
+    const { tokensList, kasPrice, walletConnected, walletBalance, handleChange } = props;
 
     const tableHeader = (
         <Box
@@ -62,6 +63,7 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
                     {tokensList.length > 0
                         ? tokensList.map((token) => (
                               <TokenRowPortfolio
+                                  handleChange={handleChange}
                                   walletBalance={walletBalance}
                                   key={token.ticker}
                                   token={token}

@@ -18,6 +18,7 @@ interface PortfolioPanelProps {
     isLoadingActivity: boolean;
     handleActivityPagination: (direction: 'next' | 'prev') => void;
     lastActivityPage: boolean;
+    handleChange: () => void;
 }
 
 const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
@@ -32,11 +33,12 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
         isLoadingActivity,
         handleActivityPagination,
         lastActivityPage,
+        handleChange,
     } = props;
     const [value, setValue] = useState('1');
     // const [paidUser] = useState(false);
 
-    const handleChange = (_event: React.SyntheticEvent, newValue: string) => {
+    const handleValueChange = (_event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
     };
 
@@ -45,7 +47,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
             <TabContext value={value}>
                 <Tabs
                     value={value}
-                    onChange={handleChange}
+                    onChange={handleValueChange}
                     sx={{
                         '& .MuiTabs-flexContainer': {
                             marginLeft: '2vw',
@@ -71,6 +73,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                 </Tabs>
                 <TabPanelStyled value="1">
                     <PortfolioTokenGrid
+                        handleChange={handleChange}
                         walletBalance={walletBalance}
                         isLoading={isLoading}
                         tokensList={tokenList}

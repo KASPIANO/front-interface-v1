@@ -4,7 +4,7 @@ import UserProfile from '../../components/portfolio-page/user-profile/UserProfil
 import PortfolioPanel from '../../components/portfolio-page/portfolio-tab-panel/PortfolioPanel';
 import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
 import { PortfolioValue, TokenRowActivityItem, TokenRowPortfolioItem } from '../../types/Types';
-import { fetchWalletActivity, fetchWalletKRC20Balance } from '../../DAL/Krc20DAL';
+import { fetchWalletActivity, fetchWalletKRC20TokensBalance } from '../../DAL/Krc20DAL';
 import { fetchTokenPortfolio } from '../../DAL/BackendDAL';
 
 interface PortfolioPageProps {
@@ -54,6 +54,7 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
     const [activityNext, setActivityNext] = useState<string | null>(null);
     const [activityPrev, setActivityPrev] = useState<string | null>(null);
     const [lastActivityPage, setLastActivityPage] = useState<boolean>(false);
+    const [operationFinished, setOperationFinished] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchPrice = async () => {
@@ -75,7 +76,7 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
         const fetchPortfolioData = async () => {
             setIsLoading(true);
             try {
-                const tokenData = await fetchWalletKRC20Balance(walletAddress);
+                const tokenData = await fetchWalletKRC20TokensBalance(walletAddress);
 
                 // Extract the tickers for later use in metadata fetch
                 const tickers = tokenData.map((token) => token.ticker);
@@ -106,7 +107,7 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
         if (walletConnected) {
             fetchPortfolioData();
         }
-    }, [walletAddress, walletConnected]);
+    }, [walletAddress, walletConnected, operationFinished]);
 
     useEffect(() => {
         const fetchActivity = async () => {
@@ -134,17 +135,22 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [walletAddress, walletConnected, paginationKey]);
+    }, [walletAddress, walletConnected, paginationKey, operationFinished]);
 
     const handleActivityPagination = (direction: 'next' | 'prev') => {
         setPaginationDirection(direction);
         setPaginationKey(direction === 'next' ? activityNext : activityPrev);
     };
 
+    const handleChange = () => {
+        setOperationFinished((prev) => !prev);
+    };
+
     return (
         <PortfolioLayout backgroundBlur={backgroundBlur}>
             <UserProfile walletAddress={walletAddress} portfolioValue={portfolioValue} kasPrice={kasPrice} />
             <PortfolioPanel
+                handleChange={handleChange}
                 handleActivityPagination={handleActivityPagination}
                 lastActivityPage={lastActivityPage}
                 walletBalance={walletBalance}

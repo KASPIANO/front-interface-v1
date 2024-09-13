@@ -86,8 +86,8 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
             console.log('metadataUpdateFeeTransactionId', metadataUpdateFeeTransactionId);
 
             if (metadataUpdateFeeTransactionId) {
-                setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId);
-                currentMetadataPaymentTransactionId = metadataUpdateFeeTransactionId;
+                setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId.id);
+                currentMetadataPaymentTransactionId = metadataUpdateFeeTransactionId.id;
 
                 showGlobalSnackbar({
                     message: 'Payment successful',
@@ -114,7 +114,8 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
 
             tokenDetailsForm.append('ticker', ticker.toUpperCase());
             tokenDetailsForm.append('walletAddress', walletAddress);
-            tokenDetailsForm.append('transactionHash', updateMetadataPaymentTransactionId);
+            debugger;
+            tokenDetailsForm.append('transactionHash', currentMetadataPaymentTransactionId);
 
             for (const [key, value] of Object.entries(tokenMetadataDetails)) {
                 if (value instanceof File || !isEmptyStringOrArray(value as any)) {

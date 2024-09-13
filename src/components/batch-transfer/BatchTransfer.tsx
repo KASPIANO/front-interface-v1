@@ -8,6 +8,7 @@ import FileDownloadIconRounded from '@mui/icons-material/FileDownloadRounded';
 import { setWalletBalanceUtil, verifyPaymentTransaction } from '../../utils/Utils';
 import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
 import { UploadButton } from '../../pages/deploy-page/DeployPage.s';
+import { fetchWalletKRC20Balance } from '../../DAL/Krc20DAL';
 
 export interface BatchTransferProps {
     walletConnected: boolean;
@@ -27,6 +28,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     const [txid, setTxid] = useState('');
     const [paymentMade, setPaymentMade] = useState(false); // Track if payment is made
     const [paymentTxnId, setPaymentTxnId] = useState<string | null>(null);
+    const [errorAmount, setErrorAmount] = useState<boolean>(false);
 
     // Example CSV header: "address"
     const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,9 +53,23 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         reader.readAsText(file);
     };
 
+    const handleTokenBalanceVerification = async (addresses: string[]) => {
+        console.log(amount);
+        const balance = await fetchWalletKRC20Balance(walletAddress, ticker);
+        console.log('Balance:', balance);
+        if (balance >= parseInt(amount) * addresses.length) {
+            return true;
+        } else {
+            showGlobalSnackbar({
+                message: 'Token balance is insufficient',
+                severity: 'error',
+            });
+            return false;
+        }
+    };
+
     const handleBatchTransfer = async () => {
         const addresses = recipientAddresses.split(',').map((addr) => addr.trim());
-
         if (addresses.length === 0) {
             showGlobalSnackbar({
                 message: 'Missing destination addresses ',
@@ -75,6 +91,12 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             });
             return;
         }
+        const tokenAmountVerification = await handleTokenBalanceVerification(addresses);
+        if (!tokenAmountVerification) {
+            setErrorAmount(true);
+            setAmount('');
+            return;
+        }
         const verification = await verifyPaymentTransaction(paymentTxnId, walletAddress, VERIFICATION_FEE_SOMPI);
         if (!verification) {
             showGlobalSnackbar({
@@ -88,13 +110,14 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             p: 'KRC-20',
             op: 'transfer',
             tick: ticker,
-            amt: (parseInt(amount) * 100000000).toString(), // Assuming Kaspa uses 8 decimal places
+            amt: (parseInt(amount) * 100000000).toString(),
         };
 
         const jsonStr = JSON.stringify(transferObj);
 
         try {
             console.log('Signing batch transfer:', jsonStr, addresses);
+
             const txid = await signKRC20BatchTransfer(jsonStr, addresses);
             setTxid(txid);
             clearFields();
@@ -106,6 +129,10 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     const clearFields = () => {
         setTicker('');
         setAmount('');
+        setTxid('');
+        setPaymentMade(false);
+        setPaymentTxnId(null);
+        setErrorAmount(false);
         setRecipientAddresses('');
     };
 
@@ -125,6 +152,8 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             return;
         }
         const paymentTxn = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
+
+        console.log('Payment txn:', paymentTxn);
         const paymentTxnId = paymentTxn.id;
 
         if (!paymentTxnId) {
@@ -198,7 +227,12 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             </Box>
             <Box sx={{ marginBottom: '1.3vh' }}>
                 <Typography variant="body2">Amount per Address:</Typography>
-                <Input value={amount} onChange={(e) => handleAmountChange(e.target.value)} fullWidth />
+                <Input
+                    value={amount}
+                    onChange={(e) => handleAmountChange(e.target.value)}
+                    fullWidth
+                    error={errorAmount}
+                />
             </Box>
             <Box sx={{ marginBottom: '1.3vh' }}>
                 <Typography variant="body2">Recipient Addresses (comma-separated):</Typography>

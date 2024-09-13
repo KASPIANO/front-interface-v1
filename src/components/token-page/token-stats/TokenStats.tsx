@@ -91,7 +91,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                         HOLDERS
                     </Typography>
                     <Typography align="center" sx={{ fontSize: '0.9vw', fontWeight: 'bold' }}>
-                        {tokenInfo.totalHolders ? tokenInfo.totalHolders : '69'}
+                        {tokenInfo.totalHolders}
                     </Typography>
                 </Box>
             </Box>
