@@ -182,7 +182,7 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = (props) => {
                         margin="normal"
                         error={!!xError}
                         helperText={xError}
-                        placeholder="Enter the token\'s X/Twitter handle"
+                        placeholder="Enter the token\'s X/Twitter URL"
                     />
                     <TextField
                         label="Telegram"

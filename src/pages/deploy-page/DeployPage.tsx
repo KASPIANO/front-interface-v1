@@ -23,6 +23,7 @@ import {
     convertToProtocolFormat,
     delay,
     isEmptyString,
+    isEmptyStringOrArray,
     setWalletBalanceUtil,
 } from '../../utils/Utils';
 import {
@@ -313,51 +314,41 @@ const DeployPage: FC<DeployPageProps> = (props) => {
 
         let currentMetadataPaymentTransactionId = updateMetadataPaymentTransactionId;
 
-        if (!currentMetadataPaymentTransactionId) {
-            if (walletBalance < VERIFICATION_FEE_KAS) {
-                showGlobalSnackbar({
-                    message: 'Insufficient funds to list token',
-                    severity: 'error',
-                });
-                return false;
-            }
-
-            let metadataUpdateFeeTransactionId = null;
-
-            try {
-                const metadataFeeTransaction = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
-
-                // TODO: GET REAL TRANSACTION ID FROM RESPONSE
-                metadataUpdateFeeTransactionId = metadataFeeTransaction.id;
-            } catch (error) {
-                console.log(error);
-                showGlobalSnackbar({
-                    message: 'Payment failed',
-                    severity: 'error',
-                });
-
-                return false;
-            }
-
-            if (metadataUpdateFeeTransactionId) {
-                setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId.id);
-                currentMetadataPaymentTransactionId = metadataUpdateFeeTransactionId.id;
-
-                showGlobalSnackbar({
-                    message: 'Payment successful',
-                    severity: 'success',
-                });
-                const balance = await fetchWalletBalance(walletAddress);
-                setWalletBalance(setWalletBalanceUtil(balance));
-            } else {
-                showGlobalSnackbar({
-                    message: 'Payment failed',
-                    severity: 'error',
-                });
-
-                return false;
-            }
+        if (walletBalance < VERIFICATION_FEE_KAS) {
+            showGlobalSnackbar({
+                message: 'Insufficient funds to list token',
+                severity: 'error',
+            });
+            return false;
         }
+
+        let metadataUpdateFeeTransactionId = null;
+
+        try {
+            const metadataFeeTransaction = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
+
+            metadataUpdateFeeTransactionId = metadataFeeTransaction.id;
+            setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId);
+            currentMetadataPaymentTransactionId = metadataUpdateFeeTransactionId;
+
+            showGlobalSnackbar({
+                message: 'Payment successful',
+                severity: 'success',
+            });
+        } catch (error) {
+            console.log(error);
+            showGlobalSnackbar({
+                message: 'Payment failed',
+                severity: 'error',
+            });
+
+            return false;
+        }
+
+        console.log('metadataUpdateFeeTransactionId', metadataUpdateFeeTransactionId);
+
+        const balance = await fetchWalletBalance(walletAddress);
+        setWalletBalance(setWalletBalanceUtil(balance));
 
         if (currentMetadataPaymentTransactionId) {
             setIsUpdateMetadataLoading(true);
@@ -368,9 +359,10 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             tokenDetailsForm.append('ticker', tokenKRC20Details.ticker.toUpperCase());
             tokenDetailsForm.append('walletAddress', walletAddress);
             tokenDetailsForm.append('transactionHash', currentMetadataPaymentTransactionId);
-
             for (const [key, value] of Object.entries(tokenMetadataDetails)) {
-                tokenDetailsForm.append(key, value as string);
+                if (value instanceof File || !isEmptyStringOrArray(value as any)) {
+                    tokenDetailsForm.append(key, value as string);
+                }
             }
 
             try {
@@ -383,10 +375,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     throw new Error('Failed to save token metadata');
                 }
 
-                showGlobalSnackbar({
-                    message: 'Token listed successfully',
-                    severity: 'success',
-                });
                 setShowReviewListTokenDialog(false);
                 setUpdateMetadataPaymentTransactionId(null);
 
@@ -1057,7 +1045,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     onClose={() => setShowReviewListTokenDialog(false)}
                     onList={handleTokenListing}
                     tokenMetadata={tokenMetadataDetails}
-                    isPaid={updateMetadataPaymentTransactionId !== null}
                     isSavingData={isUpadteMetadataLoading}
                 />
             )}

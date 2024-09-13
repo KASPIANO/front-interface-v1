@@ -61,54 +61,42 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
 
         let currentMetadataPaymentTransactionId = updateMetadataPaymentTransactionId;
 
-        if (!currentMetadataPaymentTransactionId) {
-            if (walletBalance < VERIFICATION_FEE_KAS) {
-                showGlobalSnackbar({
-                    message: 'Insufficient funds to list token',
-                    severity: 'error',
-                });
-                return false;
-            }
-
-            let metadataUpdateFeeTransactionId = null;
-
-            try {
-                const metadataFeeTransaction = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
-
-                // TODO: GET REAL TRANSACTION ID FROM RESPONSE
-                metadataUpdateFeeTransactionId = metadataFeeTransaction.id;
-            } catch (error) {
-                console.log(error);
-                showGlobalSnackbar({
-                    message: 'Payment failed',
-                    severity: 'error',
-                });
-
-                return false;
-            }
-
-            console.log('metadataUpdateFeeTransactionId', metadataUpdateFeeTransactionId);
-
-            if (metadataUpdateFeeTransactionId) {
-                setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId.id);
-                currentMetadataPaymentTransactionId = metadataUpdateFeeTransactionId.id;
-
-                showGlobalSnackbar({
-                    message: 'Payment successful',
-                    severity: 'success',
-                });
-
-                const balance = await fetchWalletBalance(walletAddress);
-                setWalletBalance(setWalletBalanceUtil(balance));
-            } else {
-                showGlobalSnackbar({
-                    message: 'Payment failed',
-                    severity: 'error',
-                });
-
-                return false;
-            }
+        if (walletBalance < VERIFICATION_FEE_KAS) {
+            showGlobalSnackbar({
+                message: 'Insufficient funds to list token',
+                severity: 'error',
+            });
+            return false;
         }
+
+        let metadataUpdateFeeTransactionId = null;
+
+        try {
+            const metadataFeeTransaction = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
+
+            // TODO: GET REAL TRANSACTION ID FROM RESPONSE
+            metadataUpdateFeeTransactionId = metadataFeeTransaction.id;
+            setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId);
+            currentMetadataPaymentTransactionId = metadataUpdateFeeTransactionId;
+
+            showGlobalSnackbar({
+                message: 'Payment successful',
+                severity: 'success',
+            });
+        } catch (error) {
+            console.log(error);
+            showGlobalSnackbar({
+                message: 'Payment failed',
+                severity: 'error',
+            });
+
+            return false;
+        }
+
+        console.log('metadataUpdateFeeTransactionId', metadataUpdateFeeTransactionId);
+
+        const balance = await fetchWalletBalance(walletAddress);
+        setWalletBalance(setWalletBalanceUtil(balance));
 
         if (currentMetadataPaymentTransactionId) {
             setIsUpdateMetadataLoading(true);
@@ -207,7 +195,6 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
                     onClose={handleReviewListTokenCloseDialog}
                     onList={handleTokenListing}
                     tokenMetadata={tokenMetadataDetails}
-                    isPaid={updateMetadataPaymentTransactionId !== null}
                     isSavingData={isUpadteMetadataLoading}
                 />
             )}
