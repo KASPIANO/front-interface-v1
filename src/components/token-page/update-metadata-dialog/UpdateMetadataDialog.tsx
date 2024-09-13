@@ -69,10 +69,14 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
                 });
                 return false;
             }
+
             let metadataUpdateFeeTransactionId = null;
 
             try {
-                metadataUpdateFeeTransactionId = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
+                const metadataFeeTransaction = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
+
+                // TODO: GET REAL TRANSACTION ID FROM RESPONSE
+                metadataUpdateFeeTransactionId = metadataFeeTransaction.id;
             } catch (error) {
                 console.log(error);
                 showGlobalSnackbar({
@@ -114,7 +118,6 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
 
             tokenDetailsForm.append('ticker', ticker.toUpperCase());
             tokenDetailsForm.append('walletAddress', walletAddress);
-            debugger;
             tokenDetailsForm.append('transactionHash', currentMetadataPaymentTransactionId);
 
             for (const [key, value] of Object.entries(tokenMetadataDetails)) {
