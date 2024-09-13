@@ -19,7 +19,8 @@ interface MintingComponentProps {
 const MintingComponent: FC<MintingComponentProps> = (props) => {
     const { tokenInfo, walletConnected, walletBalance, setWalletBalance, setTokenInfo, walletAddress } = props;
     // Calculate the total mints possible and mints left
-    const totalMintsPossible = Math.floor(tokenInfo.totalSupply / tokenInfo.mintLimit);
+    const totalMintableSupply = tokenInfo.totalSupply - tokenInfo.preMintedSupply;
+    const totalMintsPossible = Math.floor(totalMintableSupply / tokenInfo.mintLimit);
     const mintsLeft = totalMintsPossible - tokenInfo.totalMintTimes;
     const isMintingDisabled = tokenInfo.totalMinted >= tokenInfo.totalSupply;
 
