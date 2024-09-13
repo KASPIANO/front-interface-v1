@@ -13,7 +13,6 @@ interface NavbarProps {
     connectWallet: () => void;
     disconnectWallet: () => void;
     network: string;
-    onNetworkChange: (network: string) => void;
     walletBalance: number;
     walletConnected: boolean;
     setBackgroundBlur: (isFocused: boolean) => void;

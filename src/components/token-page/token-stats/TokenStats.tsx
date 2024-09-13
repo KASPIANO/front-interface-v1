@@ -63,7 +63,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                         VOLUME ({tradingDataTimeFrame})
                     </Typography>
                     <Typography align="center" sx={{ fontSize: '0.9vw', fontWeight: 'bold' }}>
-                        {tokenInfo.volume ? `$${tokenInfo.volume}` : '$69,420,880'}
+                        {tokenInfo.volume ? `$${tokenInfo.volume}` : '---'}
                     </Typography>
                 </Box>
 
@@ -73,7 +73,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                         PRICE PER TOKEN ({tradingDataTimeFrame})
                     </Typography>
                     <Typography align="center" sx={{ fontSize: '0.9vw', fontWeight: 'bold' }}>
-                        {tokenInfo.price ? `${tokenInfo.price}/SOMPI` : '69,420/SOMPI'}
+                        {tokenInfo.price ? `${tokenInfo.price}/SOMPI` : '---'}
                     </Typography>
                 </Box>
                 <Divider orientation="vertical" flexItem />

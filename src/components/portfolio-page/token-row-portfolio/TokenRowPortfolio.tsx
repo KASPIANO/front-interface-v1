@@ -18,7 +18,7 @@ import {
 import { FC, useState } from 'react';
 import { mintKRC20Token, transferKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
-import { TokenRowPortfolioItem } from '../../../types/Types';
+import { TokenRowPortfolioItem, TransferObj } from '../../../types/Types';
 import { capitalizeFirstLetter } from '../../../utils/Utils';
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -73,16 +73,18 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
             return;
         }
 
-        const inscribeJsonString = JSON.stringify({
+        const inscribeJsonString: TransferObj = {
             p: 'KRC-20',
             op: 'transfer',
             tick: currentTicker,
             amt: (parseInt(amount) * 100000000).toString(),
             to: destAddress,
-        });
+        };
+        const jsonStringified = JSON.stringify(inscribeJsonString);
+
         try {
             setWalletConfirmation(true);
-            const result = await transferKRC20Token(inscribeJsonString);
+            const result = await transferKRC20Token(jsonStringified);
             setWalletConfirmation(false);
             if (result) {
                 const { commit, reveal } = JSON.parse(result);

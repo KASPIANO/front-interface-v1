@@ -3,7 +3,7 @@ import { Box, Avatar, Typography, Button, useTheme } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { ProfileContainer, ProfileDetails } from './UserProfile.s';
 import { PortfolioValue } from '../../../types/Types';
-import XIcon from '@mui/icons-material/X';
+// import XIcon from '@mui/icons-material/X';
 import { shortenAddress } from '../../../utils/Utils';
 import { Stat, StatArrow, StatHelpText, StatNumber } from '@chakra-ui/react';
 
@@ -44,9 +44,9 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         >
                             {walletAddress ? shortenAddress(walletAddress) : 'Connect Wallet'}
                         </Button>
-                        <Button variant="outlined" endIcon={<XIcon />}>
+                        {/* <Button variant="outlined" endIcon={<XIcon />}>
                             Add
-                        </Button>
+                        </Button> */}
                         {/* <Button
                             variant="outlined"
                             size="small"
@@ -58,7 +58,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                 </ProfileDetails>
             </Box>
             <Stat sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                <StatHelpText sx={{ fontSize: '1.2vw', fontWeight: 400 }}>Portfolio Value</StatHelpText>
+                <StatHelpText sx={{ fontSize: '1.2vw', fontWeight: 400 }}>Portfolio Value - Mock</StatHelpText>
                 <StatNumber sx={{ fontSize: '2.5vw', fontWeight: 700, display: 'flex', alignItems: 'center' }}>
                     {portfolioValue.kas}
                     <Typography sx={{ marginLeft: '0.2vw', fontSize: '2vw', fontWeight: 400, opacity: 0.5 }}>

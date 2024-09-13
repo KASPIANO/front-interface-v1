@@ -81,16 +81,16 @@ const App = () => {
         [updateWalletState, resetWalletState],
     );
 
-    const handleNetworkChanged = useCallback((newNetwork) => {
-        setNetwork(newNetwork);
-    }, []);
-
     const handleDisconnect = useCallback(async () => {
         const { origin } = window.location;
         await disconnect(origin);
         resetWalletState();
         showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
     }, [resetWalletState]);
+
+    const handleNetworkChanged = useCallback(async () => {
+        handleDisconnect();
+    }, [handleDisconnect]);
 
     useEffect(() => {
         if (isKasWareInstalled()) {
@@ -141,13 +141,13 @@ const App = () => {
             // Check if KasWare is installed
             if (isKasWareInstalled()) {
                 // Request accounts from the wallet
+                await handleNetworkByEnvironment();
                 const accounts = await requestAccounts();
 
                 // Check if any accounts were returned
                 if (accounts.length > 0) {
                     // Update wallet state with the first account
                     await updateWalletState(accounts[0]);
-                    await handleNetworkByEnvironment();
                     // Show a success message with part of the wallet address
                     showGlobalSnackbar({
                         message: 'Wallet connected successfully',
@@ -298,7 +298,6 @@ Request ID: ${requestId}
                             walletConnected={walletConnected}
                             walletAddress={walletAddress}
                             network={network}
-                            onNetworkChange={handleNetworkChange}
                             walletBalance={walletBalance}
                             connectWallet={handleConnectWallet}
                             disconnectWallet={handleDisconnect}

@@ -69,6 +69,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
             });
         }
     };
+
     const limitPerMint = tokenInfo.mintLimit;
     return (
         <Card
