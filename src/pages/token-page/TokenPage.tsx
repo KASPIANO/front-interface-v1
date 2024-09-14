@@ -33,7 +33,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const [recalculateRugScoreLoading, setRecalculateRugScoreLoading] = useState(false);
 
     const fetchAndUpdateTokenInfo = useCallback(
-        async (refresh: boolean) => {
+        async (refresh?: boolean) => {
             try {
                 const updatedTokenData = await fetchTokenByTicker(ticker, walletAddress, refresh);
                 setTokenInfo(updatedTokenData);
