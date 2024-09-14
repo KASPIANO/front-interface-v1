@@ -33,7 +33,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const [recalculateRugScoreLoading, setRecalculateRugScoreLoading] = useState(false);
 
     const fetchAndUpdateTokenInfo = useCallback(
-        async (refresh: boolean) => {
+        async (refresh?: boolean) => {
             try {
                 const updatedTokenData = await fetchTokenByTicker(ticker, walletAddress, refresh);
                 setTokenInfo(updatedTokenData);
@@ -56,7 +56,6 @@ const TokenPage: FC<TokenPageProps> = (props) => {
 
     useEffect(() => {
         // Fetch the token info immediately on component mount
-        fetchAndUpdateTokenInfo(true);
 
         // Set up the interval to update token info every 15 seconds
         const interval = setInterval(fetchAndUpdateTokenInfo, 15000);
