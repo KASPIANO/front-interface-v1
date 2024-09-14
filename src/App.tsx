@@ -355,7 +355,7 @@ Request ID: ${requestId}
                                 }
                             />
                             <Route
-                                path="/batch-transfer"
+                                path="/airdrop"
                                 element={
                                     <BatchTransferPage
                                         walletBalance={walletBalance}

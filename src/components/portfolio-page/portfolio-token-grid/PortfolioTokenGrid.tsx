@@ -1,10 +1,11 @@
 import { Box, List, Table, TableCell, TableHead, TableRow } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { TokenRowPortfolioItem } from '../../../types/Types';
 import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 import { StyledPortfolioGridContainer } from './PortfolioTokenGrid.s';
 import TokenRowPortfolio from '../token-row-portfolio/TokenRowPortfolio';
+import { PrevPageButton, NextPageButton } from '../../krc-20-page/grid-title-sort/GridTitle.s';
 
 interface PortfolioTokenGridProps {
     tokensList: TokenRowPortfolioItem[];
@@ -13,6 +14,8 @@ interface PortfolioTokenGridProps {
     isLoading: boolean;
     walletBalance: number;
     handleChange: () => void;
+    lastPortfolioPage: boolean;
+    handlePortfolioPagination: (direction: 'next' | 'prev') => void;
 }
 
 enum GridHeaders {
@@ -22,13 +25,31 @@ enum GridHeaders {
 }
 
 const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
-    const { tokensList, kasPrice, walletConnected, walletBalance, handleChange } = props;
+    const {
+        tokensList,
+        kasPrice,
+        walletConnected,
+        walletBalance,
+        handleChange,
+        lastPortfolioPage,
+        handlePortfolioPagination,
+    } = props;
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const handlePrevPage = () => {
+        setCurrentPage(currentPage - 1);
+        handlePortfolioPagination('prev');
+    };
 
+    const handleNextPage = () => {
+        setCurrentPage(currentPage + 1);
+        handlePortfolioPagination('next');
+    };
     const tableHeader = (
         <Box
             sx={{
                 height: '8vh',
                 alignContent: 'center',
+                display: 'flex',
                 borderBottom: '0.1px solid rgba(111, 199, 186, 0.3)',
             }}
         >
@@ -41,6 +62,14 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
                     </TableRow>
                 </TableHead>
             </Table>
+            <Box sx={{ display: 'flex', alignItems: 'center', mr: '2vw' }}>
+                <PrevPageButton onClick={handlePrevPage} disabled={currentPage === 1}>
+                    Prev
+                </PrevPageButton>
+                <NextPageButton onClick={handleNextPage} disabled={lastPortfolioPage}>
+                    Next
+                </NextPageButton>
+            </Box>
         </Box>
     );
 

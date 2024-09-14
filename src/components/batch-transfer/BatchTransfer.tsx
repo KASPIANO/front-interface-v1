@@ -129,7 +129,6 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     const clearFields = () => {
         setTicker('');
         setAmount('');
-        setTxid('');
         setPaymentMade(false);
         setPaymentTxnId(null);
         setErrorAmount(false);

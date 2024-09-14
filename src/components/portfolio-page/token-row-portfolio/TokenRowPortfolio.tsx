@@ -21,6 +21,7 @@ import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { TokenRowPortfolioItem, TransferObj } from '../../../types/Types';
 import { capitalizeFirstLetter } from '../../../utils/Utils';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useNavigate } from 'react-router-dom';
 
 interface TokenRowPortfolioProps {
     token: TokenRowPortfolioItem;
@@ -38,6 +39,8 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
     const [amount, setAmount] = useState('');
     const [error, setError] = useState('');
     const [walletConfirmation, setWalletConfirmation] = useState(false);
+
+    const navigate = useNavigate();
 
     const validatePositiveNumber = (value) => {
         // This regex allows positive numbers, including decimals, but not zero
@@ -150,6 +153,10 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
         }
     };
 
+    const handleItemClick = (token) => {
+        navigate(`/token/${token.ticker}`);
+    };
+
     const handleSetAmount = (value) => {
         // Allow empty string for clearing the input
         if (value === '') {
@@ -176,7 +183,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
 
     return (
         <div key={token.ticker}>
-            <ListItem disablePadding sx={{ height: '12vh' }}>
+            <ListItem disablePadding sx={{ height: '12vh' }} onClick={() => handleItemClick(token)}>
                 <ListItemButton>
                     <ListItemAvatar>
                         <Avatar

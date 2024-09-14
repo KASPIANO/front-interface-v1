@@ -74,11 +74,8 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                 <NavButton isActive={activePage === 'portfolio'} onClick={() => handleNavButtonClick('portfolio')}>
                     Portfolio
                 </NavButton>
-                <NavButton
-                    isActive={activePage === 'batch-transfer'}
-                    onClick={() => handleNavButtonClick('batch-transfer')}
-                >
-                    Batch
+                <NavButton isActive={activePage === 'airdrop'} onClick={() => handleNavButtonClick('airdrop')}>
+                    Airdrop
                 </NavButton>
             </NavCenter>
             <div style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}>

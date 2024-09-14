@@ -22,8 +22,11 @@ const SuccessModal: FC<SuccessModalProps> = (props) => {
         }
     }, [open, onClose]);
     const handleClose = () => {
-        navigate(`/token/${ticker}`);
-        setTicker('');
+        debugger;
+        if (ticker) {
+            navigate(`/token/${ticker}`);
+            setTicker('');
+        }
         onClose();
     };
 

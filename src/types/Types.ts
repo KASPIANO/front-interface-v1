@@ -229,6 +229,11 @@ export interface FetchWalletActivityResponse {
     next: string | null;
     prev: string | null;
 }
+export interface FetchWalletPortfolioResponse {
+    portfolioItems: TokenRowPortfolioItem[];
+    next: string | null;
+    prev: string | null;
+}
 
 export interface UTXO {
     address: string | null;

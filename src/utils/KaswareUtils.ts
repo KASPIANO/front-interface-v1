@@ -5,6 +5,11 @@ import { KaswareSendKaspaResult } from '../types/Types';
 // Utility to detect if KasWare Wallet is installed
 export const isKasWareInstalled = (): boolean => typeof window.kasware !== 'undefined';
 const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
+
+const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
+const MINT_DEPLOY_PRIORITY = 0.005;
+const MINT_DEPLOY_PRIORITY_SOMPI = MINT_DEPLOY_PRIORITY * KASPA_TO_SOMPI;
+
 // Method to request account connection
 export const requestAccounts = async (): Promise<string[]> => {
     try {
@@ -110,7 +115,7 @@ export const getBalance = async (): Promise<{ confirmed: number; unconfirmed: nu
 export const sendKaspa = async (
     toAddress: string,
     sompi: number,
-    options?: { feeRate?: number },
+    options?: { priorityFee?: number },
 ): Promise<string> => {
     try {
         const txData = await window.kasware.sendKaspa(toAddress, sompi, options);
@@ -121,7 +126,7 @@ export const sendKaspa = async (
 };
 export const sendKaspaToKaspiano = async (
     sompi: number,
-    options?: { feeRate?: number },
+    options?: { priorityFee?: number },
 ): Promise<KaswareSendKaspaResult> => {
     try {
         const txData = await window.kasware.sendKaspa(KASPIANO_WALLET, sompi, options);
@@ -155,10 +160,13 @@ export const pushTx = async (options: { rawtx: string }): Promise<string> => {
 };
 
 // Method to sign KRC20 transaction
-export const deployKRC20Token = async (inscribeJsonString: string): Promise<string> => {
+export const deployKRC20Token = async (inscribeJsonString: string, priorityFee?: number): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2);
+        if (!priorityFee) {
+            priorityFee = MINT_DEPLOY_PRIORITY_SOMPI;
+        }
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, priorityFee);
         return txid;
     } catch (error) {
         console.error('Failed to deploy KRC20 token:', error);
@@ -167,10 +175,13 @@ export const deployKRC20Token = async (inscribeJsonString: string): Promise<stri
 };
 
 // Method to mint KRC20 token
-export const mintKRC20Token = async (inscribeJsonString: string): Promise<string> => {
+export const mintKRC20Token = async (inscribeJsonString: string, priorityFee?: number): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3);
+        if (!priorityFee) {
+            priorityFee = MINT_DEPLOY_PRIORITY_SOMPI;
+        }
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, priorityFee);
         return txid;
     } catch (error) {
         console.error('Failed to mint KRC20 token:', error);

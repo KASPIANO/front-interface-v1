@@ -19,6 +19,8 @@ interface PortfolioPanelProps {
     handleActivityPagination: (direction: 'next' | 'prev') => void;
     lastActivityPage: boolean;
     handleChange: () => void;
+    lastPortfolioPage: boolean;
+    handlePortfolioPagination: (direction: 'next' | 'prev') => void;
 }
 
 const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
@@ -34,6 +36,8 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
         handleActivityPagination,
         lastActivityPage,
         handleChange,
+        lastPortfolioPage,
+        handlePortfolioPagination,
     } = props;
     const [value, setValue] = useState('1');
     // const [paidUser] = useState(false);
@@ -79,6 +83,8 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                         tokensList={tokenList}
                         kasPrice={kasPrice}
                         walletConnected={walletConnected}
+                        lastPortfolioPage={lastPortfolioPage}
+                        handlePortfolioPagination={handlePortfolioPagination}
                     />
                 </TabPanelStyled>
                 <TabPanelStyled value="2">

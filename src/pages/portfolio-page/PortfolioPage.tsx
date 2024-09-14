@@ -49,11 +49,16 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
     const [portfolioAssetTickers, setPortfolioAssetTickers] = useState<string[]>([]);
     const [portfolioAssetsActivity, setPortfolioAssetsActivity] = useState<TokenRowActivityItem[]>([]);
     const [portfolioTokenInfo, setPortfolioTokenInfo] = useState<TokenRowPortfolioItem[]>([]);
-    const [paginationKey, setPaginationKey] = useState<string | null>(null);
-    const [paginationDirection, setPaginationDirection] = useState<'next' | 'prev' | null>(null);
+    const [paginationActivityKey, setPaginationActivityKey] = useState<string | null>(null);
+    const [paginationActivityDirection, setPaginationActivityDirection] = useState<'next' | 'prev' | null>(null);
     const [activityNext, setActivityNext] = useState<string | null>(null);
     const [activityPrev, setActivityPrev] = useState<string | null>(null);
+    const [paginationPortfolioKey, setPaginationPortfolioKey] = useState<string | null>(null);
+    const [paginationPortfolioDirection, setPaginationPortfolioDirection] = useState<'next' | 'prev' | null>(null);
+    const [portfolioNext, setPortfolioNext] = useState<string | null>(null);
+    const [portfolioPrev, setPortfolioPrev] = useState<string | null>(null);
     const [lastActivityPage, setLastActivityPage] = useState<boolean>(false);
+    const [lastPortfolioPage, setLastPortfolioPage] = useState<boolean>(false);
     const [operationFinished, setOperationFinished] = useState<boolean>(false);
 
     useEffect(() => {
@@ -76,14 +81,18 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
         const fetchPortfolioData = async () => {
             setIsLoading(true);
             try {
-                const tokenData = await fetchWalletKRC20TokensBalance(walletAddress);
+                const tokenData = await fetchWalletKRC20TokensBalance(
+                    walletAddress,
+                    paginationPortfolioKey,
+                    paginationPortfolioDirection,
+                );
 
                 // Extract the tickers for later use in metadata fetch
-                const tickers = tokenData.map((token) => token.ticker);
+                const tickers = tokenData.portfolioItems.map((token) => token.ticker);
                 const tickersPortfolio = await fetchTokenPortfolio(tickers);
 
                 // Update tokenData with logo URLs
-                const updatedTokenData = tokenData.map((token) => {
+                const updatedTokenData = tokenData.portfolioItems.map((token) => {
                     const tokenInfo = tickersPortfolio.find((item) => item.ticker === token.ticker);
                     return {
                         ...token,
@@ -96,7 +105,14 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
 
                 // Set the portfolio token info state
                 setPortfolioTokenInfo(updatedTokenData);
-                console.log(updatedTokenData);
+                setPortfolioNext(tokenData.next); // Save the 'next' key for further requests
+                setPortfolioPrev(tokenData.prev); // Save the 'prev' key for further requests
+                const checkNext = await fetchWalletKRC20TokensBalance(walletAddress, tokenData.next, 'next');
+                if (checkNext.portfolioItems.length === 0) {
+                    setLastPortfolioPage(true);
+                } else {
+                    setLastPortfolioPage(false);
+                }
             } catch (error) {
                 console.error('Error fetching portfolio data:', error);
             } finally {
@@ -107,13 +123,18 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
         if (walletConnected) {
             fetchPortfolioData();
         }
-    }, [walletAddress, walletConnected, operationFinished]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [walletAddress, walletConnected, operationFinished, paginationPortfolioKey]);
 
     useEffect(() => {
         const fetchActivity = async () => {
             setIsLoadingActivity(true);
             try {
-                const activityData = await fetchWalletActivity(walletAddress, paginationKey, paginationDirection);
+                const activityData = await fetchWalletActivity(
+                    walletAddress,
+                    paginationActivityKey,
+                    paginationActivityDirection,
+                );
                 setPortfolioAssetsActivity(activityData.activityItems);
                 setActivityNext(activityData.next); // Save the 'next' key for further requests
                 setActivityPrev(activityData.prev); // Save the 'prev' key for further requests
@@ -135,15 +156,25 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [walletAddress, walletConnected, paginationKey, operationFinished]);
+    }, [walletAddress, walletConnected, paginationActivityKey, operationFinished]);
 
     const handleActivityPagination = (direction: 'next' | 'prev') => {
-        setPaginationDirection(direction);
-        setPaginationKey(direction === 'next' ? activityNext : activityPrev);
+        setPortfolioAssetsActivity([]);
+        setPaginationActivityDirection(direction);
+        setPaginationActivityKey(direction === 'next' ? activityNext : activityPrev);
+    };
+
+    const handlePortfolioPagination = (direction: 'next' | 'prev') => {
+        setPortfolioTokenInfo([]);
+        setPaginationPortfolioDirection(direction);
+        setPaginationPortfolioKey(direction === 'next' ? portfolioNext : portfolioPrev);
     };
 
     const handleChange = () => {
-        setOperationFinished((prev) => !prev);
+        setTimeout(() => {
+            setOperationFinished((prev) => !prev);
+            console.log('Operation finished', operationFinished);
+        }, 9000); // 5000 milliseconds = 5 seconds
     };
 
     return (
@@ -152,6 +183,8 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
             <PortfolioPanel
                 handleChange={handleChange}
                 handleActivityPagination={handleActivityPagination}
+                handlePortfolioPagination={handlePortfolioPagination}
+                lastPortfolioPage={lastPortfolioPage}
                 lastActivityPage={lastActivityPage}
                 walletBalance={walletBalance}
                 isLoading={isLoading}
