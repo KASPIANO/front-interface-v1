@@ -1,5 +1,5 @@
 import { Skeleton } from '@mui/material';
-import { FC, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import TokenHeader from '../../components/token-page/token-header/TokenHeader';
 import TokenSideBar from '../../components/token-page/token-sidebar/TokenSideBar';
@@ -32,24 +32,38 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const [tokenXHandle, setTokenXHandle] = useState(false);
     const [recalculateRugScoreLoading, setRecalculateRugScoreLoading] = useState(false);
 
-    useEffect(() => {
-        const fetchData = async () => {
+    const fetchAndUpdateTokenInfo = useCallback(
+        async (refresh: boolean) => {
             try {
-                const data = await fetchTokenByTicker(ticker, walletAddress);
-                setTokenInfo(data);
+                const updatedTokenData = await fetchTokenByTicker(ticker, walletAddress, refresh);
+                setTokenInfo(updatedTokenData);
             } catch (error) {
                 console.error('Error fetching token info:', error);
             }
-        };
+        },
+        [ticker, walletAddress],
+    );
 
-        fetchData();
-    }, [ticker, walletAddress]);
+    useEffect(() => {
+        fetchAndUpdateTokenInfo(false);
+    }, [fetchAndUpdateTokenInfo, ticker]);
 
     useEffect(() => {
         if (tokenInfo) {
             setTokenXHandle(!!tokenInfo.metadata.socials?.x);
         }
     }, [tokenInfo]);
+
+    useEffect(() => {
+        // Fetch the token info immediately on component mount
+        fetchAndUpdateTokenInfo(true);
+
+        // Set up the interval to update token info every 15 seconds
+        const interval = setInterval(fetchAndUpdateTokenInfo, 15000);
+
+        // Clean up the interval when the component unmounts
+        return () => clearInterval(interval);
+    }, [fetchAndUpdateTokenInfo]);
 
     const getComponentToShow = (component: JSX.Element, height?: string, width?: string) =>
         tokenInfo ? component : <Skeleton variant="rectangular" height={height} width={width} />;

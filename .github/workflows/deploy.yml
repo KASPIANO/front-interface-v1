@@ -28,6 +28,7 @@ jobs:
         echo "VITE_APP_KAS_WALLET_ADDRESS=${{ secrets.VITE_APP_KAS_WALLET_ADDRESS }}" >> .env
         echo "VITE_KASPA_API=${{ secrets.VITE_KASPA_API }}" >> .env
         echo "VITE_WEBSERVER_API_KEY=${{ secrets.VITE_WEBSERVER_API_KEY }}" >> .env
+        echo "VITE_ENV=${{ secrets.VITE_ENV }}" >> .env
 
     - name: Build React app
       run: npm run build

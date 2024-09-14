@@ -102,7 +102,7 @@ const SnackbarComponent: React.FC = () => {
                             borderRadius: '0.5rem',
                             padding: '1rem',
                             boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
-                            maxWidth: '400px',
+                            maxWidth: '600px',
                         }}
                     >
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -152,6 +152,8 @@ const SnackbarComponent: React.FC = () => {
                                         fontSize: '0.875rem',
                                         color: alertIconColors[alert.severity],
                                         opacity: 0.8,
+                                        wordBreak: 'break-all',
+                                        overflowWrap: 'break-word',
                                     }}
                                 >
                                     Commit Txn: {alert.commit.slice(0, 10)}...
@@ -168,6 +170,8 @@ const SnackbarComponent: React.FC = () => {
                                         fontSize: '0.875rem',
                                         color: alertIconColors[alert.severity],
                                         opacity: 0.8,
+                                        wordBreak: 'break-all',
+                                        overflowWrap: 'break-word',
                                     }}
                                 >
                                     Reveal Txn: {alert.reveal.slice(0, 10)}...

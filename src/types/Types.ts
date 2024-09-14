@@ -215,6 +215,7 @@ export interface TransferObj {
     op: string;
     tick: string;
     amt: string;
+    to?: string[] | string;
 }
 
 export interface TickerPortfolioBackend {
@@ -225,6 +226,11 @@ export interface TickerPortfolioBackend {
 
 export interface FetchWalletActivityResponse {
     activityItems: TokenRowActivityItem[];
+    next: string | null;
+    prev: string | null;
+}
+export interface FetchWalletPortfolioResponse {
+    portfolioItems: TokenRowPortfolioItem[];
     next: string | null;
     prev: string | null;
 }

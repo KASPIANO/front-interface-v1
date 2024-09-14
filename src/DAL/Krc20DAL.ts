@@ -1,5 +1,6 @@
 import {
     FetchWalletActivityResponse,
+    FetchWalletPortfolioResponse,
     Krc20ApiTokenResponse,
     TokenRowActivityItem,
     TokenRowPortfolioItem,
@@ -64,9 +65,17 @@ export async function fetchDevWalletBalance(ticker: string, devWallet: string): 
     return parseFloat(balance) / 1e8;
 }
 
-export async function fetchWalletKRC20Balance(address: string): Promise<TokenRowPortfolioItem[]> {
+export async function fetchWalletKRC20TokensBalance(
+    address: string,
+    paginationKey: string | null = null,
+    direction: 'next' | 'prev' | null = null,
+): Promise<FetchWalletPortfolioResponse> {
     try {
-        const response = await KRC20InfoService.get<any>(`krc20/address/${address}/tokenlist`);
+        let queryParam = '';
+        if (paginationKey && direction) {
+            queryParam = `&${direction}=${paginationKey}`;
+        }
+        const response = await KRC20InfoService.get<any>(`krc20/address/${address}/tokenlist${queryParam}`);
         const { result } = response.data;
 
         // Map the result to fit TokenRowPortfolioItem structure
@@ -76,10 +85,24 @@ export async function fetchWalletKRC20Balance(address: string): Promise<TokenRow
             logoUrl: '', // Metadata request will fill this later
         }));
 
-        return portfolioItems;
+        return {
+            portfolioItems,
+            next: response.data.next || null, // 'next' page key
+            prev: response.data.prev || null, // 'prev' page key
+        };
     } catch (error) {
         console.error('Error fetching wallet balance:', error);
-        return [];
+        return { portfolioItems: [], next: null, prev: null };
+    }
+}
+export async function fetchWalletKRC20Balance(address: string, ticker: string): Promise<number> {
+    try {
+        const response = await KRC20InfoService.get<any>(`krc20/address/${address}/token/${ticker}`);
+        const { result } = response.data;
+        return result.length > 0 ? parseInt(result[0].balance) / 1e8 : 0;
+    } catch (error) {
+        console.error('Error fetching wallet balance:', error);
+        return 0;
     }
 }
 

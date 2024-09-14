@@ -20,7 +20,7 @@ const TokenHeader: FC<TokenHeaderProps> = (props) => {
                     sx={{ height: '2vw', width: '2vw' }}
                 />
                 <Title>{tokenInfo.ticker}</Title>
-                <Rank>#26</Rank>
+                <Rank>#69</Rank>
             </TitleHeaderContainer>
             <PriceContainer>
                 <Typography sx={{ fontWeight: '700', fontSize: '0.9vw' }}>69.20/Sompi</Typography>
