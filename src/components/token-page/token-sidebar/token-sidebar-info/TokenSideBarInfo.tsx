@@ -171,7 +171,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             PRICE USD
                         </Typography>
                         <Typography variant="body2" align="center">
-                            {priceInfo ? `$${priceInfo.priceUsd}` : '$0.0003'}
+                            {priceInfo ? `$${priceInfo.priceUsd}` : '---'}
                         </Typography>
                     </StatCard>
                     <StatCard>
@@ -179,7 +179,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             PRICE
                         </Typography>
                         <Typography variant="body2" align="center">
-                            {priceInfo ? `${priceInfo.price}KAS` : '0.006KAS'}
+                            {priceInfo ? `${priceInfo.price}KAS` : '---'}
                         </Typography>
                     </StatCard>
                 </Stack>

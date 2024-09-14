@@ -1,7 +1,6 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Button, Container, Grid, IconButton, Input, Tooltip, Typography } from '@mui/material';
 import React, { FC, useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
 import ReviewListTokenDialog from '../../components/dialogs/token-info/review-list-token/ReviewListTokenDialog';
 import {
@@ -19,7 +18,14 @@ import {
     hasErrors,
     setErrorToField,
 } from '../../utils/BackendValidationErrorsHandler';
-import { convertToProtocolFormat, delay, isEmptyString, setWalletBalanceUtil } from '../../utils/Utils';
+import {
+    checkTokenDeployment,
+    convertToProtocolFormat,
+    delay,
+    isEmptyString,
+    isEmptyStringOrArray,
+    setWalletBalanceUtil,
+} from '../../utils/Utils';
 import {
     DeployForm,
     ImagePreview,
@@ -91,7 +97,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         null,
     );
     const [isUpadteMetadataLoading, setIsUpdateMetadataLoading] = useState(false);
-    const navigate = useNavigate();
 
     const validateTokenFullName = (name: string) => {
         const regex = /^[A-Za-z]{4,6}$/;
@@ -157,7 +162,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         try {
             const data = await fetchTokenInfo(ticker, false); // Set holders to false
             console.log(data);
-            if (data && (data.state === 'deployed' || data.state === 'ignored')) {
+            if (data && (data.state === 'deployed' || data.state === 'ignored' || data.state === 'finished')) {
                 setErrorToField(
                     formErrors,
                     setFormErrors,
@@ -275,6 +280,33 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         setShowReviewListTokenDialog(true);
     };
 
+    const handleCleanAllFields = () => {
+        setValidatedTokenName('');
+        setTotalSupply('');
+        setMintLimit('');
+        setPreAllocation('');
+        setPreAllocationPercentage('');
+        setDescription('');
+        setWebsite('');
+        setX('');
+        setDiscord('');
+        setTelegram('');
+        setWhitepaper('');
+        setMedium('');
+        setGithub('');
+        setAudit('');
+        setFoundersHandles('');
+        setContacts('');
+        setLogo(null);
+        setBanner(null);
+        setFormErrors({});
+        setTotalSupplyError(false);
+        setMintLimitError(false);
+        setPreAllocationError(false);
+        setPreAllocationPercentage('');
+        setTickerMessage('');
+    };
+
     const handleTokenListing = async (): Promise<boolean> => {
         if (!tokenMetadataDetails) return;
         console.log('Token metadata:', tokenMetadataDetails);
@@ -282,36 +314,41 @@ const DeployPage: FC<DeployPageProps> = (props) => {
 
         let currentMetadataPaymentTransactionId = updateMetadataPaymentTransactionId;
 
-        if (!currentMetadataPaymentTransactionId) {
-            if (walletBalance < VERIFICATION_FEE_KAS) {
-                showGlobalSnackbar({
-                    message: 'Insufficient funds to list token',
-                    severity: 'error',
-                });
-                return false;
-            }
-
-            const metadataUpdateFeeTransactionId = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
-
-            if (metadataUpdateFeeTransactionId) {
-                setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId);
-                currentMetadataPaymentTransactionId = metadataUpdateFeeTransactionId;
-
-                showGlobalSnackbar({
-                    message: 'Payment successful',
-                    severity: 'success',
-                });
-                const balance = await fetchWalletBalance(walletAddress);
-                setWalletBalance(setWalletBalanceUtil(balance));
-            } else {
-                showGlobalSnackbar({
-                    message: 'Payment failed',
-                    severity: 'error',
-                });
-
-                return false;
-            }
+        if (walletBalance < VERIFICATION_FEE_KAS) {
+            showGlobalSnackbar({
+                message: 'Insufficient funds to list token',
+                severity: 'error',
+            });
+            return false;
         }
+
+        let metadataUpdateFeeTransactionId = null;
+
+        try {
+            const metadataFeeTransaction = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
+
+            metadataUpdateFeeTransactionId = metadataFeeTransaction.id;
+            setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId);
+            currentMetadataPaymentTransactionId = metadataUpdateFeeTransactionId;
+
+            showGlobalSnackbar({
+                message: 'Payment successful',
+                severity: 'success',
+            });
+        } catch (error) {
+            console.log(error);
+            showGlobalSnackbar({
+                message: 'Payment failed',
+                severity: 'error',
+            });
+
+            return false;
+        }
+
+        console.log('metadataUpdateFeeTransactionId', metadataUpdateFeeTransactionId);
+
+        const balance = await fetchWalletBalance(walletAddress);
+        setWalletBalance(setWalletBalanceUtil(balance));
 
         if (currentMetadataPaymentTransactionId) {
             setIsUpdateMetadataLoading(true);
@@ -321,10 +358,11 @@ const DeployPage: FC<DeployPageProps> = (props) => {
 
             tokenDetailsForm.append('ticker', tokenKRC20Details.ticker.toUpperCase());
             tokenDetailsForm.append('walletAddress', walletAddress);
-            tokenDetailsForm.append('transactionHash', updateMetadataPaymentTransactionId);
-
+            tokenDetailsForm.append('transactionHash', currentMetadataPaymentTransactionId);
             for (const [key, value] of Object.entries(tokenMetadataDetails)) {
-                tokenDetailsForm.append(key, value as string);
+                if (value instanceof File || !isEmptyStringOrArray(value as any)) {
+                    tokenDetailsForm.append(key, value as string);
+                }
             }
 
             try {
@@ -337,17 +375,17 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     throw new Error('Failed to save token metadata');
                 }
 
-                showGlobalSnackbar({
-                    message: 'Token listed successfully',
-                    severity: 'success',
-                });
                 setShowReviewListTokenDialog(false);
                 setUpdateMetadataPaymentTransactionId(null);
 
                 setIsTokenDeployed(false);
 
                 setShowSuccessModal(true);
-
+                setIsTokenDeployed(false);
+                handleCleanAllFields();
+                setTokenMetadataDetails(null);
+                setReviewTokenData(null);
+                setTokenKRC20Details(null);
                 return true;
             } catch (error) {
                 showGlobalSnackbar({
@@ -413,7 +451,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
 
     const handleCloseSuccessModal = () => {
         setShowSuccessModal(false);
-        navigate(`/token/${tokenKRC20Details.ticker}`);
     };
 
     const handleDeploy = async () => {
@@ -449,10 +486,10 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             if (txid) {
                 setIsDeploying(false);
                 setWaitingForTokenConfirmation(true);
-                await delay(14000);
-                const token = await fetchTokenInfo(tokenKRC20Details.ticker, true);
+                await delay(17000);
+                const token = await checkTokenDeployment(tokenKRC20Details.ticker);
 
-                if (token.state === 'deployed') {
+                if (token) {
                     try {
                         await fetchTokenByTicker(tokenKRC20Details.ticker, walletAddress, true);
                     } catch (error) {
@@ -468,17 +505,17 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     });
                     const balance = await fetchWalletBalance(walletAddress);
                     setWalletBalance(setWalletBalanceUtil(balance));
-                    console.log('token', token);
 
                     console.log(inscribeJsonString);
                     console.log('Deployment successful, txid:', txid);
                 } else {
                     showGlobalSnackbar({
-                        message: 'Token deployment failed',
+                        message: "We couldn't verify the token deployment, please check the token page later",
                         severity: 'error',
                     });
                     setShowDeployDialog(false);
                     setIsDeploying(false);
+                    setWaitingForTokenConfirmation(false);
                 }
             }
         } catch (error) {
@@ -534,7 +571,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     <Grid container spacing={2}>
                         <Grid item xs={6}>
                             <TextInfoTicker
-                                label="Name of the token"
+                                label="Token Name"
                                 variant="outlined"
                                 fullWidth
                                 value={tokenName}
@@ -542,7 +579,10 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                 placeholder="e.g. KASP"
                                 InputProps={{
                                     endAdornment: (
-                                        <Tooltip placement="left" title="Token name must be 4-6 letters.">
+                                        <Tooltip
+                                            placement="left"
+                                            title="Ticker or Token Name must be 4-6 letters."
+                                        >
                                             <IconButton>
                                                 <InfoOutlinedIcon fontSize="small" />
                                             </IconButton>
@@ -555,7 +595,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                                         ? 'success'
                                         : null
                                 }
-                                focused
                                 helperText={getErrorMessage(formErrors, 'ticker') || tickerMessage}
                             />
                         </Grid>
@@ -986,7 +1025,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 </Grid>
                 <Info>
                     Note: Each deployment costs 1000 $KAS. This cannot be undone, check the ticker and the details
-                    before\ you deploy.
+                    before you deploy.
                 </Info>
             </DeployForm>
             {showDeployDialog && tokenKRC20Details && (
@@ -1006,11 +1045,17 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     onClose={() => setShowReviewListTokenDialog(false)}
                     onList={handleTokenListing}
                     tokenMetadata={tokenMetadataDetails}
-                    isPaid={updateMetadataPaymentTransactionId !== null}
                     isSavingData={isUpadteMetadataLoading}
                 />
             )}
-            {showSuccessModal && <SuccessModal open={showSuccessModal} onClose={handleCloseSuccessModal} />}
+            {showSuccessModal && (
+                <SuccessModal
+                    open={showSuccessModal}
+                    onClose={handleCloseSuccessModal}
+                    ticker={tokenName}
+                    setTicker={setTokenName}
+                />
+            )}
         </Container>
     );
 };

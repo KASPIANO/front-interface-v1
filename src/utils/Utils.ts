@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { getTxnInfo } from '../DAL/KaspaApiDal';
+import { fetchTokenInfo } from '../DAL/Krc20DAL';
 
 export enum ThemeModes {
     DARK = 'dark',
@@ -107,4 +108,29 @@ export const isEmptyStringOrArray = <T>(value: T | T[] | string): boolean => {
         return isEmptyString(value);
     }
     return !value;
+};
+
+export const checkTokenDeployment = async (ticker: string): Promise<boolean> => {
+    const maxRetries = 5;
+    let retryCount = 0;
+
+    while (retryCount < maxRetries) {
+        try {
+            console.log('Checking token deployment:', ticker, retryCount);
+            const token = await fetchTokenInfo(ticker, true); // Make API call to check token info
+
+            if (token && token.state === 'deployed') {
+                return true; // Token is deployed
+            }
+        } catch (error) {
+            console.error('Error fetching token info:', error);
+        }
+
+        retryCount++;
+        if (retryCount < maxRetries) {
+            await delay(5000); // Wait 5 seconds before the next attempt
+        }
+    }
+
+    return false; // Token was not deployed after 5 attempts
 };

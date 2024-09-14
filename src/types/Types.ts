@@ -215,6 +215,7 @@ export interface TransferObj {
     op: string;
     tick: string;
     amt: string;
+    to?: string[] | string;
 }
 
 export interface TickerPortfolioBackend {
@@ -227,4 +228,41 @@ export interface FetchWalletActivityResponse {
     activityItems: TokenRowActivityItem[];
     next: string | null;
     prev: string | null;
+}
+export interface FetchWalletPortfolioResponse {
+    portfolioItems: TokenRowPortfolioItem[];
+    next: string | null;
+    prev: string | null;
+}
+
+export interface UTXO {
+    address: string | null;
+    amount: string;
+    blockDaaScore: string;
+    isCoinbase: boolean;
+    scriptPublicKey: string;
+}
+export interface KaswareSendKaspaResultInput {
+    index: number;
+    sequence: string;
+    sigOpCount: number;
+    signatureScript: string;
+    transactionId: string;
+    utxo: UTXO;
+}
+
+export interface KaswareSendKaspaResultOutput {
+    scriptPublicKey: string;
+    value: string;
+}
+
+export interface KaswareSendKaspaResult {
+    gas: string;
+    id: string;
+    inputs: KaswareSendKaspaResultInput[];
+    lockTime: string;
+    outputs: KaswareSendKaspaResultOutput[];
+    payload: string;
+    subnetworkId: string;
+    version: number;
 }

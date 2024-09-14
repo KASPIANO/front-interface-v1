@@ -77,12 +77,9 @@ const App = () => {
                 await handleUserVerification(accounts, setUserVerified, showGlobalSnackbar);
             }
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [updateWalletState, resetWalletState],
     );
-
-    const handleNetworkChanged = useCallback((newNetwork) => {
-        setNetwork(newNetwork);
-    }, []);
 
     const handleDisconnect = useCallback(async () => {
         const { origin } = window.location;
@@ -90,6 +87,10 @@ const App = () => {
         resetWalletState();
         showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
     }, [resetWalletState]);
+
+    const handleNetworkChanged = useCallback(async () => {
+        handleDisconnect();
+    }, [handleDisconnect]);
 
     useEffect(() => {
         if (isKasWareInstalled()) {
@@ -140,13 +141,13 @@ const App = () => {
             // Check if KasWare is installed
             if (isKasWareInstalled()) {
                 // Request accounts from the wallet
+                await handleNetworkByEnvironment();
                 const accounts = await requestAccounts();
 
                 // Check if any accounts were returned
                 if (accounts.length > 0) {
                     // Update wallet state with the first account
                     await updateWalletState(accounts[0]);
-                    await handleNetworkByEnvironment();
                     // Show a success message with part of the wallet address
                     showGlobalSnackbar({
                         message: 'Wallet connected successfully',
@@ -276,10 +277,11 @@ Request ID: ${requestId}
         } catch (error) {
             console.error('Error verifying user:', error);
             showGlobalSnackbar({
-                message: 'Failed to verify user',
+                message: 'Failed to verify user - Connect Again',
                 severity: 'error',
                 details: error.message,
             });
+            resetWalletState();
             return null;
         }
     };
@@ -296,7 +298,6 @@ Request ID: ${requestId}
                             walletConnected={walletConnected}
                             walletAddress={walletAddress}
                             network={network}
-                            onNetworkChange={handleNetworkChange}
                             walletBalance={walletBalance}
                             connectWallet={handleConnectWallet}
                             disconnectWallet={handleDisconnect}
@@ -354,7 +355,7 @@ Request ID: ${requestId}
                                 }
                             />
                             <Route
-                                path="/batch-transfer"
+                                path="/airdrop"
                                 element={
                                     <BatchTransferPage
                                         walletBalance={walletBalance}
