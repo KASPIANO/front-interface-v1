@@ -3,7 +3,6 @@ import {
     FetchWalletPortfolioResponse,
     Krc20ApiTokenResponse,
     TokenRowActivityItem,
-    TokenRowPortfolioItem,
 } from '../types/Types';
 import { KRC20InfoService } from './AxiosInstaces';
 
