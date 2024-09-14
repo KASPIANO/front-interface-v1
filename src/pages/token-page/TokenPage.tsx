@@ -56,7 +56,6 @@ const TokenPage: FC<TokenPageProps> = (props) => {
 
     useEffect(() => {
         // Fetch the token info immediately on component mount
-        fetchAndUpdateTokenInfo(true);
 
         // Set up the interval to update token info every 15 seconds
         const interval = setInterval(fetchAndUpdateTokenInfo, 15000);
