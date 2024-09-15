@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Box, Button, Card, Tooltip, Typography } from '@mui/material';
 import { BackendTokenResponse } from '../../../types/Types';
 import { getCurrentAccount, mintKRC20Token } from '../../../utils/KaswareUtils';
@@ -19,10 +19,29 @@ interface MintingComponentProps {
 const MintingComponent: FC<MintingComponentProps> = (props) => {
     const { tokenInfo, walletConnected, walletBalance, setWalletBalance, setTokenInfo, walletAddress } = props;
     // Calculate the total mints possible and mints left
+    const [mintSuccessful, setMintSuccessful] = useState(false);
     const totalMintableSupply = tokenInfo.totalSupply - tokenInfo.preMintedSupply;
     const totalMintsPossible = Math.floor(totalMintableSupply / tokenInfo.mintLimit);
     const mintsLeft = totalMintsPossible - tokenInfo.totalMintTimes;
     const isMintingDisabled = tokenInfo.totalMinted >= tokenInfo.totalSupply;
+
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            try {
+                const account = await getCurrentAccount();
+                const updatedTokenData = await fetchTokenByTicker(tokenInfo.ticker, walletAddress, false);
+                const balance = await fetchWalletBalance(account);
+                setWalletBalance(setWalletBalanceUtil(balance));
+                setTokenInfo(updatedTokenData);
+            } catch (error) {
+                console.error('Error updating data after mint:', error);
+            }
+        }, 10000); // 10000 milliseconds = 10 seconds
+
+        // Cleanup function to clear the timeout if the component unmounts
+        return () => clearTimeout(timer);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [mintSuccessful]);
 
     const handleMint = async (ticker: string) => {
         if (!walletConnected) {
@@ -57,11 +76,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                     reveal,
                 });
             }
-            const account = await getCurrentAccount();
-            const updatedTokenData = await fetchTokenByTicker(ticker, walletAddress, false);
-            const balance = await fetchWalletBalance(account);
-            setWalletBalance(setWalletBalanceUtil(balance));
-            setTokenInfo(updatedTokenData);
+            setMintSuccessful((prev) => !prev);
         } catch (error) {
             showGlobalSnackbar({
                 message: 'Token minting failed',
