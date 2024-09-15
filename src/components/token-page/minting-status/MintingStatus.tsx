@@ -24,6 +24,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
     const totalMintsPossible = Math.floor(totalMintableSupply / tokenInfo.mintLimit);
     const mintsLeft = totalMintsPossible - tokenInfo.totalMintTimes;
     const isMintingDisabled = tokenInfo.totalMinted >= tokenInfo.totalSupply;
+    const isSoldOut = tokenInfo.state === 'finished';
 
     useEffect(() => {
         if (mintSuccessful) {
@@ -159,7 +160,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                                 fontSize: '0.8vw',
                                 width: '100%',
                             }}
-                            disabled={isMintingDisabled || !walletConnected || walletBalance < 1}
+                            disabled={isMintingDisabled || !walletConnected || walletBalance < 1 || isSoldOut}
                         >
                             {isMintingDisabled ? 'Sold Out' : 'Mint'}
                         </Button>

@@ -36,6 +36,7 @@ export interface BackendTokenResponse {
     totalTrades: number;
     volume?: number;
     price?: number;
+    state: string;
 }
 
 export interface BackendTokenMetadata {
@@ -62,6 +63,7 @@ export interface TokenListItemResponse {
     bannerUrl: string;
     changeTotalMints: number;
     changeTotalHolders: number;
+    state: string;
 }
 export interface TokenSearchItems {
     ticker: string;
