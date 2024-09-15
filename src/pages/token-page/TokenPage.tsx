@@ -58,7 +58,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         // Fetch the token info immediately on component mount
 
         // Set up the interval to update token info every 15 seconds
-        const interval = setInterval(fetchAndUpdateTokenInfo, 15000);
+        const interval = setInterval(fetchAndUpdateTokenInfo, 30000);
 
         // Clean up the interval when the component unmounts
         return () => clearInterval(interval);
