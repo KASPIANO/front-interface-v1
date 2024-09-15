@@ -58,7 +58,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                 });
             }
             const account = await getCurrentAccount();
-            const updatedTokenData = await fetchTokenByTicker(ticker, walletAddress, true);
+            const updatedTokenData = await fetchTokenByTicker(ticker, walletAddress, false);
             const balance = await fetchWalletBalance(account);
             setWalletBalance(setWalletBalanceUtil(balance));
             setTokenInfo(updatedTokenData);
