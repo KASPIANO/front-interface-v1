@@ -198,7 +198,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             </Typography>
                         }
                     />
-                    {token.preMintedSupply < token.totalSupply ? (
+                    {token.state !== 'finished' ? (
                         <ListItemText
                             sx={{ maxWidth: '10%', display: 'flex', justifyContent: 'center' }}
                             primary={
@@ -211,7 +211,6 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                                         width: '3vw',
                                         fontSize: '0.8vw',
                                     }}
-                                    disabled={token.preMintedSupply >= token.totalSupply}
                                 >
                                     Mint
                                 </Button>

@@ -62,6 +62,7 @@ export interface TokenListItemResponse {
     bannerUrl: string;
     changeTotalMints: number;
     changeTotalHolders: number;
+    state: string;
 }
 export interface TokenSearchItems {
     ticker: string;
