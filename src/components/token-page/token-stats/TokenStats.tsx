@@ -34,7 +34,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         setTradingDataTimeFrame(value);
     };
 
-    const totalMintedDataToShow = `${(tokenInfo.totalMintedPercent * 100).toFixed(3)}%`;
+    const totalMintedDataToShow = `${(tokenInfo.totalMintedPercent * 100).toFixed(8)}%`;
     return (
         <Card sx={{ height: '20vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
