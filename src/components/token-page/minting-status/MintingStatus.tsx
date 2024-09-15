@@ -26,20 +26,23 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
     const isMintingDisabled = tokenInfo.totalMinted >= tokenInfo.totalSupply;
 
     useEffect(() => {
-        const timer = setTimeout(async () => {
-            try {
-                const account = await getCurrentAccount();
-                const updatedTokenData = await fetchTokenByTicker(tokenInfo.ticker, walletAddress, true);
-                const balance = await fetchWalletBalance(account);
-                setWalletBalance(setWalletBalanceUtil(balance));
-                setTokenInfo(updatedTokenData);
-            } catch (error) {
-                console.error('Error updating data after mint:', error);
-            }
-        }, 10000); // 10000 milliseconds = 10 seconds
+        if (mintSuccessful) {
+            const timer = setTimeout(async () => {
+                try {
+                    const account = await getCurrentAccount();
+                    const updatedTokenData = await fetchTokenByTicker(tokenInfo.ticker, walletAddress, true);
+                    const balance = await fetchWalletBalance(account);
+                    setWalletBalance(setWalletBalanceUtil(balance));
+                    setTokenInfo(updatedTokenData);
+                    setMintSuccessful(false);
+                } catch (error) {
+                    console.error('Error updating data after mint:', error);
+                }
+            }, 10000); // 10000 milliseconds = 10 seconds
 
-        // Cleanup function to clear the timeout if the component unmounts
-        return () => clearTimeout(timer);
+            // Cleanup function to clear the timeout if the component unmounts
+            return () => clearTimeout(timer);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mintSuccessful]);
 
@@ -76,7 +79,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                     reveal,
                 });
             }
-            setMintSuccessful((prev) => !prev);
+            setMintSuccessful(true);
         } catch (error) {
             showGlobalSnackbar({
                 message: 'Token minting failed',
