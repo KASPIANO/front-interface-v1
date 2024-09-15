@@ -36,6 +36,7 @@ export interface BackendTokenResponse {
     totalTrades: number;
     volume?: number;
     price?: number;
+    state: string;
 }
 
 export interface BackendTokenMetadata {
