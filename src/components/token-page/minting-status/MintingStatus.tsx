@@ -162,7 +162,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                             }}
                             disabled={isMintingDisabled || !walletConnected || walletBalance < 1 || isSoldOut}
                         >
-                            {isMintingDisabled ? 'Sold Out' : 'Mint'}
+                            {isMintingDisabled || isSoldOut ? 'Sold Out' : 'Mint'}
                         </Button>
                     </span>
                 </Tooltip>
