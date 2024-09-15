@@ -107,10 +107,10 @@ const App = () => {
     }, [handleAccountsChanged, handleNetworkChanged, handleDisconnect]);
 
     useEffect(() => {
-        if (walletAddress && walletBalance === 0) {
+        if (walletAddress) {
             fetchWalletBalance(walletAddress).then((balance) => setWalletBalance(setWalletBalanceUtil(balance)));
         }
-    }, [walletAddress, walletBalance]);
+    }, [walletAddress, walletBalance, network]);
 
     useEffect(() => {
         const checkExistingConnection = async () => {
@@ -208,6 +208,7 @@ const App = () => {
                 severity: 'error',
             });
             const reject = await switchNetwork(currentEnv);
+
             if (!reject) {
                 await handleDisconnect();
             } else {
