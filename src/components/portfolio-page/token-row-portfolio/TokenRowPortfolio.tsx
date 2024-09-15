@@ -203,7 +203,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
 
                     <ListItemText
                         sx={{
-                            width: '16vw',
+                            width: '14.5vw',
                         }}
                         primary={
                             <Tooltip title={token.ticker}>
