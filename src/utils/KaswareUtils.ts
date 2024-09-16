@@ -1,14 +1,15 @@
 // Ensure the WebSocket is available globally
 
+import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
 import { KaswareSendKaspaResult } from '../types/Types';
 
 // Utility to detect if KasWare Wallet is installed
 export const isKasWareInstalled = (): boolean => typeof window.kasware !== 'undefined';
 const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 
-const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
-const MINT_DEPLOY_PRIORITY = 0.005;
-const MINT_DEPLOY_PRIORITY_SOMPI = MINT_DEPLOY_PRIORITY * KASPA_TO_SOMPI;
+// const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
+// const MINT_DEPLOY_PRIORITY = 0.005;
+// const MINT_DEPLOY_PRIORITY_SOMPI = MINT_DEPLOY_PRIORITY * KASPA_TO_SOMPI;
 
 // Method to request account connection
 export const requestAccounts = async (): Promise<string[]> => {
@@ -163,8 +164,12 @@ export const pushTx = async (options: { rawtx: string }): Promise<string> => {
 export const deployKRC20Token = async (inscribeJsonString: string, priorityFee?: number): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        if (!priorityFee) {
-            priorityFee = MINT_DEPLOY_PRIORITY_SOMPI;
+        if (true) {
+            showGlobalSnackbar({
+                message: 'Deploy disabled',
+                severity: 'error',
+            });
+            return;
         }
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, priorityFee);
         return txid;
@@ -178,8 +183,12 @@ export const deployKRC20Token = async (inscribeJsonString: string, priorityFee?:
 export const mintKRC20Token = async (inscribeJsonString: string, priorityFee?: number): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        if (!priorityFee) {
-            priorityFee = MINT_DEPLOY_PRIORITY_SOMPI;
+        if (true) {
+            showGlobalSnackbar({
+                message: 'Minting disabled',
+                severity: 'error',
+            });
+            return;
         }
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, priorityFee);
         return txid;
@@ -193,6 +202,13 @@ export const mintKRC20Token = async (inscribeJsonString: string, priorityFee?: n
 export const transferKRC20Token = async (inscribeJsonString: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
+        if (true) {
+            showGlobalSnackbar({
+                message: 'Transfer disabled',
+                severity: 'error',
+            });
+            return;
+        }
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4);
         return txid;
     } catch (error) {

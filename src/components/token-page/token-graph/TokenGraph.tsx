@@ -67,6 +67,7 @@ const RealTimeGraph: React.FC<RealTimeGraphProps> = ({ newDates, newPrices }) =>
                     },
                 ]}
                 layout={{
+                    title: 'Token Price Chart - Mock',
                     paper_bgcolor: theme.palette.background.paper,
                     plot_bgcolor: theme.palette.background.paper,
 
