@@ -14,6 +14,7 @@ import { fetchTokenByTicker, fetchTokenPrice, recalculateRugScore } from '../../
 import { AxiosError } from 'axios';
 import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
 import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
+import { use } from 'echarts';
 
 interface TokenPageProps {
     walletAddress: string | null;
@@ -50,6 +51,11 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         // Clean up the interval when the component unmounts
         return () => clearInterval(interval);
     }, []);
+
+    useEffect(() => {
+        fetchTokenPrice(tokenInfo.ticker).then((newPrice) => setTokenKasPrice(newPrice));
+        kaspaLivePrice().then((newPrice) => setkasPrice(newPrice));
+    }, [tokenInfo.ticker]);
 
     useEffect(() => {
         const fetchPrice = async () => {
@@ -94,6 +100,10 @@ const TokenPage: FC<TokenPageProps> = (props) => {
 
         // Clean up the interval when the component unmounts
         return () => clearInterval(interval);
+    }, [fetchAndUpdateTokenInfo, ticker]);
+
+    useEffect(() => {
+        fetchAndUpdateTokenInfo(false);
     }, [fetchAndUpdateTokenInfo, ticker]);
 
     const getComponentToShow = (component: JSX.Element, height?: string, width?: string) =>
