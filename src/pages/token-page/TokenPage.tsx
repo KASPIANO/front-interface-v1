@@ -14,7 +14,6 @@ import { fetchTokenByTicker, fetchTokenPrice, recalculateRugScore } from '../../
 import { AxiosError } from 'axios';
 import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
 import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
-import { use } from 'echarts';
 
 interface TokenPageProps {
     walletAddress: string | null;
