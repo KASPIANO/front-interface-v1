@@ -52,11 +52,6 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     }, []);
 
     useEffect(() => {
-        fetchTokenPrice(tokenInfo.ticker).then((newPrice) => setTokenKasPrice(newPrice));
-        kaspaLivePrice().then((newPrice) => setkasPrice(newPrice));
-    }, [tokenInfo.ticker]);
-
-    useEffect(() => {
         const fetchPrice = async () => {
             const newPrice = await fetchTokenPrice(tokenInfo.ticker);
             setTokenKasPrice(newPrice);
@@ -93,16 +88,13 @@ const TokenPage: FC<TokenPageProps> = (props) => {
 
     useEffect(() => {
         // Fetch the token info immediately on component mount
+        fetchAndUpdateTokenInfo(false);
 
-        // Set up the interval to update token info every 15 seconds
+        // Set up the interval to update token info every 30 seconds
         const interval = setInterval(() => fetchAndUpdateTokenInfo(false), 30000);
 
         // Clean up the interval when the component unmounts
         return () => clearInterval(interval);
-    }, [fetchAndUpdateTokenInfo, ticker]);
-
-    useEffect(() => {
-        fetchAndUpdateTokenInfo(false);
     }, [fetchAndUpdateTokenInfo, ticker]);
 
     const getComponentToShow = (component: JSX.Element, height?: string, width?: string) =>
