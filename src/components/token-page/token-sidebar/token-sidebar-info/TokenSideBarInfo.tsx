@@ -33,14 +33,24 @@ interface TokenSideBarInfoProps {
     walletConnected: boolean;
     walletBalance: number;
     setWalletBalance: (balance: number) => void;
+    kasPrice: number;
+    tokenKasPrice: number;
 }
 
 // const mockBanner =
 //     'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Full-Color.png';
 
 const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
-    const { tokenInfo, setTokenInfo, priceInfo, walletAddress, walletConnected, walletBalance, setWalletBalance } =
-        props;
+    const {
+        tokenInfo,
+        setTokenInfo,
+        walletAddress,
+        walletConnected,
+        walletBalance,
+        setWalletBalance,
+        tokenKasPrice,
+        kasPrice,
+    } = props;
     const [showTokenInfoDialog, setShowTokenInfoDialog] = useState(false);
     const [showSentimentLoader, setShowSentimentLoader] = useState(false);
     const [selectedSentiment, setSelectedSentiment] = useState<string>(null);
@@ -54,6 +64,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         { key: 'negative', icon: <TrendingDownRounded sx={{ fontSize: '1.4vw' }} color="error" /> },
         { key: 'warning', icon: <WarningAmberRoundedIcon sx={{ fontSize: '1.4vw' }} color="warning" /> },
     ];
+
     useEffect(() => {
         setSocials((prevSocials) => {
             if (tokenInfo.metadata?.socials) {
@@ -106,6 +117,10 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
     const handleShowTokenInfoDialog = () => {
         setShowTokenInfoDialog(true);
     };
+
+    const tokenPriceDollars = tokenKasPrice ? (tokenKasPrice * kasPrice).toFixed(7) : null;
+    const tokenKasPriceFixed = tokenKasPrice ? tokenKasPrice.toFixed(7) : null;
+    const usdMarketCap = tokenInfo.totalSupply * (tokenKasPrice * kasPrice);
 
     const preMintedSupplyPercentage = (tokenInfo.preMintedSupply / tokenInfo.totalSupply) * 100;
 
@@ -171,7 +186,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             PRICE USD
                         </Typography>
                         <Typography variant="body2" align="center">
-                            {priceInfo ? `$${priceInfo.priceUsd}` : '---'}
+                            {tokenPriceDollars ? `$${tokenPriceDollars}` : '---'}
                         </Typography>
                     </StatCard>
                     <StatCard>
@@ -179,7 +194,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             PRICE
                         </Typography>
                         <Typography variant="body2" align="center">
-                            {priceInfo ? `${priceInfo.price}KAS` : '---'}
+                            {tokenKasPriceFixed ? `${tokenKasPriceFixed} KAS` : '---'}
                         </Typography>
                     </StatCard>
                 </Stack>
@@ -206,13 +221,15 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                         <Typography variant="body2" align="center" color="text.secondary">
                             MKT CAP
                         </Typography>
-                        <Typography variant="body2" align="center">
-                            {priceInfo ? tokenInfo.totalSupply * priceInfo.liquidity : '---'}
-                        </Typography>
+                        <Tooltip title={formatNumberWithCommas(usdMarketCap)}>
+                            <Typography variant="body2" align="center">
+                                {usdMarketCap ? simplifyNumber(usdMarketCap) : '---'}
+                            </Typography>
+                        </Tooltip>
                     </StatCard>
                 </Stack>
             </Box>
-            <Box padding={'10px'}>
+            <Box padding={'10px'} sx={{ paddingTop: '5px' }}>
                 {tokenInfo.metadata?.description || tokenInfo.metadata?.socials?.x ? (
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                         <Typography variant="body2" fontWeight={500}>

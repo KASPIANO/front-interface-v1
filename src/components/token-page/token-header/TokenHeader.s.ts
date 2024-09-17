@@ -18,9 +18,8 @@ export const PriceContainer = styled(Box)({
 
 export const TitleHeaderContainer = styled(Box)({
     display: 'flex',
-    flexDirection: 'row', // Change to column to stack title elements
+    flexDirection: 'column', // Change to column to stack title elements
     alignItems: 'start',
-    gap: '0.4vw',
     justifyItems: 'center',
 });
 

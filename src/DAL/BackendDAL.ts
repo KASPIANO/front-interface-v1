@@ -196,3 +196,13 @@ export async function fetchTokenPortfolio(tickers: string[]): Promise<TickerPort
         return [];
     }
 }
+
+export const fetchTokenPrice = async (ticker: string): Promise<number> => {
+    try {
+        const response = await backendService.get<{ price: number }>(`/${KRC20CONTROLLER}/token-price/${ticker}`);
+        return response.data.price;
+    } catch (error) {
+        console.error(`Error fetching price for ${ticker}:`, error.response ? error.response.data : error.message);
+        return 0; // Return 0 in case of an error
+    }
+};
