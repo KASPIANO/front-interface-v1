@@ -203,7 +203,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
 
                     <ListItemText
                         sx={{
-                            width: '14.5vw',
+                            width: '3vw',
                         }}
                         primary={
                             <Tooltip title={token.ticker}>
@@ -215,7 +215,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                     />
 
                     <ListItemText
-                        sx={{ width: '15vw' }}
+                        sx={{ width: '14vw' }}
                         primary={
                             <Typography
                                 variant="body1"
@@ -223,7 +223,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                                     fontSize: '1.2vw',
                                     fontWeight: 'bold',
                                     display: 'flex',
-                                    justifyContent: 'start',
+                                    justifyContent: 'center',
                                 }}
                             >
                                 {token.balance}
@@ -231,7 +231,16 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                         }
                     />
 
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '2vw', width: '30vw' }}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '2vw',
+                            width: '40vw',
+                            justifyContent: 'center',
+                            paddingRight: '14vw',
+                        }}
+                    >
                         <Button
                             onClick={(event) => handleTransferClick(event, token.ticker)}
                             variant="contained"

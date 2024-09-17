@@ -5,6 +5,7 @@ import { BackendTokenResponse } from '../../../types/Types';
 
 interface TokenStatsProps {
     tokenInfo: BackendTokenResponse;
+    tokenKasPrice: number;
 }
 
 // function calculateAgeInDays(timestamp) {
@@ -23,8 +24,9 @@ interface TokenStatsProps {
 
 //     return ageInDays;
 // }
+
 const TokenStats: FC<TokenStatsProps> = (props) => {
-    const { tokenInfo } = props;
+    const { tokenInfo, tokenKasPrice } = props;
     const tradingDataTimeFramesToSelect = ['All', '1m', '1w', '1d'];
     const [tradingDataTimeFrame, setTradingDataTimeFrame] = useState(
         tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 1],
@@ -34,7 +36,8 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         setTradingDataTimeFrame(value);
     };
 
-    const totalMintedDataToShow = `${(tokenInfo.totalMintedPercent * 100).toFixed(8)}%`;
+    const totalMintedDataToShow =
+        tokenInfo.state === 'finished' ? '100%' : `${(tokenInfo.totalMintedPercent * 100).toFixed(8)}%`;
     return (
         <Card sx={{ height: '20vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -73,7 +76,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                         PRICE PER TOKEN ({tradingDataTimeFrame})
                     </Typography>
                     <Typography align="center" sx={{ fontSize: '0.9vw', fontWeight: 'bold' }}>
-                        {tokenInfo.price ? `${tokenInfo.price}/SOMPI` : '---'}
+                        {tokenKasPrice ? `${tokenKasPrice} / KAS` : '---'}
                     </Typography>
                 </Box>
                 <Divider orientation="vertical" flexItem />
