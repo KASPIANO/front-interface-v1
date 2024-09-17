@@ -53,7 +53,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
 
     useEffect(() => {
         const fetchPrice = async () => {
-            const newPrice = await fetchTokenPrice(tokenInfo.ticker);
+            const newPrice = await fetchTokenPrice(ticker);
             setTokenKasPrice(newPrice);
         };
 
