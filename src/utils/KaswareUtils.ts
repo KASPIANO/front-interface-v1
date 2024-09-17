@@ -1,6 +1,6 @@
 // Ensure the WebSocket is available globally
 
-import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
+import { kaspaFeeEstimate } from '../DAL/KaspaApiDal';
 import { KaswareSendKaspaResult } from '../types/Types';
 
 // Utility to detect if KasWare Wallet is installed
@@ -10,6 +10,8 @@ const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 // const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
 // const MINT_DEPLOY_PRIORITY = 0.005;
 // const MINT_DEPLOY_PRIORITY_SOMPI = MINT_DEPLOY_PRIORITY * KASPA_TO_SOMPI;
+const TX_MASS = 0.0001;
+const MIN_TX_MASS = 0.00001;
 
 // Method to request account connection
 export const requestAccounts = async (): Promise<string[]> => {
@@ -125,6 +127,8 @@ export const sendKaspa = async (
         throw error;
     }
 };
+
+// PRIORITY FEE SOMPI//
 export const sendKaspaToKaspiano = async (
     sompi: number,
     options?: { priorityFee?: number },
@@ -161,16 +165,17 @@ export const pushTx = async (options: { rawtx: string }): Promise<string> => {
 };
 
 // Method to sign KRC20 transaction
-export const deployKRC20Token = async (inscribeJsonString: string, priorityFee?: number): Promise<string> => {
+// PRIORITY FEE KAS
+export const deployKRC20Token = async (inscribeJsonString: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        if (true) {
-            showGlobalSnackbar({
-                message: 'Deploy disabled',
-                severity: 'error',
-            });
-            return;
+        let priorityFee = await kaspaFeeEstimate();
+        if (priorityFee === 1) {
+            priorityFee = MIN_TX_MASS;
+        } else {
+            priorityFee = priorityFee * TX_MASS;
         }
+
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, priorityFee);
         return txid;
     } catch (error) {
@@ -180,17 +185,17 @@ export const deployKRC20Token = async (inscribeJsonString: string, priorityFee?:
 };
 
 // Method to mint KRC20 token
-export const mintKRC20Token = async (inscribeJsonString: string, priorityFee?: number): Promise<string> => {
+// PRIORITY FEE KAS
+export const mintKRC20Token = async (inscribeJsonString: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        if (true) {
-            showGlobalSnackbar({
-                message: 'Minting disabled',
-                severity: 'error',
-            });
-            return;
+        let priorityFee = await kaspaFeeEstimate();
+        if (priorityFee === 1) {
+            priorityFee = MIN_TX_MASS;
+        } else {
+            priorityFee = priorityFee * TX_MASS;
         }
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, priorityFee);
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, 8);
         return txid;
     } catch (error) {
         console.error('Failed to mint KRC20 token:', error);
@@ -199,17 +204,17 @@ export const mintKRC20Token = async (inscribeJsonString: string, priorityFee?: n
 };
 
 // Method to transfer KRC20 token
+// PRIORITY FEE KAS
 export const transferKRC20Token = async (inscribeJsonString: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        if (true) {
-            showGlobalSnackbar({
-                message: 'Transfer disabled',
-                severity: 'error',
-            });
-            return;
+        let priorityFee = await kaspaFeeEstimate();
+        if (priorityFee === 1) {
+            priorityFee = MIN_TX_MASS;
+        } else {
+            priorityFee = priorityFee * TX_MASS;
         }
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4);
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4, priorityFee);
         return txid;
     } catch (error) {
         console.error('Failed to transfer KRC20 token:', error);
