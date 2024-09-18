@@ -195,7 +195,7 @@ export const mintKRC20Token = async (inscribeJsonString: string): Promise<string
         } else {
             priorityFee = priorityFee * TX_MASS;
         }
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, 8);
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, 330000);
         return txid;
     } catch (error) {
         console.error('Failed to mint KRC20 token:', error);
