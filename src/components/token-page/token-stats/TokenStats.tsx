@@ -76,7 +76,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                         PRICE PER TOKEN ({tradingDataTimeFrame})
                     </Typography>
                     <Typography align="center" sx={{ fontSize: '0.9vw', fontWeight: 'bold' }}>
-                        {tokenKasPrice ? `${tokenKasPrice} / KAS` : '---'}
+                        {tokenKasPrice ? `${tokenKasPrice.toFixed(7)} / KAS` : '---'}
                     </Typography>
                 </Box>
                 <Divider orientation="vertical" flexItem />
