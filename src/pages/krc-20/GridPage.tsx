@@ -19,7 +19,7 @@ const GridPage: FC<GridPageProps> = (props) => {
     const { walletBalance, walletConnected, backgroundBlur, walletAddress } = props;
     const [timeInterval, setTimeInterval] = useState<string>('10m');
     const [totalTokensDeployed, setTotalTokensDeployed] = useState(0);
-    const [sortParams, setSortParams] = useState({ field: '', asc: false });
+    const [sortParams, setSortParams] = useState({ field: 'totalHolders', asc: true });
     const [page, setPage] = useState(0);
     const [activeHeader, setActiveHeader] = useState<string>('');
     const [changeTotalMintsDisabled, setChangeTotalMintsActive] = useState(true);
