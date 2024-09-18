@@ -149,13 +149,13 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemText
                         sx={{ maxWidth: '13%' }}
                         primary={
-                            <Tooltip title={formatNumberWithCommas(token.totalSupply)}>
+                            <Tooltip title={formatNumberWithCommas(token.marketCap)}>
                                 <Typography
                                     component={'span'}
                                     variant="body2"
                                     style={{ fontSize: '1vw', display: 'flex', justifyContent: 'flex-start' }}
                                 >
-                                    {simplifyNumber(token.totalSupply)}
+                                    {simplifyNumber(token.marketCap)}
                                 </Typography>
                             </Tooltip>
                         }

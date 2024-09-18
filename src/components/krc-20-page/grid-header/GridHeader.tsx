@@ -15,8 +15,8 @@ interface GridHeaderProps {
 
 const marginMapperByHeader = {
     Ticker: '17.5%',
-    Age: '12%',
-    Supply: '12%',
+    Age: '11%',
+    'Market Cap': '13.4%',
     Minted: '13.5%',
     Holders: '14%',
     'Fair Mint': '26%',
@@ -25,7 +25,7 @@ const marginMapperByHeader = {
 const marginLeft = {
     Ticker: '5%',
     Age: 0,
-    Supply: 0,
+    'Market Cap': 0,
     Minted: 0,
     Holders: 0,
     'Fair Mint': '0',
