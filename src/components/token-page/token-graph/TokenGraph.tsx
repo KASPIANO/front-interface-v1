@@ -3,51 +3,48 @@ import Plot from 'react-plotly.js';
 import { GraphContainer } from './TokenGraph.s';
 import { alpha, useTheme } from '@mui/material';
 
-const mockData = {
-    dates: [
-        '2024-08-01',
-        '2024-08-02',
-        '2024-08-03',
-        '2024-08-04',
-        '2024-08-05',
-        '2024-08-06',
-        '2024-08-07',
-        '2024-08-08',
-        '2024-08-09',
-        '2024-08-10',
-        '2024-08-11',
-        '2024-08-12',
-        '2024-08-13',
-        '2024-08-14',
-        '2024-08-15',
-        '2024-08-16',
-        '2024-08-17',
-    ],
-    prices: [10, 40, 90, 50, 40, 70, 60, 90, 120, 140, 150, 200, 180, 160, 140, 120, 100, 80],
-};
-interface RealTimeGraphProps {
-    newDates?: string[];
-    newPrices?: number[];
+interface PriceHistoryItem {
+    date: string;
+    price: number;
 }
 
-const RealTimeGraph: React.FC<RealTimeGraphProps> = ({ newDates, newPrices }) => {
+interface RealTimeGraphProps {
+    priceHistory: PriceHistoryItem[];
+    ticker: string;
+}
+
+const RealTimeGraph: React.FC<RealTimeGraphProps> = ({ priceHistory, ticker }) => {
     const theme = useTheme();
 
-    // Initial state set with static mock data
     const [data, setData] = useState<{ x: string[]; y: number[] }>({
-        x: mockData.dates,
-        y: mockData.prices,
+        x: [],
+        y: [],
     });
 
     useEffect(() => {
-        // Update the graph with new dates and prices if provided
-        if (newDates && newPrices) {
-            setData((prevData) => ({
-                x: [...prevData.x, ...newDates], // Append new dates to the existing dates
-                y: [...prevData.y, ...newPrices], // Append new prices to the existing prices
-            }));
+        if (priceHistory && priceHistory.length > 0) {
+            setData((prevData) => {
+                const newDates = priceHistory.map((item) => item.date);
+                const newPrices = priceHistory.map((item) => item.price);
+
+                // Find the index of the first new date
+                const startIndex =
+                    prevData.x.length > 0
+                        ? newDates.findIndex((date) => date > prevData.x[prevData.x.length - 1])
+                        : 0;
+
+                if (startIndex === -1) {
+                    // No new data points
+                    return prevData;
+                }
+
+                return {
+                    x: [...prevData.x, ...newDates.slice(startIndex)],
+                    y: [...prevData.y, ...newPrices.slice(startIndex)],
+                };
+            });
         }
-    }, [newDates, newPrices]);
+    }, [priceHistory]);
 
     return (
         <GraphContainer>
@@ -58,27 +55,34 @@ const RealTimeGraph: React.FC<RealTimeGraphProps> = ({ newDates, newPrices }) =>
                         y: data.y,
                         type: 'scatter',
                         mode: 'lines',
-                        // mode: 'lines+markers',
-                        fill: 'tozeroy', // Fill area under the line
-                        line: { color: theme.palette.primary.main }, // Line color
-                        fillcolor: alpha(theme.palette.primary.main, 0.5), // Fill color with opacity
-                        hoverinfo: 'x+y', // Disable default hoverinfo
-                        hovertemplate: '%{x|%b %d %Y}<br>%{y:.2f}<extra></extra>',
+                        fill: 'tozeroy',
+                        line: { color: theme.palette.primary.main },
+                        fillcolor: alpha(theme.palette.primary.main, 0.5),
+                        hoverinfo: 'x+y',
+                        hovertemplate: '%{x|%Y-%m-%d %H:%M:%S}<br>Price: %{y:.5f}<extra></extra>',
                     },
                 ]}
                 layout={{
-                    title: 'Token Price Chart - Mock',
+                    title: `${ticker} Price Chart`,
                     paper_bgcolor: theme.palette.background.paper,
                     plot_bgcolor: theme.palette.background.paper,
-
-                    xaxis: { automargin: true },
-                    yaxis: { title: 'Price', automargin: true },
-                    margin: { t: 35, r: 35, b: 35, l: 40 }, // Adjust margin as needed
+                    xaxis: {
+                        automargin: true,
+                        title: 'Date',
+                        tickformat: '%Y-%m-%d', // Date without seconds
+                        tickfont: { size: 10 },
+                    },
+                    yaxis: {
+                        title: 'Price',
+                        automargin: true,
+                        tickformat: '.5f',
+                    },
+                    margin: { t: 35, r: 35, b: 35, l: 40 },
                     hovermode: 'closest',
                 }}
                 style={{ width: '100%', height: '100%' }}
                 config={{
-                    displayModeBar: true, // Keep the mode bar for reset button
+                    displayModeBar: true,
                     modeBarButtonsToRemove: [
                         'pan2d',
                         'select2d',
@@ -87,9 +91,9 @@ const RealTimeGraph: React.FC<RealTimeGraphProps> = ({ newDates, newPrices }) =>
                         'zoomOut2d',
                         'autoScale2d',
                     ],
-                    displaylogo: false, // Hide the Plotly logo
+                    displaylogo: false,
                 }}
-                useResizeHandler={true} // Enable resizing with the container
+                useResizeHandler={true}
             />
         </GraphContainer>
     );
