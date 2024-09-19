@@ -22,7 +22,14 @@ interface TokenSidebarSocialsBarProps {
 const TokenSidebarSocialsBar: FC<TokenSidebarSocialsBarProps> = (props) => {
     const { options } = props;
     const openLink = (link: string) => {
-        window.open(link, '_blank', 'noopener,noreferrer');
+        // Check if the link starts with http:// or https://
+        if (!link.startsWith('http://') && !link.startsWith('https://')) {
+            // If not, assume it's a domain and prepend https://
+            link = `https://${link}`;
+        }
+
+        // Open the link in a new tab
+        window.open(link, '_blank');
     };
 
     const capitalizeFirstLetter = (string: string) => string.charAt(0).toUpperCase() + string.slice(1);
