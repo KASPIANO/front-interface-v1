@@ -8,6 +8,20 @@ export enum ThemeModes {
 }
 const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 
+export function formatPrice(price, decimals = 7) {
+    // First, format the price to the specified number of decimal places
+    let formattedPrice = Number(price).toFixed(decimals);
+
+    // Remove trailing zeros after the decimal point
+    formattedPrice = formattedPrice.replace(/\.?0+$/, '');
+
+    // If the formatted price ends with a decimal point, remove it
+    if (formattedPrice.endsWith('.')) {
+        formattedPrice = formattedPrice.slice(0, -1);
+    }
+
+    return formattedPrice;
+}
 export const getLocalThemeMode = () =>
     localStorage.getItem('theme_mode') ? (localStorage.getItem('theme_mode') as ThemeModes) : ThemeModes.DARK;
 
