@@ -10,7 +10,7 @@ import { TokenPageLayout } from './TokenPageLayout';
 import TokenGraph from '../../components/token-page/token-graph/TokenGraph';
 import RugScore from '../../components/token-page/rug-score/RugScore';
 import MintingComponent from '../../components/token-page/minting-status/MintingStatus';
-import { fetchTokenByTicker, recalculateRugScore } from '../../DAL/BackendDAL';
+import { fetchTokenByTicker, getTokenPriceHistory, recalculateRugScore } from '../../DAL/BackendDAL';
 import { AxiosError } from 'axios';
 import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
 import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
@@ -33,6 +33,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const [tokenXHandle, setTokenXHandle] = useState(false);
     const [recalculateRugScoreLoading, setRecalculateRugScoreLoading] = useState(false);
     const [kasPrice, setkasPrice] = useState(0);
+    const [priceHistory, setPriceHistory] = useState([]);
 
     useEffect(() => {
         const fetchPrice = async () => {
@@ -79,8 +80,25 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         return () => clearInterval(interval);
     }, [fetchAndUpdateTokenInfo, ticker]);
 
+    useEffect(() => {
+        if (ticker) {
+            const fetchPriceHistory = async () => {
+                const result = await getTokenPriceHistory(ticker);
+                setPriceHistory(result);
+            };
+            fetchPriceHistory();
+
+            const interval = setInterval(fetchPriceHistory, 900000);
+
+            return () => clearInterval(interval);
+        }
+    }, [ticker]);
+
+    const tokenData = tokenInfo && priceHistory.length > 0;
+
     const getComponentToShow = (component: JSX.Element, height?: string, width?: string) =>
-        tokenInfo ? component : <Skeleton variant="rectangular" height={height} width={width} />;
+        tokenData ? component : <Skeleton variant="rectangular" height={height} width={width} />;
+
     const rugScoreParse = tokenInfo?.metadata?.rugScore === 0 ? null : tokenInfo?.metadata?.rugScore;
 
     const recalculateRugScoreAndShow = async () => {
@@ -113,7 +131,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     return (
         <TokenPageLayout backgroundBlur={backgroundBlur}>
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '11.5vh')}
-            {getComponentToShow(<TokenGraph />, '35vh')}
+            {getComponentToShow(<TokenGraph priceHistory={priceHistory} ticker={tokenInfo?.ticker} />, '35vh')}
             {getComponentToShow(<TokenStats tokenInfo={tokenInfo} />)}
             {getComponentToShow(
                 <MintingComponent

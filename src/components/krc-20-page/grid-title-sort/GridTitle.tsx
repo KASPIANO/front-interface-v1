@@ -109,11 +109,17 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
                 >
                     10m
                 </SortFirstButton>
+                <SortMiddleButton selected={timeInterval === '30m'} onClick={() => handleSortChange('30m')}>
+                    30m
+                </SortMiddleButton>
                 <SortMiddleButton selected={timeInterval === '1h'} onClick={() => handleSortChange('1h')}>
                     1h
                 </SortMiddleButton>
                 <SortMiddleButton selected={timeInterval === '6h'} onClick={() => handleSortChange('6h')}>
                     6h
+                </SortMiddleButton>
+                <SortMiddleButton selected={timeInterval === '12h'} onClick={() => handleSortChange('12h')}>
+                    12h
                 </SortMiddleButton>
                 <SortMiddleButton selected={timeInterval === '1d'} onClick={() => handleSortChange('1d')}>
                     1d

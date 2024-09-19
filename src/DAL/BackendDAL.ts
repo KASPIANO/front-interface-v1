@@ -206,3 +206,14 @@ export const fetchTokenPrice = async (ticker: string): Promise<number> => {
         return 0; // Return 0 in case of an error
     }
 };
+export const getTokenPriceHistory = async (ticker: string): Promise<{ price: number; date: string }[]> => {
+    try {
+        const response = await backendService.get<{ data: { price: number; date: string }[] }>(
+            `/${KRC20CONTROLLER}/price-history/${ticker}`,
+        );
+        return response.data.data;
+    } catch (error) {
+        console.error(`Error fetching price for ${ticker}:`, error.response ? error.response.data : error.message);
+        return []; // Return empty array in case of an error
+    }
+};
