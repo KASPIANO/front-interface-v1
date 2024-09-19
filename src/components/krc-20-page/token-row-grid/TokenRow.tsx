@@ -150,13 +150,23 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         sx={{ maxWidth: '13%' }}
                         primary={
                             <Tooltip title={formatNumberWithCommas(token.marketCap)}>
-                                <Typography
-                                    component={'span'}
-                                    variant="body2"
-                                    style={{ fontSize: '1vw', display: 'flex', justifyContent: 'flex-start' }}
-                                >
-                                    {simplifyNumber(token.marketCap)}
-                                </Typography>
+                                <Stat>
+                                    <StatNumber style={{ fontSize: '1vw' }} margin="0">
+                                        {simplifyNumber(token.marketCap)}
+                                    </StatNumber>
+                                    {token.changeMarketCap !== null && (
+                                        <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
+                                            {token.changeMarketCap.toFixed(2)}%
+                                            <StatArrow
+                                                sx={{
+                                                    color: token.changeMarketCap >= 0 ? 'green' : 'red',
+                                                    marginLeft: '2px',
+                                                }}
+                                                type={token.changeMarketCap >= 0 ? 'increase' : 'decrease'}
+                                            />
+                                        </StatHelpText>
+                                    )}
+                                </Stat>
                             </Tooltip>
                         }
                     />
