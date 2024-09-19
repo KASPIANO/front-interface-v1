@@ -15,20 +15,11 @@ interface TokenSideBarProps {
     walletBalance: number;
     setWalletBalance: (balance: number) => void;
     kasPrice: number;
-    tokenKasPrice: number;
 }
 
 const TokenSideBar: FC<TokenSideBarProps> = (props) => {
-    const {
-        setTokenInfo,
-        tokenInfo,
-        walletAddress,
-        walletConnected,
-        walletBalance,
-        setWalletBalance,
-        tokenKasPrice,
-        kasPrice,
-    } = props;
+    const { setTokenInfo, tokenInfo, walletAddress, walletConnected, walletBalance, setWalletBalance, kasPrice } =
+        props;
     const [selectedSideActionTab, setSelectedSideActionTab] = useState('1');
 
     const handleTabChage = (_event: SyntheticEvent, newValue: string) => {
@@ -69,7 +60,6 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                     >
                         <TokenSideBarInfo
                             kasPrice={kasPrice}
-                            tokenKasPrice={tokenKasPrice}
                             tokenInfo={tokenInfo}
                             setTokenInfo={setTokenInfo}
                             walletConnected={walletConnected}
