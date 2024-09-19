@@ -38,6 +38,8 @@ export interface BackendTokenResponse {
     price?: number;
     state: string;
     marketCap?: number;
+    changeMarketCap?: number;
+    changePrice?: number;
 }
 
 export interface BackendTokenMetadata {
@@ -67,6 +69,8 @@ export interface TokenListItemResponse {
     state: string;
     price?: number;
     marketCap?: number;
+    changeMarketCap?: number;
+    changePrice?: number;
 }
 export interface TokenSearchItems {
     ticker: string;
