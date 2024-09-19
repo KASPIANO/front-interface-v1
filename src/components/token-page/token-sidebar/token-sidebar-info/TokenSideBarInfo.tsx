@@ -34,23 +34,14 @@ interface TokenSideBarInfoProps {
     walletBalance: number;
     setWalletBalance: (balance: number) => void;
     kasPrice: number;
-    tokenKasPrice: number;
 }
 
 // const mockBanner =
 //     'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Full-Color.png';
 
 const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
-    const {
-        tokenInfo,
-        setTokenInfo,
-        walletAddress,
-        walletConnected,
-        walletBalance,
-        setWalletBalance,
-        tokenKasPrice,
-        kasPrice,
-    } = props;
+    const { tokenInfo, setTokenInfo, walletAddress, walletConnected, walletBalance, setWalletBalance, kasPrice } =
+        props;
     const [showTokenInfoDialog, setShowTokenInfoDialog] = useState(false);
     const [showSentimentLoader, setShowSentimentLoader] = useState(false);
     const [selectedSentiment, setSelectedSentiment] = useState<string>(null);
@@ -118,11 +109,10 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         setShowTokenInfoDialog(true);
     };
 
-    const tokenPriceDollars = tokenKasPrice ? (tokenKasPrice * kasPrice).toFixed(7) : null;
-    const tokenKasPriceFixed = tokenKasPrice ? tokenKasPrice.toFixed(7) : null;
-    const usdMarketCap = tokenInfo.totalSupply * (tokenKasPrice * kasPrice);
+    const tokenPriceDollars = tokenInfo.price ? (tokenInfo.price * kasPrice).toFixed(7) : null;
 
     const preMintedSupplyPercentage = (tokenInfo.preMintedSupply / tokenInfo.totalSupply) * 100;
+    const tokenPrice = tokenInfo.price ? `${tokenInfo.price.toFixed(7)} KAS` : '---';
 
     return (
         <Box
@@ -194,7 +184,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             PRICE
                         </Typography>
                         <Typography variant="body2" align="center">
-                            {tokenKasPriceFixed ? `${tokenKasPriceFixed} KAS` : '---'}
+                            {tokenPrice}
                         </Typography>
                     </StatCard>
                 </Stack>
@@ -221,9 +211,9 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                         <Typography variant="body2" align="center" color="text.secondary">
                             MKT CAP
                         </Typography>
-                        <Tooltip title={formatNumberWithCommas(usdMarketCap)}>
+                        <Tooltip title={formatNumberWithCommas(tokenInfo.marketCap)}>
                             <Typography variant="body2" align="center">
-                                {usdMarketCap ? simplifyNumber(usdMarketCap) : '---'}
+                                {tokenInfo.marketCap ? simplifyNumber(tokenInfo.marketCap) : '---'}
                             </Typography>
                         </Tooltip>
                     </StatCard>
