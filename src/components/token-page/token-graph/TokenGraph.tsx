@@ -59,7 +59,7 @@ const RealTimeGraph: React.FC<RealTimeGraphProps> = ({ priceHistory, ticker }) =
                         line: { color: theme.palette.primary.main },
                         fillcolor: alpha(theme.palette.primary.main, 0.5),
                         hoverinfo: 'x+y',
-                        hovertemplate: '%{x|%Y-%m-%d %H:%M:%S}<br>Price: %{y:.5f}<extra></extra>',
+                        hovertemplate: '%{x|%Y-%m-%d %H:%M:%S}<br>Price: %{y:.8f}<extra></extra>',
                     },
                 ]}
                 layout={{
