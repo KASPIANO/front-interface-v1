@@ -5,7 +5,6 @@ import { BackendTokenResponse } from '../../../types/Types';
 
 interface TokenStatsProps {
     tokenInfo: BackendTokenResponse;
-    tokenKasPrice: number;
 }
 
 // function calculateAgeInDays(timestamp) {
@@ -26,7 +25,7 @@ interface TokenStatsProps {
 // }
 
 const TokenStats: FC<TokenStatsProps> = (props) => {
-    const { tokenInfo, tokenKasPrice } = props;
+    const { tokenInfo } = props;
     const tradingDataTimeFramesToSelect = ['All', '1m', '1w', '1d'];
     const [tradingDataTimeFrame, setTradingDataTimeFrame] = useState(
         tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 1],
@@ -35,6 +34,8 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
     const updateTradingDataTimeFrame = (value: string) => {
         setTradingDataTimeFrame(value);
     };
+
+    const tokenKasPrice = tokenInfo.price ? `${tokenInfo.price.toFixed(7)} / KAS` : '---';
 
     const totalMintedDataToShow =
         tokenInfo.state === 'finished' ? '100%' : `${(tokenInfo.totalMintedPercent * 100).toFixed(8)}%`;
@@ -76,7 +77,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                         PRICE PER TOKEN ({tradingDataTimeFrame})
                     </Typography>
                     <Typography align="center" sx={{ fontSize: '0.9vw', fontWeight: 'bold' }}>
-                        {tokenKasPrice ? `${tokenKasPrice} / KAS` : '---'}
+                        {tokenKasPrice}
                     </Typography>
                 </Box>
                 <Divider orientation="vertical" flexItem />

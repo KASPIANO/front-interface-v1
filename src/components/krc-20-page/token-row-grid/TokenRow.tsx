@@ -16,7 +16,13 @@ import moment from 'moment';
 import { FC } from 'react';
 import { TokenListItemResponse } from '../../../types/Types';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
-import { capitalizeFirstLetter, formatDate, formatNumberWithCommas, simplifyNumber } from '../../../utils/Utils';
+import {
+    capitalizeFirstLetter,
+    formatDate,
+    formatNumberWithCommas,
+    formatPrice,
+    simplifyNumber,
+} from '../../../utils/Utils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 
 interface TokenRowProps {
@@ -118,7 +124,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
 
                     <ListItemText
                         sx={{
-                            maxWidth: '17%',
+                            maxWidth: '14%',
                         }}
                         primary={
                             <Tooltip title="">
@@ -135,7 +141,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     />
 
                     <ListItemText
-                        sx={{ maxWidth: '13%' }}
+                        sx={{ maxWidth: '12.5%' }}
                         primary={
                             <Typography
                                 component={'span'}
@@ -149,49 +155,124 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemText
                         sx={{ maxWidth: '13%' }}
                         primary={
-                            <Tooltip title={formatNumberWithCommas(token.totalSupply)}>
-                                <Typography
-                                    component={'span'}
-                                    variant="body2"
-                                    style={{ fontSize: '1vw', display: 'flex', justifyContent: 'flex-start' }}
-                                >
-                                    {simplifyNumber(token.totalSupply)}
-                                </Typography>
+                            <Tooltip title={`${token.price} Kas`}>
+                                <Stat>
+                                    <StatNumber style={{ fontSize: '1vw' }} margin="0">
+                                        {formatPrice(token.price)}
+                                    </StatNumber>
+                                    {token.changePrice !== null && (
+                                        <StatHelpText
+                                            style={{
+                                                fontSize: '0.8vw',
+                                                display: token.changePrice === 0 ? 'none' : '',
+                                            }}
+                                            margin="0"
+                                        >
+                                            {token.changePrice.toFixed(2)}%
+                                            <StatArrow
+                                                sx={{
+                                                    color: token.changePrice >= 0 ? 'green' : 'red',
+                                                    marginLeft: '2px',
+                                                }}
+                                                type={token.changePrice >= 0 ? 'increase' : 'decrease'}
+                                            />
+                                        </StatHelpText>
+                                    )}
+                                </Stat>
                             </Tooltip>
                         }
                     />
-                    <Tooltip title="This shows the percentage of tokens minted, along with the number of mints made in the selected time interval.">
-                        <Stat maxWidth="14%" display="flex" justifyContent="flex-start">
-                            <StatNumber style={{ fontSize: '1vw' }} margin="0">
-                                {(token.totalMintedPercent * 100).toFixed(2)}%
-                            </StatNumber>
-                            <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
-                                Mints: {token.changeTotalMints}
-                                <StatArrow sx={{ color: 'green', marginLeft: '2px' }} type="increase" />
-                            </StatHelpText>
-                        </Stat>
-                    </Tooltip>
-                    <Tooltip title="This displays the total number of token holders and the change in the holder amount during the selected time interval.">
-                        <Stat maxWidth="16.5%">
-                            <StatNumber style={{ fontSize: '1vw' }} margin="0">
-                                {token.totalHolders || 0}
-                            </StatNumber>
+                    <ListItemText
+                        sx={{ maxWidth: '13.5%' }}
+                        primary={
+                            <Tooltip title={formatNumberWithCommas(token.marketCap)}>
+                                <Stat>
+                                    <StatNumber style={{ fontSize: '1vw' }} margin="0">
+                                        {simplifyNumber(token.marketCap)}
+                                    </StatNumber>
+                                    {token.changeMarketCap !== null && (
+                                        <StatHelpText
+                                            style={{
+                                                fontSize: '0.8vw',
+                                                display: token.changeMarketCap === 0 ? 'none' : '',
+                                            }}
+                                            margin="0"
+                                        >
+                                            {token.changeMarketCap.toFixed(2)}%
+                                            <StatArrow
+                                                sx={{
+                                                    color: token.changeMarketCap >= 0 ? 'green' : 'red',
+                                                    marginLeft: '2px',
+                                                }}
+                                                type={token.changeMarketCap >= 0 ? 'increase' : 'decrease'}
+                                            />
+                                        </StatHelpText>
+                                    )}
+                                </Stat>
+                            </Tooltip>
+                        }
+                    />
+                    <ListItemText
+                        sx={{ maxWidth: '14%' }}
+                        primary={
+                            <Tooltip title="This shows the percentage of tokens minted, along with the number of mints made in the selected time interval.">
+                                <Stat>
+                                    <StatNumber style={{ fontSize: '1vw' }} margin="0">
+                                        {(token.totalMintedPercent * 100).toFixed(2)}%
+                                    </StatNumber>
+                                    <StatHelpText
+                                        style={{
+                                            fontSize: '0.8vw',
+                                            display: token.changeTotalMints === 0 ? 'none' : '',
+                                        }}
+                                        margin="0"
+                                    >
+                                        Mints: {token.changeTotalMints}
+                                        <StatArrow
+                                            sx={{
+                                                color: 'green',
+                                                marginLeft: '2px',
+                                            }}
+                                            type="increase"
+                                        />
+                                    </StatHelpText>
+                                </Stat>
+                            </Tooltip>
+                        }
+                    />
+                    <ListItemText
+                        sx={{ maxWidth: '11%' }}
+                        primary={
+                            <Tooltip title="This displays the total number of token holders and the change in the holder amount during the selected time interval.">
+                                <Stat>
+                                    <StatNumber style={{ fontSize: '1vw' }} margin="0">
+                                        {token.totalHolders || 0}
+                                    </StatNumber>
 
-                            <StatHelpText style={{ fontSize: '0.8vw' }} margin="0">
-                                {token.changeTotalHolders}
-                                <StatArrow
-                                    sx={{
-                                        color: token.changeTotalHolders >= 0 ? 'green' : 'red',
-                                        marginLeft: '2px',
-                                    }}
-                                    type={token.changeTotalHolders >= 0 ? 'increase' : 'decrease'}
-                                />
-                            </StatHelpText>
-                        </Stat>
-                    </Tooltip>
+                                    <StatHelpText
+                                        style={{
+                                            fontSize: '0.8vw',
+                                            display: token.changeTotalHolders === 0 ? 'none' : '',
+                                        }}
+                                        margin="0"
+                                    >
+                                        {token.changeTotalHolders}
+                                        <StatArrow
+                                            sx={{
+                                                display: token.changeTotalHolders === 0 ? 'none' : '',
+                                                color: token.changeTotalHolders >= 0 ? 'green' : 'red',
+                                                marginLeft: '2px',
+                                            }}
+                                            type={token.changeTotalHolders >= 0 ? 'increase' : 'decrease'}
+                                        />
+                                    </StatHelpText>
+                                </Stat>
+                            </Tooltip>
+                        }
+                    />
 
                     <ListItemText
-                        sx={{ maxWidth: '13%' }}
+                        sx={{ maxWidth: '5%' }}
                         primary={
                             <Typography component={'span'} variant="body2" style={{ fontSize: '1vw' }}>
                                 {preMintedIcons(token.preMintedSupply, token.totalSupply)}

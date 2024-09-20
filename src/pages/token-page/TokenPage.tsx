@@ -10,7 +10,7 @@ import { TokenPageLayout } from './TokenPageLayout';
 import TokenGraph from '../../components/token-page/token-graph/TokenGraph';
 import RugScore from '../../components/token-page/rug-score/RugScore';
 import MintingComponent from '../../components/token-page/minting-status/MintingStatus';
-import { fetchTokenByTicker, fetchTokenPrice, recalculateRugScore } from '../../DAL/BackendDAL';
+import { fetchTokenByTicker, getTokenPriceHistory, recalculateRugScore } from '../../DAL/BackendDAL';
 import { AxiosError } from 'axios';
 import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
 import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
@@ -33,7 +33,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const [tokenXHandle, setTokenXHandle] = useState(false);
     const [recalculateRugScoreLoading, setRecalculateRugScoreLoading] = useState(false);
     const [kasPrice, setkasPrice] = useState(0);
-    const [tokenKasPrice, setTokenKasPrice] = useState(0);
+    const [priceHistory, setPriceHistory] = useState([]);
 
     useEffect(() => {
         const fetchPrice = async () => {
@@ -51,23 +51,6 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         return () => clearInterval(interval);
     }, []);
 
-    useEffect(() => {
-        const fetchPrice = async () => {
-            const newPrice = await fetchTokenPrice(tokenInfo.ticker);
-            setTokenKasPrice(newPrice);
-        };
-
-        // Fetch the price immediately when the component mounts
-        fetchPrice();
-
-        // Set up the interval to fetch the price every 10 minutes
-        const interval = setInterval(fetchPrice, 600000);
-
-        // Clean up the interval when the component unmounts
-        return () => clearInterval(interval);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     const fetchAndUpdateTokenInfo = useCallback(
         async (refresh?: boolean) => {
             try {
@@ -81,10 +64,6 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     );
 
     useEffect(() => {
-        fetchAndUpdateTokenInfo(false);
-    }, [fetchAndUpdateTokenInfo, ticker]);
-
-    useEffect(() => {
         if (tokenInfo) {
             setTokenXHandle(!!tokenInfo.metadata.socials?.x);
         }
@@ -92,16 +71,34 @@ const TokenPage: FC<TokenPageProps> = (props) => {
 
     useEffect(() => {
         // Fetch the token info immediately on component mount
+        fetchAndUpdateTokenInfo(false);
 
-        // Set up the interval to update token info every 15 seconds
-        const interval = setInterval(() => fetchAndUpdateTokenInfo(true), 30000);
+        // Set up the interval to update token info every 30 seconds
+        const interval = setInterval(() => fetchAndUpdateTokenInfo(false), 30000);
 
         // Clean up the interval when the component unmounts
         return () => clearInterval(interval);
-    }, [fetchAndUpdateTokenInfo]);
+    }, [fetchAndUpdateTokenInfo, ticker]);
+
+    useEffect(() => {
+        if (ticker) {
+            const fetchPriceHistory = async () => {
+                const result = await getTokenPriceHistory(ticker);
+                setPriceHistory(result);
+            };
+            fetchPriceHistory();
+
+            const interval = setInterval(fetchPriceHistory, 900000);
+
+            return () => clearInterval(interval);
+        }
+    }, [ticker]);
+
+    const tokenData = tokenInfo && priceHistory.length > 0;
 
     const getComponentToShow = (component: JSX.Element, height?: string, width?: string) =>
-        tokenInfo ? component : <Skeleton variant="rectangular" height={height} width={width} />;
+        tokenData ? component : <Skeleton variant="rectangular" height={height} width={width} />;
+
     const rugScoreParse = tokenInfo?.metadata?.rugScore === 0 ? null : tokenInfo?.metadata?.rugScore;
 
     const recalculateRugScoreAndShow = async () => {
@@ -134,8 +131,8 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     return (
         <TokenPageLayout backgroundBlur={backgroundBlur}>
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '11.5vh')}
-            {getComponentToShow(<TokenGraph />, '35vh')}
-            {getComponentToShow(<TokenStats tokenInfo={tokenInfo} tokenKasPrice={tokenKasPrice} />)}
+            {getComponentToShow(<TokenGraph priceHistory={priceHistory} ticker={tokenInfo?.ticker} />, '35vh')}
+            {getComponentToShow(<TokenStats tokenInfo={tokenInfo} />)}
             {getComponentToShow(
                 <MintingComponent
                     tokenInfo={tokenInfo}
@@ -165,7 +162,6 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             {/* {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)} */}
             {getComponentToShow(
                 <TokenSideBar
-                    tokenKasPrice={tokenKasPrice}
                     kasPrice={kasPrice}
                     tokenInfo={tokenInfo}
                     setTokenInfo={setTokenInfo}
