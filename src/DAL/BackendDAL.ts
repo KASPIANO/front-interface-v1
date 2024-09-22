@@ -208,8 +208,9 @@ export const fetchTokenPrice = async (ticker: string): Promise<number> => {
 };
 export const getTokenPriceHistory = async (ticker: string): Promise<{ price: number; date: string }[]> => {
     try {
+        const capitalTicker = ticker.toUpperCase();
         const response = await backendService.get<{ data: { price: number; date: string }[] }>(
-            `/${KRC20CONTROLLER}/price-history/${ticker}`,
+            `/${KRC20CONTROLLER}/price-history/${capitalTicker}`,
         );
         return response.data.data;
     } catch (error) {
