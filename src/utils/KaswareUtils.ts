@@ -11,7 +11,7 @@ const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 // const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
 // const MINT_DEPLOY_PRIORITY = 0.005;
 // const MINT_DEPLOY_PRIORITY_SOMPI = MINT_DEPLOY_PRIORITY * KASPA_TO_SOMPI;
-const TX_MASS = 0.00004;
+const TX_MASS = 0.00008;
 const MIN_TX_MASS = 0.00001;
 
 // Method to request account connection
@@ -196,7 +196,7 @@ export const mintKRC20Token = async (inscribeJsonString: string): Promise<string
         } else {
             priorityFee = priorityFee * TX_MASS;
         }
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, 330000);
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, priorityFee);
         return txid;
     } catch (error) {
         console.error('Failed to mint KRC20 token:', error);
