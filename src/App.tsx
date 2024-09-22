@@ -6,8 +6,10 @@ import { showGlobalSnackbar } from './components/alert-context/AlertContext';
 import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
 import { fetchWalletBalance } from './DAL/KaspaApiDal';
+// import useSSE from './hooks/useSSE';
 import { ThemeContext } from './main';
 import BatchTransferPage from './pages/batch-transfer-page/BatchTransferPage';
+import ContactUs from './pages/compliance/ContactUs';
 import PrivacyPolicy from './pages/compliance/PrivacyPolicy';
 import TermsOfService from './pages/compliance/TermsOfService';
 import TrustSafety from './pages/compliance/TrustSafety';
@@ -17,6 +19,7 @@ import PortfolioPage from './pages/portfolio-page/PortfolioPage';
 import TokenPage from './pages/token-page/TokenPage';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
+import { UserVerfication } from './types/Types';
 import {
     disconnect,
     getNetwork,
@@ -32,8 +35,6 @@ import {
     setWalletBalanceUtil,
     ThemeModes,
 } from './utils/Utils';
-import { UserVerfication } from './types/Types';
-import ContactUs from './pages/compliance/ContactUs';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -44,6 +45,7 @@ const App = () => {
     const [, setIsConnecting] = useState<boolean>(false);
     const [backgroundBlur, setBackgroundBlur] = useState(false);
     const [, setUserVerified] = useState<UserVerfication>(null);
+    // const events = useSSE(walletAddress);
 
     const toggleThemeMode = () => {
         const newMode = themeMode === ThemeModes.DARK ? ThemeModes.LIGHT : ThemeModes.DARK;

@@ -5,7 +5,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import { SpinningIcon } from './CustomSnackBar.s';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 
 type AlertSeverity = 'error' | 'success' | 'warning' | 'info' | 'loading';
 
@@ -159,7 +159,7 @@ const SnackbarComponent: React.FC = () => {
                                     Commit Txn: {alert.commit.slice(0, 10)}...
                                 </Typography>
                                 <IconButton size="small" onClick={() => copyToClipboard(alert.commit)}>
-                                    <ContentCopyIcon fontSize="small" />
+                                    <ContentCopyRoundedIcon fontSize="small" />
                                 </IconButton>
                             </Box>
                         )}
@@ -177,7 +177,7 @@ const SnackbarComponent: React.FC = () => {
                                     Reveal Txn: {alert.reveal.slice(0, 10)}...
                                 </Typography>
                                 <IconButton size="small" onClick={() => copyToClipboard(alert.reveal)}>
-                                    <ContentCopyIcon fontSize="small" />
+                                    <ContentCopyRoundedIcon fontSize="small" />
                                 </IconButton>
                             </Box>
                         )}
