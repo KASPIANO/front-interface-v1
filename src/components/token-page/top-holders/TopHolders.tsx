@@ -63,8 +63,6 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
         };
 
         fetchDevWalletPercentage();
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tokenInfo]);
 
     return (
