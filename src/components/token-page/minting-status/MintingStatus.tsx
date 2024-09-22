@@ -31,7 +31,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
             const timer = setTimeout(async () => {
                 try {
                     const account = await getCurrentAccount();
-                    const updatedTokenData = await fetchTokenByTicker(tokenInfo.ticker, walletAddress, false);
+                    const updatedTokenData = await fetchTokenByTicker(tokenInfo.ticker, walletAddress, true);
                     const balance = await fetchWalletBalance(account);
                     setWalletBalance(setWalletBalanceUtil(balance));
                     setTokenInfo(updatedTokenData);

@@ -17,6 +17,7 @@ interface ScoreLineProps {
 const ScoreLine: FC<ScoreLineProps> = (props) => {
     const { value, config } = props;
     const theme = useTheme();
+    const [thumbColor, setThumbColor] = useState(null);
 
     const generateGradient = (colorRanges) => {
         let gradientString = '';
@@ -41,15 +42,15 @@ const ScoreLine: FC<ScoreLineProps> = (props) => {
             const color = keys[i];
             const { start, end } = colorRanges[color];
 
-            if (value >= start && value <= end) {
+            if (value >= start && value < end) {
                 return color;
             }
         }
 
-        return keys[keys.length - 1]; // Default to the last color
+        // If no range matches, return the color of the last range
+        const lastColor = keys[keys.length - 1];
+        return value >= colorRanges[lastColor].end ? lastColor : keys[0];
     };
-
-    const [thumbColor, setThumbColor] = useState(null);
 
     useEffect(() => {
         const color = getColorByValue(value, config);
