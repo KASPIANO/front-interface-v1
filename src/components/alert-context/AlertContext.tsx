@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Snackbar, Slide, SlideProps, Box, Typography, IconButton } from '@mui/material';
@@ -6,7 +5,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import { SpinningIcon } from './CustomSnackBar.s';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 
 type AlertSeverity = 'error' | 'success' | 'warning' | 'info' | 'loading';
 
@@ -43,12 +42,9 @@ const autoHideDuration = {
     loading: null,
 };
 
-function SlideTransition(props: SlideProps) {
-    return <Slide {...props} direction="left" />;
-}
-
 let showSnackbar: (options: AlertOptions) => void;
 
+// eslint-disable-next-line react-refresh/only-export-components
 const SnackbarComponent: React.FC = () => {
     const [alert, setAlert] = React.useState<(AlertOptions & { open: boolean }) | null>(null);
     const [copied, setCopied] = React.useState(false);
@@ -57,6 +53,7 @@ const SnackbarComponent: React.FC = () => {
         setAlert({ ...options, open: true });
     };
 
+    const SlideTransition = (props: SlideProps) => <Slide {...props} direction="left" />;
     const handleClose = () => setAlert(null);
 
     const copyToClipboard = (text: string) => {
@@ -105,7 +102,7 @@ const SnackbarComponent: React.FC = () => {
                             borderRadius: '0.5rem',
                             padding: '1rem',
                             boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
-                            maxWidth: '400px',
+                            maxWidth: '600px',
                         }}
                     >
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -155,12 +152,14 @@ const SnackbarComponent: React.FC = () => {
                                         fontSize: '0.875rem',
                                         color: alertIconColors[alert.severity],
                                         opacity: 0.8,
+                                        wordBreak: 'break-all',
+                                        overflowWrap: 'break-word',
                                     }}
                                 >
                                     Commit Txn: {alert.commit.slice(0, 10)}...
                                 </Typography>
                                 <IconButton size="small" onClick={() => copyToClipboard(alert.commit)}>
-                                    <ContentCopyIcon fontSize="small" />
+                                    <ContentCopyRoundedIcon fontSize="small" />
                                 </IconButton>
                             </Box>
                         )}
@@ -171,12 +170,14 @@ const SnackbarComponent: React.FC = () => {
                                         fontSize: '0.875rem',
                                         color: alertIconColors[alert.severity],
                                         opacity: 0.8,
+                                        wordBreak: 'break-all',
+                                        overflowWrap: 'break-word',
                                     }}
                                 >
                                     Reveal Txn: {alert.reveal.slice(0, 10)}...
                                 </Typography>
                                 <IconButton size="small" onClick={() => copyToClipboard(alert.reveal)}>
-                                    <ContentCopyIcon fontSize="small" />
+                                    <ContentCopyRoundedIcon fontSize="small" />
                                 </IconButton>
                             </Box>
                         )}

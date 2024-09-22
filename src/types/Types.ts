@@ -36,6 +36,10 @@ export interface BackendTokenResponse {
     totalTrades: number;
     volume?: number;
     price?: number;
+    state: string;
+    marketCap?: number;
+    changeMarketCap?: number;
+    changePrice?: number;
 }
 
 export interface BackendTokenMetadata {
@@ -62,6 +66,11 @@ export interface TokenListItemResponse {
     bannerUrl: string;
     changeTotalMints: number;
     changeTotalHolders: number;
+    state: string;
+    price?: number;
+    marketCap?: number;
+    changeMarketCap?: number;
+    changePrice?: number;
 }
 export interface TokenSearchItems {
     ticker: string;
@@ -128,7 +137,8 @@ export interface TokenKRC20Deploy {
 export interface TokenKRC20DeployMetadata {
     description?: string;
     website?: string;
-    x?: string;
+    x: string;
+    email: string;
     discord?: string;
     telegram?: string;
     logo?: File;
@@ -214,6 +224,7 @@ export interface TransferObj {
     op: string;
     tick: string;
     amt: string;
+    to?: string[] | string;
 }
 
 export interface TickerPortfolioBackend {
@@ -234,4 +245,42 @@ export interface VerifiedUser {
     requestId: string;
     requestNonce: string;
     requestTimestamp: string;
+}
+
+export interface FetchWalletPortfolioResponse {
+    portfolioItems: TokenRowPortfolioItem[];
+    next: string | null;
+    prev: string | null;
+}
+
+export interface UTXO {
+    address: string | null;
+    amount: string;
+    blockDaaScore: string;
+    isCoinbase: boolean;
+    scriptPublicKey: string;
+}
+export interface KaswareSendKaspaResultInput {
+    index: number;
+    sequence: string;
+    sigOpCount: number;
+    signatureScript: string;
+    transactionId: string;
+    utxo: UTXO;
+}
+
+export interface KaswareSendKaspaResultOutput {
+    scriptPublicKey: string;
+    value: string;
+}
+
+export interface KaswareSendKaspaResult {
+    gas: string;
+    id: string;
+    inputs: KaswareSendKaspaResultInput[];
+    lockTime: string;
+    outputs: KaswareSendKaspaResultOutput[];
+    payload: string;
+    subnetworkId: string;
+    version: number;
 }

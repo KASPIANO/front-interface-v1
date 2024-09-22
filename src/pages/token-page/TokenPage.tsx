@@ -1,5 +1,5 @@
 import { Skeleton } from '@mui/material';
-import { FC, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import TokenHeader from '../../components/token-page/token-header/TokenHeader';
 import TokenSideBar from '../../components/token-page/token-sidebar/TokenSideBar';
@@ -10,7 +10,10 @@ import { TokenPageLayout } from './TokenPageLayout';
 import TokenGraph from '../../components/token-page/token-graph/TokenGraph';
 import RugScore from '../../components/token-page/rug-score/RugScore';
 import MintingComponent from '../../components/token-page/minting-status/MintingStatus';
-import { fetchTokenByTicker } from '../../DAL/BackendDAL';
+import { fetchTokenByTicker, getTokenPriceHistory, recalculateRugScore } from '../../DAL/BackendDAL';
+import { AxiosError } from 'axios';
+import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
+import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
 
 interface TokenPageProps {
     walletAddress: string | null;
@@ -28,19 +31,38 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const { ticker } = useParams();
     const [tokenInfo, setTokenInfo] = useState<BackendTokenResponse>(null);
     const [tokenXHandle, setTokenXHandle] = useState(false);
+    const [recalculateRugScoreLoading, setRecalculateRugScoreLoading] = useState(false);
+    const [kasPrice, setkasPrice] = useState(0);
+    const [priceHistory, setPriceHistory] = useState([]);
+    const [currentTicker] = useState<string>(ticker);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchPrice = async () => {
+            const newPrice = await kaspaLivePrice();
+            setkasPrice(newPrice);
+        };
+
+        // Fetch the price immediately when the component mounts
+        fetchPrice();
+
+        // Set up the interval to fetch the price every 30 seconds
+        const interval = setInterval(fetchPrice, 30000);
+
+        // Clean up the interval when the component unmounts
+        return () => clearInterval(interval);
+    }, []);
+
+    const fetchAndUpdateTokenInfo = useCallback(
+        async (refresh?: boolean) => {
             try {
-                const data = await fetchTokenByTicker(ticker, walletAddress);
-                setTokenInfo(data);
+                const updatedTokenData = await fetchTokenByTicker(ticker, walletAddress, refresh);
+                setTokenInfo(updatedTokenData);
             } catch (error) {
                 console.error('Error fetching token info:', error);
             }
-        };
-
-        fetchData();
-    }, [ticker, walletAddress]);
+        },
+        [ticker, walletAddress],
+    );
 
     useEffect(() => {
         if (tokenInfo) {
@@ -48,13 +70,76 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         }
     }, [tokenInfo]);
 
+    useEffect(() => {
+        // Fetch the token info immediately on component mount
+        fetchAndUpdateTokenInfo(false);
+
+        // Set up the interval to update token info every 30 seconds
+        const interval = setInterval(() => fetchAndUpdateTokenInfo(false), 30000);
+
+        // Clean up the interval when the component unmounts
+        return () => clearInterval(interval);
+    }, [fetchAndUpdateTokenInfo, ticker]);
+
+    useEffect(() => {
+        const fetchPriceHistory = async () => {
+            if (ticker !== currentTicker) {
+                setPriceHistory([]);
+            }
+            const result = await getTokenPriceHistory(ticker);
+            setPriceHistory(result);
+        };
+        fetchPriceHistory();
+
+        const interval = setInterval(fetchPriceHistory, 900000);
+
+        return () => clearInterval(interval);
+    }, [ticker, currentTicker]);
+
+    const tokenData = tokenInfo;
+
     const getComponentToShow = (component: JSX.Element, height?: string, width?: string) =>
-        tokenInfo ? component : <Skeleton variant="rectangular" height={height} width={width} />;
+        tokenData ? component : <Skeleton variant="rectangular" height={height} width={width} />;
+
+    const getComponentGraphToShow = (component: JSX.Element, height?: string, width?: string) =>
+        priceHistory.length > 0 ? component : <Skeleton variant="rectangular" height={height} width={width} />;
+
     const rugScoreParse = tokenInfo?.metadata?.rugScore === 0 ? null : tokenInfo?.metadata?.rugScore;
+
+    const recalculateRugScoreAndShow = async () => {
+        setRecalculateRugScoreLoading(true);
+
+        try {
+            const result = await recalculateRugScore(tokenInfo.ticker);
+
+            if (result) {
+                setTokenInfo({ ...tokenInfo, metadata: { ...tokenInfo.metadata, rugScore: result } });
+            }
+        } catch (error) {
+            console.error('Error recalculating rug score:', error);
+
+            if (error instanceof AxiosError && error.response?.status === 400) {
+                showGlobalSnackbar({
+                    message: 'Please wait 3 hours before recalculation of the rug score',
+                    severity: 'error',
+                });
+            } else {
+                showGlobalSnackbar({
+                    message: 'Error recalculating rug score, Please try again later',
+                    severity: 'error',
+                });
+            }
+        } finally {
+            setRecalculateRugScoreLoading(false);
+        }
+    };
     return (
         <TokenPageLayout backgroundBlur={backgroundBlur}>
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '11.5vh')}
-            {getComponentToShow(<TokenGraph />, '35vh')}
+            {getComponentGraphToShow(
+                <TokenGraph priceHistory={priceHistory} ticker={tokenInfo?.ticker} />,
+                '35vh',
+            )}
             {getComponentToShow(<TokenStats tokenInfo={tokenInfo} />)}
             {getComponentToShow(
                 <MintingComponent
@@ -72,12 +157,12 @@ const TokenPage: FC<TokenPageProps> = (props) => {
                     ticker={ticker}
                     walletBalance={walletBalance}
                     score={rugScoreParse}
-                    // eslint-disable-next-line @typescript-eslint/no-empty-function
-                    onRecalculate={() => {}}
+                    onRecalculate={recalculateRugScoreAndShow}
                     xHandle={tokenXHandle}
                     setWalletBalance={setWalletBalance}
                     walletAddress={walletAddress}
                     setTokenInfo={setTokenInfo}
+                    isLoadingRugScore={recalculateRugScoreLoading}
                 />,
                 '19vh',
             )}
@@ -85,6 +170,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             {/* {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)} */}
             {getComponentToShow(
                 <TokenSideBar
+                    kasPrice={kasPrice}
                     tokenInfo={tokenInfo}
                     setTokenInfo={setTokenInfo}
                     walletConnected={walletConnected}

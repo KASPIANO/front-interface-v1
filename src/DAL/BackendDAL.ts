@@ -80,6 +80,16 @@ export async function countTokens(): Promise<number> {
     }
 }
 
+export async function recalculateRugScore(ticker: string): Promise<number> {
+    const response = await backendService.post<{ rugScore: number }>(
+        `/${KRC20METADATA_CONTROLLER}/update-rug-score`,
+        {
+            ticker,
+        },
+    );
+    return response.data.rugScore;
+}
+
 export async function updateWalletSentiment(
     ticker: string,
     wallet: string,
@@ -201,3 +211,24 @@ export async function signUser(verifiedUser: VerifiedUser): Promise<{ message: s
         return;
     }
 }
+
+export const fetchTokenPrice = async (ticker: string): Promise<number> => {
+    try {
+        const response = await backendService.get<{ price: number }>(`/${KRC20CONTROLLER}/token-price/${ticker}`);
+        return response.data.price;
+    } catch (error) {
+        console.error(`Error fetching price for ${ticker}:`, error.response ? error.response.data : error.message);
+        return 0; // Return 0 in case of an error
+    }
+};
+export const getTokenPriceHistory = async (ticker: string): Promise<{ price: number; date: string }[]> => {
+    try {
+        const response = await backendService.get<{ data: { price: number; date: string }[] }>(
+            `/${KRC20CONTROLLER}/price-history/${ticker}`,
+        );
+        return response.data.data;
+    } catch (error) {
+        console.error(`Error fetching price for ${ticker}:`, error.response ? error.response.data : error.message);
+        return []; // Return empty array in case of an error
+    }
+};

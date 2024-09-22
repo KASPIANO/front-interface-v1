@@ -1,5 +1,5 @@
 import { Typography, IconButton, Box, Tooltip } from '@mui/material';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import {
     HeaderContainer,
     NextPageButton,
@@ -20,13 +20,22 @@ interface TokenGridTitleProps {
     onSortBy: (field: string, asc: boolean) => void;
     isLoading: boolean;
     setActiveHeader: (value: string) => void;
+    changeTotalMintsDisabled: boolean;
+    setChangeTotalMintsActive: (value: boolean) => void;
 }
 
 const GridTitle: FC<TokenGridTitleProps> = (props) => {
-    const { timeInterval, setTimeInterval, onSortBy, onPageChange, currentPage, totalPages, setActiveHeader } =
-        props;
-
-    const [changeTotalMintsDisabled, sethCangeTotalMintsActive] = useState(true);
+    const {
+        timeInterval,
+        setTimeInterval,
+        onSortBy,
+        onPageChange,
+        currentPage,
+        totalPages,
+        setActiveHeader,
+        changeTotalMintsDisabled,
+        setChangeTotalMintsActive,
+    } = props;
 
     const handleSortChange = (sortOption: string) => {
         setTimeInterval(sortOption);
@@ -36,7 +45,7 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
         // Handle sorting by minting rate
         const orderedBy = changeTotalMintsDisabled ? 'changeTotalMints' : 'ticker';
         const orderedByAsc = orderedBy !== 'ticker';
-        sethCangeTotalMintsActive((prev) => !prev);
+        setChangeTotalMintsActive(!changeTotalMintsDisabled);
         setActiveHeader('');
         onSortBy(orderedBy, orderedByAsc);
     };
@@ -100,11 +109,17 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
                 >
                     10m
                 </SortFirstButton>
+                <SortMiddleButton selected={timeInterval === '30m'} onClick={() => handleSortChange('30m')}>
+                    30m
+                </SortMiddleButton>
                 <SortMiddleButton selected={timeInterval === '1h'} onClick={() => handleSortChange('1h')}>
                     1h
                 </SortMiddleButton>
                 <SortMiddleButton selected={timeInterval === '6h'} onClick={() => handleSortChange('6h')}>
                     6h
+                </SortMiddleButton>
+                <SortMiddleButton selected={timeInterval === '12h'} onClick={() => handleSortChange('12h')}>
+                    12h
                 </SortMiddleButton>
                 <SortMiddleButton selected={timeInterval === '1d'} onClick={() => handleSortChange('1d')}>
                     1d

@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { BackendTokenResponse } from '../../../types/Types';
-import { HeaderContainer, PriceContainer, Rank, Title, TitleHeaderContainer } from './TokenHeader.s';
-import { Avatar, Typography } from '@mui/material';
+import { Rank, Title, TitleHeaderContainer } from './TokenHeader.s';
+import { Avatar, Box } from '@mui/material';
 
 interface TokenHeaderProps {
     tokenInfo: BackendTokenResponse;
@@ -11,22 +11,18 @@ const TokenHeader: FC<TokenHeaderProps> = (props) => {
     const { tokenInfo } = props;
 
     return (
-        <HeaderContainer>
-            <TitleHeaderContainer>
+        <TitleHeaderContainer>
+            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '0.3vw' }}>
                 <Avatar
                     variant="square"
                     alt={tokenInfo.ticker}
-                    src="/path/to/logo"
-                    sx={{ height: '2vw', width: '2vw' }}
+                    src={tokenInfo.metadata.logoUrl}
+                    sx={{ height: '3vw', width: '3vw' }}
                 />
                 <Title>{tokenInfo.ticker}</Title>
-                <Rank>#26</Rank>
-            </TitleHeaderContainer>
-            <PriceContainer>
-                <Typography sx={{ fontWeight: '700', fontSize: '0.9vw' }}>69.20/Sompi</Typography>
-                <Typography sx={{ fontSize: '0.9vw' }}>$0.0001</Typography>
-            </PriceContainer>
-        </HeaderContainer>
+            </Box>
+            <Rank>#69 - MOCK Rank</Rank>
+        </TitleHeaderContainer>
     );
 };
 

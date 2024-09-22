@@ -39,6 +39,8 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = (props) => {
 
     const [descriptionError, setDescriptionError] = useState('');
     const [xError, setXError] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [email, setEmail] = useState('');
 
     const handleDescriptionChange = (value: string) => {
         setDescription(value);
@@ -50,6 +52,16 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = (props) => {
         }
     };
 
+    const checkIfEmailExists = (email: string): boolean => {
+        if (!email) {
+            return false;
+        }
+
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+        return emailPattern.test(email);
+    };
+
     const handleSave = () => {
         const twitterUrlPattern = /^(https?:\/\/)?(www\.)?x\.com\/[a-zA-Z0-9_]{1,15}$/;
         // Check if the Twitter (x) URL is valid
@@ -57,6 +69,12 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = (props) => {
             setXError('Please enter a valid X/Twitter URL (e.g., https://x.com/username, x.com/username)');
             return;
         }
+        if (!checkIfEmailExists(email)) {
+            setEmailError('At least one valid email is required.');
+            return;
+        }
+        setEmailError('');
+        setXError('');
         const tokenMetadata: TokenKRC20DeployMetadata = {
             description,
             website,
@@ -69,6 +87,7 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = (props) => {
             medium,
             github,
             audit,
+            email,
             contacts: isEmptyString(contacts) ? [] : contacts.split(',').map((contact) => contact.trim()),
             founders: isEmptyString(foundersHandles)
                 ? []
@@ -95,6 +114,7 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = (props) => {
         setFoundersHandles('');
         setDescriptionError('');
         setXError('');
+        setEmail('');
         onClose();
     };
 
@@ -162,7 +182,7 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = (props) => {
                         margin="normal"
                         error={!!xError}
                         helperText={xError}
-                        placeholder="Enter the token\'s X/Twitter handle"
+                        placeholder="Enter the token\'s X/Twitter URL"
                     />
                     <TextField
                         label="Telegram"
@@ -171,6 +191,17 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = (props) => {
                         fullWidth
                         margin="normal"
                         placeholder="Enter the token\'s Telegram handle (e.g., @telegram_handle)"
+                    />
+
+                    <TextField
+                        label="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        fullWidth
+                        margin="normal"
+                        placeholder="Enter Email"
+                        helperText={emailError ? emailError : 'Email is required to send the listing confirmation'}
+                        error={!!emailError}
                     />
                     <TextField
                         label="Discord"
@@ -213,6 +244,18 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = (props) => {
                         placeholder="Enter the token\'s Whitepaper URL"
                     />
                     <TextField
+                        label="Contact"
+                        value={contacts}
+                        onChange={(e) => setContacts(e.target.value)}
+                        fullWidth
+                        multiline // Enables multiline input
+                        minRows={1} // Minimum number of rows when the input is not filled
+                        maxRows={6}
+                        margin="normal"
+                        placeholder="Contact information"
+                        helperText="Example: email@example.com ,@twitter_handle,@telegram_handle (separate with commas)"
+                    />
+                    <TextField
                         label="Founders X Handles"
                         value={foundersHandles}
                         onChange={(e) => setFoundersHandles(e.target.value)}
@@ -224,18 +267,7 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = (props) => {
                         helperText="Separate multiple handles with a comma (e.g., @founder1, @founder2)"
                         placeholder="Founder handles"
                     />
-                    <TextField
-                        label="Contact"
-                        value={contacts}
-                        onChange={(e) => setContacts(e.target.value)}
-                        fullWidth
-                        multiline // Enables multiline input
-                        minRows={1} // Minimum number of rows when the input is not filled
-                        maxRows={6}
-                        margin="normal"
-                        placeholder="Contact information"
-                        helperText="Example: @twitter_handle, email@example.com, @telegram_handle (separate with commas)"
-                    />
+
                     <UploadContainer>
                         {logo ? (
                             <ImagePreview src={URL.createObjectURL(logo)} alt="Token Logo" />

@@ -1,6 +1,7 @@
 import { jwtDecode } from 'jwt-decode';
 import moment from 'moment';
 import { getTxnInfo } from '../DAL/KaspaApiDal';
+import { fetchTokenInfo } from '../DAL/Krc20DAL';
 
 export enum ThemeModes {
     DARK = 'dark',
@@ -8,6 +9,20 @@ export enum ThemeModes {
 }
 const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 
+export function formatPrice(price, decimals = 7) {
+    // First, format the price to the specified number of decimal places
+    let formattedPrice = Number(price).toFixed(decimals);
+
+    // Remove trailing zeros after the decimal point
+    formattedPrice = formattedPrice.replace(/\.?0+$/, '');
+
+    // If the formatted price ends with a decimal point, remove it
+    if (formattedPrice.endsWith('.')) {
+        formattedPrice = formattedPrice.slice(0, -1);
+    }
+
+    return formattedPrice;
+}
 export const getLocalThemeMode = () =>
     localStorage.getItem('theme_mode') ? (localStorage.getItem('theme_mode') as ThemeModes) : ThemeModes.DARK;
 
@@ -119,4 +134,29 @@ export const checkTokenExpiration = (token) => {
         console.error('Failed to decode token:', error);
         return true; // Consider token expired if decoding fails
     }
+};
+
+export const checkTokenDeployment = async (ticker: string): Promise<boolean> => {
+    const maxRetries = 5;
+    let retryCount = 0;
+
+    while (retryCount < maxRetries) {
+        try {
+            console.log('Checking token deployment:', ticker, retryCount);
+            const token = await fetchTokenInfo(ticker, true); // Make API call to check token info
+
+            if (token && token.state === 'deployed') {
+                return true; // Token is deployed
+            }
+        } catch (error) {
+            console.error('Error fetching token info:', error);
+        }
+
+        retryCount++;
+        if (retryCount < maxRetries) {
+            await delay(5000); // Wait 5 seconds before the next attempt
+        }
+    }
+
+    return false; // Token was not deployed after 5 attempts
 };

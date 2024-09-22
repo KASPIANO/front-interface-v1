@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Box, Button, Card, Tooltip, Typography } from '@mui/material';
 import { BackendTokenResponse } from '../../../types/Types';
 import { getCurrentAccount, mintKRC20Token } from '../../../utils/KaswareUtils';
@@ -19,9 +19,33 @@ interface MintingComponentProps {
 const MintingComponent: FC<MintingComponentProps> = (props) => {
     const { tokenInfo, walletConnected, walletBalance, setWalletBalance, setTokenInfo, walletAddress } = props;
     // Calculate the total mints possible and mints left
-    const totalMintsPossible = Math.floor(tokenInfo.totalSupply / tokenInfo.mintLimit);
+    const [mintSuccessful, setMintSuccessful] = useState(false);
+    const totalMintableSupply = tokenInfo.totalSupply - tokenInfo.preMintedSupply;
+    const totalMintsPossible = Math.floor(totalMintableSupply / tokenInfo.mintLimit);
     const mintsLeft = totalMintsPossible - tokenInfo.totalMintTimes;
     const isMintingDisabled = tokenInfo.totalMinted >= tokenInfo.totalSupply;
+    const isSoldOut = tokenInfo.state === 'finished';
+
+    useEffect(() => {
+        if (mintSuccessful) {
+            const timer = setTimeout(async () => {
+                try {
+                    const account = await getCurrentAccount();
+                    const updatedTokenData = await fetchTokenByTicker(tokenInfo.ticker, walletAddress, false);
+                    const balance = await fetchWalletBalance(account);
+                    setWalletBalance(setWalletBalanceUtil(balance));
+                    setTokenInfo(updatedTokenData);
+                    setMintSuccessful(false);
+                } catch (error) {
+                    console.error('Error updating data after mint:', error);
+                }
+            }, 10000); // 10000 milliseconds = 10 seconds
+
+            // Cleanup function to clear the timeout if the component unmounts
+            return () => clearTimeout(timer);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [mintSuccessful]);
 
     const handleMint = async (ticker: string) => {
         if (!walletConnected) {
@@ -56,11 +80,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                     reveal,
                 });
             }
-            const account = await getCurrentAccount();
-            const updatedTokenData = await fetchTokenByTicker(ticker, walletAddress, true);
-            const balance = await fetchWalletBalance(account);
-            setWalletBalance(setWalletBalanceUtil(balance));
-            setTokenInfo(updatedTokenData);
+            setMintSuccessful(true);
         } catch (error) {
             showGlobalSnackbar({
                 message: 'Token minting failed',
@@ -69,6 +89,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
             });
         }
     };
+
     const limitPerMint = tokenInfo.mintLimit;
     return (
         <Card
@@ -108,14 +129,14 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                     <Box sx={{ marginRight: '2vw', textAlign: 'center' }}>
                         <Typography sx={{ fontSize: '1vw', fontWeight: 'bold' }}>Total Mints</Typography>
                         <Typography sx={{ fontSize: '1vw' }}>
-                            {tokenInfo.totalMintTimes} / {totalMintsPossible}
+                            {isSoldOut ? totalMintsPossible : tokenInfo.totalMintTimes} / {totalMintsPossible}
                         </Typography>
                     </Box>
 
                     {/* Mints Left */}
                     <Box sx={{ textAlign: 'center' }}>
                         <Typography sx={{ fontSize: '1vw', fontWeight: 'bold' }}>Mints Left</Typography>
-                        <Typography sx={{ fontSize: '1vw' }}>{mintsLeft}</Typography>
+                        <Typography sx={{ fontSize: '1vw' }}>{isSoldOut ? '0' : mintsLeft}</Typography>
                     </Box>
                 </Box>
                 {/* Right Side: Mint Button */}
@@ -139,9 +160,9 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                                 fontSize: '0.8vw',
                                 width: '100%',
                             }}
-                            disabled={isMintingDisabled || !walletConnected || walletBalance < 1}
+                            disabled={isMintingDisabled || !walletConnected || walletBalance < 1 || isSoldOut}
                         >
-                            {isMintingDisabled ? 'Sold Out' : 'Mint'}
+                            {isMintingDisabled || isSoldOut ? 'Sold Out' : 'Mint'}
                         </Button>
                     </span>
                 </Tooltip>

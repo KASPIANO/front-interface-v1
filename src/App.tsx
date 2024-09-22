@@ -8,8 +8,10 @@ import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
 import { signUser } from './DAL/BackendDAL';
 import { fetchWalletBalance } from './DAL/KaspaApiDal';
+// import useSSE from './hooks/useSSE';
 import { ThemeContext } from './main';
 import BatchTransferPage from './pages/batch-transfer-page/BatchTransferPage';
+import ContactUs from './pages/compliance/ContactUs';
 import PrivacyPolicy from './pages/compliance/PrivacyPolicy';
 import TermsOfService from './pages/compliance/TermsOfService';
 import TrustSafety from './pages/compliance/TrustSafety';
@@ -20,7 +22,14 @@ import TokenPage from './pages/token-page/TokenPage';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
 import { UserVerfication } from './types/Types';
-import { disconnect, isKasWareInstalled, requestAccounts, signMessage, switchNetwork } from './utils/KaswareUtils';
+import {
+    disconnect,
+    getNetwork,
+    isKasWareInstalled,
+    requestAccounts,
+    signMessage,
+    switchNetwork,
+} from './utils/KaswareUtils';
 import {
     checkTokenExpiration,
     generateNonce,
@@ -57,6 +66,8 @@ const App = () => {
         }
     }, []);
 
+    // const events = useSSE(walletAddress);
+
     const toggleThemeMode = () => {
         const newMode = themeMode === ThemeModes.DARK ? ThemeModes.LIGHT : ThemeModes.DARK;
         localStorage.setItem('theme_mode', newMode);
@@ -89,12 +100,9 @@ const App = () => {
                 await handleUserVerification(accounts, setUserVerified, showGlobalSnackbar);
             }
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [updateWalletState, resetWalletState],
     );
-
-    const handleNetworkChanged = useCallback((newNetwork) => {
-        setNetwork(newNetwork);
-    }, []);
 
     const handleDisconnect = useCallback(async () => {
         const { origin } = window.location;
@@ -102,6 +110,10 @@ const App = () => {
         resetWalletState();
         showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
     }, [resetWalletState]);
+
+    const handleNetworkChanged = useCallback(async () => {
+        handleDisconnect();
+    }, [handleDisconnect]);
 
     useEffect(() => {
         if (isKasWareInstalled()) {
@@ -118,10 +130,10 @@ const App = () => {
     }, [handleAccountsChanged, handleNetworkChanged, handleDisconnect]);
 
     useEffect(() => {
-        if (walletAddress && walletBalance === 0) {
+        if (walletAddress) {
             fetchWalletBalance(walletAddress).then((balance) => setWalletBalance(setWalletBalanceUtil(balance)));
         }
-    }, [walletAddress, walletBalance]);
+    }, [walletAddress, walletBalance, network]);
 
     useEffect(() => {
         const checkExistingConnection = async () => {
@@ -131,6 +143,7 @@ const App = () => {
                     const accounts = await requestAccounts();
                     if (accounts.length > 0 && accounts[0].toLowerCase() === storedAddress.toLowerCase()) {
                         await updateWalletState(accounts[0]);
+                        await handleNetworkByEnvironment();
                     } else {
                         localStorage.removeItem('walletAddress');
                     }
@@ -142,6 +155,7 @@ const App = () => {
         };
 
         checkExistingConnection();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [updateWalletState]);
 
     const handleConnectWallet = async () => {
@@ -150,6 +164,7 @@ const App = () => {
             // Check if KasWare is installed
             if (isKasWareInstalled()) {
                 // Request accounts from the wallet
+                await handleNetworkByEnvironment();
                 const accounts = await requestAccounts();
 
                 // Check if any accounts were returned
@@ -196,11 +211,30 @@ const App = () => {
         }
     };
 
+    const handleNetworkByEnvironment = async () => {
+        const currentEnv = import.meta.env.VITE_ENV === 'prod' ? 'kaspa_mainnet' : 'kaspa_testnet_10';
+        const getCurrentNetwork = await getNetwork();
+        if (currentEnv !== getCurrentNetwork) {
+            showGlobalSnackbar({
+                message: 'Please switch to the correct network',
+                severity: 'error',
+            });
+            const reject = await switchNetwork(currentEnv);
+
+            if (!reject) {
+                await handleDisconnect();
+            } else {
+                setNetwork(currentEnv);
+            }
+        }
+    };
+
     const handleNetworkChange = async (newNetwork) => {
         if (network !== newNetwork) {
             try {
                 await switchNetwork(newNetwork);
                 setNetwork(newNetwork);
+                await handleNetworkByEnvironment();
                 showGlobalSnackbar({ message: `Switched to ${newNetwork}`, severity: 'success' });
             } catch (error) {
                 console.error('Error switching network:', error);
@@ -266,10 +300,11 @@ Request ID: ${requestId}
         } catch (error) {
             console.error('Error verifying user:', error);
             showGlobalSnackbar({
-                message: 'Failed to verify user',
+                message: 'Failed to verify user - Connect Again',
                 severity: 'error',
                 details: error.message,
             });
+            resetWalletState();
             return null;
         }
     };
@@ -286,7 +321,6 @@ Request ID: ${requestId}
                             walletConnected={walletConnected}
                             walletAddress={walletAddress}
                             network={network}
-                            onNetworkChange={handleNetworkChange}
                             walletBalance={walletBalance}
                             connectWallet={handleConnectWallet}
                             disconnectWallet={handleDisconnect}
@@ -344,7 +378,7 @@ Request ID: ${requestId}
                                 }
                             />
                             <Route
-                                path="/batch-transfer"
+                                path="/airdrop"
                                 element={
                                     <BatchTransferPage
                                         walletBalance={walletBalance}
@@ -358,6 +392,7 @@ Request ID: ${requestId}
                             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                             <Route path="/terms-service" element={<TermsOfService />} />
                             <Route path="/trust-safety" element={<TrustSafety />} />
+                            <Route path="/contact-us" element={<ContactUs />} />
                             {/* Handle 404 - Not Found */}
                             <Route path="*" element={<div>404 - Not Found</div>} />
                         </Routes>

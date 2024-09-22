@@ -1,16 +1,34 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { Modal, Typography, Button, IconButton, useTheme } from '@mui/material';
 import CloseIconRounded from '@mui/icons-material/CloseRounded';
 import { SuccessModalActions, SuccessModalContainer, SuccessModalContent } from './SuccessModal.s';
+import { useNavigate } from 'react-router-dom';
 
 interface SuccessModalProps {
     open: boolean;
     onClose: () => void;
+    ticker?: string;
+    setTicker?: (ticker: string) => void;
 }
 
 const SuccessModal: FC<SuccessModalProps> = (props) => {
     const theme = useTheme();
-    const { open, onClose } = props;
+    const navigate = useNavigate();
+
+    const { open, onClose, ticker, setTicker } = props;
+    useEffect(() => {
+        if (!open) {
+            onClose();
+        }
+    }, [open, onClose]);
+    const handleClose = () => {
+        if (ticker) {
+            navigate(`/token/${ticker}`);
+            setTicker('');
+        }
+        onClose();
+    };
+
     return (
         <Modal
             sx={{
@@ -19,7 +37,7 @@ const SuccessModal: FC<SuccessModalProps> = (props) => {
                 justifyContent: 'center',
             }}
             open={open}
-            onClose={onClose}
+            onClose={handleClose}
         >
             <SuccessModalContainer
                 sx={{
@@ -56,14 +74,14 @@ const SuccessModal: FC<SuccessModalProps> = (props) => {
                     <Typography variant="body2" sx={{ mb: 1 }}>
                         For more insight, information, or collaborations, please contact us at:
                         <br />
-                        <strong>info@mockemail.com</strong>
+                        <strong>listings@kaspiano.com</strong>
                     </Typography>
                     <Typography variant="body1" sx={{ mb: 1 }}>
                         Thank you for your patience!
                     </Typography>
                 </SuccessModalContent>
                 <SuccessModalActions>
-                    <Button sx={{ marginBottom: '2vw' }} variant="contained" color="primary" onClick={onClose}>
+                    <Button sx={{ marginBottom: '2vw' }} variant="contained" color="primary" onClick={handleClose}>
                         Close
                     </Button>
                 </SuccessModalActions>

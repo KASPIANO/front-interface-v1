@@ -1,8 +1,19 @@
 // Ensure the WebSocket is available globally
 
+import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
+import { kaspaFeeEstimate } from '../DAL/KaspaApiDal';
+import { KaswareSendKaspaResult } from '../types/Types';
+
 // Utility to detect if KasWare Wallet is installed
 export const isKasWareInstalled = (): boolean => typeof window.kasware !== 'undefined';
 const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
+
+// const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
+// const MINT_DEPLOY_PRIORITY = 0.005;
+// const MINT_DEPLOY_PRIORITY_SOMPI = MINT_DEPLOY_PRIORITY * KASPA_TO_SOMPI;
+const TX_MASS = 0.00008;
+const MIN_TX_MASS = 0.00001;
+
 // Method to request account connection
 export const requestAccounts = async (): Promise<string[]> => {
     try {
@@ -58,10 +69,14 @@ export const getNetwork = async (): Promise<string> => {
 };
 
 // Method to switch network
-export const switchNetwork = async (network: string): Promise<void> => {
+export const switchNetwork = async (network: string): Promise<any> => {
     try {
         await window.kasware.switchNetwork(network);
+        return true;
     } catch (error) {
+        if (error.code === 4001) {
+            return false;
+        }
         console.error(error);
         throw error;
     }
@@ -104,20 +119,25 @@ export const getBalance = async (): Promise<{ confirmed: number; unconfirmed: nu
 export const sendKaspa = async (
     toAddress: string,
     sompi: number,
-    options?: { feeRate?: number },
+    options?: { priorityFee?: number },
 ): Promise<string> => {
     try {
-        const txid = await window.kasware.sendKaspa(toAddress, sompi, options);
-        return txid;
+        const txData = await window.kasware.sendKaspa(toAddress, sompi, options);
+        return txData;
     } catch (error) {
         throw error;
     }
 };
-export const sendKaspaToKaspiano = async (sompi: number, options?: { feeRate?: number }): Promise<any> => {
+
+// PRIORITY FEE SOMPI//
+export const sendKaspaToKaspiano = async (
+    sompi: number,
+    options?: { priorityFee?: number },
+): Promise<KaswareSendKaspaResult> => {
     try {
-        const txid = await window.kasware.sendKaspa(KASPIANO_WALLET, sompi, options);
-        const parsedTxid = JSON.parse(txid);
-        return parsedTxid;
+        const txData = await window.kasware.sendKaspa(KASPIANO_WALLET, sompi, options);
+        const parsedTxData = JSON.parse(txData);
+        return parsedTxData;
     } catch (error) {
         throw error;
     }
@@ -146,10 +166,18 @@ export const pushTx = async (options: { rawtx: string }): Promise<string> => {
 };
 
 // Method to sign KRC20 transaction
+// PRIORITY FEE KAS
 export const deployKRC20Token = async (inscribeJsonString: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2);
+        let priorityFee = await kaspaFeeEstimate();
+        if (priorityFee === 1) {
+            priorityFee = MIN_TX_MASS;
+        } else {
+            priorityFee = priorityFee * TX_MASS;
+        }
+
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, priorityFee);
         return txid;
     } catch (error) {
         console.error('Failed to deploy KRC20 token:', error);
@@ -158,10 +186,17 @@ export const deployKRC20Token = async (inscribeJsonString: string): Promise<stri
 };
 
 // Method to mint KRC20 token
+// PRIORITY FEE KAS
 export const mintKRC20Token = async (inscribeJsonString: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3);
+        let priorityFee = await kaspaFeeEstimate();
+        if (priorityFee === 1) {
+            priorityFee = MIN_TX_MASS;
+        } else {
+            priorityFee = priorityFee * TX_MASS;
+        }
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, priorityFee);
         return txid;
     } catch (error) {
         console.error('Failed to mint KRC20 token:', error);
@@ -170,10 +205,17 @@ export const mintKRC20Token = async (inscribeJsonString: string): Promise<string
 };
 
 // Method to transfer KRC20 token
-export const transferKRC20Token = async (inscribeJsonString: string, destAddr: string): Promise<string> => {
+// PRIORITY FEE KAS
+export const transferKRC20Token = async (inscribeJsonString: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4, destAddr);
+        let priorityFee = await kaspaFeeEstimate();
+        if (priorityFee === 1) {
+            priorityFee = MIN_TX_MASS;
+        } else {
+            priorityFee = priorityFee * TX_MASS;
+        }
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4, priorityFee);
         return txid;
     } catch (error) {
         console.error('Failed to transfer KRC20 token:', error);
@@ -200,12 +242,19 @@ export const removeNetworkChangedListener = (handler: (network: string) => void)
 };
 
 // Utility function to sign a KRC20 batch transfer transaction
-export const signKRC20BatchTransfer = async (inscribeJsonString: string, toAddrs: string[]): Promise<string> => {
+export const signKRC20BatchTransfer = async (inscribeJsonString: string, addresses: string[]): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
 
     try {
+        if (true) {
+            showGlobalSnackbar({
+                message: 'Airdrop disabled',
+                severity: 'error',
+            });
+            return;
+        }
         // Calling the KasWare method to sign the batch transfer transaction
-        const txid = await window.kasware.signKRC20BatchTransferTransaction(inscribeJsonString, 4, toAddrs);
+        const txid = await window.kasware.signKRC20BatchTransferTransaction(inscribeJsonString, 4, addresses);
         return txid;
     } catch (error) {
         console.error('Failed to execute batch KRC20 token transfer:', error);

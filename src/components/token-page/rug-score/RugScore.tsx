@@ -1,7 +1,7 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { Box, Button, Card, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Box, Button, Card, CircularProgress, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
 import { FC, useState } from 'react';
 import ScoreLine, { ScoreLineConfig } from './score-line/ScoreLine';
 import { UpdateMetadataDialog } from '../update-metadata-dialog/UpdateMetadataDialog';
@@ -16,6 +16,7 @@ interface RugScoreProps {
     walletConnected: boolean;
     walletAddress: string | null;
     setTokenInfo: (tokenInfo: any) => void;
+    isLoadingRugScore: boolean;
 }
 
 const RugScore: FC<RugScoreProps> = (props) => {
@@ -29,6 +30,7 @@ const RugScore: FC<RugScoreProps> = (props) => {
         walletConnected,
         walletAddress,
         setTokenInfo,
+        isLoadingRugScore,
     } = props;
     const theme = useTheme();
     const [showInfoForm, setShowInfoForm] = useState(false);
@@ -63,9 +65,25 @@ const RugScore: FC<RugScoreProps> = (props) => {
                 </Box>
                 {xHandle && (
                     <Tooltip title="Click to recalculate the Rug Score.">
-                        <IconButton onClick={onRecalculate} aria-label="recalculate score" sx={{ padding: 0 }}>
-                            <RefreshIcon />
-                        </IconButton>
+                        {isLoadingRugScore ? (
+                            <CircularProgress
+                                size={24}
+                                thickness={5}
+                                sx={{
+                                    padding: 0,
+                                }}
+                            />
+                        ) : (
+                            <IconButton
+                                onClick={onRecalculate}
+                                aria-label="recalculate score"
+                                sx={{
+                                    padding: 0,
+                                }}
+                            >
+                                <RefreshIcon />
+                            </IconButton>
+                        )}
                     </Tooltip>
                 )}
             </Box>
@@ -85,7 +103,7 @@ const RugScore: FC<RugScoreProps> = (props) => {
                         mt: '3vh',
                     }}
                 >
-                    Send New Request by Clicking Refresh Button
+                    NO SCORE - Send New Request
                 </Typography>
             ) : null}
             {xHandle && score !== null ? <ScoreLine value={score} config={scoreLineRanges} /> : null}

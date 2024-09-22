@@ -17,13 +17,12 @@ interface ReviewListTokenDialogProps {
     onClose: () => void;
     onList: () => Promise<boolean>;
     tokenMetadata: TokenKRC20DeployMetadata;
-    isPaid: boolean;
     isSavingData: boolean;
     walletConnected: boolean;
 }
 
 const ReviewListTokenDialog: React.FC<ReviewListTokenDialogProps> = (props) => {
-    const { open, onClose, onList, tokenMetadata, isPaid, isSavingData, walletConnected } = props;
+    const { open, onClose, onList, tokenMetadata, isSavingData, walletConnected } = props;
     const [disableList, setDisableList] = useState(false);
 
     const handleList = async () => {
@@ -84,7 +83,7 @@ const ReviewListTokenDialog: React.FC<ReviewListTokenDialogProps> = (props) => {
                             variant="contained"
                             color="primary"
                         >
-                            {isSavingData ? 'Listing Token...' : isPaid ? 'List Token' : 'List Token & Pay'}
+                            {isSavingData ? 'Listing Token...' : 'List Token & Pay'}
                         </Button>
                     </span>
                 </Tooltip>

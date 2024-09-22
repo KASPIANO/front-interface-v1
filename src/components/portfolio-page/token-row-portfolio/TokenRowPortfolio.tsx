@@ -18,23 +18,29 @@ import {
 import { FC, useState } from 'react';
 import { mintKRC20Token, transferKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
-import { TokenRowPortfolioItem } from '../../../types/Types';
+import { TokenRowPortfolioItem, TransferObj } from '../../../types/Types';
 import { capitalizeFirstLetter } from '../../../utils/Utils';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useNavigate } from 'react-router-dom';
 
 interface TokenRowPortfolioProps {
     token: TokenRowPortfolioItem;
     walletConnected: boolean;
     kasPrice: number;
     walletBalance: number;
+    handleChange: () => void;
 }
 
 const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
-    const { token, walletConnected, walletBalance } = props;
+    const { token, walletConnected, walletBalance, handleChange } = props;
     const [openTransferDialog, setOpenTransferDialog] = useState(false);
     const [destAddress, setDestAddress] = useState('');
     const [currentTicker, setCurrentTicker] = useState('');
     const [amount, setAmount] = useState('');
     const [error, setError] = useState('');
+    const [walletConfirmation, setWalletConfirmation] = useState(false);
+
+    const navigate = useNavigate();
 
     const validatePositiveNumber = (value) => {
         // This regex allows positive numbers, including decimals, but not zero
@@ -44,6 +50,8 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
     const handleTransferDialogClose = () => {
         setOpenTransferDialog(false);
         setDestAddress('');
+        setAmount('');
+        setError('');
     };
 
     const handleTransferClick = (event, ticker: string) => {
@@ -67,22 +75,30 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
             });
             return;
         }
-        const inscribeJsonString = JSON.stringify({
+
+        const inscribeJsonString: TransferObj = {
             p: 'KRC-20',
             op: 'transfer',
             tick: currentTicker,
             amt: (parseInt(amount) * 100000000).toString(),
-        });
+            to: destAddress,
+        };
+        const jsonStringified = JSON.stringify(inscribeJsonString);
+
         try {
-            const mint = await transferKRC20Token(inscribeJsonString, destAddress);
-            if (mint) {
-                const { commit, reveal } = JSON.parse(mint);
+            setWalletConfirmation(true);
+            const result = await transferKRC20Token(jsonStringified);
+            setWalletConfirmation(false);
+            if (result) {
+                const { commit, reveal } = JSON.parse(result);
+
                 showGlobalSnackbar({
                     message: 'Token transferred successfully',
                     severity: 'success',
                     commit,
                     reveal,
                 });
+                handleChange();
                 handleTransferDialogClose();
             }
         } catch (error) {
@@ -127,6 +143,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                     reveal,
                 });
             }
+            handleChange();
         } catch (error) {
             showGlobalSnackbar({
                 message: 'Failed to Mint Token',
@@ -136,11 +153,19 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
         }
     };
 
+    const handleItemClick = (token) => {
+        navigate(`/token/${token.ticker}`);
+    };
+
     const handleSetAmount = (value) => {
         // Allow empty string for clearing the input
         if (value === '') {
             setAmount('');
             setError('');
+            return;
+        }
+        if (parseInt(value) > parseInt(token.balance)) {
+            setError('Insufficient Token Balance');
             return;
         }
 
@@ -158,7 +183,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
 
     return (
         <div key={token.ticker}>
-            <ListItem disablePadding sx={{ height: '12vh' }}>
+            <ListItem disablePadding sx={{ height: '12vh' }} onClick={() => handleItemClick(token)}>
                 <ListItemButton>
                     <ListItemAvatar>
                         <Avatar
@@ -178,7 +203,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
 
                     <ListItemText
                         sx={{
-                            width: '16vw',
+                            width: '3vw',
                         }}
                         primary={
                             <Tooltip title={token.ticker}>
@@ -190,7 +215,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                     />
 
                     <ListItemText
-                        sx={{ width: '15vw' }}
+                        sx={{ width: '14vw' }}
                         primary={
                             <Typography
                                 variant="body1"
@@ -198,7 +223,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                                     fontSize: '1.2vw',
                                     fontWeight: 'bold',
                                     display: 'flex',
-                                    justifyContent: 'start',
+                                    justifyContent: 'center',
                                 }}
                             >
                                 {token.balance}
@@ -206,7 +231,16 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                         }
                     />
 
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '2vw', width: '30vw' }}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '2vw',
+                            width: '40vw',
+                            justifyContent: 'center',
+                            paddingRight: '14vw',
+                        }}
+                    >
                         <Button
                             onClick={(event) => handleTransferClick(event, token.ticker)}
                             variant="contained"
@@ -267,30 +301,41 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
             >
                 <DialogTitle>Transfer Token</DialogTitle>
                 <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="address"
-                        label="Destination Address"
-                        type="text"
-                        fullWidth
-                        variant="outlined"
-                        value={destAddress}
-                        onChange={(e) => setDestAddress(e.target.value)}
-                    />
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="amount"
-                        label="Amount"
-                        type="text"
-                        fullWidth
-                        variant="outlined"
-                        error={!!error}
-                        helperText={error}
-                        value={amount}
-                        onChange={(e) => handleSetAmount(e.target.value)}
-                    />
+                    {walletConfirmation ? (
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            <CircularProgress />
+                            <Typography variant="body1" sx={{ ml: '1vw' }}>
+                                Waiting for wallet confirmation
+                            </Typography>
+                        </div>
+                    ) : (
+                        <>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="address"
+                                label="Destination Address"
+                                type="text"
+                                fullWidth
+                                variant="outlined"
+                                value={destAddress}
+                                onChange={(e) => setDestAddress(e.target.value)}
+                            />
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="amount"
+                                label="Amount"
+                                type="text"
+                                fullWidth
+                                variant="outlined"
+                                error={!!error}
+                                helperText={error}
+                                value={amount}
+                                onChange={(e) => handleSetAmount(e.target.value)}
+                            />
+                        </>
+                    )}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleTransferDialogClose}>Cancel</Button>

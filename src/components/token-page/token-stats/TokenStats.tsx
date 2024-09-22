@@ -23,6 +23,7 @@ interface TokenStatsProps {
 
 //     return ageInDays;
 // }
+
 const TokenStats: FC<TokenStatsProps> = (props) => {
     const { tokenInfo } = props;
     const tradingDataTimeFramesToSelect = ['All', '1m', '1w', '1d'];
@@ -34,7 +35,10 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         setTradingDataTimeFrame(value);
     };
 
-    const totalMintedDataToShow = `${(tokenInfo.totalMintedPercent * 100).toFixed(3)}%`;
+    const tokenKasPrice = tokenInfo.price ? `${tokenInfo.price.toFixed(7)} / KAS` : '---';
+
+    const totalMintedDataToShow =
+        tokenInfo.state === 'finished' ? '100%' : `${(tokenInfo.totalMintedPercent * 100).toFixed(8)}%`;
     return (
         <Card sx={{ height: '20vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -63,7 +67,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                         VOLUME ({tradingDataTimeFrame})
                     </Typography>
                     <Typography align="center" sx={{ fontSize: '0.9vw', fontWeight: 'bold' }}>
-                        {tokenInfo.volume ? `$${tokenInfo.volume}` : '$69,420,880'}
+                        {tokenInfo.volume ? `$${tokenInfo.volume}` : '---'}
                     </Typography>
                 </Box>
 
@@ -73,7 +77,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                         PRICE PER TOKEN ({tradingDataTimeFrame})
                     </Typography>
                     <Typography align="center" sx={{ fontSize: '0.9vw', fontWeight: 'bold' }}>
-                        {tokenInfo.price ? `${tokenInfo.price}/SOMPI` : '69,420/SOMPI'}
+                        {tokenKasPrice}
                     </Typography>
                 </Box>
                 <Divider orientation="vertical" flexItem />
@@ -91,7 +95,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                         HOLDERS
                     </Typography>
                     <Typography align="center" sx={{ fontSize: '0.9vw', fontWeight: 'bold' }}>
-                        {tokenInfo.totalHolders ? tokenInfo.totalHolders : '69'}
+                        {tokenInfo.totalHolders}
                     </Typography>
                 </Box>
             </Box>
