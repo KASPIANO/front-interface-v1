@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { BackendTokenResponse } from '../../../types/Types';
-import { Rank, Title, TitleHeaderContainer } from './TokenHeader.s';
+import { Title, TitleHeaderContainer } from './TokenHeader.s';
 import { Avatar, Box } from '@mui/material';
 
 interface TokenHeaderProps {
