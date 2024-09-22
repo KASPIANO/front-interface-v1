@@ -6,7 +6,7 @@ import { showGlobalSnackbar } from './components/alert-context/AlertContext';
 import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
 import { fetchWalletBalance } from './DAL/KaspaApiDal';
-import useSSE from './hooks/useSSE';
+// import useSSE from './hooks/useSSE';
 import { ThemeContext } from './main';
 import BatchTransferPage from './pages/batch-transfer-page/BatchTransferPage';
 import ContactUs from './pages/compliance/ContactUs';
@@ -45,7 +45,7 @@ const App = () => {
     const [, setIsConnecting] = useState<boolean>(false);
     const [backgroundBlur, setBackgroundBlur] = useState(false);
     const [, setUserVerified] = useState<UserVerfication>(null);
-    const events = useSSE(walletAddress);
+    // const events = useSSE(walletAddress);
 
     const toggleThemeMode = () => {
         const newMode = themeMode === ThemeModes.DARK ? ThemeModes.LIGHT : ThemeModes.DARK;
