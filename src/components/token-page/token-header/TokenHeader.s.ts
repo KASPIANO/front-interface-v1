@@ -29,9 +29,9 @@ export const Title = styled(Typography)({
 });
 
 export const Rank = styled(Typography)({
-    fontSize: '1vw',
+    fontSize: '1.3vw',
     fontWeight: 600,
-    marginTop: '1vh',
+    marginLeft: '1vh',
 });
 
 export const Subtitle = styled(Typography)({
