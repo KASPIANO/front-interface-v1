@@ -1,5 +1,6 @@
 // Ensure the WebSocket is available globally
 
+import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
 import { kaspaFeeEstimate } from '../DAL/KaspaApiDal';
 import { KaswareSendKaspaResult } from '../types/Types';
 
@@ -247,7 +248,7 @@ export const signKRC20BatchTransfer = async (inscribeJsonString: string, address
     try {
         if (true) {
             showGlobalSnackbar({
-                message: 'Transfer disabled',
+                message: 'Airdrop disabled',
                 severity: 'error',
             });
             return;
