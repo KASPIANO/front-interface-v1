@@ -129,14 +129,14 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                     <Box sx={{ marginRight: '2vw', textAlign: 'center' }}>
                         <Typography sx={{ fontSize: '1vw', fontWeight: 'bold' }}>Total Mints</Typography>
                         <Typography sx={{ fontSize: '1vw' }}>
-                            {tokenInfo.totalMintTimes} / {totalMintsPossible}
+                            {isSoldOut ? totalMintsPossible : tokenInfo.totalMintTimes} / {totalMintsPossible}
                         </Typography>
                     </Box>
 
                     {/* Mints Left */}
                     <Box sx={{ textAlign: 'center' }}>
                         <Typography sx={{ fontSize: '1vw', fontWeight: 'bold' }}>Mints Left</Typography>
-                        <Typography sx={{ fontSize: '1vw' }}>{mintsLeft}</Typography>
+                        <Typography sx={{ fontSize: '1vw' }}>{isSoldOut ? '0' : mintsLeft}</Typography>
                     </Box>
                 </Box>
                 {/* Right Side: Mint Button */}

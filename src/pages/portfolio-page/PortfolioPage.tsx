@@ -174,7 +174,7 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
         setTimeout(() => {
             setOperationFinished((prev) => !prev);
             console.log('Operation finished', operationFinished);
-        }, 9000); // 5000 milliseconds = 5 seconds
+        }, 11000); // 5000 milliseconds = 5 seconds
     };
 
     return (

@@ -34,6 +34,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const [recalculateRugScoreLoading, setRecalculateRugScoreLoading] = useState(false);
     const [kasPrice, setkasPrice] = useState(0);
     const [priceHistory, setPriceHistory] = useState([]);
+    const [currentTicker] = useState<string>(ticker);
 
     useEffect(() => {
         const fetchPrice = async () => {
@@ -81,23 +82,27 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     }, [fetchAndUpdateTokenInfo, ticker]);
 
     useEffect(() => {
-        if (ticker) {
-            const fetchPriceHistory = async () => {
-                const result = await getTokenPriceHistory(ticker);
-                setPriceHistory(result);
-            };
-            fetchPriceHistory();
+        const fetchPriceHistory = async () => {
+            if (ticker !== currentTicker) {
+                setPriceHistory([]);
+            }
+            const result = await getTokenPriceHistory(ticker);
+            setPriceHistory(result);
+        };
+        fetchPriceHistory();
 
-            const interval = setInterval(fetchPriceHistory, 900000);
+        const interval = setInterval(fetchPriceHistory, 900000);
 
-            return () => clearInterval(interval);
-        }
-    }, [ticker]);
+        return () => clearInterval(interval);
+    }, [ticker, currentTicker]);
 
-    const tokenData = tokenInfo && priceHistory.length > 0;
+    const tokenData = tokenInfo;
 
     const getComponentToShow = (component: JSX.Element, height?: string, width?: string) =>
         tokenData ? component : <Skeleton variant="rectangular" height={height} width={width} />;
+
+    const getComponentGraphToShow = (component: JSX.Element, height?: string, width?: string) =>
+        priceHistory.length > 0 ? component : <Skeleton variant="rectangular" height={height} width={width} />;
 
     const rugScoreParse = tokenInfo?.metadata?.rugScore === 0 ? null : tokenInfo?.metadata?.rugScore;
 
@@ -131,7 +136,10 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     return (
         <TokenPageLayout backgroundBlur={backgroundBlur}>
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '11.5vh')}
-            {getComponentToShow(<TokenGraph priceHistory={priceHistory} ticker={tokenInfo?.ticker} />, '35vh')}
+            {getComponentGraphToShow(
+                <TokenGraph priceHistory={priceHistory} ticker={tokenInfo?.ticker} />,
+                '35vh',
+            )}
             {getComponentToShow(<TokenStats tokenInfo={tokenInfo} />)}
             {getComponentToShow(
                 <MintingComponent

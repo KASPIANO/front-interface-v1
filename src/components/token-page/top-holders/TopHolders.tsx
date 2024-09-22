@@ -1,9 +1,10 @@
 import { FC, useEffect, useState } from 'react';
-import { Box, Card, Divider, Tooltip, Typography } from '@mui/material';
+import { Box, Card, Divider, IconButton, Snackbar, Tooltip, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
 import { BackendTokenResponse } from '../../../types/Types';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { fetchDevWalletBalance } from '../../../DAL/Krc20DAL';
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 
 interface TopHoldersProps {
     tokenInfo: BackendTokenResponse;
@@ -16,10 +17,23 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
     const [devWalletPercentage, setDevWalletPercentage] = useState('---');
     const [tokenHolders] = useState(tokenInfo.topHolders || []);
     const [holderTitle, setHolderTitle] = useState(numberOfHoldersToSelect[0]);
+    const [copied, setCopied] = useState(false);
 
     const updateTokenHoldersToShow = (value: number) => {
         setTokenHoldersToShow(value);
         setHolderTitle(value);
+    };
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard
+            .writeText(text)
+            .then(() => {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            })
+            .catch((err) => {
+                console.error('Failed to copy: ', err);
+            });
     };
 
     useEffect(() => {
@@ -91,8 +105,23 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
                 <Divider orientation="vertical" flexItem />
                 <Typography sx={{ marginLeft: 4, fontSize: '1.3vw' }}>
                     DEV WALLET HOLDS: {devWalletPercentage}
+                    <IconButton size="small" onClick={() => copyToClipboard(tokenInfo.devWallet)}>
+                        <ContentCopyRoundedIcon fontSize="small" />
+                    </IconButton>
                 </Typography>
             </Box>
+            {copied && (
+                <Snackbar
+                    sx={{
+                        backgroundColor: '#EDF7ED',
+                    }}
+                    open={copied}
+                    autoHideDuration={2000}
+                    onClose={() => setCopied(false)}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    message="Copied to clipboard!"
+                />
+            )}
         </Card>
     );
 };
