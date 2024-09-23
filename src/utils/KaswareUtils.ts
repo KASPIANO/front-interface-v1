@@ -1,5 +1,6 @@
 // Ensure the WebSocket is available globally
 
+import Cookies from 'js-cookie';
 import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
 import { kaspaFeeEstimate } from '../DAL/KaspaApiDal';
 import { KaswareSendKaspaResult } from '../types/Types';
@@ -86,6 +87,8 @@ export const switchNetwork = async (network: string): Promise<any> => {
 export const disconnect = async (origin: string): Promise<any> => {
     try {
         const response = await window.kasware.disconnect(origin);
+        Cookies.remove('access_token');
+        Cookies.remove('refresh_token');
         return response;
     } catch (error) {
         console.error(error);

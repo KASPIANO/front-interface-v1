@@ -238,6 +238,15 @@ export interface FetchWalletActivityResponse {
     next: string | null;
     prev: string | null;
 }
+
+export interface VerifiedUser {
+    userWalletAddress: string;
+    userSignedMessageTxId: string;
+    requestId: string;
+    requestNonce: string;
+    requestTimestamp: string;
+}
+
 export interface FetchWalletPortfolioResponse {
     portfolioItems: TokenRowPortfolioItem[];
     next: string | null;

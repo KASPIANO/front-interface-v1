@@ -5,11 +5,13 @@ import {
     TokenListItemResponse,
     TokenSearchItems,
     TokenSentiment,
+    VerifiedUser,
 } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
 const KRC20METADATA_CONTROLLER = 'krc20metadata';
+const AUTH_CONTROLLER = 'auth';
 
 export type BackendValidationErrorsType = {
     [key: string]: string[];
@@ -194,6 +196,19 @@ export async function fetchTokenPortfolio(tickers: string[]): Promise<TickerPort
     } catch (error) {
         console.error('Error fetching token logo URL:', error);
         return [];
+    }
+}
+export async function signUser(verifiedUser: VerifiedUser): Promise<{ message: string }> {
+    try {
+        const response = await backendService.post<{ message: string }>(`/${AUTH_CONTROLLER}/sign`, {
+            verifiedUser,
+        });
+
+        // Assuming response.data contains the actual array of logo URLs
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching token logo URL:', error);
+        return;
     }
 }
 

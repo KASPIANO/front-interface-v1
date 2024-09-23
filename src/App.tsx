@@ -1,10 +1,12 @@
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
+import Cookies from 'js-cookie';
 import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { showGlobalSnackbar } from './components/alert-context/AlertContext';
 import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
+import { signUser } from './DAL/BackendDAL';
 import { fetchWalletBalance } from './DAL/KaspaApiDal';
 // import useSSE from './hooks/useSSE';
 import { ThemeContext } from './main';
@@ -29,6 +31,7 @@ import {
     switchNetwork,
 } from './utils/KaswareUtils';
 import {
+    checkTokenExpiration,
     generateNonce,
     generateRequestId,
     getLocalThemeMode,
@@ -45,6 +48,24 @@ const App = () => {
     const [, setIsConnecting] = useState<boolean>(false);
     const [backgroundBlur, setBackgroundBlur] = useState(false);
     const [, setUserVerified] = useState<UserVerfication>(null);
+    useEffect(() => {
+        const token = Cookies.get('userVerifiedToken');
+        if (token) {
+            const isExpired = checkTokenExpiration(token);
+            if (isExpired) {
+                alert(
+                    'For security reasons, you have been automatically disconnected due to prolonged inactivity. Please log in again to continue using the system.',
+                );
+                handleDisconnect();
+            }
+        } else {
+            alert(
+                'For security reasons, you have been automatically disconnected due to prolonged inactivity. Please log in again to continue using the system.',
+            );
+            handleDisconnect();
+        }
+    }, []);
+
     // const events = useSSE(walletAddress);
 
     const toggleThemeMode = () => {
@@ -148,27 +169,16 @@ const App = () => {
 
                 // Check if any accounts were returned
                 if (accounts.length > 0) {
-                    // Update wallet state with the first account
-                    await updateWalletState(accounts[0]);
-                    // Show a success message with part of the wallet address
-                    showGlobalSnackbar({
-                        message: 'Wallet connected successfully',
-                        severity: 'success',
-                        details: `Connected to wallet ${accounts[0].substring(0, 9)}....${accounts[0].substring(accounts[0].length - 4)}`,
-                    });
-
                     // Perform user verification
-                    const storedAddress = localStorage.getItem('walletAddress');
-                    if (!storedAddress && storedAddress !== accounts[0]) {
-                        const userVerification = await handleUserVerification(
-                            accounts,
-                            setUserVerified,
-                            showGlobalSnackbar,
-                        );
 
-                        // Log the verification result
-                        console.log('User Verification:', userVerification, accounts[0]);
-                    }
+                    const userVerification = await handleUserVerification(
+                        accounts,
+                        setUserVerified,
+                        showGlobalSnackbar,
+                    );
+
+                    // Log the verification result
+                    console.log('User Verification:', userVerification, accounts[0]);
 
                     // Log the verification result
                 } else {
@@ -263,19 +273,29 @@ Request ID: ${requestId}
 
             const userVerification = await signMessage(userVerificationMessage);
             if (userVerification) {
-                setUserVerified({
+                const verifiedUser = {
                     userWalletAddress: accounts[0],
                     userSignedMessageTxId: userVerification,
                     requestId,
                     requestNonce: nonce,
                     requestTimestamp: requestDate,
-                });
-
+                };
+                setUserVerified(verifiedUser);
+                await signUser(verifiedUser);
                 showGlobalSnackbar({
                     message: 'User verified successfully',
                     severity: 'success',
                 });
-                return userVerification;
+                // Update wallet state with the first account
+                await updateWalletState(accounts[0]);
+
+                // Show a success message with part of the wallet address
+                showGlobalSnackbar({
+                    message: 'Wallet connected successfully',
+                    severity: 'success',
+                    details: `Connected to wallet ${accounts[0].substring(0, 9)}....${accounts[0].substring(accounts[0].length - 4)}`,
+                });
+                return verifiedUser;
             }
         } catch (error) {
             console.error('Error verifying user:', error);
