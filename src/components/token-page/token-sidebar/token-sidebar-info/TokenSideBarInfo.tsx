@@ -49,11 +49,11 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
     const [socials, setSocials] = useState<TokenSidebarSocialsBarOptions>(null);
 
     const sentimentButtonsConfig: SentimentButtonsConfig[] = [
-        { key: 'love', icon: <FavoriteBorderRoundedIcon sx={{ fontSize: '1.4vw' }} color="success" /> },
-        { key: 'positive', icon: <RocketLaunchRounded sx={{ fontSize: '1.4vw' }} color="primary" /> },
-        { key: 'neutral', icon: <SentimentNeutralRounded sx={{ fontSize: '1.4vw' }} color="info" /> },
-        { key: 'negative', icon: <TrendingDownRounded sx={{ fontSize: '1.4vw' }} color="error" /> },
-        { key: 'warning', icon: <WarningAmberRoundedIcon sx={{ fontSize: '1.4vw' }} color="warning" /> },
+        { key: 'love', icon: <FavoriteBorderRoundedIcon sx={{ fontSize: '1.1rem' }} color="success" /> },
+        { key: 'positive', icon: <RocketLaunchRounded sx={{ fontSize: '1.1rem' }} color="primary" /> },
+        { key: 'neutral', icon: <SentimentNeutralRounded sx={{ fontSize: '1.1rem' }} color="info" /> },
+        { key: 'negative', icon: <TrendingDownRounded sx={{ fontSize: '1.1rem' }} color="error" /> },
+        { key: 'warning', icon: <WarningAmberRoundedIcon sx={{ fontSize: '1.1rem' }} color="warning" /> },
     ];
 
     useEffect(() => {
@@ -95,7 +95,13 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
             const sentimentToSet = tokenInfo.metadata?.selectedSentiment === key ? null : key;
             const result = await updateWalletSentiment(tokenInfo.ticker, walletAddress, sentimentToSet);
 
-            setTokenInfo({ ...tokenInfo, metadata: result });
+            setTokenInfo({
+                ...tokenInfo,
+                metadata: {
+                    ...tokenInfo.metadata,
+                    ...result,
+                },
+            });
         } catch (error) {
             console.error('Error updating sentiment:', error);
         } finally {
@@ -225,7 +231,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                         <Typography variant="body2" fontWeight={500}>
                             Description:
                         </Typography>
-                        <Typography sx={{ fontSize: '1vw' }} color="text.secondary">
+                        <Typography sx={{ fontSize: '0.8rem' }} color="text.secondary">
                             {tokenInfo.metadata?.description}
                         </Typography>
                     </Box>
@@ -236,7 +242,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                 )}
             </Box>
             <Box sx={{ mt: 'auto' }}>
-                <Typography variant="body2" align="center" sx={{ fontSize: '1.1vw' }} color="text.primary">
+                <Typography variant="body2" align="center" sx={{ fontSize: '0.85rem' }} color="text.primary">
                     Community Sentiments
                 </Typography>
                 <SentimentsContainerBox>
@@ -256,7 +262,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                                 >
                                     {button.icon}
                                     <Typography
-                                        sx={{ fontSize: '1vw' }}
+                                        sx={{ fontSize: '0.8rem' }}
                                         variant="body2"
                                         align="center"
                                         color="text.secondary"

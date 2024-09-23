@@ -66,7 +66,7 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
         <HeaderContainer>
             {/* Fire Icon Button for Minting Rate Sort */}
 
-            <Typography sx={{ fontWeight: 'bold', fontSize: '1.5vw', marginLeft: '1vw' }}>Top KRC-20</Typography>
+            <Typography sx={{ fontWeight: 'bold', fontSize: '1.2rem', marginLeft: '1vw' }}>Top KRC-20</Typography>
 
             {/* Pagination Buttons */}
             <Box sx={{ display: 'flex', alignItems: 'center' }}>

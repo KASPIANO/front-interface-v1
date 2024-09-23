@@ -24,16 +24,12 @@ export const TitleHeaderContainer = styled(Box)({
 });
 
 export const Title = styled(Typography)({
-    fontSize: '1.5vw',
+    fontSize: '1rem',
     fontWeight: 600,
 });
 
 export const Rank = styled(Typography)({
-    fontSize: '1.3vw',
+    fontSize: '1rem',
     fontWeight: 600,
     marginLeft: '1vh',
-});
-
-export const Subtitle = styled(Typography)({
-    fontSize: '1vw',
 });

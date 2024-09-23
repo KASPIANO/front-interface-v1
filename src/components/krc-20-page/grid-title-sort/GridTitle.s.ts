@@ -29,7 +29,7 @@ export const SortMiddleButton = styled(Button)<{ selected: boolean }>(({ selecte
     },
     '&.MuiButton-root': {
         padding: '5px 5px',
-        fontSize: '0.8vw',
+        fontSize: '0.68rem',
     },
 
     '&:hover': {
@@ -41,7 +41,7 @@ export const SortFirstButton = styled(Button)<{ selected: boolean }>(({ selected
     '&.MuiButton-root': {
         borderRadius: '4px 0 0 4px',
         padding: '4px 4px',
-        fontSize: '0.8vw',
+        fontSize: '0.68rem',
     },
     '&.MuiButtonGroup-firstButton': {
         backgroundColor: selected ? 'rgba(111, 199, 186, 0.8)' : 'rgba(111, 199, 186, 0.25)',
@@ -58,7 +58,7 @@ export const SortLastButton = styled(Button)<{ selected: boolean }>(({ selected 
     },
     '&.MuiButton-root': {
         padding: '4px 4px',
-        fontSize: '0.8vw',
+        fontSize: '0.68rem',
         borderRadius: '0 4px 4px 0',
     },
     '&:hover': {
@@ -71,7 +71,7 @@ export const PrevPageButton = styled(Button)({
         marginLeft: '1.4vw',
         padding: '4px 4px',
         borderRadius: '4px 0 0 4px',
-        fontSize: '0.8vw',
+        fontSize: '0.68rem',
         minWidth: '0',
         width: '3vw',
         backgroundColor: 'rgba(111, 199, 186, 0.25)', // Primary color with less opacity
@@ -85,7 +85,7 @@ export const NextPageButton = styled(Button)({
     '&.MuiButton-root': {
         padding: '4px 4px',
         borderRadius: '0 4px 4px 0',
-        fontSize: '0.8vw',
+        fontSize: '0.68rem',
         minWidth: '0',
         width: '3vw',
         backgroundColor: 'rgba(111, 199, 186, 0.25)', // Primary color with less opacity

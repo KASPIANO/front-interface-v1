@@ -111,10 +111,11 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             sx={{
                                 width: '6vh',
                                 height: '6vh',
+                                marginRight: '1vw',
                             }}
                             style={{
                                 marginLeft: '0.1vw',
-                                borderRadius: 5,
+                                borderRadius: 7,
                             }}
                             variant="square"
                             alt={token.ticker}
@@ -128,13 +129,13 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }}
                         primary={
                             <Tooltip title="">
-                                <Typography component={'span'} variant="body1" style={{ fontSize: '1vw' }}>
+                                <Typography component={'span'} variant="body1" style={{ fontSize: '0.8rem' }}>
                                     {capitalizeFirstLetter(token.ticker)}
                                 </Typography>
                             </Tooltip>
                         }
                         secondary={
-                            <Typography component={'span'} variant="body2" style={{ fontSize: '0.9vw' }}>
+                            <Typography component={'span'} variant="body2" style={{ fontSize: '0.75rem' }}>
                                 {formatDate(token.creationDate)}
                             </Typography>
                         }
@@ -146,7 +147,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             <Typography
                                 component={'span'}
                                 variant="body2"
-                                style={{ fontSize: '1vw', display: 'flex', justifyContent: 'flex-start' }}
+                                style={{ fontSize: '0.8rem', display: 'flex', justifyContent: 'flex-start' }}
                             >
                                 {`${moment().diff(Number(token.creationDate), 'days')} days`}
                             </Typography>
@@ -157,14 +158,14 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         primary={
                             <Tooltip title={`${token.price} Kas`}>
                                 <Stat>
-                                    <StatNumber style={{ fontSize: '1vw' }} margin="0">
+                                    <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
                                         {formatPrice(token.price)}
                                     </StatNumber>
                                     {token.changePrice !== null && (
                                         <StatHelpText
                                             style={{
-                                                fontSize: '0.8vw',
                                                 display: token.changePrice === 0 ? 'none' : '',
+                                                fontSize: '0.7rem',
                                             }}
                                             margin="0"
                                         >
@@ -187,13 +188,13 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         primary={
                             <Tooltip title={formatNumberWithCommas(token.marketCap)}>
                                 <Stat>
-                                    <StatNumber style={{ fontSize: '1vw' }} margin="0">
+                                    <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
                                         {simplifyNumber(token.marketCap)}
                                     </StatNumber>
                                     {token.changeMarketCap !== null && (
                                         <StatHelpText
                                             style={{
-                                                fontSize: '0.8vw',
+                                                fontSize: '0.7rem',
                                                 display: token.changeMarketCap === 0 ? 'none' : '',
                                             }}
                                             margin="0"
@@ -217,12 +218,12 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         primary={
                             <Tooltip title="This shows the percentage of tokens minted, along with the number of mints made in the selected time interval.">
                                 <Stat>
-                                    <StatNumber style={{ fontSize: '1vw' }} margin="0">
+                                    <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
                                         {(token.totalMintedPercent * 100).toFixed(2)}%
                                     </StatNumber>
                                     <StatHelpText
                                         style={{
-                                            fontSize: '0.8vw',
+                                            fontSize: '0.7rem',
                                             display: token.changeTotalMints === 0 ? 'none' : '',
                                         }}
                                         margin="0"
@@ -245,13 +246,13 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         primary={
                             <Tooltip title="This displays the total number of token holders and the change in the holder amount during the selected time interval.">
                                 <Stat>
-                                    <StatNumber style={{ fontSize: '1vw' }} margin="0">
+                                    <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
                                         {token.totalHolders || 0}
                                     </StatNumber>
 
                                     <StatHelpText
                                         style={{
-                                            fontSize: '0.8vw',
+                                            fontSize: '0.7rem',
                                             display: token.changeTotalHolders === 0 ? 'none' : '',
                                         }}
                                         margin="0"
@@ -274,7 +275,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemText
                         sx={{ maxWidth: '5%' }}
                         primary={
-                            <Typography component={'span'} variant="body2" style={{ fontSize: '1vw' }}>
+                            <Typography component={'span'} variant="body2" style={{ fontSize: '0.8rem' }}>
                                 {preMintedIcons(token.preMintedSupply, token.totalSupply)}
                             </Typography>
                         }
@@ -290,7 +291,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                                     style={{
                                         minWidth: '2vw',
                                         width: '3vw',
-                                        fontSize: '0.8vw',
+                                        fontSize: '0.75rem',
                                     }}
                                 >
                                     Mint
