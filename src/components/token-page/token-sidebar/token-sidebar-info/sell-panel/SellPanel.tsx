@@ -55,28 +55,24 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     }, [pricePerToken, tokenInfo.price]);
 
     const buttons = (
-        <Box sx={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-            <StyledButton onClick={() => setPricePerToken(tokenInfo.price)} variant="outlined">
+        <Box sx={{ display: 'flex', gap: '0.3rem', mb: '0.5rem' }}>
+            <StyledButton onClick={() => setPricePerToken(tokenInfo.price)} variant="contained">
                 Floor
             </StyledButton>
-            <StyledButton onClick={() => setPricePerToken(tokenInfo.price * 1.01)} variant="outlined">
+            <StyledButton onClick={() => setPricePerToken(tokenInfo.price * 1.01)} variant="contained">
                 +1%
             </StyledButton>
-            <StyledButton onClick={() => setPricePerToken(tokenInfo.price * 1.05)} variant="outlined">
+            <StyledButton onClick={() => setPricePerToken(tokenInfo.price * 1.05)} variant="contained">
                 +5%
             </StyledButton>
-            <StyledButton onClick={() => setPricePerToken(tokenInfo.price * 1.1)} variant="outlined">
+            <StyledButton onClick={() => setPricePerToken(tokenInfo.price * 1.1)} variant="contained">
                 +10%
-            </StyledButton>
-            <StyledButton onClick={() => setPricePerToken(tokenInfo.price * 0.95)} variant="outlined">
-                -5%
             </StyledButton>
         </Box>
     );
     return (
         <StyledSellPanel>
-            <Typography variant="h5">Sell Tokens</Typography>
-
+            {buttons}
             <StyledTextField
                 label="Token Amount"
                 type="number"
@@ -106,7 +102,6 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     {`Price per token is ${priceDifference > 0 ? '+' : ''}${priceDifference.toFixed(2)}% compared to the floor price.`}
                 </Typography>
             )}
-            {buttons}
         </StyledSellPanel>
     );
 };

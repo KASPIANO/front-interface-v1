@@ -170,9 +170,9 @@ export enum FilterState {
 }
 
 export interface PortfolioValue {
-    kas: number;
-    change: number;
-    changeDirection: 'increase' | 'decrease';
+    value: number;
+    change?: number;
+    changeDirection?: 'increase' | 'decrease';
 }
 
 export interface UserPortfolioOverview {
@@ -195,7 +195,7 @@ export interface UserSettings {
 export interface TokenRowPortfolioItem {
     ticker: string;
     balance: string;
-    price?: string;
+    price?: number;
     totalValue?: string;
     oneDayChange?: string;
     logoUrl?: string;
@@ -231,6 +231,7 @@ export interface TickerPortfolioBackend {
     ticker: string;
     logo: string;
     state?: string;
+    price?: number;
 }
 
 export interface FetchWalletActivityResponse {

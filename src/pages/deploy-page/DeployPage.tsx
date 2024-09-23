@@ -564,7 +564,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             }}
         >
             <DeployForm>
-                <Typography sx={{ fontSize: '2.2vw', fontWeight: '500' }} variant="h4" gutterBottom>
+                <Typography sx={{ fontSize: '1.5rem', fontWeight: '500' }} variant="h4" gutterBottom>
                     KRC-20 Token Information
                 </Typography>
                 <form id="tokenKrc20Form" onSubmit={handleSubmitKRC20}>
@@ -679,7 +679,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 </form>
 
                 <Typography
-                    sx={{ fontSize: '2.2vw', fontWeight: '500', marginTop: '2vh' }}
+                    sx={{ fontSize: '1.5rem', fontWeight: '500', marginTop: '2vh' }}
                     variant="h4"
                     gutterBottom
                 >

@@ -22,7 +22,7 @@ const TokenRowActivity: FC<TokenRowActivityProps> = (props) => {
                     }}
                     primary={
                         <Tooltip title={token.ticker}>
-                            <Typography variant="body1" sx={{ fontSize: '1.2vw' }}>
+                            <Typography variant="body1" sx={{ fontSize: '0.8rem' }}>
                                 {capitalizeFirstLetter(token.ticker)}
                             </Typography>
                         </Tooltip>
@@ -35,7 +35,7 @@ const TokenRowActivity: FC<TokenRowActivityProps> = (props) => {
                         <Typography
                             variant="body1"
                             style={{
-                                fontSize: '1.2vw',
+                                fontSize: '0.8rem',
                                 fontWeight: 'bold',
                                 display: 'flex',
                                 justifyContent: 'start',
@@ -51,7 +51,7 @@ const TokenRowActivity: FC<TokenRowActivityProps> = (props) => {
                         <Typography
                             variant="body1"
                             style={{
-                                fontSize: '1.2vw',
+                                fontSize: '0.8rem',
                                 fontWeight: 'bold',
                                 display: 'flex',
                                 justifyContent: 'start',
@@ -67,7 +67,7 @@ const TokenRowActivity: FC<TokenRowActivityProps> = (props) => {
                         <Typography
                             variant="body1"
                             style={{
-                                fontSize: '1.2vw',
+                                fontSize: '0.8rem',
                                 fontWeight: 'bold',
                                 display: 'flex',
                                 justifyContent: 'start',

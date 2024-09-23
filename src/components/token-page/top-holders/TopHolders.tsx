@@ -101,7 +101,7 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
                     {topHoldersPercentage}
                 </Typography>
                 <Divider orientation="vertical" flexItem />
-                <Typography sx={{ marginLeft: 4, fontSize: '1.3vw' }}>
+                <Typography sx={{ marginLeft: 4, fontSize: '0.85rem' }}>
                     DEV WALLET HOLDS: {devWalletPercentage}
                     <IconButton size="small" onClick={() => copyToClipboard(tokenInfo.devWallet)}>
                         <ContentCopyRoundedIcon fontSize="small" />

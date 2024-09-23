@@ -11,7 +11,7 @@ export const DeployForm = styled(Box)({
 
 export const Info = styled(Typography)({
     marginTop: '20px',
-    fontSize: '14px',
+    fontSize: '0.8rem',
     color: 'red',
     textAlign: 'center',
 });

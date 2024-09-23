@@ -3,7 +3,7 @@ import { PortfolioLayout } from './PortfolioPageLayout';
 import UserProfile from '../../components/portfolio-page/user-profile/UserProfile';
 import PortfolioPanel from '../../components/portfolio-page/portfolio-tab-panel/PortfolioPanel';
 import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
-import { PortfolioValue, TokenRowActivityItem, TokenRowPortfolioItem } from '../../types/Types';
+import { TokenRowActivityItem, TokenRowPortfolioItem } from '../../types/Types';
 import { fetchWalletActivity, fetchWalletKRC20TokensBalance } from '../../DAL/Krc20DAL';
 import { fetchTokenPortfolio } from '../../DAL/BackendDAL';
 
@@ -14,11 +14,11 @@ interface PortfolioPageProps {
     walletBalance: number;
 }
 
-const portfolioValue: PortfolioValue = {
-    kas: 6089.56,
-    change: 14.5,
-    changeDirection: 'increase',
-};
+// const portfolioValue: PortfolioValue = {
+//     kas: 6089.56,
+//     change: 14.5,
+//     changeDirection: 'increase',
+// };
 
 // export const mockTokenRowPortfolioItems: TokenRowPortfolioItem[] = [
 //     {
@@ -60,6 +60,7 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
     const [lastActivityPage, setLastActivityPage] = useState<boolean>(false);
     const [lastPortfolioPage, setLastPortfolioPage] = useState<boolean>(false);
     const [operationFinished, setOperationFinished] = useState<boolean>(false);
+    const [portfolioValueKAS, setPortfolioValueKAS] = useState<number>(0);
 
     useEffect(() => {
         const fetchPrice = async () => {
@@ -90,19 +91,22 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
                 // Extract the tickers for later use in metadata fetch
                 const tickers = tokenData.portfolioItems.map((token) => token.ticker);
                 const tickersPortfolio = await fetchTokenPortfolio(tickers);
-
+                let totalPortfolioValue = 0;
                 // Update tokenData with logo URLs
                 const updatedTokenData = tokenData.portfolioItems.map((token) => {
                     const tokenInfo = tickersPortfolio.find((item) => item.ticker === token.ticker);
+                    const portfolioValue = parseInt(token.balance) * (tokenInfo ? tokenInfo.price : 0);
+                    totalPortfolioValue += portfolioValue;
                     return {
                         ...token,
                         state: tokenInfo ? tokenInfo.state : null,
                         logoUrl: tokenInfo ? tokenInfo.logo : null,
+                        price: tokenInfo ? tokenInfo.price : 0,
                     };
                 });
 
                 setPortfolioAssetTickers(tickers);
-
+                setPortfolioValueKAS(totalPortfolioValue);
                 // Set the portfolio token info state
                 setPortfolioTokenInfo(updatedTokenData);
                 setPortfolioNext(tokenData.next); // Save the 'next' key for further requests
@@ -179,7 +183,7 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
 
     return (
         <PortfolioLayout backgroundBlur={backgroundBlur}>
-            <UserProfile walletAddress={walletAddress} portfolioValue={portfolioValue} kasPrice={kasPrice} />
+            <UserProfile walletAddress={walletAddress} portfolioValue={portfolioValueKAS} kasPrice={kasPrice} />
             <PortfolioPanel
                 handleChange={handleChange}
                 handleActivityPagination={handleActivityPagination}

@@ -70,7 +70,16 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                         />
                     </TabPanel>
                     <TabPanel value="2">Buy The Token</TabPanel>
-                    <TabPanel value="3">
+                    <TabPanel
+                        sx={{
+                            '&.MuiTabPanel-root': {
+                                padding: '0px',
+                                height: '100%',
+                                overflowY: 'auto',
+                            },
+                        }}
+                        value="3"
+                    >
                         <SellPanel tokenInfo={tokenInfo} kasPrice={kasPrice} />
                     </TabPanel>
                 </TabContext>

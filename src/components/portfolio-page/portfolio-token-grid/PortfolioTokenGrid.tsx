@@ -22,6 +22,8 @@ enum GridHeaders {
     TICKER = 'TICKER',
     BALANCE = 'BALANCE',
     ACTIONS = 'ACTIONS',
+    PRICE = 'PRICE',
+    TOTAL = 'TOTAL AMOUNT',
 }
 
 const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
@@ -53,12 +55,14 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
                 borderBottom: '0.1px solid rgba(111, 199, 186, 0.3)',
             }}
         >
-            <Table style={{ width: '90%', marginLeft: '0.9vw' }}>
+            <Table style={{ width: '100%', marginLeft: '0.9vw' }}>
                 <TableHead>
                     <TableRow>
-                        <TableCell sx={{ width: '33%', borderBottom: 0 }}>{GridHeaders.TICKER}</TableCell>
-                        <TableCell sx={{ width: '33%', borderBottom: 0 }}>{GridHeaders.BALANCE}</TableCell>
-                        <TableCell sx={{ width: '33%', borderBottom: 0 }}>{GridHeaders.ACTIONS}</TableCell>
+                        <TableCell sx={{ width: '17%', borderBottom: 0 }}>{GridHeaders.TICKER}</TableCell>
+                        <TableCell sx={{ width: '14.5%', borderBottom: 0 }}>{GridHeaders.PRICE}</TableCell>
+                        <TableCell sx={{ width: '14%', borderBottom: 0 }}>{GridHeaders.BALANCE}</TableCell>
+                        <TableCell sx={{ width: '20%', borderBottom: 0 }}>{GridHeaders.TOTAL}</TableCell>
+                        <TableCell sx={{ width: '15%', borderBottom: 0 }}>{GridHeaders.ACTIONS}</TableCell>
                     </TableRow>
                 </TableHead>
             </Table>
@@ -78,7 +82,7 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
             <GlobalStyle />
             {tableHeader}
             {!walletConnected ? (
-                <p style={{ textAlign: 'center', fontSize: '1vw', marginTop: '10vh' }}>
+                <p style={{ textAlign: 'center', fontSize: '0.8rem', marginTop: '10vh' }}>
                     <b>Please connect your wallet to view the portfolio.</b>
                 </p>
             ) : (
@@ -105,7 +109,7 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
                 </List>
             )}
             {tokensList.length === 0 && walletConnected && (
-                <p style={{ textAlign: 'center', fontSize: '1vw' }}>
+                <p style={{ textAlign: 'center', fontSize: '0.8rem' }}>
                     <b>End of list</b>
                 </p>
             )}
