@@ -6,6 +6,7 @@ import { BackendTokenResponse } from '../../../types/Types';
 import { SideBarContainer } from './TokenSideBar.s';
 import TokenSideBarInfo from './token-sidebar-info/TokenSideBarInfo';
 import { GlobalStyleTokenSideBar } from '../../../utils/GlobalStyleScrollBar';
+import SellPanel from './token-sidebar-info/sell-panel/SellPanel';
 
 interface TokenSideBarProps {
     tokenInfo: BackendTokenResponse;
@@ -69,7 +70,9 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                         />
                     </TabPanel>
                     <TabPanel value="2">Buy The Token</TabPanel>
-                    <TabPanel value="3">Sell The Token</TabPanel>
+                    <TabPanel value="3">
+                        <SellPanel tokenInfo={tokenInfo} kasPrice={kasPrice} />
+                    </TabPanel>
                 </TabContext>
             </SideBarContainer>
         </>
