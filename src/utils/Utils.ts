@@ -148,3 +148,8 @@ export const checkTokenDeployment = async (ticker: string): Promise<boolean> => 
 
     return false; // Token was not deployed after 5 attempts
 };
+
+export const kasToSompi = (kas: number): number => {
+    const sompi = (kas * 1e8).toFixed(0);
+    return parseFloat(sompi);
+};
