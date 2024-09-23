@@ -2,7 +2,6 @@ import { FC } from 'react';
 import { Box, Avatar, Typography, Button, useTheme } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { ProfileContainer, ProfileDetails } from './UserProfile.s';
-import { PortfolioValue } from '../../../types/Types';
 // import XIcon from '@mui/icons-material/X';
 import { shortenAddress } from '../../../utils/Utils';
 import { Stat, StatHelpText, StatNumber } from '@chakra-ui/react';
