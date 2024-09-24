@@ -1,13 +1,13 @@
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
-import Cookies from 'js-cookie';
+// import Cookies from 'js-cookie';
 import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { showGlobalSnackbar } from './components/alert-context/AlertContext';
 import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
-import { signUser } from './DAL/BackendDAL';
 import { fetchWalletBalance } from './DAL/KaspaApiDal';
+import { signUser } from './DAL/BackendDAL';
 // import useSSE from './hooks/useSSE';
 import { ThemeContext } from './main';
 import BatchTransferPage from './pages/batch-transfer-page/BatchTransferPage';
@@ -31,7 +31,6 @@ import {
     switchNetwork,
 } from './utils/KaswareUtils';
 import {
-    checkTokenExpiration,
     generateNonce,
     generateRequestId,
     getLocalThemeMode,
@@ -48,23 +47,6 @@ const App = () => {
     const [, setIsConnecting] = useState<boolean>(false);
     const [backgroundBlur, setBackgroundBlur] = useState(false);
     const [, setUserVerified] = useState<UserVerfication>(null);
-    useEffect(() => {
-        const token = Cookies.get('userVerifiedToken');
-        if (token) {
-            const isExpired = checkTokenExpiration(token);
-            if (isExpired) {
-                alert(
-                    'For security reasons, you have been automatically disconnected due to prolonged inactivity. Please log in again to continue using the system.',
-                );
-                handleDisconnect();
-            }
-        } else {
-            alert(
-                'For security reasons, you have been automatically disconnected due to prolonged inactivity. Please log in again to continue using the system.',
-            );
-            handleDisconnect();
-        }
-    }, []);
 
     // const events = useSSE(walletAddress);
 
@@ -308,6 +290,24 @@ Request ID: ${requestId}
             return null;
         }
     };
+
+    // useEffect(() => {
+    //     const token = Cookies.get('userVerifiedToken');
+    //     if (token) {
+    //         const isExpired = checkTokenExpiration(token);
+    //         if (isExpired) {
+    //             alert(
+    //                 'For security reasons, you have been automatically disconnected due to prolonged inactivity. Please log in again to continue using the system.',
+    //             );
+    //             handleDisconnect();
+    //         }
+    //     } else {
+    //         alert(
+    //             'For security reasons, you have been automatically disconnected due to prolonged inactivity. Please log in again to continue using the system.',
+    //         );
+    //         handleDisconnect();
+    //     }
+    // }, [handleDisconnect]);
 
     if (!themeMode) {
         return null;

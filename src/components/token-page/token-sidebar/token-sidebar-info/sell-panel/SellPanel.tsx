@@ -1,24 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Box, IconButton, InputAdornment, Typography } from '@mui/material';
-import { BackendTokenResponse } from '../../../../../types/Types';
+import { BackendTokenResponse, TransferObj } from '../../../../../types/Types';
 import { StyledButton, StyledSellPanel, StyledTextField } from './SellPanel.s';
 import { fetchWalletKRC20Balance } from '../../../../../DAL/Krc20DAL';
 import { SwapHoriz } from '@mui/icons-material'; // MUI icon for swap
+import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
+import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
+import { transferKRC20Token } from '../../../../../utils/KaswareUtils';
 
 interface SellPanelProps {
     tokenInfo: BackendTokenResponse;
     kasPrice: number;
     walletAddress: string | null;
+    walletConnected;
 }
 
 const SellPanel: React.FC<SellPanelProps> = (props) => {
-    const { tokenInfo, kasPrice, walletAddress } = props;
+    const { tokenInfo, kasPrice, walletAddress, walletConnected } = props;
     const [tokenAmount, setTokenAmount] = useState<string>(''); // Changed to string
     const [totalPrice, setTotalPrice] = useState<string>(''); // Changed to string
     const [pricePerToken, setPricePerToken] = useState<string>(''); // Changed to string
     const [priceDifference, setPriceDifference] = useState<number>(0);
     const [walletTickerBalance, setWalletTickerBalance] = useState<number>(0);
     const [priceCurrency, setPriceCurrency] = useState<'KAS' | 'USD'>('KAS');
+    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false); // Dialog state
+    const [walletConfirmation, setWalletConfirmation] = useState<boolean>(false);
 
     useEffect(() => {
         fetchWalletKRC20Balance(walletAddress, tokenInfo.ticker).then((balance) => {
@@ -70,7 +76,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         setPricePerToken(priceStr);
 
         const pricePerTokenValue = parseFloat(priceStr);
-        const amount = parseInt(tokenAmount);
+        const amount = parseFloat(tokenAmount);
 
         if (!isNaN(pricePerTokenValue)) {
             if (!isNaN(amount) && amount > 0) {
@@ -94,14 +100,21 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
 
     const handleSetPricePerToken = (multiplier: number) => {
         const newPricePerTokenValue = tokenInfo.price * multiplier;
-        setPricePerToken(newPricePerTokenValue.toString());
+        const roundedPricePerToken = roundUp(newPricePerTokenValue, 8);
+        setPricePerToken(roundedPricePerToken.toString());
 
         const amount = parseInt(tokenAmount);
         if (!isNaN(amount) && amount > 0) {
             const newTotalPrice = newPricePerTokenValue * amount;
-            setTotalPrice(newTotalPrice.toString());
+            const roundedTotalPrice = roundUp(newTotalPrice, 8);
+            setTotalPrice(roundedTotalPrice.toString());
         }
     };
+
+    function roundUp(value, decimals) {
+        const factor = Math.pow(10, decimals);
+        return Math.ceil(value * factor) / factor;
+    }
 
     const handleCurrencyToggle = () => {
         if (priceCurrency === 'KAS') {
@@ -110,12 +123,12 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             if (pricePerToken !== '') {
                 const pricePerTokenValue = parseFloat(pricePerToken);
                 const priceInUSD = pricePerTokenValue * kasPrice;
-                setPricePerToken(priceInUSD.toFixed(2));
+                setPricePerToken(priceInUSD.toString());
             }
             if (totalPrice !== '') {
                 const totalPriceValue = parseFloat(totalPrice);
                 const totalInUSD = totalPriceValue * kasPrice;
-                setTotalPrice(totalInUSD.toFixed(2));
+                setTotalPrice(totalInUSD.toString());
             }
         } else {
             // Convert prices back to KAS
@@ -123,12 +136,14 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             if (pricePerToken !== '') {
                 const pricePerTokenValue = parseFloat(pricePerToken);
                 const priceInKAS = pricePerTokenValue / kasPrice;
-                setPricePerToken(priceInKAS.toString());
+                const roundedPriceInKAS = roundUp(priceInKAS, 8);
+                setPricePerToken(roundedPriceInKAS.toString());
             }
             if (totalPrice !== '') {
                 const totalPriceValue = parseFloat(totalPrice);
                 const totalInKAS = totalPriceValue / kasPrice;
-                setTotalPrice(totalInKAS.toString());
+                const roundedTotalInKAS = roundUp(totalInKAS, 8);
+                setTotalPrice(roundedTotalInKAS.toString());
             }
         }
     };
@@ -136,16 +151,65 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const handleCreateSellOrder = () => {
         const amount = parseInt(tokenAmount);
         if (isNaN(amount) || amount <= 0) {
-            alert('Please enter a valid token amount.');
+            showGlobalSnackbar({ message: 'Please enter a valid token amount.', severity: 'error' });
             return;
         }
         if (amount > walletTickerBalance) {
-            alert('Token amount exceeds your balance.');
+            showGlobalSnackbar({ message: 'Insufficient Token balance.', severity: 'error' });
             return;
         }
-        // Proceed with creating the sell order
-        // Implement the logic to create the sell order here
-        alert('Sell order created successfully.');
+        // Retrieve wallet temp wallert address and order id and set it
+        setIsDialogOpen(true);
+    };
+
+    const handleTransfer = async () => {
+        const inscribeJsonString: TransferObj = {
+            p: 'KRC-20',
+            op: 'transfer',
+            tick: tokenInfo.ticker,
+            amt: (parseInt(tokenAmount) * 100000000).toString(),
+            to: '0x',
+        };
+        const jsonStringified = JSON.stringify(inscribeJsonString);
+
+        try {
+            setWalletConfirmation(true);
+            const result = await transferKRC20Token(jsonStringified);
+            setWalletConfirmation(false);
+            if (result) {
+                const { commit, reveal } = JSON.parse(result);
+
+                showGlobalSnackbar({
+                    message: 'Token transferred successfully',
+                    severity: 'success',
+                    commit,
+                    reveal,
+                });
+            }
+            return true;
+        } catch (error) {
+            setWalletConfirmation(false);
+            showGlobalSnackbar({
+                message: 'Failed to Transfer Token',
+                severity: 'error',
+                details: error.message,
+            });
+            return false;
+        }
+    };
+
+    const handleConfirmSellOrder = async () => {
+        // Close the dialog
+        setIsDialogOpen(false);
+        const status = await handleTransfer();
+        // Backend sell order confirmation created
+        if (status) {
+            showGlobalSnackbar({ message: 'Sell order created successfully.', severity: 'success' });
+        }
+    };
+
+    const handleCloseDialog = () => {
+        setIsDialogOpen(false);
     };
 
     const currencyAdornment = (
@@ -192,52 +256,81 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         </Box>
     );
     return (
-        <StyledSellPanel>
-            {buttons}
-            <StyledTextField
-                label="Token Amount"
-                value={tokenAmount}
-                onChange={handleTokenAmountChange}
-                fullWidth
-            />
+        <>
+            <StyledSellPanel>
+                {buttons}
+                <StyledTextField
+                    label="Token Amount"
+                    value={tokenAmount}
+                    onChange={handleTokenAmountChange}
+                    fullWidth
+                />
 
-            <StyledTextField
-                label={`Total Price (${priceCurrency})`}
-                value={totalPrice}
-                onChange={handleTotalPriceChange}
-                fullWidth
-                InputProps={{
-                    endAdornment: currencyAdornment,
-                }}
-            />
-            <StyledTextField
-                label={`Price per Token (${priceCurrency})`}
-                value={pricePerToken}
-                onChange={handlePricePerTokenChange}
-                fullWidth
-                InputProps={{
-                    endAdornment: currencyAdornment,
-                }}
-            />
-            <Box sx={{ mb: '0.5rem' }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', fontSize: '0.8rem' }}>
-                    Wallet Balance:
-                </Typography>
-                <Typography
-                    sx={{ fontWeight: 'bold', fontSize: '0.7rem' }}
-                    variant="body2"
-                >{`${walletTickerBalance} ${tokenInfo.ticker}`}</Typography>
-            </Box>
+                <StyledTextField
+                    label={`Total Price (${priceCurrency})`}
+                    value={totalPrice}
+                    onChange={handleTotalPriceChange}
+                    fullWidth
+                    InputProps={{
+                        endAdornment: currencyAdornment,
+                    }}
+                />
+                <StyledTextField
+                    label={`Price per Token (${priceCurrency})`}
+                    value={pricePerToken}
+                    onChange={handlePricePerTokenChange}
+                    fullWidth
+                    InputProps={{
+                        endAdornment: currencyAdornment,
+                    }}
+                />
+                {pricePerToken !== '' && (
+                    <Typography variant="body2" sx={{ fontWeigh: 300, ml: '0.15rem' }}>
+                        {`Price per token is ${
+                            priceDifference > 0 ? '+' : ''
+                        }${priceDifference.toFixed(2)}% compared to the floor price.`}
+                    </Typography>
+                )}
+                <Box
+                    sx={{
+                        mt: '0.5rem',
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: '0.2rem',
+                    }}
+                >
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', fontSize: '0.8rem', ml: '0.15rem' }}>
+                        Wallet Balance:
+                    </Typography>
+                    <Typography
+                        sx={{ fontWeight: 'bold', fontSize: '0.8rem' }}
+                        variant="body2"
+                    >{`${walletTickerBalance} ${tokenInfo.ticker}`}</Typography>
+                </Box>
 
-            <StyledButton sx={{ marginTop: 'auto' }} variant="contained" onClick={handleCreateSellOrder} fullWidth>
-                Create Sell Order
-            </StyledButton>
-            {pricePerToken !== '' && (
-                <Typography variant="body2">
-                    {`Price per token is ${priceDifference > 0 ? '+' : ''}${priceDifference.toFixed(2)}% compared to the floor price.`}
-                </Typography>
-            )}
-        </StyledSellPanel>
+                <StyledButton
+                    sx={{ marginTop: 'auto' }}
+                    variant="contained"
+                    onClick={handleCreateSellOrder}
+                    fullWidth
+                    disabled={!walletConnected}
+                >
+                    Create Sell Order
+                </StyledButton>
+            </StyledSellPanel>
+            <ConfirmSellDialog
+                waitingForWalletConfirmation={walletConfirmation}
+                open={isDialogOpen}
+                onClose={handleCloseDialog}
+                onConfirm={handleConfirmSellOrder}
+                ticker={tokenInfo.ticker}
+                tokenAmount={tokenAmount}
+                totalPrice={totalPrice}
+                pricePerToken={pricePerToken}
+                priceCurrency={priceCurrency}
+            />
+        </>
     );
 };
 

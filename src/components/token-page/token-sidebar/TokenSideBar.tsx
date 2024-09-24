@@ -1,4 +1,4 @@
-import { Tab, Tabs } from '@mui/material';
+import { Tab, Tabs, Typography } from '@mui/material';
 import TabPanel from '@mui/lab/TabPanel';
 import TabContext from '@mui/lab/TabContext';
 import { FC, useState, SyntheticEvent } from 'react';
@@ -80,8 +80,13 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                         }}
                         value="3"
                     >
-                        Coming soon
-                        {/* <SellPanel tokenInfo={tokenInfo} kasPrice={kasPrice} walletAddress={walletAddress} /> */}
+                        {/* <SellPanel
+                            walletConnected={walletConnected}
+                            tokenInfo={tokenInfo}
+                            kasPrice={kasPrice}
+                            walletAddress={walletAddress}
+                        /> */}
+                        <Typography variant="h5">Coming Soon</Typography>
                     </TabPanel>
                 </TabContext>
             </SideBarContainer>
