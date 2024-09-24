@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Box, Avatar, Typography, Button, useTheme } from '@mui/material';
+import { Box, Avatar, Typography, Button, useTheme, TextField, alpha } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { ProfileContainer, ProfileDetails } from './UserProfile.s';
 // import XIcon from '@mui/icons-material/X';
@@ -10,11 +10,18 @@ interface UserProfileProps {
     walletAddress: string;
     portfolioValue: number;
     kasPrice: number;
+    setWalletAddress: (address: string) => void;
 }
 
 const UserProfile: FC<UserProfileProps> = (props) => {
-    const { walletAddress, portfolioValue, kasPrice } = props;
+    const { walletAddress, portfolioValue, kasPrice, setWalletAddress } = props;
     const theme = useTheme();
+
+    const handleManualAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newAddress = e.target.value;
+        setWalletAddress(newAddress);
+    };
+
     const handleCopy = () => {
         navigator.clipboard.writeText(walletAddress);
     };
@@ -40,9 +47,43 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                             size="small"
                             endIcon={<ContentCopyIcon fontSize="small" />}
                             startIcon={<img style={{ height: '5vh', width: '5vh' }} src={kaspaIcon} alt="Kaspa" />}
+                            sx={{
+                                color: theme.palette.text.secondary,
+                            }}
                         >
                             {walletAddress ? shortenAddress(walletAddress) : 'Connect Wallet'}
                         </Button>
+                        <TextField
+                            label="Kaspa Wallet Address"
+                            variant="outlined"
+                            size="small"
+                            value={walletAddress}
+                            onChange={handleManualAddressChange}
+                            sx={{
+                                minWidth: '3rem',
+
+                                '& .MuiOutlinedInput-root': {
+                                    height: '2.4rem', // Adjust as needed
+
+                                    '& fieldset': {
+                                        borderColor: alpha(theme.palette.primary.main, 0.7),
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: alpha(theme.palette.primary.main, 0.7),
+                                    },
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: alpha(theme.palette.primary.main, 0.7),
+                                    },
+                                },
+                                '& .MuiInputLabel-root': {
+                                    color: theme.palette.text.secondary,
+                                },
+                                '& .MuiInputLabel-root.Mui-focused': {
+                                    color: alpha(theme.palette.primary.main, 0.7),
+                                },
+                            }}
+                        />
+
                         {/* <Button variant="outlined" endIcon={<XIcon />}>
                             Add
                         </Button> */}
