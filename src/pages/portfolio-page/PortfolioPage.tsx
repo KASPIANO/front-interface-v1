@@ -61,7 +61,8 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
     const [lastPortfolioPage, setLastPortfolioPage] = useState<boolean>(false);
     const [operationFinished, setOperationFinished] = useState<boolean>(false);
     const [portfolioValueKAS, setPortfolioValueKAS] = useState<number>(0);
-
+    const [currentWallet, setCurrentWallet] = useState<string>(walletAddress || '');
+    const isUserConnected = walletConnected || !!currentWallet;
     useEffect(() => {
         const fetchPrice = async () => {
             const newPrice = await kaspaLivePrice();
@@ -83,7 +84,7 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
             setIsLoading(true);
             try {
                 const tokenData = await fetchWalletKRC20TokensBalance(
-                    walletAddress,
+                    currentWallet,
                     paginationPortfolioKey,
                     paginationPortfolioDirection,
                 );
@@ -111,7 +112,7 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
                 setPortfolioTokenInfo(updatedTokenData);
                 setPortfolioNext(tokenData.next); // Save the 'next' key for further requests
                 setPortfolioPrev(tokenData.prev); // Save the 'prev' key for further requests
-                const checkNext = await fetchWalletKRC20TokensBalance(walletAddress, tokenData.next, 'next');
+                const checkNext = await fetchWalletKRC20TokensBalance(currentWallet, tokenData.next, 'next');
                 if (checkNext.portfolioItems.length === 0) {
                     setLastPortfolioPage(true);
                 } else {
@@ -124,25 +125,25 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
             }
         };
 
-        if (walletConnected) {
+        if (isUserConnected) {
             fetchPortfolioData();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [walletAddress, walletConnected, operationFinished, paginationPortfolioKey]);
+    }, [walletConnected, operationFinished, paginationPortfolioKey, currentWallet]);
 
     useEffect(() => {
         const fetchActivity = async () => {
             setIsLoadingActivity(true);
             try {
                 const activityData = await fetchWalletActivity(
-                    walletAddress,
+                    currentWallet,
                     paginationActivityKey,
                     paginationActivityDirection,
                 );
                 setPortfolioAssetsActivity(activityData.activityItems);
                 setActivityNext(activityData.next); // Save the 'next' key for further requests
                 setActivityPrev(activityData.prev); // Save the 'prev' key for further requests
-                const checkNext = await fetchWalletActivity(walletAddress, activityData.next, 'next');
+                const checkNext = await fetchWalletActivity(currentWallet, activityData.next, 'next');
                 if (checkNext.activityItems.length === 0) {
                     setLastActivityPage(true);
                 } else {
@@ -155,12 +156,12 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
             }
         };
 
-        if (walletConnected) {
+        if (isUserConnected) {
             fetchActivity();
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [walletAddress, walletConnected, paginationActivityKey, operationFinished]);
+    }, [currentWallet, walletConnected, paginationActivityKey, operationFinished]);
 
     const handleActivityPagination = (direction: 'next' | 'prev') => {
         setPortfolioAssetsActivity([]);
@@ -183,7 +184,12 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
 
     return (
         <PortfolioLayout backgroundBlur={backgroundBlur}>
-            <UserProfile walletAddress={walletAddress} portfolioValue={portfolioValueKAS} kasPrice={kasPrice} />
+            <UserProfile
+                walletAddress={currentWallet}
+                portfolioValue={portfolioValueKAS}
+                kasPrice={kasPrice}
+                setWalletAddress={setCurrentWallet}
+            />
             <PortfolioPanel
                 handleChange={handleChange}
                 handleActivityPagination={handleActivityPagination}
@@ -194,7 +200,7 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
                 isLoading={isLoading}
                 isLoadingActivity={isLoadingActivity}
                 kasPrice={kasPrice}
-                walletConnected={walletConnected}
+                walletConnected={isUserConnected}
                 tokenList={portfolioTokenInfo}
                 tokensActivityList={portfolioAssetsActivity}
                 tickers={portfolioAssetTickers}
