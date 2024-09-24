@@ -285,3 +285,10 @@ export interface KaswareSendKaspaResult {
     subnetworkId: string;
     version: number;
 }
+
+export interface Order {
+    orderId: string;
+    tokenAmount: number;
+    totalPrice: number;
+    pricePerToken: number;
+}

@@ -6,6 +6,7 @@ import { BackendTokenResponse } from '../../../types/Types';
 import { SideBarContainer } from './TokenSideBar.s';
 import TokenSideBarInfo from './token-sidebar-info/TokenSideBarInfo';
 import { GlobalStyleTokenSideBar } from '../../../utils/GlobalStyleScrollBar';
+import BuyPanel from './token-sidebar-info/buy-panel/BuyPanel';
 // import SellPanel from './token-sidebar-info/sell-panel/SellPanel';
 
 interface TokenSideBarProps {
@@ -69,7 +70,23 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                             setWalletBalance={setWalletBalance}
                         />
                     </TabPanel>
-                    <TabPanel value="2"> Coming soon</TabPanel>
+                    <TabPanel
+                        sx={{
+                            '&.MuiTabPanel-root': {
+                                padding: '0px',
+                                height: '100%',
+                                overflowY: 'auto',
+                            },
+                        }}
+                        value="2"
+                    >
+                        <BuyPanel
+                            walletConnected={walletConnected}
+                            tokenInfo={tokenInfo}
+                            kasPrice={kasPrice}
+                            walletBalance={walletBalance}
+                        />
+                    </TabPanel>
                     <TabPanel
                         sx={{
                             '&.MuiTabPanel-root': {
