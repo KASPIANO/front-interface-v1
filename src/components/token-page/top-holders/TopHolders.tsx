@@ -42,7 +42,6 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
             const holdersToCalculate = (tokenInfo.topHolders || [])
                 .filter((holder) => holder.address !== burnWalletAddress) // Omit the burn wallet address
                 .slice(0, tokenHoldersToShow);
-            console.log(holdersToCalculate);
             const { totalSupply } = tokenInfo;
             const burntWalletBalance = await fetchBurntRC20Balance(tokenInfo.ticker);
             const totalSupplyAdjusted = burntWalletBalance ? totalSupply - burntWalletBalance : totalSupply;
