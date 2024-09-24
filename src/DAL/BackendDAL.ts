@@ -57,10 +57,12 @@ export async function fetchTokenByTicker(
     if (refresh) {
         params['refresh'] = true;
     }
+    if (wallet) {
+        params['wallet'] = wallet;
+    }
 
     try {
         const response = await backendService.get<BackendTokenResponse>(`/${KRC20CONTROLLER}/${capitalTicker}`, {
-            headers: { wallet },
             params,
         });
         return response.data;
@@ -95,18 +97,11 @@ export async function updateWalletSentiment(
     wallet: string,
     sentiment: keyof TokenSentiment,
 ): Promise<TokenSentiment> {
-    const result = await backendService.post<TokenSentiment>(
-        `/${KRC20METADATA_CONTROLLER}/set-sentiment`,
-        {
-            sentiment,
-            ticker,
-        },
-        {
-            headers: {
-                wallet,
-            },
-        },
-    );
+    const result = await backendService.post<TokenSentiment>(`/${KRC20METADATA_CONTROLLER}/set-sentiment`, {
+        sentiment,
+        ticker,
+        wallet,
+    });
 
     return result.data;
 }
@@ -198,6 +193,7 @@ export async function fetchTokenPortfolio(tickers: string[]): Promise<TickerPort
         return [];
     }
 }
+
 export async function signUser(verifiedUser: VerifiedUser): Promise<{ message: string }> {
     try {
         const response = await backendService.post<{ message: string }>(`/${AUTH_CONTROLLER}/sign`, {

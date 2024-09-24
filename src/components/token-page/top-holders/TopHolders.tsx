@@ -15,7 +15,6 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
     const [tokenHoldersToShow, setTokenHoldersToShow] = useState(numberOfHoldersToSelect[0]);
     const [topHoldersPercentage, setTopHoldersPercentage] = useState('---');
     const [devWalletPercentage, setDevWalletPercentage] = useState('---');
-    const [tokenHolders] = useState(tokenInfo.topHolders || []);
     const [holderTitle, setHolderTitle] = useState(numberOfHoldersToSelect[0]);
     const [copied, setCopied] = useState(false);
 
@@ -37,8 +36,8 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
     };
 
     useEffect(() => {
-        const calculatePercentages = async () => {
-            const holdersToCalculate = tokenHolders.slice(0, tokenHoldersToShow);
+        const calculatePercentages = () => {
+            const holdersToCalculate = (tokenInfo.topHolders || []).slice(0, tokenHoldersToShow);
             const { totalSupply } = tokenInfo;
 
             // Calculate top holders percentage
@@ -51,8 +50,6 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
         };
 
         calculatePercentages();
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tokenHoldersToShow, tokenInfo]);
 
     useEffect(() => {
