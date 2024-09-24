@@ -19,7 +19,6 @@ import { AddBanner, AddBox, AddText } from './token-sidebar-socials-bar/TokenSid
 import { formatNumberWithCommas, simplifyNumber } from '../../../../utils/Utils';
 import { updateWalletSentiment } from '../../../../DAL/BackendDAL';
 import { UpdateMetadataDialog } from '../../update-metadata-dialog/UpdateMetadataDialog';
-import { use } from 'echarts';
 import { fetchBurntRC20Balance } from '../../../../DAL/Krc20DAL';
 
 export type SentimentButtonsConfig = {
