@@ -3,7 +3,7 @@ import { Box, Card, Divider, IconButton, Snackbar, Tooltip, Typography } from '@
 import OptionSelection from '../option-selection/OptionSelection';
 import { BackendTokenResponse } from '../../../types/Types';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { fetchDevWalletBalance } from '../../../DAL/Krc20DAL';
+import { fetchBurntRC20Balance, fetchDevWalletBalance } from '../../../DAL/Krc20DAL';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 
 interface TopHoldersProps {
@@ -16,6 +16,7 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
     const [topHoldersPercentage, setTopHoldersPercentage] = useState('---');
     const [devWalletPercentage, setDevWalletPercentage] = useState('---');
     const [holderTitle, setHolderTitle] = useState(numberOfHoldersToSelect[0]);
+    const [totalSupplyAfterBurn, setTotalSupplyAfterBurn] = useState<number>(0);
     const [copied, setCopied] = useState(false);
 
     const updateTokenHoldersToShow = (value: number) => {
@@ -36,31 +37,36 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
     };
 
     useEffect(() => {
-        const calculatePercentages = () => {
-            const holdersToCalculate = (tokenInfo.topHolders || []).slice(0, tokenHoldersToShow);
+        const calculatePercentages = async () => {
+            const burnWalletAddress = 'kaspa:qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqkx9awp4e';
+            const holdersToCalculate = (tokenInfo.topHolders || [])
+                .filter((holder) => holder.address !== burnWalletAddress) // Omit the burn wallet address
+                .slice(0, tokenHoldersToShow);
+            console.log(holdersToCalculate);
             const { totalSupply } = tokenInfo;
+            const burntWalletBalance = await fetchBurntRC20Balance(tokenInfo.ticker);
+            const totalSupplyAdjusted = burntWalletBalance ? totalSupply - burntWalletBalance : totalSupply;
+            setTotalSupplyAfterBurn(totalSupplyAdjusted);
 
-            // Calculate top holders percentage
             const totalHolding = holdersToCalculate.map((h) => h.balance).reduce((acc, curr) => acc + curr, 0);
 
-            const totalPercentage = (totalHolding / totalSupply) * 100;
+            const totalPercentage = (totalHolding / totalSupplyAdjusted) * 100;
             const totalPercentageFixed = totalPercentage ? totalPercentage.toFixed(2) : '---';
             const totalPercentageString = totalPercentageFixed === '---' ? '---' : `${totalPercentageFixed}%`;
             setTopHoldersPercentage(totalPercentageString);
         };
 
         calculatePercentages();
-    }, [tokenHoldersToShow, tokenInfo]);
+    }, [tokenHoldersToShow, tokenInfo, totalSupplyAfterBurn]);
 
     useEffect(() => {
         const fetchDevWalletPercentage = async () => {
             const devWalletBalance = await fetchDevWalletBalance(tokenInfo.ticker, tokenInfo.devWallet);
-            const devWalletPercent = devWalletBalance === 0 ? 0 : (devWalletBalance / tokenInfo.totalSupply) * 100;
+            const devWalletPercent = devWalletBalance === 0 ? 0 : (devWalletBalance / totalSupplyAfterBurn) * 100;
             setDevWalletPercentage(`${devWalletPercent.toFixed(2)}%`);
         };
-
         fetchDevWalletPercentage();
-    }, [tokenInfo]);
+    }, [totalSupplyAfterBurn, tokenInfo]);
 
     return (
         <Card sx={{ height: '18vh', padding: '8px 10px' }}>

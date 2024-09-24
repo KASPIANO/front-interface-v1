@@ -105,6 +105,19 @@ export async function fetchWalletKRC20Balance(address: string, ticker: string): 
     }
 }
 
+export async function fetchBurntRC20Balance(ticker: string): Promise<number> {
+    try {
+        const response = await KRC20InfoService.get<any>(
+            `krc20/address/kaspa:qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqkx9awp4e/token/${ticker}`,
+        );
+        const { result } = response.data;
+        return result.length > 0 ? parseInt(result[0].balance) / 1e8 : 0;
+    } catch (error) {
+        console.error('Error fetching wallet balance:', error);
+        return 0;
+    }
+}
+
 export async function fetchWalletActivity(
     address: string,
     paginationKey: string | null = null,
