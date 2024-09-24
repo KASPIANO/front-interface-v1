@@ -19,6 +19,7 @@ import { AddBanner, AddBox, AddText } from './token-sidebar-socials-bar/TokenSid
 import { formatNumberWithCommas, simplifyNumber } from '../../../../utils/Utils';
 import { updateWalletSentiment } from '../../../../DAL/BackendDAL';
 import { UpdateMetadataDialog } from '../../update-metadata-dialog/UpdateMetadataDialog';
+import { fetchBurntRC20Balance } from '../../../../DAL/Krc20DAL';
 
 export type SentimentButtonsConfig = {
     key: keyof TokenSentiment;
@@ -47,6 +48,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
     const [selectedSentiment, setSelectedSentiment] = useState<string>(null);
     const [sentimentValues, setSentimentValues] = useState<TokenSentiment | null>(null);
     const [socials, setSocials] = useState<TokenSidebarSocialsBarOptions>(null);
+    const [totalSupplyAfterBurn, setTotalSupplyAfterBurn] = useState<number>(0);
 
     const sentimentButtonsConfig: SentimentButtonsConfig[] = [
         { key: 'love', icon: <FavoriteBorderRoundedIcon sx={{ fontSize: '1.1rem' }} color="success" /> },
@@ -55,6 +57,19 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         { key: 'negative', icon: <TrendingDownRounded sx={{ fontSize: '1.1rem' }} color="error" /> },
         { key: 'warning', icon: <WarningAmberRoundedIcon sx={{ fontSize: '1.1rem' }} color="warning" /> },
     ];
+
+    useEffect(() => {
+        const fetchAndSetSupplyAfterBurn = async () => {
+            const { totalSupply, ticker } = tokenInfo;
+            const burntWalletBalance = await fetchBurntRC20Balance(ticker); // Fetch burnt balance
+            const newSupplyAfterBurn = burntWalletBalance ? totalSupply - burntWalletBalance : totalSupply;
+            setTotalSupplyAfterBurn(newSupplyAfterBurn);
+        };
+
+        if (tokenInfo && tokenInfo.totalSupply && tokenInfo.ticker) {
+            fetchAndSetSupplyAfterBurn();
+        }
+    }, [tokenInfo]);
 
     useEffect(() => {
         setSocials((prevSocials) => {
@@ -199,9 +214,9 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                         <Typography variant="body2" align="center" color="text.secondary">
                             SUPPLY
                         </Typography>
-                        <Tooltip title={formatNumberWithCommas(tokenInfo.totalSupply)}>
+                        <Tooltip title={formatNumberWithCommas(totalSupplyAfterBurn)}>
                             <Typography variant="body2" align="center">
-                                {simplifyNumber(tokenInfo.totalSupply)}
+                                {simplifyNumber(totalSupplyAfterBurn)}
                             </Typography>
                         </Tooltip>
                     </StatCard>
