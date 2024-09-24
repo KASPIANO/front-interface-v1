@@ -32,7 +32,7 @@ interface TokenRowPortfolioProps {
 }
 
 const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
-    const { token, walletConnected, walletBalance, handleChange } = props;
+    const { token, walletConnected, walletBalance, handleChange, kasPrice } = props;
     const [openTransferDialog, setOpenTransferDialog] = useState(false);
     const [destAddress, setDestAddress] = useState('');
     const [currentTicker, setCurrentTicker] = useState('');
@@ -180,7 +180,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
             // setAmount(value);
         }
     };
-
+    const totalBalanceUsd = parseInt(token.balance) * token.price * kasPrice;
     return (
         <div key={token.ticker}>
             <ListItem disablePadding sx={{ height: '12vh' }} onClick={() => handleItemClick(token)}>
@@ -193,7 +193,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                             }}
                             style={{
                                 marginLeft: '0.1vw',
-                                borderRadius: 5,
+                                borderRadius: 8,
                             }}
                             variant="square"
                             alt={token.ticker}
@@ -203,11 +203,11 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
 
                     <ListItemText
                         sx={{
-                            width: '3vw',
+                            width: '5vw',
                         }}
                         primary={
                             <Tooltip title={token.ticker}>
-                                <Typography variant="body1" sx={{ fontSize: '1.2vw' }}>
+                                <Typography variant="body1" sx={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
                                     {capitalizeFirstLetter(token.ticker)}
                                 </Typography>
                             </Tooltip>
@@ -215,12 +215,28 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                     />
 
                     <ListItemText
-                        sx={{ width: '14vw' }}
+                        sx={{ width: '12vw' }}
                         primary={
                             <Typography
                                 variant="body1"
                                 style={{
-                                    fontSize: '1.2vw',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 'bold',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                {token.price.toFixed(6)} KAS
+                            </Typography>
+                        }
+                    />
+                    <ListItemText
+                        sx={{ width: '13vw' }}
+                        primary={
+                            <Typography
+                                variant="body1"
+                                style={{
+                                    fontSize: '0.8rem',
                                     fontWeight: 'bold',
                                     display: 'flex',
                                     justifyContent: 'center',
@@ -230,13 +246,29 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                             </Typography>
                         }
                     />
+                    <ListItemText
+                        sx={{ width: '12vw' }}
+                        primary={
+                            <Typography
+                                variant="body1"
+                                style={{
+                                    fontSize: '0.8rem',
+                                    fontWeight: 'bold',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                {totalBalanceUsd.toFixed(2)} USD
+                            </Typography>
+                        }
+                    />
 
                     <Box
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
                             gap: '2vw',
-                            width: '40vw',
+                            width: '27.5vw',
                             justifyContent: 'center',
                             paddingRight: '14vw',
                         }}
@@ -248,7 +280,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                             sx={{
                                 minWidth: '2vw',
                                 width: '4vw',
-                                fontSize: '0.8vw',
+                                fontSize: '0.6rem',
                             }}
                         >
                             Transfer
@@ -261,7 +293,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                                 sx={{
                                     minWidth: '2vw',
                                     width: '3vw',
-                                    fontSize: '0.8vw',
+                                    fontSize: '0.6rem',
                                 }}
                             >
                                 Mint
@@ -279,7 +311,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                                     style={{
                                         minWidth: '2vw',
                                         width: '3vw',
-                                        fontSize: '0.8vw',
+                                        fontSize: '0.6rem',
                                     }}
                                 >
                                     Mint

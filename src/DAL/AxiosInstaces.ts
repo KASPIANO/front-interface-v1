@@ -14,4 +14,5 @@ export const kasInfoMainnetService = axios.create({
 
 export const backendService = axios.create({
     baseURL: import.meta.env.VITE_API_ENDPOINT,
+    // withCredentials: true,
 });

@@ -25,7 +25,7 @@ export const OptionSelectionButton = styled(Button)(({ theme }) => ({
         borderRadius: '0 4px 4px 0', // Rounded corners on the right
     },
     '&.MuiButton-root': {
-        fontSize: '1vw', // Slightly larger text
+        fontSize: '0.8rem', // Slightly larger text
         border: `1px solid ${alpha(theme.palette.primary.main, 0.5)}`, // Subtle border
     },
     '&:hover': {

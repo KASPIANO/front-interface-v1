@@ -105,7 +105,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                 /> */}
                 <TokenSearch setBackgroundBlur={setBackgroundBlur} />
                 <WalletBalance>
-                    <Typography variant="body1" style={{ fontSize: '1vw', marginRight: '1vw' }}>
+                    <Typography variant="body1" style={{ fontSize: '0.8rem', marginRight: '1vw' }}>
                         {formatNumberWithCommas(walletBalance)} KAS
                     </Typography>
                 </WalletBalance>

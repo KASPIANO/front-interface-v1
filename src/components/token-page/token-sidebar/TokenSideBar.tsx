@@ -1,4 +1,4 @@
-import { Tab, Tabs } from '@mui/material';
+import { Tab, Tabs, Typography } from '@mui/material';
 import TabPanel from '@mui/lab/TabPanel';
 import TabContext from '@mui/lab/TabContext';
 import { FC, useState, SyntheticEvent } from 'react';
@@ -6,6 +6,7 @@ import { BackendTokenResponse } from '../../../types/Types';
 import { SideBarContainer } from './TokenSideBar.s';
 import TokenSideBarInfo from './token-sidebar-info/TokenSideBarInfo';
 import { GlobalStyleTokenSideBar } from '../../../utils/GlobalStyleScrollBar';
+// import SellPanel from './token-sidebar-info/sell-panel/SellPanel';
 
 interface TokenSideBarProps {
     tokenInfo: BackendTokenResponse;
@@ -68,8 +69,25 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                             setWalletBalance={setWalletBalance}
                         />
                     </TabPanel>
-                    <TabPanel value="2">Buy The Token</TabPanel>
-                    <TabPanel value="3">Sell The Token</TabPanel>
+                    <TabPanel value="2"> Coming soon</TabPanel>
+                    <TabPanel
+                        sx={{
+                            '&.MuiTabPanel-root': {
+                                padding: '0px',
+                                height: '100%',
+                                overflowY: 'auto',
+                            },
+                        }}
+                        value="3"
+                    >
+                        {/* <SellPanel
+                            walletConnected={walletConnected}
+                            tokenInfo={tokenInfo}
+                            kasPrice={kasPrice}
+                            walletAddress={walletAddress}
+                        /> */}
+                        <Typography variant="h5">Coming Soon</Typography>
+                    </TabPanel>
                 </TabContext>
             </SideBarContainer>
         </>

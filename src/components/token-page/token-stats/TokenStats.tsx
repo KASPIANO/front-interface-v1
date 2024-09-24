@@ -63,38 +63,38 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                 }}
             >
                 <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '1vw' }} align="center">
+                    <Typography sx={{ fontSize: '0.8rem' }} align="center">
                         VOLUME ({tradingDataTimeFrame})
                     </Typography>
-                    <Typography align="center" sx={{ fontSize: '0.9vw', fontWeight: 'bold' }}>
+                    <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
                         {tokenInfo.volume ? `$${tokenInfo.volume}` : '---'}
                     </Typography>
                 </Box>
 
                 <Divider orientation="vertical" flexItem />
                 <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '1vw' }} align="center">
+                    <Typography sx={{ fontSize: '0.8rem' }} align="center">
                         PRICE PER TOKEN ({tradingDataTimeFrame})
                     </Typography>
-                    <Typography align="center" sx={{ fontSize: '0.9vw', fontWeight: 'bold' }}>
+                    <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
                         {tokenKasPrice}
                     </Typography>
                 </Box>
                 <Divider orientation="vertical" flexItem />
                 <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '1vw' }} align="center">
+                    <Typography sx={{ fontSize: '0.8rem' }} align="center">
                         TOTAL MINTED
                     </Typography>
-                    <Typography align="center" sx={{ fontSize: '0.9vw', fontWeight: 'bold' }}>
+                    <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
                         {totalMintedDataToShow}
                     </Typography>
                 </Box>
                 <Divider orientation="vertical" flexItem />
                 <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '1vw' }} align="center">
+                    <Typography sx={{ fontSize: '0.8rem' }} align="center">
                         HOLDERS
                     </Typography>
-                    <Typography align="center" sx={{ fontSize: '0.9vw', fontWeight: 'bold' }}>
+                    <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
                         {tokenInfo.totalHolders}
                     </Typography>
                 </Box>

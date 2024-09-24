@@ -40,13 +40,13 @@ const Footer: React.FC = () => (
                             gutterBottom
                             href="https://chromewebstore.google.com/detail/kasware-wallet/hklhheigdmpoolooomdihmhlpjjdbklf"
                             target="_blank"
-                            sx={{ fontSize: '0.9vw', color: '#49EACB' }}
+                            sx={{ fontSize: '0.8rem', color: '#49EACB' }}
                         >
                             Kasware Wallet Extension
                         </FooterLink>
                     </Grid>
                     <Grid item xs={12} md={12} sm={12} lg={12}>
-                        <RightsReserved gutterBottom sx={{ fontSize: '0.9vw' }}>
+                        <RightsReserved gutterBottom sx={{ fontSize: '0.8rem' }}>
                             © 2021 Kaspiano. All rights reserved.
                         </RightsReserved>
                     </Grid>
@@ -55,7 +55,7 @@ const Footer: React.FC = () => (
                 {/* Links Section */}
                 <Grid item container xs={8} md={8} sm={8} lg={8}>
                     <Grid item xs={4} md={4} sm={4} lg={4}>
-                        <Typography gutterBottom sx={{ fontSize: '1vw' }}>
+                        <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             App
                         </Typography>
                         <FooterList>
@@ -72,7 +72,7 @@ const Footer: React.FC = () => (
                     </Grid>
 
                     {/* <Grid item xs={4}>
-                        <Typography gutterBottom sx={{ fontSize: '1vw' }}>
+                        <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             Company
                         </Typography>
                         <FooterList>
@@ -85,7 +85,7 @@ const Footer: React.FC = () => (
                         </FooterList>
                     </Grid> */}
                     <Grid item xs={4} md={4} sm={4} lg={4}>
-                        <Typography gutterBottom sx={{ fontSize: '1vw' }}>
+                        <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             Need Help?
                         </Typography>
                         <FooterList>
@@ -95,7 +95,7 @@ const Footer: React.FC = () => (
                         </FooterList>
                     </Grid>
                     <Grid item xs={4} md={4} sm={4} lg={4}>
-                        <Typography gutterBottom sx={{ fontSize: '1vw' }}>
+                        <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             Resources
                         </Typography>
                         <FooterList>

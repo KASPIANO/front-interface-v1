@@ -14,7 +14,7 @@ export const NavButton = styled(Button, {
 })<{ isActive: boolean }>(({ isActive }) => ({
     fontWeight: 500,
     cursor: 'pointer',
-    fontSize: '1vw',
+    fontSize: '0.8rem',
     position: 'relative',
     maxWidth: '7vw',
 
@@ -36,7 +36,7 @@ export const NavButton = styled(Button, {
 export const Logo = styled(Button)({
     fontWeight: 'bold',
     cursor: 'pointer',
-    fontSize: '1.5vw',
+    fontSize: '1.3rem',
     position: 'relative',
     '&:hover': {
         backgroundColor: 'transparent',
@@ -62,7 +62,7 @@ export const ConnectButton = styled(Button)({
 
     border: 'none',
     cursor: 'pointer',
-    fontSize: '0.7vw',
+    fontSize: '0.6rem',
     padding: '0.5vh 0.5vw',
     marginRight: '0.7vw',
     borderRadius: '14px',

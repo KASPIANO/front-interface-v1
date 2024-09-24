@@ -2,14 +2,13 @@ import { FC } from 'react';
 import { Box, Avatar, Typography, Button, useTheme } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { ProfileContainer, ProfileDetails } from './UserProfile.s';
-import { PortfolioValue } from '../../../types/Types';
 // import XIcon from '@mui/icons-material/X';
 import { shortenAddress } from '../../../utils/Utils';
-import { Stat, StatArrow, StatHelpText, StatNumber } from '@chakra-ui/react';
+import { Stat, StatHelpText, StatNumber } from '@chakra-ui/react';
 
 interface UserProfileProps {
     walletAddress: string;
-    portfolioValue: PortfolioValue;
+    portfolioValue: number;
     kasPrice: number;
 }
 
@@ -19,8 +18,8 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     const handleCopy = () => {
         navigator.clipboard.writeText(walletAddress);
     };
-    const porfolioUSDValue = (portfolioValue.kas * kasPrice).toFixed(2);
-    const arrowColor = portfolioValue.changeDirection === 'increase' ? 'green' : 'red';
+    const porfolioUSDValue = (portfolioValue * kasPrice).toFixed(2);
+    // const arrowColor = portfolioValue.changeDirection === 'increase' ? 'green' : 'red';
 
     const profileSourceLink = `https://api.dicebear.com/9.x/pixel-art/svg?seed=${walletAddress}`;
     const darkKaspaIcon =
@@ -58,20 +57,20 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                 </ProfileDetails>
             </Box>
             <Stat sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                <StatHelpText sx={{ fontSize: '1.2vw', fontWeight: 400 }}>Portfolio Value - Mock</StatHelpText>
-                <StatNumber sx={{ fontSize: '2.5vw', fontWeight: 700, display: 'flex', alignItems: 'center' }}>
-                    {portfolioValue.kas}
-                    <Typography sx={{ marginLeft: '0.2vw', fontSize: '2vw', fontWeight: 400, opacity: 0.5 }}>
+                <StatHelpText sx={{ fontSize: '1rem', fontWeight: 400 }}>Portfolio Value</StatHelpText>
+                <StatNumber sx={{ fontSize: '2rem', fontWeight: 700, display: 'flex', alignItems: 'center' }}>
+                    {portfolioValue.toFixed(2)}
+                    <Typography sx={{ marginLeft: '0.2vw', fontSize: '2rem', fontWeight: 400, opacity: 0.5 }}>
                         KAS
                     </Typography>
                 </StatNumber>
-                <StatHelpText sx={{ fontSize: '1vw' }}>
+                <StatHelpText sx={{ fontSize: '1rem' }}>
                     ${porfolioUSDValue}
-                    <StatArrow
+                    {/* <StatArrow
                         sx={{ color: arrowColor, marginLeft: '4px' }}
                         type={portfolioValue.changeDirection}
                     />
-                    {portfolioValue.change}%
+                    {portfolioValue.change}% */}
                 </StatHelpText>
             </Stat>
         </ProfileContainer>

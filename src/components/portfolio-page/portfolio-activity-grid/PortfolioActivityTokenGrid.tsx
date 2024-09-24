@@ -81,7 +81,7 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
             <GlobalStyle />
             {tableHeader}
             {!walletConnected ? (
-                <p style={{ textAlign: 'center', fontSize: '1vw', marginTop: '10vh' }}>
+                <p style={{ textAlign: 'center', fontSize: '0.8rem', marginTop: '10vh' }}>
                     <b>Please connect your wallet to view the portfolio.</b>
                 </p>
             ) : (
@@ -107,7 +107,7 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
                 </List>
             )}
             {tokensActivityList.length === 0 && walletConnected && (
-                <p style={{ textAlign: 'center', fontSize: '1vw' }}>
+                <p style={{ textAlign: 'center', fontSize: '0.8rem' }}>
                     <b>End of list</b>
                 </p>
             )}

@@ -68,7 +68,7 @@ export const GridHeader: FC<GridHeaderProps> = (props) => {
                 marginLeft: marginLeft[name],
             }}
         >
-            <Typography sx={{ fontWeight: 600, fontSize: '1.2vw' }}>{name}</Typography>
+            <Typography sx={{ fontWeight: 600, fontSize: '0.9rem' }}>{name}</Typography>
             {disableSort(name) && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <UpButton

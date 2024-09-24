@@ -186,7 +186,7 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
                                 type: 'search',
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <SearchRoundedIcon sx={{ fontSize: '1vw' }} />
+                                        <SearchRoundedIcon sx={{ fontSize: '0.8rem' }} />
                                     </InputAdornment>
                                 ),
                                 sx: {
@@ -198,11 +198,11 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
                             sx={{
                                 height: isFocused ? '5vh' : '3.5vh',
                                 '& input': {
-                                    fontSize: '0.8vw',
+                                    fontSize: '0.7rem',
                                     textAlign: 'start',
                                 },
                                 '& input::placeholder': {
-                                    fontSize: '0.8vw',
+                                    fontSize: '0.7rem',
                                     textAlign: 'start',
                                 },
                             }}

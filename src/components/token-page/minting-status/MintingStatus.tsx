@@ -102,7 +102,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                 <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold' }}>
                     MINT STATUS
                 </Typography>
-                <Typography color="text.secondary" sx={{ fontWeight: 500, fontSize: '0.9vw' }}>
+                <Typography color="text.secondary" sx={{ fontWeight: 500, fontSize: '0.7rem' }}>
                     Limit Per Mint: {limitPerMint}
                 </Typography>
             </Box>
@@ -127,16 +127,16 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                 >
                     {/* Total Mints */}
                     <Box sx={{ marginRight: '2vw', textAlign: 'center' }}>
-                        <Typography sx={{ fontSize: '1vw', fontWeight: 'bold' }}>Total Mints</Typography>
-                        <Typography sx={{ fontSize: '1vw' }}>
+                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 'bold' }}>Total Mints</Typography>
+                        <Typography sx={{ fontSize: '0.8rem' }}>
                             {isSoldOut ? totalMintsPossible : tokenInfo.totalMintTimes} / {totalMintsPossible}
                         </Typography>
                     </Box>
 
                     {/* Mints Left */}
                     <Box sx={{ textAlign: 'center' }}>
-                        <Typography sx={{ fontSize: '1vw', fontWeight: 'bold' }}>Mints Left</Typography>
-                        <Typography sx={{ fontSize: '1vw' }}>{isSoldOut ? '0' : mintsLeft}</Typography>
+                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 'bold' }}>Mints Left</Typography>
+                        <Typography sx={{ fontSize: '0.8rem' }}>{isSoldOut ? '0' : mintsLeft}</Typography>
                     </Box>
                 </Box>
                 {/* Right Side: Mint Button */}
@@ -157,7 +157,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                             variant="contained"
                             color="primary"
                             style={{
-                                fontSize: '0.8vw',
+                                fontSize: '0.7rem',
                                 width: '100%',
                             }}
                             disabled={isMintingDisabled || !walletConnected || walletBalance < 1 || isSoldOut}
