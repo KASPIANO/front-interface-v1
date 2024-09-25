@@ -167,8 +167,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         setIsPanelOpen(true);
     };
 
-    const handlePurchase = async (order: Order) => {
-        const sompiAmount = order.totalPrice * KASPA_TO_SOMPI;
+    const handlePurchase = async (order: Order, finalTotal: number) => {
+        const sompiAmount = (order.totalPrice + finalTotal) * KASPA_TO_SOMPI;
 
         const paymentTxn = await sendKaspa(tempWalletAddress, sompiAmount);
         const parsedTxData = JSON.parse(paymentTxn);

@@ -12,7 +12,7 @@ interface OrderDetailsProps {
     kasPrice: number;
     onClose: () => void;
     timeLeft: number;
-    handlePurchase: (order: Order) => void;
+    handlePurchase: (order: Order, finalTotal: number) => void;
 }
 
 const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
@@ -111,7 +111,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
             <Button
                 variant="contained"
                 color="primary"
-                onClick={() => handlePurchase(order)}
+                onClick={() => handlePurchase(order, finalTotal)}
                 disabled={!walletConnected || walletBalance < finalTotal}
                 sx={{ width: '100%' }}
             >
