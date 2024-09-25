@@ -71,8 +71,8 @@ const App = () => {
                 const userVerificationMessage = generateVerificationMessage(
                     accounts[0],
                     nonce,
-                    requestId,
                     requestDate,
+                    requestId,
                 );
 
                 const userVerification = await signMessage(userVerificationMessage);
