@@ -165,3 +165,26 @@ export const kasToSompi = (kas: number): number => {
     const sompi = (kas * 1e8).toFixed(0);
     return parseFloat(sompi);
 };
+
+export const doPolling = async <T>(
+    fn: () => Promise<T>,
+    endFunction: (T) => boolean,
+    interval = 3000,
+    maxRetries = -1,
+): Promise<T> => {
+    let result: T = await fn();
+    let currentRetries = 0;
+
+    while (!(await endFunction(result))) {
+        await new Promise((resolve) => setTimeout(resolve, interval));
+        currentRetries++;
+
+        if (currentRetries === maxRetries) {
+            throw new Error('Max retries reached');
+        }
+
+        result = await fn();
+    }
+
+    return result;
+};

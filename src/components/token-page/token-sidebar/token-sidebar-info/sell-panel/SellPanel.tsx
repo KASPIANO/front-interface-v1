@@ -8,6 +8,7 @@ import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
 import { transferKRC20Token } from '../../../../../utils/KaswareUtils';
 import { confirmSellOrder, createSellOrder } from '../../../../../DAL/BackendDAL';
+import { doPolling } from '../../../../../utils/Utils';
 
 interface SellPanelProps {
     tokenInfo: BackendTokenResponse;
@@ -227,7 +228,12 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     reveal,
                 });
             }
-            await confirmSellOrder(orderId);
+
+            await doPolling(
+                () => confirmSellOrder(orderId),
+                (result) => result.confirmed,
+            );
+
             return true;
         } catch (error) {
             setWalletConfirmation(false);
