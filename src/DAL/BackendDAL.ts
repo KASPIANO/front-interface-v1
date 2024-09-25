@@ -236,18 +236,18 @@ export const createSellOrder = async (
     quantity: number,
     totalPrice: number,
     pricePerToken: number,
-    walletAddres: string,
-): Promise<{ id: string; temporaryWalletAddres: string; status: string }> => {
+    walletAddress: string,
+): Promise<{ id: string; temporaryWalletAddress: string; status: string }> => {
     try {
         const capitalTicker = ticker.toUpperCase();
-        const response = await backendService.post<{ temporaryWalletAddres: string; id: string; status: string }>(
+        const response = await backendService.post<{ temporaryWalletAddress: string; id: string; status: string }>(
             `/${P2PCONTROLLER}/sell`,
             {
                 ticker: capitalTicker,
                 quantity,
                 totalPrice,
                 pricePerToken,
-                walletAddres,
+                walletAddress,
             },
         );
         return response.data;
@@ -256,28 +256,28 @@ export const createSellOrder = async (
             `Error creating sell order for ${ticker}:`,
             error.response ? error.response.data : error.message,
         );
-        return { id: '', temporaryWalletAddres: '', status: '' }; // Return empty array in case of an error
+        return { id: '', temporaryWalletAddress: '', status: '' }; // Return empty array in case of an error
     }
 };
 
 export const startBuyOrder = async (
     orderId,
-    walletAddres: string,
-): Promise<{ id: string; temporaryWalletAddres: string; status: string }> => {
+    walletAddress: string,
+): Promise<{ id: string; temporaryWalletAddress: string; status: string }> => {
     try {
-        const response = await backendService.post<{ temporaryWalletAddres: string; id: string; status: string }>(
+        const response = await backendService.post<{ temporaryWalletAddress: string; id: string; status: string }>(
             `/${P2PCONTROLLER}/buy/${orderId}`,
             {
-                walletAddres,
+                walletAddress,
             },
         );
         return response.data;
     } catch (error) {
         console.error(
-            `Error starting buy order for ${walletAddres}:`,
+            `Error starting buy order for ${walletAddress}:`,
             error.response ? error.response.data : error.message,
         );
-        return { id: '', temporaryWalletAddres: '', status: '' }; // Return empty array in case of an error
+        return { id: '', temporaryWalletAddress: '', status: '' }; // Return empty array in case of an error
     }
 };
 
@@ -325,18 +325,70 @@ export const confirmBuyOrder = async (
 
 export const getOrders = async (
     ticker: string,
-): Promise<{
-    confirmed: boolean;
-}> => {
+    offset?: number,
+    limit?: number,
+    sort?: { field: string; direction: string },
+): Promise<any> => {
     try {
         const capitalTicker = ticker.toUpperCase();
-        const response = await backendService.get<any>(`/${P2PCONTROLLER}/getSellOrders?ticker=${capitalTicker}`);
+        const response = await backendService.post<any>(
+            `/${P2PCONTROLLER}/getSellOrders?ticker=${capitalTicker}`,
+            {
+                pagination: {
+                    offset,
+                    limit,
+                },
+                sort,
+            },
+        );
         return response.data;
     } catch (error) {
         console.error(
             `Error getting sell orders for ${ticker}:`,
             error.response ? error.response.data : error.message,
         );
+        return { confirmed: false }; // Return empty array in case of an error
+    }
+};
+
+export const getUSerListings = async (
+    walletAdress: string,
+    offset = 0,
+    limit = 30,
+    sort?: { field: string; direction: string },
+): Promise<any> => {
+    try {
+        const response = await backendService.post<any>(`/${P2PCONTROLLER}/getSellOrders`, {
+            walletAdress,
+            pagination: {
+                offset,
+                limit,
+            },
+            sort,
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Error getUSerListings`, error.response ? error.response.data : error.message);
+        return { confirmed: false }; // Return empty array in case of an error
+    }
+};
+
+export const deleteOrder = async (orderId: string): Promise<any> => {
+    try {
+        const response = await backendService.delete<any>(`/${P2PCONTROLLER}/cancel/${orderId}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error deleting order ${orderId}:`, error.response ? error.response.data : error.message);
+        return { confirmed: false }; // Return empty array in case of an error
+    }
+};
+
+export const getGasEstimator = async (orderId: string): Promise<any> => {
+    try {
+        const response = await backendService.get<any>(`/${P2PCONTROLLER}/feeRate`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error deleting order ${orderId}:`, error.response ? error.response.data : error.message);
         return { confirmed: false }; // Return empty array in case of an error
     }
 };

@@ -2,7 +2,6 @@ import React from 'react';
 import { Box, Typography, Button, IconButton, Tooltip } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Order } from '../../../../../../types/Types';
-import { showGlobalSnackbar } from '../../../../../alert-context/AlertContext';
 import { OrderDetailsItem, OrderItemPrimary } from './OrderDetails.s';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
@@ -13,25 +12,15 @@ interface OrderDetailsProps {
     kasPrice: number;
     onClose: () => void;
     timeLeft: number;
+    handlePurchase: (order: Order) => void;
 }
 
 const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
-    const { order, walletConnected, walletBalance, kasPrice, onClose, timeLeft } = props;
+    const { order, walletConnected, walletBalance, kasPrice, onClose, timeLeft, handlePurchase } = props;
 
     // Fee Calculations
-    const marketplaceFeePercentage = 0.01; // 2%
-    const marketplaceFee = order.totalPrice * marketplaceFeePercentage;
     const networkFee = 5; // Fixed network fee
-    const finalTotal = order.totalPrice + marketplaceFee + networkFee;
-
-    const handlePurchase = () => {
-        // Proceed with the purchase
-        // Implement the logic to handle the purchase here
-        showGlobalSnackbar({
-            message: 'Purchase successful!',
-            severity: 'success',
-        });
-    };
+    const finalTotal = order.totalPrice + networkFee;
 
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60)
@@ -75,15 +64,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                 </OrderDetailsItem>
 
                 {/* Marketplace Fee */}
-                <OrderDetailsItem variant="body1">
-                    Marketplace Fee:
-                    <OrderItemPrimary>
-                        {marketplaceFee.toFixed(2)} KAS
-                        <Typography sx={{ ml: '0.3rem' }} variant="body2" color="textSecondary" component="span">
-                            (${(marketplaceFee * kasPrice).toFixed(2)})
-                        </Typography>
-                    </OrderItemPrimary>
-                </OrderDetailsItem>
 
                 {/* Network Fee */}
                 <OrderDetailsItem variant="body1">
@@ -131,7 +111,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
             <Button
                 variant="contained"
                 color="primary"
-                onClick={handlePurchase}
+                onClick={() => handlePurchase(order)}
                 disabled={!walletConnected || walletBalance < finalTotal}
                 sx={{ width: '100%' }}
             >

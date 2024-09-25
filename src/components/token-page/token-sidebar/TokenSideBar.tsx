@@ -82,6 +82,7 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                         value="2"
                     >
                         <BuyPanel
+                            walletAddress={walletAddress}
                             walletConnected={walletConnected}
                             tokenInfo={tokenInfo}
                             kasPrice={kasPrice}

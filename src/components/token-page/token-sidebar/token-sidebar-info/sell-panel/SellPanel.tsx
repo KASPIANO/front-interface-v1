@@ -7,6 +7,7 @@ import { SwapHoriz } from '@mui/icons-material'; // MUI icon for swap
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
 import { transferKRC20Token } from '../../../../../utils/KaswareUtils';
+import { confirmSellOrder, createSellOrder } from '../../../../../DAL/BackendDAL';
 
 interface SellPanelProps {
     tokenInfo: BackendTokenResponse;
@@ -14,6 +15,8 @@ interface SellPanelProps {
     walletAddress: string | null;
     walletConnected;
 }
+
+const KASPA_TO_SOMPI = 100000000;
 
 const SellPanel: React.FC<SellPanelProps> = (props) => {
     const { tokenInfo, kasPrice, walletAddress, walletConnected } = props;
@@ -25,6 +28,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [priceCurrency, setPriceCurrency] = useState<'KAS' | 'USD'>('KAS');
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false); // Dialog state
     const [walletConfirmation, setWalletConfirmation] = useState<boolean>(false);
+    const [orderId, setOrderId] = useState<string>('');
+    const [tempWalletAddress, setTempWalletAddress] = useState<string>('');
 
     useEffect(() => {
         fetchWalletKRC20Balance(walletAddress, tokenInfo.ticker).then((balance) => {
@@ -148,7 +153,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         }
     };
 
-    const handleCreateSellOrder = () => {
+    const handleCreateSellOrder = async () => {
         if (!walletConnected) {
             showGlobalSnackbar({ message: 'Please connect your wallet.', severity: 'error' });
             return;
@@ -178,7 +183,23 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             showGlobalSnackbar({ message: 'Insufficient Token balance.', severity: 'error' });
             return;
         }
+        if (parseInt(totalPrice) < 1) {
+            showGlobalSnackbar({
+                message: 'Please enter a valid total price has to be more than 1 KAS',
+                severity: 'error',
+            });
+            return;
+        }
         // Retrieve wallet temp wallert address and order id and set it
+        const { id, temporaryWalletAddress } = await createSellOrder(
+            tokenInfo.ticker,
+            amount,
+            parseInt(totalPrice),
+            parseFloat(pricePerToken),
+            walletAddress,
+        );
+        setOrderId(id);
+        setTempWalletAddress(temporaryWalletAddress);
         setIsDialogOpen(true);
     };
 
@@ -187,8 +208,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             p: 'KRC-20',
             op: 'transfer',
             tick: tokenInfo.ticker,
-            amt: (parseInt(tokenAmount) * 100000000).toString(),
-            to: '0x',
+            amt: (parseInt(tokenAmount) * KASPA_TO_SOMPI).toString(),
+            to: tempWalletAddress,
         };
         const jsonStringified = JSON.stringify(inscribeJsonString);
 
@@ -206,6 +227,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     reveal,
                 });
             }
+            await confirmSellOrder(orderId);
             return true;
         } catch (error) {
             setWalletConfirmation(false);
@@ -304,7 +326,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                         endAdornment: currencyAdornment,
                     }}
                 />
-                {pricePerToken !== '' && (
+                {pricePerToken !== '' && tokenInfo.price && (
                     <Typography variant="body2" sx={{ ml: '0.15rem' }}>
                         {'Price per token is '}
                         <Typography

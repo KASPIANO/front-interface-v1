@@ -9,6 +9,7 @@ import {
     Typography,
     Box,
     CircularProgress,
+    Divider,
 } from '@mui/material';
 
 interface ConfirmSellDialogProps {
@@ -41,6 +42,10 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
         }
         onClose();
     };
+    const calculateAmountReceived = () => {
+        const total = parseFloat(totalPrice);
+        return (total * 0.98).toFixed(2); // 98% of total price, rounded to 2 decimal places
+    };
     return (
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle sx={{ fontWeight: 'bold' }}>Confirm Sell Order</DialogTitle>
@@ -70,9 +75,20 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                                 <strong>Price per Token ({priceCurrency}):</strong> {pricePerToken}
                             </Typography>
                         </Box>
-                        <Typography variant="body2" sx={{ mt: 2 }}>
-                            Please confirm that you want to create this sell order.
-                        </Typography>
+                        <Divider sx={{ my: 2 }} />
+                        <Box sx={{ bgcolor: 'info.light', p: 2, borderRadius: 1 }}>
+                            <Typography variant="body1" gutterBottom>
+                                By confirming this sell order:
+                            </Typography>
+                            <Typography variant="body2" paragraph>
+                                • You will receive{' '}
+                                <strong>
+                                    {calculateAmountReceived()} {priceCurrency}
+                                </strong>{' '}
+                                when the token is sold.
+                            </Typography>
+                            <Typography variant="body2">• Kaspiano will apply a 2% marketplace fee.</Typography>
+                        </Box>
                     </>
                 )}
             </DialogContent>

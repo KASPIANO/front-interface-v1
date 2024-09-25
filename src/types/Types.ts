@@ -288,7 +288,7 @@ export interface KaswareSendKaspaResult {
 
 export interface Order {
     orderId: string;
-    tokenAmount: number;
+    quantity: number;
     totalPrice: number;
     pricePerToken: number;
 }

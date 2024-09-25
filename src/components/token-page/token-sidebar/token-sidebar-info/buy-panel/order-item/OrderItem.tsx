@@ -31,7 +31,7 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                 {/* Amount with Floor Difference */}
                 <Box sx={{ width: '17%' }}>
                     <OrderItemPrimary variant="body2">
-                        {order.tokenAmount}
+                        {order.quantity}
                         {/* <Tooltip title="Difference from floor price"> */}
                         {/* <Typography
                                 variant="caption"
