@@ -3,71 +3,72 @@ import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import { BackendTokenResponse, Order } from '../../../../../types/Types';
 import OrderList from './order-list/OrderList';
-import PaginationControls from './pagiantion-controls/PaginationControls';
 import BuyHeader from './buy-header/BuyHeader';
+import OrderDetails from './order-details/OrderDetails';
+import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 
 // mockOrders.ts
 
-export const mockOrders: Order[] = [
+const mockOrders: Order[] = [
     {
         orderId: 'order1',
-        tokenAmount: 100,
-        totalPrice: 500,
-        pricePerToken: 5.0,
+        tokenAmount: 1000000,
+        pricePerToken: 0.0001,
+        totalPrice: 120.5,
     },
     {
         orderId: 'order2',
-        tokenAmount: 50,
-        totalPrice: 275,
-        pricePerToken: 5.5,
+        tokenAmount: 50000,
+        pricePerToken: 0.002,
+        totalPrice: 95.3,
     },
     {
         orderId: 'order3',
-        tokenAmount: 200,
-        totalPrice: 900,
-        pricePerToken: 4.5,
+        tokenAmount: 1851852,
+        pricePerToken: 0.000054,
+        totalPrice: 102.75,
     },
     {
         orderId: 'order4',
-        tokenAmount: 75,
-        totalPrice: 412.5,
-        pricePerToken: 5.5,
+        tokenAmount: 25000,
+        pricePerToken: 0.004,
+        totalPrice: 87.65,
     },
     {
         orderId: 'order5',
-        tokenAmount: 150,
-        totalPrice: 825,
-        pricePerToken: 5.5,
+        tokenAmount: 200000,
+        pricePerToken: 0.0005,
+        totalPrice: 110.2,
     },
     {
         orderId: 'order6',
-        tokenAmount: 80,
-        totalPrice: 400,
-        pricePerToken: 5.0,
+        tokenAmount: 100000,
+        pricePerToken: 0.001,
+        totalPrice: 99.99,
     },
     {
         orderId: 'order7',
-        tokenAmount: 60,
-        totalPrice: 330,
-        pricePerToken: 5.5,
+        tokenAmount: 60000,
+        pricePerToken: 0.00075,
+        totalPrice: 80.0,
     },
     {
         orderId: 'order8',
-        tokenAmount: 90,
-        totalPrice: 427.5,
-        pricePerToken: 4.75,
+        tokenAmount: 900000,
+        pricePerToken: 0.000055,
+        totalPrice: 70.45,
     },
     {
         orderId: 'order9',
-        tokenAmount: 110,
-        totalPrice: 605,
-        pricePerToken: 5.5,
+        tokenAmount: 133333,
+        pricePerToken: 0.00075,
+        totalPrice: 115.6,
     },
     {
         orderId: 'order10',
-        tokenAmount: 130,
-        totalPrice: 650,
-        pricePerToken: 5.0,
+        tokenAmount: 50000000,
+        pricePerToken: 0.000002,
+        totalPrice: 130.0,
     },
 ];
 
@@ -81,11 +82,40 @@ interface BuyPanelProps {
 const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const { tokenInfo, walletBalance, walletConnected, kasPrice } = props;
     const [orders, setOrders] = useState<Order[]>(mockOrders);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
     const [sortBy, setSortBy] = useState('pricePerToken');
-    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-    const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+    const [sortOrder] = useState<'asc' | 'desc'>('asc');
+    const [isPanelOpen, setIsPanelOpen] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [timeLeft, setTimeLeft] = useState(235); // 235 seconds = 3 minutes and 55 seconds
+
+    useEffect(() => {
+        const handleTimeout = () => {
+            showGlobalSnackbar({
+                message: 'Purchase canceled due to timeout.',
+                severity: 'info',
+            });
+            handleDrawerClose(); // Close the OrderDetails panel
+        };
+
+        // Reset the timer when selectedOrder changes
+        setTimeLeft(235);
+
+        const endTime = Date.now() + 235 * 1000; // Calculate the end time
+
+        const timer = setInterval(() => {
+            const newTimeLeft = Math.round((endTime - Date.now()) / 1000);
+
+            if (newTimeLeft >= 0) {
+                setTimeLeft(newTimeLeft);
+            } else {
+                // Time is up
+                clearInterval(timer);
+                handleTimeout();
+            }
+        }, 1000);
+
+        return () => clearInterval(timer); // Cleanup on unmount
+    }, [selectedOrder]);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -102,46 +132,58 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 }
             });
 
-            const pageSize = 10;
-            const startIndex = (currentPage - 1) * pageSize;
-            const paginatedOrders = sortedOrders.slice(startIndex, startIndex + pageSize);
-            const totalPages = Math.ceil(sortedOrders.length / pageSize);
-
-            setOrders(paginatedOrders);
-            setTotalPages(totalPages);
+            setOrders(sortedOrders);
         };
         fetchOrders();
-    }, [tokenInfo, currentPage, sortBy, sortOrder, orders]);
-
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
+    }, [tokenInfo, sortBy, sortOrder, orders]);
 
     const handleSortChange = (sortBy: string) => {
         setSortBy(sortBy);
-        setCurrentPage(1); // Reset to first page when sorting changes
     };
-    const handleOrderExpand = (orderId: string) => {
-        setExpandedOrderId((prev) => (prev === orderId ? null : orderId));
+    const handleOrderSelect = (order: Order) => {
+        setSelectedOrder(order);
+        setIsPanelOpen(true);
     };
 
+    // Handler to close the drawer
+    const handleDrawerClose = () => {
+        setIsPanelOpen(false);
+        setSelectedOrder(null);
+    };
     return (
-        <Box>
+        <Box sx={{ width: '100%' }}>
             <BuyHeader sortBy={sortBy} onSortChange={handleSortChange} />
             <OrderList
                 walletConnected={walletConnected}
                 walletBalance={walletBalance}
                 kasPrice={kasPrice}
                 orders={orders}
-                onOrderExpand={handleOrderExpand}
-                expandedOrderId={expandedOrderId}
+                onOrderSelect={handleOrderSelect}
                 floorPrice={tokenInfo.price}
             />
-            <PaginationControls
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-            />
+            <Box
+                sx={{
+                    position: 'absolute',
+                    bottom: isPanelOpen ? 0 : '-100%',
+                    height: '45%',
+                    width: '100%',
+                    backgroundColor: 'background.paper',
+                    transition: 'bottom 0.5s ease-in-out',
+                    boxShadow: '0px -2px 10px rgba(0,0,0,0.3)',
+                    borderRadius: '6px 6px 0 0',
+                }}
+            >
+                {selectedOrder && (
+                    <OrderDetails
+                        order={selectedOrder}
+                        kasPrice={kasPrice}
+                        walletConnected={walletConnected}
+                        walletBalance={walletBalance}
+                        onClose={handleDrawerClose}
+                        timeLeft={timeLeft}
+                    />
+                )}
+            </Box>
         </Box>
     );
 };

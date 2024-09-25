@@ -10,6 +10,7 @@ import {
 import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
+const P2PCONTROLLER = 'p2p';
 const KRC20METADATA_CONTROLLER = 'krc20metadata';
 const AUTH_CONTROLLER = 'auth';
 
@@ -227,5 +228,115 @@ export const getTokenPriceHistory = async (ticker: string): Promise<{ price: num
     } catch (error) {
         console.error(`Error fetching price for ${ticker}:`, error.response ? error.response.data : error.message);
         return []; // Return empty array in case of an error
+    }
+};
+
+export const createSellOrder = async (
+    ticker: string,
+    quantity: number,
+    totalPrice: number,
+    pricePerToken: number,
+    walletAddres: string,
+): Promise<{ id: string; temporaryWalletAddres: string; status: string }> => {
+    try {
+        const capitalTicker = ticker.toUpperCase();
+        const response = await backendService.post<{ temporaryWalletAddres: string; id: string; status: string }>(
+            `/${P2PCONTROLLER}/sell`,
+            {
+                ticker: capitalTicker,
+                quantity,
+                totalPrice,
+                pricePerToken,
+                walletAddres,
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.error(
+            `Error creating sell order for ${ticker}:`,
+            error.response ? error.response.data : error.message,
+        );
+        return { id: '', temporaryWalletAddres: '', status: '' }; // Return empty array in case of an error
+    }
+};
+
+export const startBuyOrder = async (
+    orderId,
+    walletAddres: string,
+): Promise<{ id: string; temporaryWalletAddres: string; status: string }> => {
+    try {
+        const response = await backendService.post<{ temporaryWalletAddres: string; id: string; status: string }>(
+            `/${P2PCONTROLLER}/buy/${orderId}`,
+            {
+                walletAddres,
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.error(
+            `Error starting buy order for ${walletAddres}:`,
+            error.response ? error.response.data : error.message,
+        );
+        return { id: '', temporaryWalletAddres: '', status: '' }; // Return empty array in case of an error
+    }
+};
+
+export const confirmSellOrder = async (
+    orderId: string,
+): Promise<{
+    confirmed: boolean;
+}> => {
+    try {
+        const response = await backendService.get<{ confirmed: boolean }>(
+            `/${P2PCONTROLLER}/confirmSellOrder/${orderId}`,
+        );
+        return response.data;
+    } catch (error) {
+        console.error(
+            `Error confirming sell order ${orderId}:`,
+            error.response ? error.response.data : error.message,
+        );
+        return { confirmed: false }; // Return empty array in case of an error
+    }
+};
+
+export const confirmBuyOrder = async (
+    orderId: string,
+    transactionId: string,
+): Promise<{
+    confirmed: boolean;
+}> => {
+    try {
+        const response = await backendService.post<{ confirmed: boolean }>(
+            `/${P2PCONTROLLER}/confirmBuyOrder/${orderId}`,
+            {
+                transactionId,
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.error(
+            `Error confirming buy order ${orderId}:`,
+            error.response ? error.response.data : error.message,
+        );
+        return { confirmed: false }; // Return empty array in case of an error
+    }
+};
+
+export const getOrders = async (
+    ticker: string,
+): Promise<{
+    confirmed: boolean;
+}> => {
+    try {
+        const capitalTicker = ticker.toUpperCase();
+        const response = await backendService.get<any>(`/${P2PCONTROLLER}/getSellOrders?ticker=${capitalTicker}`);
+        return response.data;
+    } catch (error) {
+        console.error(
+            `Error getting sell orders for ${ticker}:`,
+            error.response ? error.response.data : error.message,
+        );
+        return { confirmed: false }; // Return empty array in case of an error
     }
 };

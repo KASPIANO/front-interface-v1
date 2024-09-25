@@ -1,24 +1,27 @@
 import React from 'react';
-import { Box, Button, Typography } from '@mui/material';
+import { Box } from '@mui/material';
+import { NextPageButton, PrevPageButton } from '../../../../../krc-20-page/grid-title-sort/GridTitle.s';
 
 interface PaginationControlsProps {
     currentPage: number;
     totalPages: number;
-    onPageChange: (page: number) => void;
+    handlePrevPage: () => void;
+    handleNextPage: () => void;
 }
 
-const PaginationControls: React.FC<PaginationControlsProps> = ({ currentPage, totalPages, onPageChange }) => (
-    <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
-        <Button disabled={currentPage === 1} onClick={() => onPageChange(currentPage - 1)}>
-            Previous
-        </Button>
-        <Typography variant="body1" sx={{ margin: '0 1rem' }}>
-            Page {currentPage} of {totalPages}
-        </Typography>
-        <Button disabled={currentPage === totalPages} onClick={() => onPageChange(currentPage + 1)}>
-            Next
-        </Button>
-    </Box>
-);
+const PaginationControls: React.FC<PaginationControlsProps> = (props) => {
+    const { handlePrevPage, handleNextPage, totalPages, currentPage } = props;
+
+    return (
+        <Box sx={{ display: 'flex', alignItems: 'center', mr: '2vw' }}>
+            <PrevPageButton onClick={handlePrevPage} disabled={currentPage === 1}>
+                Prev
+            </PrevPageButton>
+            <NextPageButton onClick={handleNextPage} disabled={currentPage === totalPages}>
+                Next
+            </NextPageButton>
+        </Box>
+    );
+};
 
 export default PaginationControls;

@@ -1,4 +1,4 @@
-import { Tab, Tabs, Typography } from '@mui/material';
+import { Tab, Tabs } from '@mui/material';
 import TabPanel from '@mui/lab/TabPanel';
 import TabContext from '@mui/lab/TabContext';
 import { FC, useState, SyntheticEvent } from 'react';
@@ -7,6 +7,7 @@ import { SideBarContainer } from './TokenSideBar.s';
 import TokenSideBarInfo from './token-sidebar-info/TokenSideBarInfo';
 import { GlobalStyleTokenSideBar } from '../../../utils/GlobalStyleScrollBar';
 import BuyPanel from './token-sidebar-info/buy-panel/BuyPanel';
+import SellPanel from './token-sidebar-info/sell-panel/SellPanel';
 // import SellPanel from './token-sidebar-info/sell-panel/SellPanel';
 
 interface TokenSideBarProps {
@@ -97,13 +98,13 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                         }}
                         value="3"
                     >
-                        {/* <SellPanel
+                        <SellPanel
                             walletConnected={walletConnected}
                             tokenInfo={tokenInfo}
                             kasPrice={kasPrice}
                             walletAddress={walletAddress}
-                        /> */}
-                        <Typography variant="h5">Coming Soon</Typography>
+                        />
+                        {/* <Typography variant="h5">Coming Soon</Typography> */}
                     </TabPanel>
                 </TabContext>
             </SideBarContainer>

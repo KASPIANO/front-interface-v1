@@ -1,34 +1,30 @@
-import React, { useState } from 'react';
-import { Box, Typography, Checkbox, FormControlLabel, Button } from '@mui/material';
+import React from 'react';
+import { Box, Typography, Button, IconButton, Tooltip } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import { Order } from '../../../../../../types/Types';
 import { showGlobalSnackbar } from '../../../../../alert-context/AlertContext';
+import { OrderDetailsItem, OrderItemPrimary } from './OrderDetails.s';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 interface OrderDetailsProps {
     order: Order;
     walletConnected: boolean;
     walletBalance: number;
     kasPrice: number;
+    onClose: () => void;
+    timeLeft: number;
 }
 
 const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
-    const { order, walletConnected, walletBalance, kasPrice } = props;
-    const [agreeToTerms, setAgreeToTerms] = useState(false);
+    const { order, walletConnected, walletBalance, kasPrice, onClose, timeLeft } = props;
 
     // Fee Calculations
-    const marketplaceFeePercentage = 0.02; // 2%
+    const marketplaceFeePercentage = 0.01; // 2%
     const marketplaceFee = order.totalPrice * marketplaceFeePercentage;
-    const networkFee = 0.1; // Fixed network fee
+    const networkFee = 5; // Fixed network fee
     const finalTotal = order.totalPrice + marketplaceFee + networkFee;
 
     const handlePurchase = () => {
-        if (!agreeToTerms) {
-            showGlobalSnackbar({
-                message: 'Please agree to the terms of service to proceed with the purchase',
-                severity: 'error',
-            });
-            return;
-        }
-
         // Proceed with the purchase
         // Implement the logic to handle the purchase here
         showGlobalSnackbar({
@@ -37,50 +33,107 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
         });
     };
 
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60)
+            .toString()
+            .padStart(2, '0');
+        const secs = (seconds % 60).toString().padStart(2, '0');
+        return `${minutes}:${secs}`;
+    };
+
     return (
-        <Box sx={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#f5f5f5' }}>
-            <Typography variant="body1">
-                Total Token Price: {order.totalPrice.toFixed(2)} KAS{' '}
-                <Typography variant="body2" color="textSecondary" component="span">
-                    (${(order.totalPrice * kasPrice).toFixed(2)})
-                </Typography>
-            </Typography>
-            <Typography variant="body1">
-                Marketplace Fee: {marketplaceFee.toFixed(2)} KAS{' '}
-                <Typography variant="body2" color="textSecondary" component="span">
-                    (${(marketplaceFee * kasPrice).toFixed(2)})
-                </Typography>
-            </Typography>
-            <Typography variant="body1">
-                Network Fee: {networkFee.toFixed(2)} KAS{' '}
-                <Typography variant="body2" color="textSecondary" component="span">
-                    (${(networkFee * kasPrice).toFixed(2)})
-                </Typography>
-            </Typography>
-            <Typography variant="h6">
-                Final Total: {finalTotal.toFixed(2)} KAS{' '}
-                <Typography variant="body2" color="textSecondary" component="span">
-                    (${(finalTotal * kasPrice).toFixed(2)})
-                </Typography>
-            </Typography>
+        <Box
+            sx={{
+                padding: '0.7rem',
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+            }}
+        >
+            {/* Close Button */}
+            <Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography sx={{ fontWeight: '700' }}>Order Details</Typography>
+                    <IconButton onClick={onClose}>
+                        <CloseIcon
+                            sx={{
+                                fontSize: '1rem',
+                                mb: '0.2rem',
+                            }}
+                        />
+                    </IconButton>
+                </Box>
 
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={agreeToTerms}
-                        onChange={(e) => setAgreeToTerms(e.target.checked)}
-                        color="primary"
-                    />
-                }
-                label="I agree to the Kaspiano Terms of Service"
-            />
+                <OrderDetailsItem variant="body1">
+                    Total Token Price:
+                    <OrderItemPrimary>
+                        {order.totalPrice.toFixed(2)} KAS
+                        <Typography sx={{ ml: '0.3rem' }} variant="body2" color="textSecondary" component="span">
+                            (${(order.totalPrice * kasPrice).toFixed(2)})
+                        </Typography>
+                    </OrderItemPrimary>
+                </OrderDetailsItem>
 
+                {/* Marketplace Fee */}
+                <OrderDetailsItem variant="body1">
+                    Marketplace Fee:
+                    <OrderItemPrimary>
+                        {marketplaceFee.toFixed(2)} KAS
+                        <Typography sx={{ ml: '0.3rem' }} variant="body2" color="textSecondary" component="span">
+                            (${(marketplaceFee * kasPrice).toFixed(2)})
+                        </Typography>
+                    </OrderItemPrimary>
+                </OrderDetailsItem>
+
+                {/* Network Fee */}
+                <OrderDetailsItem variant="body1">
+                    Network Fee:
+                    <OrderItemPrimary
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Tooltip
+                            placement="left"
+                            title="Network fee for processing the transaction, the fee unused will be refunded"
+                        >
+                            <IconButton size="small">
+                                <InfoOutlinedIcon
+                                    sx={{
+                                        fontSize: '0.7rem',
+                                    }}
+                                    fontSize="small"
+                                />
+                            </IconButton>
+                        </Tooltip>
+                        {networkFee.toFixed(2)} KAS
+                        <Typography sx={{ ml: '0.3rem' }} variant="body2" color="textSecondary" component="span">
+                            (${(networkFee * kasPrice).toFixed(2)})
+                        </Typography>
+                    </OrderItemPrimary>
+                </OrderDetailsItem>
+
+                {/* Final Total */}
+                <OrderDetailsItem variant="body1" sx={{ fontWeight: 'bold' }}>
+                    Final Total:
+                    <OrderItemPrimary>
+                        {finalTotal.toFixed(2)} KAS
+                        <Typography sx={{ ml: '0.3rem' }} variant="body2" color="textSecondary" component="span">
+                            (${(finalTotal * kasPrice).toFixed(2)})
+                        </Typography>
+                    </OrderItemPrimary>
+                </OrderDetailsItem>
+            </Box>
+            <Typography variant="body2" color="error" sx={{ mb: '0.2rem', fontSize: '0.8rem' }}>
+                Time left to confirm purchase: {formatTime(timeLeft)}
+            </Typography>
             <Button
                 variant="contained"
                 color="primary"
                 onClick={handlePurchase}
-                disabled={!agreeToTerms || !walletConnected || walletBalance < finalTotal}
-                sx={{ marginTop: '1rem' }}
+                disabled={!walletConnected || walletBalance < finalTotal}
+                sx={{ width: '100%' }}
             >
                 Confirm Purchase
             </Button>

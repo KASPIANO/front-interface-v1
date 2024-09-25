@@ -149,6 +149,26 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     };
 
     const handleCreateSellOrder = () => {
+        if (!walletConnected) {
+            showGlobalSnackbar({ message: 'Please connect your wallet.', severity: 'error' });
+            return;
+        }
+        if (priceCurrency === 'USD') {
+            setPriceCurrency('KAS');
+            if (pricePerToken !== '') {
+                const pricePerTokenValue = parseFloat(pricePerToken);
+                const priceInKAS = pricePerTokenValue / kasPrice;
+                const roundedPriceInKAS = roundUp(priceInKAS, 8);
+                setPricePerToken(roundedPriceInKAS.toString());
+            }
+            if (totalPrice !== '') {
+                const totalPriceValue = parseFloat(totalPrice);
+                const totalInKAS = totalPriceValue / kasPrice;
+                const roundedTotalInKAS = roundUp(totalInKAS, 8);
+                setTotalPrice(roundedTotalInKAS.toString());
+            }
+        }
+
         const amount = parseInt(tokenAmount);
         if (isNaN(amount) || amount <= 0) {
             showGlobalSnackbar({ message: 'Please enter a valid token amount.', severity: 'error' });
@@ -285,10 +305,16 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     }}
                 />
                 {pricePerToken !== '' && (
-                    <Typography variant="body2" sx={{ fontWeigh: 300, ml: '0.15rem' }}>
-                        {`Price per token is ${
-                            priceDifference > 0 ? '+' : ''
-                        }${priceDifference.toFixed(2)}% compared to the floor price.`}
+                    <Typography variant="body2" sx={{ ml: '0.15rem' }}>
+                        {'Price per token is '}
+                        <Typography
+                            component="span"
+                            sx={{ fontWeight: 'bold', color: priceDifference > 0 ? '#4caf50' : '#f44336' }}
+                        >
+                            {priceDifference > 0 ? '+' : ''}
+                            {priceDifference.toFixed(2)}%
+                        </Typography>
+                        {' compared to the floor price.'}
                     </Typography>
                 )}
                 <Box
