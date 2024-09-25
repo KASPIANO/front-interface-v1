@@ -8,7 +8,6 @@ import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
 import { transferKRC20Token } from '../../../../../utils/KaswareUtils';
 import { confirmSellOrder, createSellOrder } from '../../../../../DAL/BackendDAL';
-import { delay } from 'lodash';
 
 interface SellPanelProps {
     tokenInfo: BackendTokenResponse;
