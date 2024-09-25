@@ -1,10 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
 import { FC, useState } from 'react';
 import TokenDataGrid from '../../components/krc-20-page/grid-krc-20/Krc20Grid';
 import { StyledDataGridContainer } from '../../components/krc-20-page/grid-krc-20/Krc20Grid.s';
 import GridTitle from '../../components/krc-20-page/grid-title-sort/GridTitle';
-import { countTokens } from '../../DAL/BackendDAL';
-import { useFetchTokens } from '../../DAL/UseQueriesBackend';
+import { useFetchCountTokensQuery, useFetchTokens } from '../../DAL/UseQueriesBackend';
 import { GridLayout } from './GridPageLayout';
 
 interface GridPageProps {
@@ -25,7 +23,7 @@ const GridPage: FC<GridPageProps> = (props) => {
     const [changeTotalMintsDisabled, setChangeTotalMintsActive] = useState(true);
     const {
         data: tokenList,
-        isLoading,
+        isLoading: isTokenListLoading,
         error,
     } = useFetchTokens(
         PAGE_TOKENS_COUNT,
@@ -34,12 +32,8 @@ const GridPage: FC<GridPageProps> = (props) => {
         timeInterval,
         page,
     );
-    const { data: totalTokensDeployed, isLoading: isTotalTokenIsLoading } = useQuery({
-        queryKey: ['countTokens'], // Query key to uniquely identify this query
-        queryFn: countTokens, // Function to fetch data
-        staleTime: Infinity, // Data won't be refetched until explicitly invalidated
-        gcTime: Infinity, // Data remains cached indefinitely
-    });
+    const { data: totalTokensDeployed, isLoading: isTotalTokenLoading } = useFetchCountTokensQuery();
+    const totalPages = Math.ceil(totalTokensDeployed / PAGE_TOKENS_COUNT);
 
     const onSortBy = (field: string, asc: boolean) => {
         setPage(0); // Reset to first page when sorting
@@ -54,7 +48,7 @@ const GridPage: FC<GridPageProps> = (props) => {
         setPage(0); // Reset to first page when time interval changes
         setTimeInterval(newInterval);
     };
-    const totalPages = Math.ceil(totalTokensDeployed / PAGE_TOKENS_COUNT);
+
     return (
         <GridLayout backgroundBlur={backgroundBlur}>
             <GridTitle
@@ -66,7 +60,7 @@ const GridPage: FC<GridPageProps> = (props) => {
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
                 onSortBy={onSortBy}
-                isLoading={isLoading && isTotalTokenIsLoading}
+                isLoading={isTokenListLoading && isTotalTokenLoading}
                 setActiveHeader={setActiveHeader}
             />
             <StyledDataGridContainer>
@@ -80,7 +74,7 @@ const GridPage: FC<GridPageProps> = (props) => {
                     sortBy={onSortBy}
                     walletAddress={walletAddress}
                     timeInterval={timeInterval}
-                    isLoading={isLoading}
+                    isLoading={isTokenListLoading}
                     error={error}
                 />
             </StyledDataGridContainer>
