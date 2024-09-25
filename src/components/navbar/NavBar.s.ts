@@ -16,7 +16,7 @@ export const NavbarContainer = styled('div')(({ theme }) => ({
 export const NavButton = styled(Button, {
     shouldForwardProp: (prop) => prop !== 'isActive',
 })<{ isActive: boolean }>(({ isActive }) => ({
-    fontWeight: 500,
+    fontWeight: 600,
     cursor: 'pointer',
     fontSize: '0.8rem',
     position: 'relative',

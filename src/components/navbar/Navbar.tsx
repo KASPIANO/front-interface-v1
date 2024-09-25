@@ -70,7 +70,7 @@ const Navbar: React.FC<NavbarProps> = ({
                     {walletConnected ? 'Disconnect' : 'Connect'}
                 </ConnectButton>
                 <Logo
-                    onClick={() => handleNavButtonClick('/')}
+                    onClick={() => handleNavButtonClick('/KRC-20')}
                     sx={{ display: 'flex', alignItems: 'center', marginRight: '1vw' }}
                 >
                     <Avatar
@@ -80,7 +80,10 @@ const Navbar: React.FC<NavbarProps> = ({
                             height: '6.5vh',
                         }}
                     />
-                    <Typography variant="h6" sx={{ display: { xs: 'none', md: 'block' }, marginLeft: '0.5vw' }}>
+                    <Typography
+                        variant="h6"
+                        sx={{ display: { xs: 'none', md: 'block' }, marginLeft: '0.5vw', fontWeight: 'bold' }}
+                    >
                         Kaspiano
                     </Typography>
                 </Logo>
@@ -128,6 +131,9 @@ const Navbar: React.FC<NavbarProps> = ({
                 ))}
             </NavCenter>
             <TokenSearch isMobile={false} setBackgroundBlur={setBackgroundBlur} />
+            <Typography variant="body1" style={{ fontSize: '0.8rem', fontWeight: '600' }}>
+                {formatNumberWithCommas(walletBalance)} KAS
+            </Typography>
             <Tooltip
                 title={isDarkMode ? 'Light Mode' : 'Dark Mode'}
                 placement="bottom"
@@ -139,7 +145,7 @@ const Navbar: React.FC<NavbarProps> = ({
             </Tooltip>
             <ConnectButton
                 onClick={handleConnectButton}
-                sx={{ marginLeft: '1vw', display: { xs: 'none', md: 'flex' } }}
+                sx={{ marginLeft: '0.2rem', display: { xs: 'none', md: 'flex' } }}
             >
                 {walletConnected ? 'Disconnect' : 'Connect'}
             </ConnectButton>
