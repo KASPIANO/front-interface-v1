@@ -61,8 +61,17 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
     const [lastPortfolioPage, setLastPortfolioPage] = useState<boolean>(false);
     const [operationFinished, setOperationFinished] = useState<boolean>(false);
     const [portfolioValueKAS, setPortfolioValueKAS] = useState<number>(0);
-    const [currentWallet, setCurrentWallet] = useState<string>(walletAddress || '');
-    const isUserConnected = walletConnected || !!currentWallet;
+    const [currentWallet, setCurrentWallet] = useState<string>('');
+    const [isUserConnected, setIsUserConnected] = useState<boolean>(false);
+
+    useEffect(() => {
+        // Update currentWallet when walletAddress changes
+        setCurrentWallet(walletAddress || '');
+
+        // Update isUserConnected when either walletConnected or currentWallet changes
+        setIsUserConnected(walletConnected || !!walletAddress);
+    }, [walletAddress, walletConnected]);
+
     useEffect(() => {
         const fetchPrice = async () => {
             const newPrice = await kaspaLivePrice();

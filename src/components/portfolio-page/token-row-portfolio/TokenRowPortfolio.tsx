@@ -226,7 +226,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                                     justifyContent: 'center',
                                 }}
                             >
-                                {token.price.toFixed(6)} KAS
+                                {token.price ? token.price.toFixed(6) : 0} KAS
                             </Typography>
                         }
                     />
