@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../../main';
 import { ThemeModes } from '../../utils/Utils';
 import TokenSearch from '../token-search/TokenSearch';
-import { ConnectButton, Logo, NavbarContainer, NavButton, NavCenter, WalletBalance } from './NavBar.s';
+import { ConnectButton, Logo, NavbarContainer, NavButton, NavCenter } from './NavBar.s';
 
 interface NavbarProps {
     walletAddress: string | null;
@@ -47,50 +47,77 @@ const Navbar: React.FC<NavbarProps> = ({
     const formatNumberWithCommas = (value: number) => value.toLocaleString();
 
     const handleConnectButton = () => {
-        if (walletConnected) {
-            disconnectWallet();
-        } else {
-            connectWallet();
-        }
+        if (walletConnected) disconnectWallet();
+        else connectWallet();
     };
 
     return (
-        <NavbarContainer sx={{ height: backgroundBlur ? '9vh' : '7vh' }}>
-            <Logo onClick={() => handleNavButtonClick('/')} sx={{ display: 'flex', alignItems: 'center' }}>
-                <Avatar
-                    src="/Logo.png"
-                    sx={{
-                        width: '6.5vh',
-                        height: '6.5vh',
-                        marginTop: '0.8vh',
-                        marginRight: '0.2vw',
-                    }}
-                />
-                Kaspiano
-            </Logo>
-
+        <NavbarContainer sx={{ height: backgroundBlur ? '9vh' : '7vh', display: 'flex', alignItems: 'center' }}>
             {/* Responsive Hamburger Menu for Mobile */}
             <IconButton
-                sx={{ display: { xs: 'flex', md: 'none' }, marginLeft: 'auto' }}
+                sx={{ display: { xs: 'flex', md: 'none' }, marginRight: 'auto' }}
                 onClick={() => setDrawerOpen(true)}
             >
                 <MenuIcon />
             </IconButton>
 
+            {/* Logo and Connect Button on the left */}
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <ConnectButton
+                    onClick={handleConnectButton}
+                    sx={{ marginLeft: '1vw', display: { xs: 'flex', md: 'none' } }}
+                >
+                    {walletConnected ? 'Disconnect' : 'Connect'}
+                </ConnectButton>
+                <Logo
+                    onClick={() => handleNavButtonClick('/')}
+                    sx={{ display: 'flex', alignItems: 'center', marginRight: '1vw' }}
+                >
+                    <Avatar
+                        src="/Logo.png"
+                        sx={{
+                            width: '6.5vh',
+                            height: '6.5vh',
+                        }}
+                    />
+                    <Typography variant="h6" sx={{ display: { xs: 'none', md: 'block' }, marginLeft: '0.5vw' }}>
+                        Kaspiano
+                    </Typography>
+                </Logo>
+            </div>
+
             {/* Drawer Menu */}
             <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
                 <List>
                     {['KRC-20', 'deploy', 'portfolio', 'airdrop'].map((page) => (
-                        <ListItem button key={page} onClick={() => handleNavButtonClick(page)}>
+                        <ListItem key={page} onClick={() => handleNavButtonClick(page)}>
                             <ListItemText primary={page.charAt(0).toUpperCase() + page.slice(1)} />
                         </ListItem>
                     ))}
+                    {/* Include TokenSearch in the Drawer */}
+                    <ListItem>
+                        <TokenSearch isMobile={true} setBackgroundBlur={setBackgroundBlur} />
+                    </ListItem>
+                    {/* Wallet Balance */}
+                    <ListItem>
+                        <Typography variant="body1" style={{ fontSize: '0.8rem', marginRight: '1vw' }}>
+                            {formatNumberWithCommas(walletBalance)} KAS
+                        </Typography>
+                    </ListItem>
+                    {/* Theme Toggle */}
+                    <ListItem>
+                        <Tooltip title={isDarkMode ? 'Light Mode' : 'Dark Mode'} placement="bottom">
+                            <IconButton onClick={themeContext.toggleThemeMode}>
+                                {isDarkMode ? <LightModeRoundedIcon /> : <NightlightRoundIcon />}
+                            </IconButton>
+                        </Tooltip>
+                    </ListItem>
                 </List>
             </Drawer>
 
             {/* Full Navigation for Larger Screens */}
             <NavCenter sx={{ display: { xs: 'none', md: 'flex' } }}>
-                {['KRC-20', 'deploy', 'portfolio', 'airdrop'].map((page) => (
+                {['KRC-20   ', 'deploy', 'portfolio', 'airdrop'].map((page) => (
                     <NavButton
                         key={page}
                         isActive={activePage === page}
@@ -100,24 +127,22 @@ const Navbar: React.FC<NavbarProps> = ({
                     </NavButton>
                 ))}
             </NavCenter>
-
-            {/* Right Side Menu Elements */}
-            <div style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}>
-                <TokenSearch setBackgroundBlur={setBackgroundBlur} />
-                <WalletBalance>
-                    <Typography variant="body1" style={{ fontSize: '0.8rem', marginRight: '1vw' }}>
-                        {formatNumberWithCommas(walletBalance)} KAS
-                    </Typography>
-                </WalletBalance>
-                <ConnectButton onClick={handleConnectButton}>
-                    {walletConnected ? 'Disconnect' : 'Connect'}
-                </ConnectButton>
-                <Tooltip title={isDarkMode ? 'Light Mode' : 'Dark Mode'} placement="bottom">
-                    <IconButton onClick={themeContext.toggleThemeMode}>
-                        {isDarkMode ? <LightModeRoundedIcon /> : <NightlightRoundIcon />}
-                    </IconButton>
-                </Tooltip>
-            </div>
+            <TokenSearch isMobile={false} setBackgroundBlur={setBackgroundBlur} />
+            <Tooltip
+                title={isDarkMode ? 'Light Mode' : 'Dark Mode'}
+                placement="bottom"
+                sx={{ display: { xs: 'none', md: 'flex' } }}
+            >
+                <IconButton onClick={themeContext.toggleThemeMode}>
+                    {isDarkMode ? <LightModeRoundedIcon /> : <NightlightRoundIcon />}
+                </IconButton>
+            </Tooltip>
+            <ConnectButton
+                onClick={handleConnectButton}
+                sx={{ marginLeft: '1vw', display: { xs: 'none', md: 'flex' } }}
+            >
+                {walletConnected ? 'Disconnect' : 'Connect'}
+            </ConnectButton>
         </NavbarContainer>
     );
 };

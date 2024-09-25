@@ -18,6 +18,7 @@ const styles = `
 
 interface TokenSearchProps {
     setBackgroundBlur: (isFocused: boolean) => void;
+    isMobile: boolean;
 }
 
 const TokenSearch: FC<TokenSearchProps> = (props) => {
@@ -125,6 +126,7 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
             <Box
                 sx={{
                     marginRight: '1.5vw',
+                    display: props.isMobile ? { xs: 'flex', md: 'none' } : { xs: 'none', md: 'flex' },
                 }}
             >
                 <style>{styles}</style>
