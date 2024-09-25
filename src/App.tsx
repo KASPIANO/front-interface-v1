@@ -67,9 +67,9 @@ const App = () => {
                 const nonce = generateNonce();
                 const requestId = generateRequestId();
                 const requestDate = new Date().toISOString();
-
+                const account = accounts[0];
                 const userVerificationMessage = generateVerificationMessage(
-                    accounts[0],
+                    account,
                     nonce,
                     requestDate,
                     requestId,
@@ -78,7 +78,7 @@ const App = () => {
                 const userVerification = await signMessage(userVerificationMessage);
                 if (userVerification) {
                     const verifiedUser = {
-                        userWalletAddress: accounts[0],
+                        userWalletAddress: account,
                         userSignedMessageTxId: userVerification,
                         requestId,
                         requestNonce: nonce,
@@ -91,13 +91,13 @@ const App = () => {
                         severity: 'success',
                     });
                     // Update wallet state with the first account
-                    await updateWalletState(accounts[0]);
+                    await updateWalletState(account);
 
                     // Show a success message with part of the wallet address
                     showGlobalSnackbar({
                         message: 'Wallet connected successfully',
                         severity: 'success',
-                        details: `Connected to wallet ${accounts[0].substring(0, 9)}....${accounts[0].substring(accounts[0].length - 4)}`,
+                        details: `Connected to wallet ${account.substring(0, 9)}....${account.substring(account.length - 4)}`,
                     });
                     return verifiedUser;
                 }
