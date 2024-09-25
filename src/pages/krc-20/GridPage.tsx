@@ -1,10 +1,11 @@
-import { FC, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { FC, useState } from 'react';
 import TokenDataGrid from '../../components/krc-20-page/grid-krc-20/Krc20Grid';
-import { GridLayout } from './GridPageLayout';
 import { StyledDataGridContainer } from '../../components/krc-20-page/grid-krc-20/Krc20Grid.s';
 import GridTitle from '../../components/krc-20-page/grid-title-sort/GridTitle';
 import { countTokens } from '../../DAL/BackendDAL';
 import { useFetchTokens } from '../../DAL/UseQueriesBackend';
+import { GridLayout } from './GridPageLayout';
 
 interface GridPageProps {
     walletAddress: string | null;
@@ -18,7 +19,6 @@ const PAGE_TOKENS_COUNT = 50;
 const GridPage: FC<GridPageProps> = (props) => {
     const { walletBalance, walletConnected, backgroundBlur, walletAddress } = props;
     const [timeInterval, setTimeInterval] = useState<string>('10m');
-    const [totalTokensDeployed, setTotalTokensDeployed] = useState(0);
     const [sortParams, setSortParams] = useState({ field: '', asc: false });
     const [page, setPage] = useState(0);
     const [activeHeader, setActiveHeader] = useState<string>('');
@@ -34,17 +34,17 @@ const GridPage: FC<GridPageProps> = (props) => {
         timeInterval,
         page,
     );
+    const { data: totalTokensDeployed, isLoading: isTotalTokenIsLoading } = useQuery({
+        queryKey: ['countTokens'], // Query key to uniquely identify this query
+        queryFn: countTokens, // Function to fetch data
+        staleTime: Infinity, // Data won't be refetched until explicitly invalidated
+        gcTime: Infinity, // Data remains cached indefinitely
+    });
 
     const onSortBy = (field: string, asc: boolean) => {
         setPage(0); // Reset to first page when sorting
         setSortParams({ field, asc });
     };
-
-    useEffect(() => {
-        countTokens().then((result) => {
-            setTotalTokensDeployed(result);
-        });
-    }, []);
 
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
@@ -66,7 +66,7 @@ const GridPage: FC<GridPageProps> = (props) => {
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
                 onSortBy={onSortBy}
-                isLoading={isLoading}
+                isLoading={isLoading && isTotalTokenIsLoading}
                 setActiveHeader={setActiveHeader}
             />
             <StyledDataGridContainer>
@@ -84,12 +84,6 @@ const GridPage: FC<GridPageProps> = (props) => {
                     error={error}
                 />
             </StyledDataGridContainer>
-            {/* {showNotification && walletAddress && (
-                <NotificationComponent
-                    message={`Connected to wallet ${walletAddress.substring(0, 4)}...${walletAddress.substring(walletAddress.length - 4)}`}
-                    onClose={() => setShowNotification(false)}
-                />
-            )} */}
         </GridLayout>
     );
 };
