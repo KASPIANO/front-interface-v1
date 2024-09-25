@@ -67,7 +67,7 @@ const App = () => {
                 const nonce = generateNonce();
                 const requestId = generateRequestId();
                 const requestDate = new Date().toISOString();
-                const account = accounts[0];
+                const [account] = accounts;
                 const userVerificationMessage = generateVerificationMessage(
                     account,
                     nonce,
