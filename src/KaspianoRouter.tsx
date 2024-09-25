@@ -32,7 +32,7 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
 }) => (
     <Routes>
         <Route
-            path="/"
+            path="/KRC-20"
             element={
                 <GridPage
                     backgroundBlur={backgroundBlur}
