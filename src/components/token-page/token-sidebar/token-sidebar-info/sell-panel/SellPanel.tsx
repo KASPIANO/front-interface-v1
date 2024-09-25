@@ -8,6 +8,7 @@ import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
 import { transferKRC20Token } from '../../../../../utils/KaswareUtils';
 import { confirmSellOrder, createSellOrder } from '../../../../../DAL/BackendDAL';
+import { delay } from 'lodash';
 
 interface SellPanelProps {
     tokenInfo: BackendTokenResponse;
@@ -152,7 +153,11 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             }
         }
     };
-
+    const cleanFields = () => {
+        setTokenAmount('');
+        setTotalPrice('');
+        setPricePerToken('');
+    };
     const handleCreateSellOrder = async () => {
         if (!walletConnected) {
             showGlobalSnackbar({ message: 'Please connect your wallet.', severity: 'error' });
@@ -227,8 +232,21 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     reveal,
                 });
             }
-            await confirmSellOrder(orderId);
-            return true;
+            const confirmation = await confirmSellOrder(orderId);
+            if (confirmation) {
+                showGlobalSnackbar({
+                    message: 'Sell order confirmed successfully',
+                    severity: 'success',
+                });
+                cleanFields();
+                return true;
+            } else {
+                showGlobalSnackbar({
+                    message: 'Failed to confirm sell order',
+                    severity: 'error',
+                });
+                return false;
+            }
         } catch (error) {
             setWalletConfirmation(false);
             showGlobalSnackbar({
