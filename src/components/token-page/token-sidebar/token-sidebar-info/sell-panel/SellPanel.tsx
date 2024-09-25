@@ -204,9 +204,9 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             parseFloat(pricePerToken),
             walletAddress,
         );
+        setIsDialogOpen(true);
         setOrderId(id);
         setTempWalletAddress(temporaryWalletAddress);
-        setIsDialogOpen(true);
     };
 
     const handleTransfer = async () => {
@@ -245,6 +245,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     severity: 'success',
                 });
                 setCreatingSellOrder(false);
+                setIsDialogOpen(false);
                 cleanFields();
                 return true;
             } else {
@@ -262,16 +263,6 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 details: error.message,
             });
             return false;
-        }
-    };
-
-    const handleConfirmSellOrder = async () => {
-        // Close the dialog
-        setIsDialogOpen(false);
-        const status = await handleTransfer();
-        // Backend sell order confirmation created
-        if (status) {
-            showGlobalSnackbar({ message: 'Sell order created successfully.', severity: 'success' });
         }
     };
 
@@ -397,7 +388,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 waitingForWalletConfirmation={walletConfirmation}
                 open={isDialogOpen}
                 onClose={handleCloseDialog}
-                onConfirm={handleConfirmSellOrder}
+                onConfirm={handleTransfer}
                 ticker={tokenInfo.ticker}
                 tokenAmount={tokenAmount}
                 totalPrice={totalPrice}
