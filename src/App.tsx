@@ -1,24 +1,14 @@
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
-// import Cookies from 'js-cookie';
 import { useCallback, useEffect, useState } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { showGlobalSnackbar } from './components/alert-context/AlertContext';
 import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
-import { fetchWalletBalance } from './DAL/KaspaApiDal';
 import { signUser } from './DAL/BackendDAL';
-// import useSSE from './hooks/useSSE';
+import { fetchWalletBalance } from './DAL/KaspaApiDal';
+import { KaspianoRouter } from './KaspianoRouter';
 import { ThemeContext } from './main';
-import BatchTransferPage from './pages/batch-transfer-page/BatchTransferPage';
-import ContactUs from './pages/compliance/ContactUs';
-import PrivacyPolicy from './pages/compliance/PrivacyPolicy';
-import TermsOfService from './pages/compliance/TermsOfService';
-import TrustSafety from './pages/compliance/TrustSafety';
-import DeployPage from './pages/deploy-page/DeployPage';
-import GridPage from './pages/krc-20/GridPage';
-import PortfolioPage from './pages/portfolio-page/PortfolioPage';
-import TokenPage from './pages/token-page/TokenPage';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
 import { UserVerfication } from './types/Types';
@@ -33,6 +23,7 @@ import {
 import {
     generateNonce,
     generateRequestId,
+    generateVerificationMessage,
     getLocalThemeMode,
     setWalletBalanceUtil,
     ThemeModes,
@@ -48,15 +39,13 @@ const App = () => {
     const [backgroundBlur, setBackgroundBlur] = useState(false);
     const [, setUserVerified] = useState<UserVerfication>(null);
 
-    // const events = useSSE(walletAddress);
-
     const toggleThemeMode = () => {
         const newMode = themeMode === ThemeModes.DARK ? ThemeModes.LIGHT : ThemeModes.DARK;
         localStorage.setItem('theme_mode', newMode);
         setThemeMode(newMode);
     };
 
-    const updateWalletState = useCallback(async (address) => {
+    const updateWalletState = useCallback(async (address: string) => {
         setWalletAddress(address);
         setWalletConnected(true);
         const balance = await fetchWalletBalance(address);
@@ -72,8 +61,62 @@ const App = () => {
         localStorage.removeItem('walletAddress');
     }, []);
 
+    const handleUserVerification = useCallback(
+        async (accounts: string[], setUserVerified: any, showGlobalSnackbar: any) => {
+            try {
+                const nonce = generateNonce();
+                const requestId = generateRequestId();
+                const requestDate = new Date().toISOString();
+                const [account] = accounts;
+                const userVerificationMessage = generateVerificationMessage(
+                    account,
+                    nonce,
+                    requestDate,
+                    requestId,
+                );
+
+                const userVerification = await signMessage(userVerificationMessage);
+                if (userVerification) {
+                    const verifiedUser = {
+                        userWalletAddress: account,
+                        userSignedMessageTxId: userVerification,
+                        requestId,
+                        requestNonce: nonce,
+                        requestTimestamp: requestDate,
+                    };
+                    setUserVerified(verifiedUser);
+                    await signUser(verifiedUser);
+                    showGlobalSnackbar({
+                        message: 'User verified successfully',
+                        severity: 'success',
+                    });
+                    // Update wallet state with the first account
+                    await updateWalletState(account);
+
+                    // Show a success message with part of the wallet address
+                    showGlobalSnackbar({
+                        message: 'Wallet connected successfully',
+                        severity: 'success',
+                        details: `Connected to wallet ${account.substring(0, 9)}....${account.substring(account.length - 4)}`,
+                    });
+                    return verifiedUser;
+                }
+            } catch (error) {
+                console.error('Error verifying user:', error);
+                showGlobalSnackbar({
+                    message: 'Failed to verify user - Connect Again',
+                    severity: 'error',
+                    details: error.message,
+                });
+                resetWalletState();
+                return null;
+            }
+        },
+        [resetWalletState, updateWalletState],
+    );
+
     const handleAccountsChanged = useCallback(
-        async (accounts) => {
+        async (accounts: string[]) => {
             setUserVerified(null);
             if (accounts.length === 0) {
                 resetWalletState();
@@ -82,8 +125,7 @@ const App = () => {
                 await handleUserVerification(accounts, setUserVerified, showGlobalSnackbar);
             }
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [updateWalletState, resetWalletState],
+        [handleUserVerification, resetWalletState, updateWalletState],
     );
 
     const handleDisconnect = useCallback(async () => {
@@ -228,180 +270,36 @@ const App = () => {
             }
         }
     };
-    // Utility function to handle user verification
-    const handleUserVerification = async (accounts: string[], setUserVerified: any, showGlobalSnackbar: any) => {
-        try {
-            const nonce = generateNonce();
-            const requestId = generateRequestId();
-            const requestDate = new Date().toISOString();
 
-            const userVerificationMessage = `
-kaspiano.com wants you to sign in with your Kaspa account:
-
-${accounts[0]}
-
-Welcome to Kaspiano. Signing is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give Kaspiano permission to perform any transactions with your wallet.
-
-URI: https://kaspiano.com
-
-Version: 1
-
-Nonce: ${nonce}
-
-Issued At: ${requestDate}
-
-Request ID: ${requestId}
-        `;
-
-            const userVerification = await signMessage(userVerificationMessage);
-            if (userVerification) {
-                const verifiedUser = {
-                    userWalletAddress: accounts[0],
-                    userSignedMessageTxId: userVerification,
-                    requestId,
-                    requestNonce: nonce,
-                    requestTimestamp: requestDate,
-                };
-                setUserVerified(verifiedUser);
-                await signUser(verifiedUser);
-                showGlobalSnackbar({
-                    message: 'User verified successfully',
-                    severity: 'success',
-                });
-                // Update wallet state with the first account
-                await updateWalletState(accounts[0]);
-
-                // Show a success message with part of the wallet address
-                showGlobalSnackbar({
-                    message: 'Wallet connected successfully',
-                    severity: 'success',
-                    details: `Connected to wallet ${accounts[0].substring(0, 9)}....${accounts[0].substring(accounts[0].length - 4)}`,
-                });
-                return verifiedUser;
-            }
-        } catch (error) {
-            console.error('Error verifying user:', error);
-            showGlobalSnackbar({
-                message: 'Failed to verify user - Connect Again',
-                severity: 'error',
-                details: error.message,
-            });
-            resetWalletState();
-            return null;
-        }
-    };
-
-    // useEffect(() => {
-    //     const token = Cookies.get('userVerifiedToken');
-    //     if (token) {
-    //         const isExpired = checkTokenExpiration(token);
-    //         if (isExpired) {
-    //             alert(
-    //                 'For security reasons, you have been automatically disconnected due to prolonged inactivity. Please log in again to continue using the system.',
-    //             );
-    //             handleDisconnect();
-    //         }
-    //     } else {
-    //         alert(
-    //             'For security reasons, you have been automatically disconnected due to prolonged inactivity. Please log in again to continue using the system.',
-    //         );
-    //         handleDisconnect();
-    //     }
-    // }, [handleDisconnect]);
-
-    if (!themeMode) {
-        return null;
-    } else {
-        return (
-            <ThemeContext.Provider value={{ themeMode, toggleThemeMode }}>
-                <ThemeProvider theme={themeMode === ThemeModes.DARK ? darkTheme : lightTheme}>
-                    <CssBaseline />
-                    <BrowserRouter>
-                        <Navbar
-                            walletConnected={walletConnected}
-                            walletAddress={walletAddress}
-                            network={network}
-                            walletBalance={walletBalance}
-                            connectWallet={handleConnectWallet}
-                            disconnectWallet={handleDisconnect}
-                            setBackgroundBlur={setBackgroundBlur}
-                            backgroundBlur={backgroundBlur}
-                        />
-                        <Routes>
-                            <Route
-                                path="/"
-                                element={
-                                    <GridPage
-                                        backgroundBlur={backgroundBlur}
-                                        walletConnected={walletConnected}
-                                        walletAddress={walletAddress}
-                                        walletBalance={walletBalance}
-                                    />
-                                }
-                            />
-                            <Route
-                                path="/token/:ticker"
-                                element={
-                                    <TokenPage
-                                        backgroundBlur={backgroundBlur}
-                                        network={network}
-                                        walletAddress={walletAddress}
-                                        connectWallet={requestAccounts}
-                                        handleNetworkChange={handleNetworkChange}
-                                        setWalletBalance={setWalletBalance}
-                                        walletBalance={walletBalance}
-                                        walletConnected={walletConnected}
-                                    />
-                                }
-                            />
-                            <Route
-                                path="/deploy"
-                                element={
-                                    <DeployPage
-                                        walletBalance={walletBalance}
-                                        backgroundBlur={backgroundBlur}
-                                        walletConnected={walletConnected}
-                                        setWalletBalance={setWalletBalance}
-                                        walletAddress={walletAddress}
-                                    />
-                                }
-                            />
-                            <Route
-                                path="/portfolio"
-                                element={
-                                    <PortfolioPage
-                                        walletBalance={walletBalance}
-                                        walletAddress={walletAddress}
-                                        backgroundBlur={backgroundBlur}
-                                        walletConnected={walletConnected}
-                                    />
-                                }
-                            />
-                            <Route
-                                path="/airdrop"
-                                element={
-                                    <BatchTransferPage
-                                        walletBalance={walletBalance}
-                                        setWalletBalance={setWalletBalance}
-                                        walletAddress={walletAddress}
-                                        backgroundBlur={backgroundBlur}
-                                        walletConnected={walletConnected}
-                                    />
-                                }
-                            />
-                            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                            <Route path="/terms-service" element={<TermsOfService />} />
-                            <Route path="/trust-safety" element={<TrustSafety />} />
-                            <Route path="/contact-us" element={<ContactUs />} />
-                            {/* Handle 404 - Not Found */}
-                            <Route path="*" element={<div>404 - Not Found</div>} />
-                        </Routes>
-                        <Footer />
-                    </BrowserRouter>
-                </ThemeProvider>
-            </ThemeContext.Provider>
-        );
-    }
+    return themeMode ? (
+        <ThemeContext.Provider value={{ themeMode, toggleThemeMode }}>
+            <ThemeProvider theme={themeMode === ThemeModes.DARK ? darkTheme : lightTheme}>
+                <CssBaseline />
+                <BrowserRouter>
+                    <Navbar
+                        walletConnected={walletConnected}
+                        walletAddress={walletAddress}
+                        network={network}
+                        walletBalance={walletBalance}
+                        connectWallet={handleConnectWallet}
+                        disconnectWallet={handleDisconnect}
+                        setBackgroundBlur={setBackgroundBlur}
+                        backgroundBlur={backgroundBlur}
+                    />
+                    <KaspianoRouter
+                        backgroundBlur={backgroundBlur}
+                        handleNetworkChange={handleNetworkChange}
+                        network={network}
+                        setWalletBalance={setWalletBalance}
+                        walletAddress={walletAddress}
+                        walletBalance={walletBalance}
+                        walletConnected={walletConnected}
+                    />
+                    <Footer />
+                </BrowserRouter>
+            </ThemeProvider>
+        </ThemeContext.Provider>
+    ) : null;
 };
 
 export default App;

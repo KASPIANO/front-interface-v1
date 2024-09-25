@@ -1,0 +1,101 @@
+import { FC } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import BatchTransferPage from './pages/batch-transfer-page/BatchTransferPage';
+import ContactUs from './pages/compliance/ContactUs';
+import PrivacyPolicy from './pages/compliance/PrivacyPolicy';
+import TermsOfService from './pages/compliance/TermsOfService';
+import TrustSafety from './pages/compliance/TrustSafety';
+import DeployPage from './pages/deploy-page/DeployPage';
+import GridPage from './pages/krc-20/GridPage';
+import PortfolioPage from './pages/portfolio-page/PortfolioPage';
+import TokenPage from './pages/token-page/TokenPage';
+import { requestAccounts } from './utils/KaswareUtils';
+
+interface KaspianoRouterProps {
+    backgroundBlur: boolean;
+    walletConnected: boolean;
+    walletAddress: string;
+    walletBalance: number;
+    network: any;
+    handleNetworkChange: any;
+    setWalletBalance: any;
+}
+
+export const KaspianoRouter: FC<KaspianoRouterProps> = ({
+    backgroundBlur,
+    walletConnected,
+    walletAddress,
+    walletBalance,
+    network,
+    handleNetworkChange,
+    setWalletBalance,
+}) => (
+    <Routes>
+        <Route
+            path="/"
+            element={
+                <GridPage
+                    backgroundBlur={backgroundBlur}
+                    walletConnected={walletConnected}
+                    walletAddress={walletAddress}
+                    walletBalance={walletBalance}
+                />
+            }
+        />
+        <Route
+            path="/token/:ticker"
+            element={
+                <TokenPage
+                    backgroundBlur={backgroundBlur}
+                    network={network}
+                    walletAddress={walletAddress}
+                    connectWallet={requestAccounts}
+                    handleNetworkChange={handleNetworkChange}
+                    setWalletBalance={setWalletBalance}
+                    walletBalance={walletBalance}
+                    walletConnected={walletConnected}
+                />
+            }
+        />
+        <Route
+            path="/deploy"
+            element={
+                <DeployPage
+                    walletBalance={walletBalance}
+                    backgroundBlur={backgroundBlur}
+                    walletConnected={walletConnected}
+                    setWalletBalance={setWalletBalance}
+                    walletAddress={walletAddress}
+                />
+            }
+        />
+        <Route
+            path="/portfolio"
+            element={
+                <PortfolioPage
+                    walletBalance={walletBalance}
+                    walletAddress={walletAddress}
+                    backgroundBlur={backgroundBlur}
+                    walletConnected={walletConnected}
+                />
+            }
+        />
+        <Route
+            path="/airdrop"
+            element={
+                <BatchTransferPage
+                    walletBalance={walletBalance}
+                    setWalletBalance={setWalletBalance}
+                    walletAddress={walletAddress}
+                    backgroundBlur={backgroundBlur}
+                    walletConnected={walletConnected}
+                />
+            }
+        />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-service" element={<TermsOfService />} />
+        <Route path="/trust-safety" element={<TrustSafety />} />
+        <Route path="/contact-us" element={<ContactUs />} />
+        <Route path="*" element={<div>404 - Not Found</div>} />
+    </Routes>
+);

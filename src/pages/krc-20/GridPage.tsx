@@ -1,10 +1,9 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import TokenDataGrid from '../../components/krc-20-page/grid-krc-20/Krc20Grid';
-import { GridLayout } from './GridPageLayout';
 import { StyledDataGridContainer } from '../../components/krc-20-page/grid-krc-20/Krc20Grid.s';
 import GridTitle from '../../components/krc-20-page/grid-title-sort/GridTitle';
-import { countTokens } from '../../DAL/BackendDAL';
-import { useFetchTokens } from '../../DAL/UseQueriesBackend';
+import { useFetchCountTokensQuery, useFetchTokens } from '../../DAL/UseQueriesBackend';
+import { GridLayout } from './GridPageLayout';
 
 interface GridPageProps {
     walletAddress: string | null;
@@ -18,14 +17,13 @@ const PAGE_TOKENS_COUNT = 50;
 const GridPage: FC<GridPageProps> = (props) => {
     const { walletBalance, walletConnected, backgroundBlur, walletAddress } = props;
     const [timeInterval, setTimeInterval] = useState<string>('10m');
-    const [totalTokensDeployed, setTotalTokensDeployed] = useState(0);
     const [sortParams, setSortParams] = useState({ field: '', asc: false });
     const [page, setPage] = useState(0);
     const [activeHeader, setActiveHeader] = useState<string>('');
     const [changeTotalMintsDisabled, setChangeTotalMintsActive] = useState(true);
     const {
         data: tokenList,
-        isLoading,
+        isLoading: isTokenListLoading,
         error,
     } = useFetchTokens(
         PAGE_TOKENS_COUNT,
@@ -34,17 +32,13 @@ const GridPage: FC<GridPageProps> = (props) => {
         timeInterval,
         page,
     );
+    const { data: totalTokensDeployed, isLoading: isTotalTokenLoading } = useFetchCountTokensQuery();
+    const totalPages = Math.ceil(totalTokensDeployed / PAGE_TOKENS_COUNT);
 
     const onSortBy = (field: string, asc: boolean) => {
         setPage(0); // Reset to first page when sorting
         setSortParams({ field, asc });
     };
-
-    useEffect(() => {
-        countTokens().then((result) => {
-            setTotalTokensDeployed(result);
-        });
-    }, []);
 
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
@@ -54,7 +48,7 @@ const GridPage: FC<GridPageProps> = (props) => {
         setPage(0); // Reset to first page when time interval changes
         setTimeInterval(newInterval);
     };
-    const totalPages = Math.ceil(totalTokensDeployed / PAGE_TOKENS_COUNT);
+
     return (
         <GridLayout backgroundBlur={backgroundBlur}>
             <GridTitle
@@ -66,7 +60,7 @@ const GridPage: FC<GridPageProps> = (props) => {
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
                 onSortBy={onSortBy}
-                isLoading={isLoading}
+                isLoading={isTokenListLoading && isTotalTokenLoading}
                 setActiveHeader={setActiveHeader}
             />
             <StyledDataGridContainer>
@@ -80,16 +74,10 @@ const GridPage: FC<GridPageProps> = (props) => {
                     sortBy={onSortBy}
                     walletAddress={walletAddress}
                     timeInterval={timeInterval}
-                    isLoading={isLoading}
+                    isLoading={isTokenListLoading}
                     error={error}
                 />
             </StyledDataGridContainer>
-            {/* {showNotification && walletAddress && (
-                <NotificationComponent
-                    message={`Connected to wallet ${walletAddress.substring(0, 4)}...${walletAddress.substring(walletAddress.length - 4)}`}
-                    onClose={() => setShowNotification(false)}
-                />
-            )} */}
         </GridLayout>
     );
 };
