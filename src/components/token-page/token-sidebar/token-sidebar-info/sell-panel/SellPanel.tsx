@@ -8,6 +8,7 @@ import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
 import { transferKRC20Token } from '../../../../../utils/KaswareUtils';
 import { confirmSellOrder, createSellOrder } from '../../../../../DAL/BackendDAL';
+import { doPolling } from '../../../../../utils/Utils';
 
 interface SellPanelProps {
     tokenInfo: BackendTokenResponse;
@@ -233,7 +234,11 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     reveal,
                 });
             }
-            const confirmation = await confirmSellOrder(orderId);
+            const confirmation = await doPolling(
+                () => confirmSellOrder(orderId),
+                (result) => result.confirmed,
+            );
+
             if (confirmation) {
                 showGlobalSnackbar({
                     message: 'Sell order confirmed successfully',
