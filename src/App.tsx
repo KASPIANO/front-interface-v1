@@ -23,6 +23,7 @@ import {
 import {
     generateNonce,
     generateRequestId,
+    generateVerificationMessage,
     getLocalThemeMode,
     setWalletBalanceUtil,
     ThemeModes,
@@ -67,23 +68,12 @@ const App = () => {
                 const requestId = generateRequestId();
                 const requestDate = new Date().toISOString();
 
-                const userVerificationMessage = `
-kaspiano.com wants you to sign in with your Kaspa account:
-
-${accounts[0]}
-
-Welcome to Kaspiano. Signing is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give Kaspiano permission to perform any transactions with your wallet.
-
-URI: https://kaspiano.com
-
-Version: 1
-
-Nonce: ${nonce}
-
-Issued At: ${requestDate}
-
-Request ID: ${requestId}
-        `;
+                const userVerificationMessage = generateVerificationMessage(
+                    accounts[0],
+                    nonce,
+                    requestId,
+                    requestDate,
+                );
 
                 const userVerification = await signMessage(userVerificationMessage);
                 if (userVerification) {
