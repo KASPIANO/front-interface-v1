@@ -22,6 +22,7 @@ interface ConfirmSellDialogProps {
     pricePerToken: string;
     priceCurrency: 'KAS' | 'USD';
     waitingForWalletConfirmation: boolean;
+    creatingSellOrder: boolean;
 }
 
 const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
@@ -35,9 +36,10 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
         totalPrice,
         pricePerToken,
         priceCurrency,
+        creatingSellOrder,
     } = props;
     const handleClose = () => {
-        if (waitingForWalletConfirmation) {
+        if (waitingForWalletConfirmation || creatingSellOrder) {
             return; // Prevent closing if waiting
         }
         onClose();
@@ -56,6 +58,15 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                             <CircularProgress size={24} sx={{ mr: 2 }} />
                             <Typography variant="body1" sx={{ fontWeight: 700 }}>
                                 Processing transaction...
+                            </Typography>
+                        </Box>
+                    </>
+                ) : creatingSellOrder ? (
+                    <>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+                            <CircularProgress size={24} sx={{ mr: 2 }} />
+                            <Typography variant="body1" sx={{ fontWeight: 700 }}>
+                                Creating sell order...
                             </Typography>
                         </Box>
                     </>

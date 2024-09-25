@@ -31,6 +31,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [walletConfirmation, setWalletConfirmation] = useState<boolean>(false);
     const [orderId, setOrderId] = useState<string>('');
     const [tempWalletAddress, setTempWalletAddress] = useState<string>('');
+    const [creatingSellOrder, setCreatingSellOrder] = useState<boolean>(false);
 
     useEffect(() => {
         fetchWalletKRC20Balance(walletAddress, tokenInfo.ticker).then((balance) => {
@@ -153,7 +154,11 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             }
         }
     };
-
+    const cleanFields = () => {
+        setTokenAmount('');
+        setTotalPrice('');
+        setPricePerToken('');
+    };
     const handleCreateSellOrder = async () => {
         if (!walletConnected) {
             showGlobalSnackbar({ message: 'Please connect your wallet.', severity: 'error' });
@@ -218,6 +223,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             setWalletConfirmation(true);
             const result = await transferKRC20Token(jsonStringified);
             setWalletConfirmation(false);
+            setCreatingSellOrder(true);
             if (result) {
                 const { commit, reveal } = JSON.parse(result);
 
@@ -228,13 +234,26 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     reveal,
                 });
             }
-
-            await doPolling(
+            const confirmation = await doPolling(
                 () => confirmSellOrder(orderId),
                 (result) => result.confirmed,
             );
 
-            return true;
+            if (confirmation) {
+                showGlobalSnackbar({
+                    message: 'Sell order confirmed successfully',
+                    severity: 'success',
+                });
+                setCreatingSellOrder(false);
+                cleanFields();
+                return true;
+            } else {
+                showGlobalSnackbar({
+                    message: 'Failed to confirm sell order',
+                    severity: 'error',
+                });
+                return false;
+            }
         } catch (error) {
             setWalletConfirmation(false);
             showGlobalSnackbar({
@@ -374,6 +393,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 </StyledButton>
             </StyledSellPanel>
             <ConfirmSellDialog
+                creatingSellOrder={creatingSellOrder}
                 waitingForWalletConfirmation={walletConfirmation}
                 open={isDialogOpen}
                 onClose={handleCloseDialog}

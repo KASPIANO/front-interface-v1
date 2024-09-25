@@ -8,71 +8,72 @@ import OrderDetails from './order-details/OrderDetails';
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import { getOrders, startBuyOrder, confirmBuyOrder } from '../../../../../DAL/BackendDAL';
 import { sendKaspa } from '../../../../../utils/KaswareUtils';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 // mockOrders.ts
 
-const mockOrders: Order[] = [
-    {
-        orderId: 'order1',
-        quantity: 1000000,
-        pricePerToken: 0.0001,
-        totalPrice: 120.5,
-    },
-    {
-        orderId: 'order2',
-        quantity: 50000,
-        pricePerToken: 0.002,
-        totalPrice: 95.3,
-    },
-    {
-        orderId: 'order3',
-        quantity: 1851852,
-        pricePerToken: 0.000054,
-        totalPrice: 102.75,
-    },
-    {
-        orderId: 'order4',
-        quantity: 25000,
-        pricePerToken: 0.004,
-        totalPrice: 87.65,
-    },
-    {
-        orderId: 'order5',
-        quantity: 200000,
-        pricePerToken: 0.0005,
-        totalPrice: 110.2,
-    },
-    {
-        orderId: 'order6',
-        quantity: 100000,
-        pricePerToken: 0.001,
-        totalPrice: 99.99,
-    },
-    {
-        orderId: 'order7',
-        quantity: 60000,
-        pricePerToken: 0.00075,
-        totalPrice: 80.0,
-    },
-    {
-        orderId: 'order8',
-        quantity: 900000,
-        pricePerToken: 0.000055,
-        totalPrice: 70.45,
-    },
-    {
-        orderId: 'order9',
-        quantity: 133333,
-        pricePerToken: 0.00075,
-        totalPrice: 115.6,
-    },
-    {
-        orderId: 'order10',
-        quantity: 50000000,
-        pricePerToken: 0.000002,
-        totalPrice: 130.0,
-    },
-];
+// const mockOrders: Order[] = [
+//     {
+//         orderId: 'order1',
+//         quantity: 1000000,
+//         pricePerToken: 0.0001,
+//         totalPrice: 120.5,
+//     },
+//     {
+//         orderId: 'order2',
+//         quantity: 50000,
+//         pricePerToken: 0.002,
+//         totalPrice: 95.3,
+//     },
+//     {
+//         orderId: 'order3',
+//         quantity: 1851852,
+//         pricePerToken: 0.000054,
+//         totalPrice: 102.75,
+//     },
+//     {
+//         orderId: 'order4',
+//         quantity: 25000,
+//         pricePerToken: 0.004,
+//         totalPrice: 87.65,
+//     },
+//     {
+//         orderId: 'order5',
+//         quantity: 200000,
+//         pricePerToken: 0.0005,
+//         totalPrice: 110.2,
+//     },
+//     {
+//         orderId: 'order6',
+//         quantity: 100000,
+//         pricePerToken: 0.001,
+//         totalPrice: 99.99,
+//     },
+//     {
+//         orderId: 'order7',
+//         quantity: 60000,
+//         pricePerToken: 0.00075,
+//         totalPrice: 80.0,
+//     },
+//     {
+//         orderId: 'order8',
+//         quantity: 900000,
+//         pricePerToken: 0.000055,
+//         totalPrice: 70.45,
+//     },
+//     {
+//         orderId: 'order9',
+//         quantity: 133333,
+//         pricePerToken: 0.00075,
+//         totalPrice: 115.6,
+//     },
+//     {
+//         orderId: 'order10',
+//         quantity: 50000000,
+//         pricePerToken: 0.000002,
+//         totalPrice: 130.0,
+//     },
+// ];
 
 interface BuyPanelProps {
     tokenInfo: BackendTokenResponse;
@@ -87,7 +88,7 @@ const KASPA_TO_SOMPI = 100000000;
 
 const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const { tokenInfo, walletBalance, walletConnected, kasPrice, walletAddress } = props;
-    const [orders, setOrders] = useState<Order[]>(mockOrders);
+    const [orders, setOrders] = useState<Order[]>([]);
     const [sortBy, setSortBy] = useState('pricePerToken');
     const [sortOrder] = useState<'asc' | 'desc'>('asc');
     const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -136,11 +137,10 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 field: sortBy,
                 direction: sortOrder,
             });
-            const newOrders = response.orders || [];
+            const newOrders = response || [];
 
             // If we get less than the limit, no more orders to load
             setHasMore(newOrders.length === LIMIT);
-
             setOrders((prevOrders) => [...prevOrders, ...newOrders]);
             setOffset((prevOffset) => prevOffset + LIMIT);
         } catch (error) {
@@ -149,10 +149,6 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setLoading(false);
         }
     }, [offset, sortBy, sortOrder, loading, hasMore, tokenInfo.ticker]);
-
-    useEffect(() => {
-        fetchOrders();
-    }, [fetchOrders]);
 
     const handleSortChange = (sortBy: string) => {
         setSortBy(sortBy);
@@ -166,6 +162,10 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         setSelectedOrder(order);
         setIsPanelOpen(true);
     };
+
+    useEffect(() => {
+        fetchOrders();
+    }, [fetchOrders]);
 
     const handlePurchase = async (order: Order, finalTotal: number) => {
         const sompiAmount = (order.totalPrice + finalTotal) * KASPA_TO_SOMPI;
@@ -196,14 +196,23 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     return (
         <Box sx={{ width: '100%' }}>
             <BuyHeader sortBy={sortBy} onSortChange={handleSortChange} />
-            <OrderList
-                walletConnected={walletConnected}
-                walletBalance={walletBalance}
-                kasPrice={kasPrice}
-                orders={orders}
-                onOrderSelect={handleOrderSelect}
-                floorPrice={tokenInfo.price}
-            />
+            <InfiniteScroll
+                dataLength={orders.length} // Length of the current data
+                next={fetchOrders} // Function to load more data
+                hasMore={hasMore} // Boolean to indicate if there's more data to load
+                loader={<h4>Loading more orders...</h4>} // Loading message
+                scrollableTarget="scrollableDiv"
+                endMessage={<p style={{ textAlign: 'center' }}>No more orders to load.</p>}
+            >
+                <OrderList
+                    walletConnected={walletConnected}
+                    walletBalance={walletBalance}
+                    kasPrice={kasPrice}
+                    orders={orders}
+                    onOrderSelect={handleOrderSelect}
+                    floorPrice={tokenInfo.price}
+                />
+            </InfiniteScroll>
             <Box
                 sx={{
                     position: 'absolute',
