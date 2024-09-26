@@ -3,9 +3,9 @@ import { PortfolioLayout } from './PortfolioPageLayout';
 import UserProfile from '../../components/portfolio-page/user-profile/UserProfile';
 import PortfolioPanel from '../../components/portfolio-page/portfolio-tab-panel/PortfolioPanel';
 import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
-import { TokenRowActivityItem, TokenRowPortfolioItem } from '../../types/Types';
+import { Order, TokenRowActivityItem, TokenRowPortfolioItem } from '../../types/Types';
 import { fetchWalletActivity, fetchWalletKRC20TokensBalance } from '../../DAL/Krc20DAL';
-import { fetchTokenPortfolio } from '../../DAL/BackendDAL';
+import { fetchTokenPortfolio, getUSerListings } from '../../DAL/BackendDAL';
 
 interface PortfolioPageProps {
     walletAddress: string | null;
@@ -63,6 +63,7 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
     const [portfolioValueKAS, setPortfolioValueKAS] = useState<number>(0);
     const [currentWallet, setCurrentWallet] = useState<string>('');
     const [isUserConnected, setIsUserConnected] = useState<boolean>(false);
+    const [listings, setListings] = useState<Order[]>([]);
 
     useEffect(() => {
         // Update currentWallet when walletAddress changes
@@ -172,6 +173,14 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentWallet, walletConnected, paginationActivityKey, operationFinished]);
 
+    useEffect(() => {
+        if (walletAddress || currentWallet) {
+            getUSerListings(currentWallet).then((data) => {
+                setListings(data);
+            });
+        }
+    }, [walletAddress, currentWallet]);
+
     const handleActivityPagination = (direction: 'next' | 'prev') => {
         setPortfolioAssetsActivity([]);
         setPaginationActivityDirection(direction);
@@ -200,6 +209,7 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
                 setWalletAddress={setCurrentWallet}
             />
             <PortfolioPanel
+                listings={listings}
                 handleChange={handleChange}
                 handleActivityPagination={handleActivityPagination}
                 handlePortfolioPagination={handlePortfolioPagination}

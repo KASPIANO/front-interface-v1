@@ -9,6 +9,7 @@ import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import { getOrders, startBuyOrder, confirmBuyOrder } from '../../../../../DAL/BackendDAL';
 import { sendKaspa } from '../../../../../utils/KaswareUtils';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { CircularProgress } from '@mui/material'; // Import CircularProgress for the spinner
 
 // mockOrders.ts
 
@@ -171,6 +172,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         const sompiAmount = finalTotal * KASPA_TO_SOMPI;
 
         const paymentTxn = await sendKaspa(tempWalletAddress, sompiAmount);
+        setIsPanelOpen(false);
+        setSelectedOrder(null);
         const parsedTxData = JSON.parse(paymentTxn);
         const paymentTxnId = parsedTxData.id;
         const confirmBuy = await confirmBuyOrder(order.orderId, paymentTxnId);
@@ -200,7 +203,11 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 dataLength={orders.length} // Length of the current data
                 next={fetchOrders} // Function to load more data
                 hasMore={hasMore} // Boolean to indicate if there's more data to load
-                loader={<h4>Loading more orders...</h4>} // Loading message
+                loader={
+                    <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+                        <CircularProgress />
+                    </Box>
+                } // Loading message
                 scrollableTarget="scrollableDiv"
                 endMessage={<p style={{ textAlign: 'center' }}>No more orders to load.</p>}
             >

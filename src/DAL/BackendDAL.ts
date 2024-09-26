@@ -354,11 +354,11 @@ export const getOrders = async (
 export const getUSerListings = async (
     walletAdress: string,
     offset = 0,
-    limit = 30,
+    limit = 50,
     sort?: { field: string; direction: string },
 ): Promise<any> => {
     try {
-        const response = await backendService.post<any>(`/${P2PCONTROLLER}/getSellOrders`, {
+        const response = await backendService.post<any>(`/${P2PCONTROLLER}/getUserListings`, {
             walletAdress,
             pagination: {
                 offset,

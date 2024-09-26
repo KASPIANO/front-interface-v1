@@ -46,7 +46,11 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
     };
     const calculateAmountReceived = () => {
         const total = parseFloat(totalPrice);
-        return (total * 0.98).toFixed(2); // 98% of total price, rounded to 2 decimal places
+        if (total <= 10) {
+            return (total - 0.2).toFixed(2); // 20 cents off total price, rounded to 2 decimal places
+        } else {
+            return (total * 0.98).toFixed(2); // 98% of total price, rounded to 2 decimal places
+        }
     };
     return (
         <Dialog open={open} onClose={handleClose}>
@@ -98,7 +102,9 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                                 </strong>{' '}
                                 when the token is sold.
                             </Typography>
-                            <Typography variant="body2">• Kaspiano will apply a 2% marketplace fee.</Typography>
+                            <Typography variant="body2">
+                                • Kaspiano will apply a 2% marketplace fee or 0.2 Depending on order.{' '}
+                            </Typography>
                         </Box>
                     </>
                 )}
