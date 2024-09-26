@@ -1,3 +1,4 @@
+import { Order } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const P2PCONTROLLER = 'p2p';
@@ -101,7 +102,7 @@ export const getOrders = async (
     offset?: number,
     limit?: number,
     sort?: { field: string; direction: string },
-): Promise<any> => {
+): Promise<{ orders: Order[]; totalCount: number }> => {
     try {
         const capitalTicker = ticker.toUpperCase();
         const response = await backendService.post<any>(
@@ -120,7 +121,7 @@ export const getOrders = async (
             `Error getting sell orders for ${ticker}:`,
             error.response ? error.response.data : error.message,
         );
-        return { confirmed: false }; // Return empty array in case of an error
+        return { orders: [], totalCount: 0 }; // Return empty array in case of an error
     }
 };
 

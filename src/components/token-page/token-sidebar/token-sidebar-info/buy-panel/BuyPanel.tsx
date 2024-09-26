@@ -140,12 +140,11 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 field: sortBy,
                 direction: sortOrder,
             });
-            const newOrders = response || [];
+            const newOrders = response.orders || [];
 
             // If we get less than the limit, no more orders to load
-            setHasMore(newOrders.length === LIMIT);
-            // setOrders((prevOrders) => [...prevOrders, ...newOrders]);
-            setOrders(newOrders);
+            setHasMore(response.totalCount > offset + LIMIT);
+            setOrders((prevOrders) => [...prevOrders, ...newOrders]);
             setOffset((prevOffset) => prevOffset + LIMIT);
         } catch (error) {
             console.error(`Error fetching orders: ${error.message}`);
