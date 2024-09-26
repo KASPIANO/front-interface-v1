@@ -1,0 +1,72 @@
+name: Deploy Dev ENV React App to AWS S3 and CloudFront
+
+on:
+  push:
+    branches:
+      - develop  # Change this to the branch you want to deploy from
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'  # Specify the Node.js version you need
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Create .env file
+      run: |
+        echo "VITE_API_ENDPOINT=${{ secrets.VITE_API_ENDPOINT }}" >> .env
+        echo "VITE_API_KRC20=${{ secrets.VITE_API_KRC20 }}" >> .env
+        echo "VITE_APP_KAS_WALLET_ADDRESS=${{ secrets.VITE_APP_KAS_WALLET_ADDRESS }}" >> .env
+        echo "VITE_KASPA_API=${{ secrets.VITE_KASPA_API }}" >> .env
+        echo "VITE_WEBSERVER_API_KEY=${{ secrets.VITE_WEBSERVER_API_KEY }}" >> .env
+        echo "VITE_ENV=${{ secrets.VITE_ENV }}" >> .env
+
+    - name: Build React app
+      run: npm run build
+
+    - name: Install AWS CLI
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y awscli
+
+    - name: Verify AWS CLI Installation
+      run: aws --version
+
+    - name: Debug AWS Configuration
+      run: |
+        aws s3 ls --region ${{ env.AWS_REGION }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+
+    - name: Deploy to S3
+      run: |
+        aws s3 sync build/ s3://${{ env.S3_BUCKET_NAME_DEV }}/ --delete
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        S3_BUCKET_NAME_DEV_DEV: ${{ secrets.S3_BUCKET_NAME_DEV }}
+
+
+    # - name: Invalidate CloudFront cache
+    #   run: |
+    #     aws cloudfront create-invalidation \
+    #       --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
+    #       --paths "/*"
+    #   env:
+    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     AWS_REGION: ${{ secrets.AWS_REGION }}
+    #     CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+    #     S3_BUCKET_NAME_DEV: ${{ secrets.S3_BUCKET_NAME_DEV }}
