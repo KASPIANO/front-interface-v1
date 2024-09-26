@@ -5,7 +5,8 @@ import PortfolioPanel from '../../components/portfolio-page/portfolio-tab-panel/
 import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
 import { Order, TokenRowActivityItem, TokenRowPortfolioItem } from '../../types/Types';
 import { fetchWalletActivity, fetchWalletKRC20TokensBalance } from '../../DAL/Krc20DAL';
-import { fetchTokenPortfolio, getUSerListings } from '../../DAL/BackendDAL';
+import { fetchTokenPortfolio } from '../../DAL/BackendDAL';
+import { getUSerListings } from '../../DAL/BackendP2PDAL';
 
 interface PortfolioPageProps {
     walletAddress: string | null;

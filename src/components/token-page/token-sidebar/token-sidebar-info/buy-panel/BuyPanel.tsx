@@ -6,7 +6,7 @@ import OrderList from './order-list/OrderList';
 import BuyHeader from './buy-header/BuyHeader';
 import OrderDetails from './order-details/OrderDetails';
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
-import { getOrders, startBuyOrder, confirmBuyOrder } from '../../../../../DAL/BackendDAL';
+import { getOrders, startBuyOrder, confirmBuyOrder } from '../../../../../DAL/BackendP2PDAL';
 import { sendKaspa } from '../../../../../utils/KaswareUtils';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material'; // Import CircularProgress for the spinner

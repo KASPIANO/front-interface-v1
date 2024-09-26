@@ -2,6 +2,8 @@ import { getBalance } from '../utils/KaswareUtils';
 import { kasInfoMainnetService, kasInfoService } from './AxiosInstaces';
 import { delay } from '../utils/Utils';
 
+const KASPA_TRANSACTION_MASS = 3000;
+const KRC20_TRANSACTION_MASS = 50020;
 export const fetchWalletBalance = async (address: string): Promise<number> => {
     try {
         let balanceInKaspa;
@@ -53,6 +55,20 @@ export const kaspaFeeEstimate = async (): Promise<number> => {
         return feeRate;
     } catch (error) {
         console.error('Error fetching kaspa fee estimate:', error);
+        return 0;
+    }
+};
+
+export const gasEstimator = async (txType: 'KASPA' | 'TRANSFER'): Promise<number> => {
+    try {
+        const fee = await kaspaFeeEstimate();
+        if (txType === 'KASPA') {
+            return KASPA_TRANSACTION_MASS * fee;
+        } else {
+            return KRC20_TRANSACTION_MASS * fee;
+        }
+    } catch (error) {
+        console.error('Error estimating gas:', error);
         return 0;
     }
 };

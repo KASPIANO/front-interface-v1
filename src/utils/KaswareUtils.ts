@@ -2,7 +2,7 @@
 
 import Cookies from 'js-cookie';
 import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
-import { kaspaFeeEstimate } from '../DAL/KaspaApiDal';
+import { gasEstimator, kaspaFeeEstimate } from '../DAL/KaspaApiDal';
 import { KaswareSendKaspaResult } from '../types/Types';
 
 // Utility to detect if KasWare Wallet is installed
@@ -12,8 +12,7 @@ const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 // const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
 // const MINT_DEPLOY_PRIORITY = 0.005;
 // const MINT_DEPLOY_PRIORITY_SOMPI = MINT_DEPLOY_PRIORITY * KASPA_TO_SOMPI;
-const TX_MASS = 0.00008;
-const MIN_TX_MASS = 0.00001;
+const MIN_TX_MASS = 0.000001;
 
 // Method to request account connection
 export const requestAccounts = async (): Promise<string[]> => {
@@ -119,12 +118,20 @@ export const getBalance = async (): Promise<{ confirmed: number; unconfirmed: nu
 };
 
 // Method to send KAS
+// PRIORITY FEE SOMPI//
 export const sendKaspa = async (
     toAddress: string,
     sompi: number,
     options?: { priorityFee?: number },
 ): Promise<string> => {
     try {
+        let priorityFee = await kaspaFeeEstimate();
+        if (priorityFee === 1) {
+            priorityFee = MIN_TX_MASS;
+        } else {
+            priorityFee = await gasEstimator('KASPA');
+        }
+        options = { priorityFee };
         const txData = await window.kasware.sendKaspa(toAddress, sompi, options);
         return txData;
     } catch (error) {
@@ -138,6 +145,13 @@ export const sendKaspaToKaspiano = async (
     options?: { priorityFee?: number },
 ): Promise<KaswareSendKaspaResult> => {
     try {
+        let priorityFee = await kaspaFeeEstimate();
+        if (priorityFee === 1) {
+            priorityFee = MIN_TX_MASS;
+        } else {
+            priorityFee = await gasEstimator('KASPA');
+        }
+        options = { priorityFee };
         const txData = await window.kasware.sendKaspa(KASPIANO_WALLET, sompi, options);
         const parsedTxData = JSON.parse(txData);
         return parsedTxData;
@@ -177,9 +191,9 @@ export const deployKRC20Token = async (inscribeJsonString: string): Promise<stri
         if (priorityFee === 1) {
             priorityFee = MIN_TX_MASS;
         } else {
-            priorityFee = priorityFee * TX_MASS;
+            priorityFee = await gasEstimator('TRANSFER');
         }
-
+        // need check
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, priorityFee);
         return txid;
     } catch (error) {
@@ -197,7 +211,7 @@ export const mintKRC20Token = async (inscribeJsonString: string): Promise<string
         if (priorityFee === 1) {
             priorityFee = MIN_TX_MASS;
         } else {
-            priorityFee = priorityFee * TX_MASS;
+            priorityFee = await gasEstimator('TRANSFER');
         }
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, priorityFee);
         return txid;
@@ -216,7 +230,7 @@ export const transferKRC20Token = async (inscribeJsonString: string): Promise<st
         if (priorityFee === 1) {
             priorityFee = MIN_TX_MASS;
         } else {
-            priorityFee = priorityFee * TX_MASS;
+            priorityFee = await gasEstimator('TRANSFER');
         }
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4, priorityFee);
         return txid;
@@ -255,6 +269,12 @@ export const signKRC20BatchTransfer = async (inscribeJsonString: string, address
                 severity: 'error',
             });
             return;
+        }
+        let priorityFee = await kaspaFeeEstimate();
+        if (priorityFee === 1) {
+            priorityFee = MIN_TX_MASS;
+        } else {
+            priorityFee = await gasEstimator('TRANSFER');
         }
         // Calling the KasWare method to sign the batch transfer transaction
         const txid = await window.kasware.signKRC20BatchTransferTransaction(inscribeJsonString, 4, addresses);
