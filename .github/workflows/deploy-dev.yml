@@ -3,7 +3,7 @@ name: Deploy Dev ENV React App to AWS S3 and CloudFront
 on:
   push:
     branches:
-      - main  # Change this to the branch you want to deploy from
+      - develop  # Change this to the branch you want to deploy from
 
 jobs:
   deploy:
