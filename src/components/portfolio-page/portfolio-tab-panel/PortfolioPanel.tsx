@@ -4,8 +4,9 @@ import TabContext from '@mui/lab/TabContext';
 import { TabPanelContainer, TabPanelStyled, TabStyled } from './PortfolioPanel.s';
 // import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import PortfolioTokenGrid from '../portfolio-token-grid/PortfolioTokenGrid';
-import { TokenRowActivityItem, TokenRowPortfolioItem } from '../../../types/Types';
+import { Order, TokenRowActivityItem, TokenRowPortfolioItem } from '../../../types/Types';
 import PortfolioActivityTokenGrid from '../portfolio-activity-grid/PortfolioActivityTokenGrid';
+import UserOrdersGrid from '../user-orders/UserOrders';
 
 interface PortfolioPanelProps {
     kasPrice: number;
@@ -21,6 +22,7 @@ interface PortfolioPanelProps {
     handleChange: () => void;
     lastPortfolioPage: boolean;
     handlePortfolioPagination: (direction: 'next' | 'prev') => void;
+    listings: Order[];
 }
 
 const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
@@ -38,6 +40,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
         handleChange,
         lastPortfolioPage,
         handlePortfolioPagination,
+        listings,
     } = props;
     const [value, setValue] = useState('1');
     // const [paidUser] = useState(false);
@@ -62,13 +65,8 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                 >
                     <TabStyled label="Overview" value="1" />
                     <TabStyled label="Activity" value="2" />
+                    <TabStyled label="Listings" iconPosition="end" value="3" />
                     {/* <TabStyled
-                        label="Insights"
-                        icon={!paidUser && <LockRoundedIcon sx={{ marginBottom: '3px' }} />}
-                        iconPosition="end"
-                        value="3"
-                    />
-                    <TabStyled
                         label="Wallet Tracking"
                         icon={!paidUser && <LockRoundedIcon sx={{ marginBottom: '3px' }} />}
                         iconPosition="end"
@@ -99,7 +97,14 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                         walletConnected={walletConnected}
                     />
                 </TabPanelStyled>
-                <TabPanelStyled value="3">Portfolio Insights </TabPanelStyled>
+                <TabPanelStyled value="3">
+                    <UserOrdersGrid
+                        kasPrice={kasPrice}
+                        walletConnected={walletConnected}
+                        isLoading={isLoading}
+                        orders={listings}
+                    />
+                </TabPanelStyled>
                 <TabPanelStyled value="4">Wallet Tracking </TabPanelStyled>
             </TabContext>
         </TabPanelContainer>

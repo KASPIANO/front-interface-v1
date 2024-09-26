@@ -7,7 +7,7 @@ import { SwapHoriz } from '@mui/icons-material'; // MUI icon for swap
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
 import { transferKRC20Token } from '../../../../../utils/KaswareUtils';
-import { confirmSellOrder, createSellOrder } from '../../../../../DAL/BackendDAL';
+import { confirmSellOrder, createSellOrder } from '../../../../../DAL/BackendP2PDAL';
 import { doPolling } from '../../../../../utils/Utils';
 
 interface SellPanelProps {
@@ -298,7 +298,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     );
 
     const buttons = (
-        <Box sx={{ display: 'flex', gap: '0.3rem', mb: '0.5rem' }}>
+        <Box sx={{ display: 'flex', gap: '0.3rem', mb: '0.5rem', justifyContent: 'center' }}>
             <StyledButton onClick={() => handleSetPricePerToken(1)} variant="contained">
                 Floor
             </StyledButton>

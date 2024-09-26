@@ -6,9 +6,10 @@ import OrderList from './order-list/OrderList';
 import BuyHeader from './buy-header/BuyHeader';
 import OrderDetails from './order-details/OrderDetails';
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
-import { getOrders, startBuyOrder, confirmBuyOrder } from '../../../../../DAL/BackendDAL';
+import { getOrders, startBuyOrder, confirmBuyOrder, releaseBuyLock } from '../../../../../DAL/BackendP2PDAL';
 import { sendKaspa } from '../../../../../utils/KaswareUtils';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { CircularProgress } from '@mui/material'; // Import CircularProgress for the spinner
 
 // mockOrders.ts
 
@@ -93,11 +94,13 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const [sortOrder] = useState<'asc' | 'desc'>('asc');
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-    const [timeLeft, setTimeLeft] = useState(235); // 235 seconds = 3 minutes and 55 seconds
+    const [timeLeft, setTimeLeft] = useState(240); // 235 seconds = 3 minutes and 55 seconds
     const [offset, setOffset] = useState(0);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [tempWalletAddress, setTempWalletAddress] = useState('');
+    const [isProcessingBuyOrder, setIsProcessingBuyOrder] = useState(false);
+    const [waitingForWalletConfirmation, setWaitingForWalletConfirmation] = useState(false);
 
     useEffect(() => {
         const handleTimeout = () => {
@@ -105,13 +108,13 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 message: 'Purchase canceled due to timeout.',
                 severity: 'info',
             });
-            handleDrawerClose(); // Close the OrderDetails panel
+            handleDrawerClose(selectedOrder.orderId); // Close the OrderDetails panel
         };
 
         // Reset the timer when selectedOrder changes
-        setTimeLeft(235);
+        setTimeLeft(240);
 
-        const endTime = Date.now() + 235 * 1000; // Calculate the end time
+        const endTime = Date.now() + 240 * 1000; // Calculate the end time
 
         const timer = setInterval(() => {
             const newTimeLeft = Math.round((endTime - Date.now()) / 1000);
@@ -137,10 +140,10 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 field: sortBy,
                 direction: sortOrder,
             });
-            const newOrders = response || [];
+            const newOrders = response.orders || [];
 
             // If we get less than the limit, no more orders to load
-            setHasMore(newOrders.length === LIMIT);
+            setHasMore(response.totalCount > offset + LIMIT);
             setOrders((prevOrders) => [...prevOrders, ...newOrders]);
             setOffset((prevOffset) => prevOffset + LIMIT);
         } catch (error) {
@@ -157,7 +160,14 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     };
 
     const handleOrderSelect = async (order: Order) => {
-        const { temporaryWalletAddress } = await startBuyOrder(order.orderId, walletAddress);
+        const { temporaryWalletAddress, success } = await startBuyOrder(order.orderId, walletAddress);
+        if (!success) {
+            showGlobalSnackbar({
+                message: 'Order already taken. Please select another order.',
+                severity: 'error',
+            });
+            return;
+        }
         setTempWalletAddress(temporaryWalletAddress);
         setSelectedOrder(order);
         setIsPanelOpen(true);
@@ -169,8 +179,20 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
 
     const handlePurchase = async (order: Order, finalTotal: number) => {
         const sompiAmount = finalTotal * KASPA_TO_SOMPI;
-
-        const paymentTxn = await sendKaspa(tempWalletAddress, sompiAmount);
+        let paymentTxn = '';
+        try {
+            setWaitingForWalletConfirmation(true);
+            paymentTxn = await sendKaspa(tempWalletAddress, sompiAmount);
+        } catch {
+            showGlobalSnackbar({
+                message:
+                    "Payment failed. Please ensure you're using the latest version of the wallet and try to compound your UTXOs before retrying.",
+                severity: 'error',
+            });
+            return;
+        }
+        setWaitingForWalletConfirmation(false);
+        setIsProcessingBuyOrder(true);
         const parsedTxData = JSON.parse(paymentTxn);
         const paymentTxnId = parsedTxData.id;
         const confirmBuy = await confirmBuyOrder(order.orderId, paymentTxnId);
@@ -179,7 +201,9 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 message: 'Purchase successful!',
                 severity: 'success',
             });
-            handleDrawerClose();
+            setIsProcessingBuyOrder(false);
+            setIsPanelOpen(false);
+            setSelectedOrder(null);
         } else {
             showGlobalSnackbar({
                 message: 'Purchase failed!',
@@ -189,7 +213,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     };
 
     // Handler to close the drawer
-    const handleDrawerClose = () => {
+    const handleDrawerClose = async (orderId: string) => {
+        await releaseBuyLock(orderId);
         setIsPanelOpen(false);
         setSelectedOrder(null);
     };
@@ -200,11 +225,16 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 dataLength={orders.length} // Length of the current data
                 next={fetchOrders} // Function to load more data
                 hasMore={hasMore} // Boolean to indicate if there's more data to load
-                loader={<h4>Loading more orders...</h4>} // Loading message
+                loader={
+                    <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+                        <CircularProgress />
+                    </Box>
+                } // Loading message
                 scrollableTarget="scrollableDiv"
                 endMessage={<p style={{ textAlign: 'center' }}>No more orders to load.</p>}
             >
                 <OrderList
+                    selectedOrder={selectedOrder}
                     walletConnected={walletConnected}
                     walletBalance={walletBalance}
                     kasPrice={kasPrice}
@@ -227,6 +257,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             >
                 {selectedOrder && (
                     <OrderDetails
+                        isProcessingBuyOrder={isProcessingBuyOrder}
+                        waitingForWalletConfirmation={waitingForWalletConfirmation}
                         handlePurchase={handlePurchase}
                         order={selectedOrder}
                         kasPrice={kasPrice}

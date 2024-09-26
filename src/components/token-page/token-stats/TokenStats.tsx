@@ -43,7 +43,11 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         <Card sx={{ height: '20vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold', mr: 1 }}>
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ fontWeight: 'bold', mr: 1, fontSize: '0.75rem' }}
+                    >
                         STATS
                     </Typography>
                 </Box>

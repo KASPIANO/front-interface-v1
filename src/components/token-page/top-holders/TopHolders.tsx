@@ -71,12 +71,21 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
         <Card sx={{ height: '18vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold', mr: 1 }}>
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ fontWeight: 'bold', mr: 1, fontSize: '0.75rem' }}
+                    >
                         TOP HOLDERS {holderTitle}
                     </Typography>
 
                     <Tooltip title="Top holders represent the amount of tokens held by the top X holders combined. This metric helps understand token distribution, potential whale dominance, and the risk of market manipulation. A large concentration of tokens among few holders might be a red flag.">
-                        <InfoOutlinedIcon fontSize="small" />
+                        <InfoOutlinedIcon
+                            sx={{
+                                fontSize: '0.9rem',
+                            }}
+                            fontSize="small"
+                        />
                     </Tooltip>
                 </Box>
                 <OptionSelection

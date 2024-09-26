@@ -28,7 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({
     setBackgroundBlur,
     backgroundBlur,
 }) => {
-    const [activePage, setActivePage] = useState('/');
+    const [activePage, setActivePage] = useState('/KRC-20');
     const [drawerOpen, setDrawerOpen] = useState(false);
     const themeContext = useContext(ThemeContext);
     const navigate = useNavigate();
