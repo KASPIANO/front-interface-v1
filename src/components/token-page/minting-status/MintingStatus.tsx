@@ -99,7 +99,11 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
             }}
         >
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold' }}>
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ fontWeight: 'bold', fontSize: '0.75rem' }}
+                >
                     MINT STATUS
                 </Typography>
                 <Typography color="text.secondary" sx={{ fontWeight: 500, fontSize: '0.7rem' }}>

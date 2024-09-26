@@ -43,6 +43,17 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
             }
         />
         <Route
+            path="/"
+            element={
+                <GridPage
+                    backgroundBlur={backgroundBlur}
+                    walletConnected={walletConnected}
+                    walletAddress={walletAddress}
+                    walletBalance={walletBalance}
+                />
+            }
+        />
+        <Route
             path="/token/:ticker"
             element={
                 <TokenPage

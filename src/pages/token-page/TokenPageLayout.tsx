@@ -13,10 +13,10 @@ export const TokenPageLayout = ({ children, backgroundBlur }) => (
                 item
                 container
                 rowSpacing={1}
-                xs={9}
-                sm={9}
-                md={9}
-                lg={9}
+                xs={8.5}
+                sm={8.5}
+                md={8.5}
+                lg={8.5}
                 sx={{
                     '&.MuiGrid-item': {
                         paddingTop: 0,
@@ -49,10 +49,10 @@ export const TokenPageLayout = ({ children, backgroundBlur }) => (
             </Grid>
             <Grid
                 item
-                xs={3}
-                sm={3}
-                md={3}
-                lg={3}
+                xs={3.5}
+                sm={3.5}
+                md={3.5}
+                lg={3.5}
                 sx={{
                     '&.MuiGrid-item': {
                         paddingTop: 0,

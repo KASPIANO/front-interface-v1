@@ -9,15 +9,17 @@ interface OrderListProps {
     walletBalance: number;
     walletConnected: boolean;
     onOrderSelect: (order: Order) => void;
+    selectedOrder: Order | null;
 }
 
-const OrderList: React.FC<OrderListProps> = ({ orders, onOrderSelect, floorPrice, kasPrice }) => (
+const OrderList: React.FC<OrderListProps> = ({ orders, onOrderSelect, floorPrice, kasPrice, selectedOrder }) => (
     <div style={{ width: '100%' }}>
         {/* Header Row */}
 
         {/* Order Items */}
         {orders.map((order) => (
             <OrderItem
+                selectedOrder={selectedOrder}
                 onSelect={onOrderSelect}
                 key={order.orderId}
                 order={order}

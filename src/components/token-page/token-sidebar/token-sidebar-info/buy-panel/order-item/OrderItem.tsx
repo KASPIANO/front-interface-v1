@@ -9,10 +9,11 @@ interface OrderItemProps {
     floorPrice: number;
     kasPrice: number;
     onSelect: (order: Order) => void;
+    selectedOrder: Order | null;
 }
 
 const OrderItem: React.FC<OrderItemProps> = (props) => {
-    const { order, onSelect, kasPrice } = props;
+    const { order, onSelect, kasPrice, selectedOrder } = props;
     // const floorPriceDifference = ((order.pricePerToken - floorPrice) / floorPrice) * 100;
     const formatPrice = (price: number) => {
         if (price >= 1) {
@@ -64,6 +65,7 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                     <StyledButton
                         variant="contained"
                         onClick={() => onSelect(order)}
+                        disabled={selectedOrder !== null}
                         size="small"
                         sx={{
                             fontSize: '0.5rem',

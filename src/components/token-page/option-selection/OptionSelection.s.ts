@@ -13,6 +13,7 @@ export const OptionSelectionGroup = styled(ButtonGroup)(({ theme }) => ({
 
 export const OptionSelectionButton = styled(Button)(({ theme }) => ({
     color: theme.palette.text.primary,
+    // Slightly larger text
     '&.MuiButtonGroup-middleButton': {
         backgroundColor: alpha(theme.palette.primary.light, 0.1),
     },
@@ -25,7 +26,7 @@ export const OptionSelectionButton = styled(Button)(({ theme }) => ({
         borderRadius: '0 4px 4px 0', // Rounded corners on the right
     },
     '&.MuiButton-root': {
-        fontSize: '0.8rem', // Slightly larger text
+        fontSize: '0.65rem', // Slightly larger text
         border: `1px solid ${alpha(theme.palette.primary.main, 0.5)}`, // Subtle border
     },
     '&:hover': {

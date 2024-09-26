@@ -298,7 +298,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     );
 
     const buttons = (
-        <Box sx={{ display: 'flex', gap: '0.3rem', mb: '0.5rem' }}>
+        <Box sx={{ display: 'flex', gap: '0.3rem', mb: '0.5rem', justifyContent: 'center' }}>
             <StyledButton onClick={() => handleSetPricePerToken(1)} variant="contained">
                 Floor
             </StyledButton>

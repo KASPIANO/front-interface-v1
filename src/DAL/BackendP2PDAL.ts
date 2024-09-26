@@ -34,21 +34,23 @@ export const createSellOrder = async (
 export const startBuyOrder = async (
     orderId,
     walletAddress: string,
-): Promise<{ id: string; temporaryWalletAddress: string; status: string }> => {
+): Promise<{ id: string; temporaryWalletAddress: string; status: string; success: boolean }> => {
     try {
-        const response = await backendService.post<{ temporaryWalletAddress: string; id: string; status: string }>(
-            `/${P2PCONTROLLER}/buy/${orderId}`,
-            {
-                walletAddress,
-            },
-        );
+        const response = await backendService.post<{
+            temporaryWalletAddress: string;
+            id: string;
+            status: string;
+            success: boolean;
+        }>(`/${P2PCONTROLLER}/buy/${orderId}`, {
+            walletAddress,
+        });
         return response.data;
     } catch (error) {
         console.error(
             `Error starting buy order for ${walletAddress}:`,
             error.response ? error.response.data : error.message,
         );
-        return { id: '', temporaryWalletAddress: '', status: '' }; // Return empty array in case of an error
+        return { id: '', temporaryWalletAddress: '', status: '', success: false }; // Return empty array in case of an error
     }
 };
 
