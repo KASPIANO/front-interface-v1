@@ -50,12 +50,13 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                 width: '100%',
                 display: 'flex',
                 flexDirection: 'column',
+                height: '100%', //
             }}
         >
             {waitingForWalletConfirmation ? (
-                <LoadingSpinner title="Waiting for wallet confirmation..." size={24} />
+                <LoadingSpinner title="Waiting for wallet confirmation..." size={45} />
             ) : isProcessingBuyOrder ? (
-                <LoadingSpinner title="Processing your order..." size={24} />
+                <LoadingSpinner title="Processing your order..." size={45} />
             ) : (
                 <>
                     {/* Close Button */}
