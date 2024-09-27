@@ -378,7 +378,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     variant="contained"
                     onClick={handleCreateSellOrder}
                     fullWidth
-                    disabled={!walletConnected}
+                    disabled={!walletConnected || walletTickerBalance === 0}
                 >
                     Create Sell Order
                 </StyledButton>

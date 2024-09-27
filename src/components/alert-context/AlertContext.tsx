@@ -35,10 +35,10 @@ const alertIconColors = {
 };
 
 const autoHideDuration = {
-    error: 6000,
-    success: 4000,
+    error: 8000,
+    success: 8000,
     warning: 8000,
-    info: 4000,
+    info: 8000,
     loading: null,
 };
 
@@ -49,6 +49,9 @@ const SnackbarComponent: React.FC = () => {
     const [alert, setAlert] = React.useState<(AlertOptions & { open: boolean }) | null>(null);
     const [copied, setCopied] = React.useState(false);
 
+    const currentEnv = import.meta.env.VITE_ENV === 'prod' ? 'kaspa_mainnet' : 'kaspa_testnet_10';
+    const txnLink =
+        currentEnv === 'kaspa_mainnet' ? 'https://kas.fyi/transaction/' : 'https://explorer-tn10.kaspa.org/txs/';
     showSnackbar = (options: AlertOptions) => {
         setAlert({ ...options, open: true });
     };
@@ -156,7 +159,15 @@ const SnackbarComponent: React.FC = () => {
                                         overflowWrap: 'break-word',
                                     }}
                                 >
-                                    Commit Txn: {alert.commit.slice(0, 10)}...
+                                    Commit Txn:{' '}
+                                    <a
+                                        href={`${txnLink}${alert.commit}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ textDecoration: 'none', color: alertIconColors[alert.severity] }}
+                                    >
+                                        {alert.commit.slice(0, 10)}...
+                                    </a>
                                 </Typography>
                                 <IconButton size="small" onClick={() => copyToClipboard(alert.commit)}>
                                     <ContentCopyRoundedIcon fontSize="small" />
@@ -174,7 +185,15 @@ const SnackbarComponent: React.FC = () => {
                                         overflowWrap: 'break-word',
                                     }}
                                 >
-                                    Reveal Txn: {alert.reveal.slice(0, 10)}...
+                                    Reveal Txn:{' '}
+                                    <a
+                                        href={`${txnLink}${alert.reveal}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ textDecoration: 'none', color: alertIconColors[alert.severity] }}
+                                    >
+                                        {alert.reveal.slice(0, 10)}...
+                                    </a>
                                 </Typography>
                                 <IconButton size="small" onClick={() => copyToClipboard(alert.reveal)}>
                                     <ContentCopyRoundedIcon fontSize="small" />

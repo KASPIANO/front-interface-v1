@@ -10,6 +10,7 @@ import { getOrders, startBuyOrder, confirmBuyOrder, releaseBuyLock } from '../..
 import { sendKaspa } from '../../../../../utils/KaswareUtils';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material'; // Import CircularProgress for the spinner
+import { useFetchOrders } from '../../../../../DAL/UseQueriesBackend';
 
 // mockOrders.ts
 
@@ -89,18 +90,33 @@ const KASPA_TO_SOMPI = 100000000;
 
 const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const { tokenInfo, walletBalance, walletConnected, kasPrice, walletAddress } = props;
-    const [orders, setOrders] = useState<Order[]>([]);
     const [sortBy, setSortBy] = useState('pricePerToken');
     const [sortOrder] = useState<'asc' | 'desc'>('asc');
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [timeLeft, setTimeLeft] = useState(240); // 235 seconds = 3 minutes and 55 seconds
-    const [offset, setOffset] = useState(0);
-    const [loading, setLoading] = useState(false);
-    const [hasMore, setHasMore] = useState(true);
     const [tempWalletAddress, setTempWalletAddress] = useState('');
     const [isProcessingBuyOrder, setIsProcessingBuyOrder] = useState(false);
     const [waitingForWalletConfirmation, setWaitingForWalletConfirmation] = useState(false);
+
+    const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = useFetchOrders(
+        tokenInfo,
+        sortBy,
+        sortOrder,
+    );
+
+    const orders = data?.pages.flatMap((page) => page.orders) || [];
+
+    const handleSortChange = useCallback((newSortBy: string) => {
+        setSortBy(newSortBy);
+        // The query will automatically refetch with the new parameters
+    }, []);
+
+    const loadMoreOrders = useCallback(() => {
+        if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+        }
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     useEffect(() => {
         const handleTimeout = () => {
@@ -131,34 +147,6 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         return () => clearInterval(timer); // Cleanup on unmount
     }, [selectedOrder]);
 
-    const fetchOrders = useCallback(async () => {
-        if (loading || !hasMore) return;
-
-        setLoading(true);
-        try {
-            const response = await getOrders(tokenInfo.ticker, offset, LIMIT, {
-                field: sortBy,
-                direction: sortOrder,
-            });
-            const newOrders = response.orders || [];
-
-            // If we get less than the limit, no more orders to load
-            setHasMore(response.totalCount > offset + LIMIT);
-            setOrders((prevOrders) => [...prevOrders, ...newOrders]);
-            setOffset((prevOffset) => prevOffset + LIMIT);
-        } catch (error) {
-            console.error(`Error fetching orders: ${error.message}`);
-        } finally {
-            setLoading(false);
-        }
-    }, [offset, sortBy, sortOrder, loading, hasMore, tokenInfo.ticker]);
-
-    const handleSortChange = (sortBy: string) => {
-        setSortBy(sortBy);
-        setOrders([]);
-        setOffset(0);
-    };
-
     const handleOrderSelect = async (order: Order) => {
         const { temporaryWalletAddress, success } = await startBuyOrder(order.orderId, walletAddress);
         if (!success) {
@@ -172,10 +160,6 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         setSelectedOrder(order);
         setIsPanelOpen(true);
     };
-
-    useEffect(() => {
-        fetchOrders();
-    }, [fetchOrders]);
 
     const handlePurchase = async (order: Order, finalTotal: number) => {
         const sompiAmount = finalTotal * KASPA_TO_SOMPI;
@@ -195,11 +179,16 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         setIsProcessingBuyOrder(true);
         const parsedTxData = JSON.parse(paymentTxn);
         const paymentTxnId = parsedTxData.id;
-        const confirmBuy = await confirmBuyOrder(order.orderId, paymentTxnId);
-        if (confirmBuy) {
+        const { confirmed, commitTransactionId, revealTransactionId } = await confirmBuyOrder(
+            order.orderId,
+            paymentTxnId,
+        );
+        if (confirmed) {
             showGlobalSnackbar({
                 message: 'Purchase successful!',
                 severity: 'success',
+                reveal: revealTransactionId,
+                commit: commitTransactionId,
             });
             setIsProcessingBuyOrder(false);
             setIsPanelOpen(false);
@@ -223,8 +212,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             <BuyHeader sortBy={sortBy} onSortChange={handleSortChange} />
             <InfiniteScroll
                 dataLength={orders.length} // Length of the current data
-                next={fetchOrders} // Function to load more data
-                hasMore={hasMore} // Boolean to indicate if there's more data to load
+                next={loadMoreOrders}
+                hasMore={!!hasNextPage} // Boolean to indicate if there's more data to load
                 loader={
                     <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
                         <CircularProgress />

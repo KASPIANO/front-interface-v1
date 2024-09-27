@@ -79,22 +79,35 @@ export const confirmBuyOrder = async (
     transactionId: string,
 ): Promise<{
     confirmed: boolean;
+    commitTransactionId: string;
+    revealTransactionId: string;
+    sellerTransactionId: string;
+    buyerTransactionId: string;
 }> => {
     try {
-        const response = await backendService.post<{ confirmed: boolean }>(
-            `/${P2PCONTROLLER}/confirmBuyOrder/${orderId}`,
-            {
-                transactionId,
-            },
-        );
+        const response = await backendService.post<{
+            confirmed: boolean;
+            commitTransactionId: string;
+            revealTransactionId: string;
+            sellerTransactionId: string;
+            buyerTransactionId: string;
+        }>(`/${P2PCONTROLLER}/confirmBuyOrder/${orderId}`, {
+            transactionId,
+        });
         return response.data;
     } catch (error) {
         console.error(
             `Error confirming buy order ${orderId}:`,
             error.response ? error.response.data : error.message,
         );
-        return { confirmed: false }; // Return empty array in case of an error
-    }
+        return {
+            confirmed: false,
+            commitTransactionId: '',
+            revealTransactionId: '',
+            sellerTransactionId: '',
+            buyerTransactionId: '',
+        }; // Return empty array in case of an error
+    } // Return empty array in case of an error
 };
 
 export const getOrders = async (
