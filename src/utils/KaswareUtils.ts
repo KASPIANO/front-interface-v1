@@ -12,7 +12,7 @@ const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 // const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
 // const MINT_DEPLOY_PRIORITY = 0.005;
 // const MINT_DEPLOY_PRIORITY_SOMPI = MINT_DEPLOY_PRIORITY * KASPA_TO_SOMPI;
-const MIN_TX_MASS = 0.000001;
+// const MIN_TX_MASS = 0.000001;
 
 // Method to request account connection
 export const requestAccounts = async (): Promise<string[]> => {
