@@ -106,8 +106,8 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
                 <Typography
                     variant="h5"
                     sx={{
-                        marginRight: 4,
-                        fontSize: '1.3rem',
+                        marginRight: '0.7rem',
+                        fontSize: '1.2rem',
                     }}
                 >
                     {topHoldersPercentage}

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Box, Typography, Button, IconButton, Tooltip, CircularProgress } from '@mui/material';
+import { Box, Typography, Button, IconButton, Tooltip } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Order } from '../../../../../../types/Types';
 import { OrderDetailsItem, OrderItemPrimary } from './OrderDetails.s';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
 
 interface OrderDetailsProps {
     order: Order;
@@ -52,19 +53,9 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
             }}
         >
             {waitingForWalletConfirmation ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CircularProgress size={24} />
-                    <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                        Waiting for wallet confirmation...
-                    </Typography>
-                </Box>
+                <LoadingSpinner title="Waiting for wallet confirmation..." size={24} />
             ) : isProcessingBuyOrder ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CircularProgress size={24} />
-                    <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                        Processing buy order...
-                    </Typography>
-                </Box>
+                <LoadingSpinner title="Processing your order..." size={24} />
             ) : (
                 <>
                     {/* Close Button */}

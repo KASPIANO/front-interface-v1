@@ -6,7 +6,7 @@ import OrderList from './order-list/OrderList';
 import BuyHeader from './buy-header/BuyHeader';
 import OrderDetails from './order-details/OrderDetails';
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
-import { getOrders, startBuyOrder, confirmBuyOrder, releaseBuyLock } from '../../../../../DAL/BackendP2PDAL';
+import { startBuyOrder, confirmBuyOrder, releaseBuyLock } from '../../../../../DAL/BackendP2PDAL';
 import { sendKaspa } from '../../../../../utils/KaswareUtils';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material'; // Import CircularProgress for the spinner
@@ -85,7 +85,6 @@ interface BuyPanelProps {
     walletAddress: string | null;
 }
 
-const LIMIT = 10;
 const KASPA_TO_SOMPI = 100000000;
 
 const BuyPanel: React.FC<BuyPanelProps> = (props) => {
@@ -99,11 +98,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const [isProcessingBuyOrder, setIsProcessingBuyOrder] = useState(false);
     const [waitingForWalletConfirmation, setWaitingForWalletConfirmation] = useState(false);
 
-    const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = useFetchOrders(
-        tokenInfo,
-        sortBy,
-        sortOrder,
-    );
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useFetchOrders(tokenInfo, sortBy, sortOrder);
 
     const orders = data?.pages.flatMap((page) => page.orders) || [];
 
@@ -148,17 +143,25 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     }, [selectedOrder]);
 
     const handleOrderSelect = async (order: Order) => {
-        const { temporaryWalletAddress, success } = await startBuyOrder(order.orderId, walletAddress);
-        if (!success) {
+        try {
+            const { temporaryWalletAddress, success } = await startBuyOrder(order.orderId, walletAddress);
+
+            if (!success) {
+                showGlobalSnackbar({
+                    message: 'Order already taken. Please select another order.',
+                    severity: 'error',
+                });
+                return;
+            }
+            setTempWalletAddress(temporaryWalletAddress);
+            setSelectedOrder(order);
+            setIsPanelOpen(true);
+        } catch (error) {
             showGlobalSnackbar({
-                message: 'Order already taken. Please select another order.',
+                message: 'Error starting buy order. Please try again.',
                 severity: 'error',
             });
-            return;
         }
-        setTempWalletAddress(temporaryWalletAddress);
-        setSelectedOrder(order);
-        setIsPanelOpen(true);
     };
 
     const handlePurchase = async (order: Order, finalTotal: number) => {
