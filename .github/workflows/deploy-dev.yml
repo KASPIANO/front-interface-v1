@@ -23,12 +23,12 @@ jobs:
 
     - name: Create .env file
       run: |
-        echo "VITE_API_ENDPOINT=${{ secrets.VITE_API_ENDPOINT }}" >> .env
-        echo "VITE_API_KRC20=${{ secrets.VITE_API_KRC20 }}" >> .env
-        echo "VITE_APP_KAS_WALLET_ADDRESS=${{ secrets.VITE_APP_KAS_WALLET_ADDRESS }}" >> .env
-        echo "VITE_KASPA_API=${{ secrets.VITE_KASPA_API }}" >> .env
-        echo "VITE_WEBSERVER_API_KEY=${{ secrets.VITE_WEBSERVER_API_KEY }}" >> .env
-        echo "VITE_ENV=${{ secrets.VITE_ENV }}" >> .env
+        echo "VITE_API_ENDPOINT=${{ secrets.VITE_API_ENDPOINT_DEV }}" >> .env
+        echo "VITE_API_KRC20=${{ secrets.VITE_API_KRC20_DEV }}" >> .env
+        echo "VITE_APP_KAS_WALLET_ADDRESS=${{ secrets.VITE_APP_KAS_WALLET_ADDRESS_DEV }}" >> .env
+        echo "VITE_KASPA_API=${{ secrets.VITE_KASPA_API_DEV }}" >> .env
+        echo "VITE_WEBSERVER_API_KEY=${{ secrets.VITE_WEBSERVER_API_KEY_DEV }}" >> .env
+        echo "VITE_ENV=${{ secrets.VITE_ENV_DEV }}" >> .env
 
     - name: Build React app
       run: npm run build
