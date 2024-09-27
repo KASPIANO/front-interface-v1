@@ -11,6 +11,7 @@ import { sendKaspa } from '../../../../../utils/KaswareUtils';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material'; // Import CircularProgress for the spinner
 import { useFetchOrders } from '../../../../../DAL/UseQueriesBackend';
+import { GlobalStyle } from '../../../../../utils/GlobalStyleScrollBar';
 
 // mockOrders.ts
 
@@ -211,57 +212,63 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         setSelectedOrder(null);
     };
     return (
-        <Box sx={{ width: '100%' }}>
-            <BuyHeader sortBy={sortBy} onSortChange={handleSortChange} />
-            <InfiniteScroll
-                dataLength={orders.length} // Length of the current data
-                next={loadMoreOrders}
-                hasMore={!!hasNextPage} // Boolean to indicate if there's more data to load
-                loader={
-                    <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
-                        <CircularProgress />
-                    </Box>
-                } // Loading message
-                scrollableTarget="scrollableDiv"
-                endMessage={<p style={{ textAlign: 'center' }}>No more orders to load.</p>}
-            >
-                <OrderList
-                    selectedOrder={selectedOrder}
-                    walletConnected={walletConnected}
-                    walletBalance={walletBalance}
-                    kasPrice={kasPrice}
-                    orders={orders}
-                    onOrderSelect={handleOrderSelect}
-                    floorPrice={tokenInfo.price}
-                />
-            </InfiniteScroll>
-            <Box
-                sx={{
-                    position: 'absolute',
-                    bottom: isPanelOpen ? 0 : '-100%',
-                    height: '45%',
-                    width: '100%',
-                    backgroundColor: 'background.paper',
-                    transition: 'bottom 0.5s ease-in-out',
-                    boxShadow: '0px -2px 10px rgba(0,0,0,0.3)',
-                    borderRadius: '6px 6px 0 0',
-                }}
-            >
-                {selectedOrder && (
-                    <OrderDetails
-                        isProcessingBuyOrder={isProcessingBuyOrder}
-                        waitingForWalletConfirmation={waitingForWalletConfirmation}
-                        handlePurchase={handlePurchase}
-                        order={selectedOrder}
-                        kasPrice={kasPrice}
-                        walletConnected={walletConnected}
-                        walletBalance={walletBalance}
-                        onClose={handleDrawerClose}
-                        timeLeft={timeLeft}
-                    />
-                )}
+        <>
+            <GlobalStyle />
+            <Box sx={{ width: '100%' }}>
+                <BuyHeader sortBy={sortBy} onSortChange={handleSortChange} />
+                <div id="scrollableList" style={{ overflow: 'auto', height: '64vh' }}>
+                    <InfiniteScroll
+                        dataLength={orders.length} // Length of the current data
+                        next={loadMoreOrders}
+                        hasMore={!!hasNextPage} // Boolean to indicate if there's more data to load
+                        loader={
+                            <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+                                <CircularProgress />
+                            </Box>
+                        } // Loading message
+                        scrollableTarget="scrollableList"
+                        scrollThreshold={0.6}
+                        endMessage={<p style={{ textAlign: 'center' }}>No more orders to load.</p>}
+                    >
+                        <OrderList
+                            selectedOrder={selectedOrder}
+                            walletConnected={walletConnected}
+                            walletBalance={walletBalance}
+                            kasPrice={kasPrice}
+                            orders={orders}
+                            onOrderSelect={handleOrderSelect}
+                            floorPrice={tokenInfo.price}
+                        />
+                    </InfiniteScroll>
+                </div>
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        bottom: isPanelOpen ? 0 : '-100%',
+                        height: '45%',
+                        width: '100%',
+                        backgroundColor: 'background.paper',
+                        transition: 'bottom 0.5s ease-in-out',
+                        boxShadow: '0px -2px 10px rgba(0,0,0,0.3)',
+                        borderRadius: '6px 6px 0 0',
+                    }}
+                >
+                    {selectedOrder && (
+                        <OrderDetails
+                            isProcessingBuyOrder={isProcessingBuyOrder}
+                            waitingForWalletConfirmation={waitingForWalletConfirmation}
+                            handlePurchase={handlePurchase}
+                            order={selectedOrder}
+                            kasPrice={kasPrice}
+                            walletConnected={walletConnected}
+                            walletBalance={walletBalance}
+                            onClose={handleDrawerClose}
+                            timeLeft={timeLeft}
+                        />
+                    )}
+                </Box>
             </Box>
-        </Box>
+        </>
     );
 };
 

@@ -76,7 +76,7 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                             '&.MuiTabPanel-root': {
                                 padding: '0px',
                                 height: '100%',
-                                overflowY: 'auto',
+                                overflowY: 'hidden',
                             },
                         }}
                         value="2"

@@ -41,9 +41,12 @@ export const useFetchOrders = (tokenInfo, sortBy, sortOrder) =>
                 orders: response.orders || [],
                 nextOffset: pageParam + LIMIT,
                 hasMore: response.totalCount > pageParam + LIMIT,
+                totalCount: response.totalCount, // You can also return the totalCount if needed elsewhere
             };
         },
-        getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextOffset : undefined),
+        getNextPageParam: (lastPage) =>
+            // Return undefined if there are no more orders to fetch
+            lastPage.hasMore ? lastPage.nextOffset : undefined,
         initialPageParam: 0, // Add this line
         staleTime: 25000,
         retry: 2,
