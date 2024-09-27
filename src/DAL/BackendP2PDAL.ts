@@ -36,23 +36,15 @@ export const startBuyOrder = async (
     orderId,
     walletAddress: string,
 ): Promise<{ id: string; temporaryWalletAddress: string; status: string; success: boolean }> => {
-    try {
-        const response = await backendService.post<{
-            temporaryWalletAddress: string;
-            id: string;
-            status: string;
-            success: boolean;
-        }>(`/${P2PCONTROLLER}/buy/${orderId}`, {
-            walletAddress,
-        });
-        return response.data;
-    } catch (error) {
-        console.error(
-            `Error starting buy order for ${walletAddress}:`,
-            error.response ? error.response.data : error.message,
-        );
-        return { id: '', temporaryWalletAddress: '', status: '', success: false }; // Return empty array in case of an error
-    }
+    const response = await backendService.post<{
+        temporaryWalletAddress: string;
+        id: string;
+        status: string;
+        success: boolean;
+    }>(`/${P2PCONTROLLER}/buy/${orderId}`, {
+        walletAddress,
+    });
+    return response.data;
 };
 
 export const confirmSellOrder = async (
@@ -79,22 +71,35 @@ export const confirmBuyOrder = async (
     transactionId: string,
 ): Promise<{
     confirmed: boolean;
+    commitTransactionId: string;
+    revealTransactionId: string;
+    sellerTransactionId: string;
+    buyerTransactionId: string;
 }> => {
     try {
-        const response = await backendService.post<{ confirmed: boolean }>(
-            `/${P2PCONTROLLER}/confirmBuyOrder/${orderId}`,
-            {
-                transactionId,
-            },
-        );
+        const response = await backendService.post<{
+            confirmed: boolean;
+            commitTransactionId: string;
+            revealTransactionId: string;
+            sellerTransactionId: string;
+            buyerTransactionId: string;
+        }>(`/${P2PCONTROLLER}/confirmBuyOrder/${orderId}`, {
+            transactionId,
+        });
         return response.data;
     } catch (error) {
         console.error(
             `Error confirming buy order ${orderId}:`,
             error.response ? error.response.data : error.message,
         );
-        return { confirmed: false }; // Return empty array in case of an error
-    }
+        return {
+            confirmed: false,
+            commitTransactionId: '',
+            revealTransactionId: '',
+            sellerTransactionId: '',
+            buyerTransactionId: '',
+        }; // Return empty array in case of an error
+    } // Return empty array in case of an error
 };
 
 export const getOrders = async (
@@ -147,6 +152,43 @@ export const getUSerListings = async (
     }
 };
 
+export const relistSellOrder = async (orderId: string, walletAddress: string): Promise<any> => {
+    try {
+        const response = await backendService.post<any>(
+            `/${P2PCONTROLLER}/relistSellOrder/${orderId}`,
+
+            {
+                walletAddress,
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.error(`Error relisting order ${orderId}:`, error.response ? error.response.data : error.message);
+        return { confirmed: false }; // Return empty array in case of an error
+    }
+};
+export const updateSellOrder = async (
+    orderId: string,
+    walletAddress: string,
+    pricePerToken: number,
+    totalPrice: number,
+): Promise<any> => {
+    try {
+        const response = await backendService.post<any>(
+            `/${P2PCONTROLLER}/updateSellOrder/${orderId}`,
+
+            {
+                pricePerToken,
+                totalPrice,
+                walletAddress,
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.error(`Error relisting order ${orderId}:`, error.response ? error.response.data : error.message);
+        return { confirmed: false }; // Return empty array in case of an error
+    }
+};
 export const removeFromMarketplace = async (orderId: string, walletAddress: string): Promise<any> => {
     try {
         const response = await backendService.post<any>(

@@ -114,6 +114,7 @@ const RugScore: FC<RugScoreProps> = (props) => {
                         display: 'flex',
                         justifyContent: 'center',
                         mt: '3vh',
+                        fontSize: '0.8rem',
                     }}
                 >
                     NO SCORE - Send New Request
