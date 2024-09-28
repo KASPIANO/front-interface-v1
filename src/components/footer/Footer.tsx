@@ -105,6 +105,9 @@ const Footer: React.FC = () => (
                             <li>
                                 <FooterLink href="/privacy-policy">Privacy Policy</FooterLink>
                             </li>
+                            <li>
+                                <FooterLink href="/trade-terms">Terms of Trade</FooterLink>
+                            </li>
                             {/* <li>
                                 <FooterLink href="/trust-safety">Trust Safety</FooterLink>
                             </li> */}

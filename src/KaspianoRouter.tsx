@@ -10,6 +10,7 @@ import GridPage from './pages/krc-20/GridPage';
 import PortfolioPage from './pages/portfolio-page/PortfolioPage';
 import TokenPage from './pages/token-page/TokenPage';
 import { requestAccounts } from './utils/KaswareUtils';
+import TermsOfTrade from './pages/compliance/TermsOfTrade';
 
 interface KaspianoRouterProps {
     backgroundBlur: boolean;
@@ -107,6 +108,7 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
         <Route path="/terms-service" element={<TermsOfService />} />
         <Route path="/trust-safety" element={<TrustSafety />} />
         <Route path="/contact-us" element={<ContactUs />} />
+        <Route path="/trade-terms" element={<TermsOfTrade />} />
         <Route path="*" element={<div>404 - Not Found</div>} />
     </Routes>
 );

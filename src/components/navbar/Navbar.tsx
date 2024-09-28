@@ -8,6 +8,8 @@ import { ThemeContext } from '../../main';
 import { ThemeModes } from '../../utils/Utils';
 import TokenSearch from '../token-search/TokenSearch';
 import { ConnectButton, Logo, NavbarContainer, NavButton, NavCenter } from './NavBar.s';
+import EvStationRoundedIcon from '@mui/icons-material/EvStationRounded';
+import { gasEstimator } from '../../DAL/KaspaApiDal';
 
 interface NavbarProps {
     walletAddress: string | null;
@@ -31,6 +33,7 @@ const Navbar: React.FC<NavbarProps> = ({
     const [activePage, setActivePage] = useState('/KRC-20');
     const [drawerOpen, setDrawerOpen] = useState(false);
     const themeContext = useContext(ThemeContext);
+    const [gas, setGas] = useState('');
     const navigate = useNavigate();
     const isDarkMode = themeContext.themeMode === ThemeModes.DARK;
 
@@ -44,12 +47,30 @@ const Navbar: React.FC<NavbarProps> = ({
         setDrawerOpen(false); // Close drawer on navigation in mobile
     };
 
-    const formatNumberWithCommas = (value: number) => value.toLocaleString();
+    const formatNumberWithCommas = (value: number) => Math.floor(value).toLocaleString();
 
     const handleConnectButton = () => {
         if (walletConnected) disconnectWallet();
         else connectWallet();
     };
+
+    useEffect(() => {
+        const fetchGas = async () => {
+            const gasfee = await gasEstimator('TRANSFER');
+            const kaspaToSompi = 100000000;
+            const kasFee = (gasfee / kaspaToSompi).toFixed(5);
+            setGas(kasFee);
+        };
+
+        // Fetch gas immediately when the component mounts
+        fetchGas();
+
+        // Set up an interval to run every minute
+        const intervalId = setInterval(fetchGas, 60000);
+
+        // Clear the interval when the component unmounts
+        return () => clearInterval(intervalId);
+    }, []);
 
     return (
         <NavbarContainer sx={{ height: backgroundBlur ? '9vh' : '7vh', display: 'flex', alignItems: 'center' }}>
@@ -131,6 +152,20 @@ const Navbar: React.FC<NavbarProps> = ({
                 ))}
             </NavCenter>
             <TokenSearch isMobile={false} setBackgroundBlur={setBackgroundBlur} />
+            <Typography
+                variant="body1"
+                style={{
+                    fontSize: '0.8rem',
+                    marginRight: '1.3rem',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginLeft: '1.5rem',
+                }}
+            >
+                <EvStationRoundedIcon />
+                Gas: {gas}
+            </Typography>
             <Typography variant="body1" style={{ fontSize: '0.8rem', fontWeight: '600' }}>
                 {formatNumberWithCommas(walletBalance)} KAS
             </Typography>

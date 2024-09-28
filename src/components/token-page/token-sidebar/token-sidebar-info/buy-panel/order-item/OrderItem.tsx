@@ -10,11 +10,20 @@ interface OrderItemProps {
     kasPrice: number;
     onSelect: (order: Order) => void;
     selectedOrder: Order | null;
+    isProccesing: boolean;
+    setIsProcessing: (value: boolean) => void;
 }
 
 const OrderItem: React.FC<OrderItemProps> = (props) => {
-    const { order, onSelect, kasPrice, selectedOrder } = props;
+    const { order, onSelect, kasPrice, selectedOrder, isProccesing, setIsProcessing } = props;
+
     // const floorPriceDifference = ((order.pricePerToken - floorPrice) / floorPrice) * 100;
+
+    const handleSelect = (order: Order) => {
+        setIsProcessing(true);
+        onSelect(order);
+    };
+
     const formatPrice = (price: number) => {
         if (price >= 1) {
             return price.toFixed(2);
@@ -26,6 +35,8 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
             return price.toFixed(6); // Adjust precision as needed
         }
     };
+
+    const disableButton = selectedOrder !== null || isProccesing;
     return (
         <Box sx={{ borderBottom: '0.5px solid  rgba(111, 199, 186, 0.5)', width: '100%', padding: '10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -64,8 +75,8 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                 <Box>
                     <StyledButton
                         variant="contained"
-                        onClick={() => onSelect(order)}
-                        disabled={selectedOrder !== null}
+                        onClick={() => handleSelect(order)}
+                        disabled={disableButton}
                         size="small"
                         sx={{
                             fontSize: '0.5rem',

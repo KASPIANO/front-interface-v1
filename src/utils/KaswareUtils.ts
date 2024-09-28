@@ -148,7 +148,6 @@ export const sendKaspaToKaspiano = async (
         if (priorityFee) {
             options = { priorityFee };
         }
-        debugger;
         const txData = await window.kasware.sendKaspa(KASPIANO_WALLET, sompi, options);
         const parsedTxData = JSON.parse(txData);
         return parsedTxData;
@@ -200,7 +199,6 @@ export const mintKRC20Token = async (inscribeJsonString: string): Promise<string
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
         const priorityFee = await getPriorityFee('TRANSFER');
-        debugger;
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, priorityFee);
         return txid;
     } catch (error) {
