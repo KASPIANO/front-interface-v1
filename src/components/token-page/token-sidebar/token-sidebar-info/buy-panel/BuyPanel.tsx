@@ -160,17 +160,25 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     };
 
     const handleOrderSelect = async (order: Order) => {
-        const { temporaryWalletAddress, success } = await startBuyOrder(order.orderId, walletAddress);
-        if (!success) {
+        try {
+            const { temporaryWalletAddress, success } = await startBuyOrder(order.orderId, walletAddress);
+            if (!success) {
+                showGlobalSnackbar({
+                    message: 'Order already taken. Please select another order.',
+                    severity: 'error',
+                });
+                return;
+            }
+            setTempWalletAddress(temporaryWalletAddress);
+            setSelectedOrder(order);
+            setIsPanelOpen(true);
+        } catch (error) {
+            console.error(error);
             showGlobalSnackbar({
-                message: 'Order already taken. Please select another order.',
+                message: 'An error has occurred. Please try again.',
                 severity: 'error',
             });
-            return;
         }
-        setTempWalletAddress(temporaryWalletAddress);
-        setSelectedOrder(order);
-        setIsPanelOpen(true);
     };
 
     useEffect(() => {
@@ -183,7 +191,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         try {
             setWaitingForWalletConfirmation(true);
             paymentTxn = await sendKaspa(tempWalletAddress, sompiAmount);
-        } catch {
+        } catch (err) {
+            console.error(err);
             showGlobalSnackbar({
                 message:
                     "Payment failed. Please ensure you're using the latest version of the wallet and try to compound your UTXOs before retrying.",
