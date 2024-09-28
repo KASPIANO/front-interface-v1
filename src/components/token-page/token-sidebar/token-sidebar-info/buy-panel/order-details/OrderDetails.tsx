@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, Typography, Button, IconButton, Tooltip } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Typography, Button, IconButton, Tooltip, FormControlLabel, Checkbox } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Order } from '../../../../../../types/Types';
 import { OrderDetailsItem, OrderItemPrimary } from './OrderDetails.s';
@@ -30,7 +30,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
         waitingForWalletConfirmation,
         isProcessingBuyOrder,
     } = props;
-
+    const [agreedToTerms, setAgreedToTerms] = useState(false);
     // Fee Calculations
     const networkFee = 5; // Fixed network fee
     const finalTotal = order.totalPrice + networkFee;
@@ -41,6 +41,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
             .padStart(2, '0');
         const secs = (seconds % 60).toString().padStart(2, '0');
         return `${minutes}:${secs}`;
+    };
+
+    const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setAgreedToTerms(event.target.checked);
     };
 
     return (
@@ -138,13 +142,24 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                             </OrderItemPrimary>
                         </OrderDetailsItem>
                     </Box>
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={agreedToTerms}
+                                onChange={handleCheckboxChange}
+                                sx={{
+                                    '& .MuiSvgIcon-root': { fontSize: '1rem' }, // Scales down the checkbox icon
+                                }} // Scales down the checkbox
+                            />
+                        }
+                        label={'I agree with the terms and conditions of this trade'}
+                        sx={{
+                            '& .MuiFormControlLabel-label': { fontSize: '0.7rem', fontWeight: '600' }, // Adjusts the label font size
+                        }}
+                    />
 
                     {/* Time left */}
-                    <Typography
-                        variant="body2"
-                        color="error"
-                        sx={{ mb: '0.2rem', fontSize: '0.8rem', mt: '0.8rem' }}
-                    >
+                    <Typography variant="body2" color="error" sx={{ mb: '0.2rem', fontSize: '0.8rem' }}>
                         Time left to confirm purchase: {formatTime(timeLeft)}
                     </Typography>
 
@@ -153,7 +168,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                         variant="contained"
                         color="primary"
                         onClick={() => handlePurchase(order, finalTotal)}
-                        disabled={!walletConnected || walletBalance < finalTotal}
+                        disabled={!walletConnected || walletBalance < finalTotal || !agreedToTerms}
                         sx={{ width: '100%' }}
                     >
                         Confirm Purchase

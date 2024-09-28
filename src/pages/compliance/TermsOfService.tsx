@@ -7,7 +7,7 @@ const TermsOfService: React.FC = () => (
             Terms of Service
         </Typography>
         <Typography variant="body1" paragraph>
-            Last Updated: 08/30/2024
+            Last Updated: 09/30/2024
         </Typography>
         <Typography variant="body1" paragraph>
             Please read these Terms of Service ("Terms") carefully as they govern your use of the Kaspiano platform
