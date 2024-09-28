@@ -175,7 +175,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         } catch (error) {
             console.error(error);
             showGlobalSnackbar({
-                message: 'An error has occurred. Please try again.',
+                message: 'Failed to start the buying process. Please try again later.',
                 severity: 'error',
             });
         }

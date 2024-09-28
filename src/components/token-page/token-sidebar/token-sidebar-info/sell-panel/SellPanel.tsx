@@ -210,7 +210,10 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             setTempWalletAddress(temporaryWalletAddress);
         } catch (error) {
             console.error(error);
-            showGlobalSnackbar({ message: 'Error buying token, please try again later.', severity: 'error' });
+            showGlobalSnackbar({
+                message: 'Failed to create sell order for the token. Please try again later.',
+                severity: 'error',
+            });
         }
     };
 
