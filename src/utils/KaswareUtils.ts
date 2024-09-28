@@ -127,15 +127,16 @@ export const sendKaspa = async (
     options?: { priorityFee?: number },
 ): Promise<string> => {
     try {
-        let txData;
         let priorityFee = await kaspaFeeEstimate();
         if (priorityFee === 1) {
             priorityFee = 0;
         } else {
             priorityFee = await gasEstimator('KASPA');
             options = { priorityFee };
-            txData = await window.kasware.sendKaspa(toAddress, sompi, options);
         }
+
+        const txData = await window.kasware.sendKaspa(toAddress, sompi, options);
+
         return txData;
     } catch (error) {
         throw error;
