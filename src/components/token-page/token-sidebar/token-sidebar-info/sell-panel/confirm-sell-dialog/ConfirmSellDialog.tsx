@@ -46,8 +46,8 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
     };
     const calculateAmountReceived = () => {
         const total = parseFloat(totalPrice);
-        if (total <= 10) {
-            return (total - 0.2).toFixed(2); // 20 cents off total price, rounded to 2 decimal places
+        if (total <= 50) {
+            return (total - 1).toFixed(2); // 20 cents off total price, rounded to 2 decimal places
         } else {
             return (total * 0.98).toFixed(2); // 98% of total price, rounded to 2 decimal places
         }
@@ -91,23 +91,25 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                                 when the token is sold.
                             </Typography>
                             <Typography variant="body2">
-                                • Kaspiano will apply a 2% marketplace fee or 0.2 Depending on order.{' '}
+                                • Kaspiano will apply a 2% marketplace fee or 1 KAS.{' '}
                             </Typography>
                         </Box>
                     </>
                 )}
             </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button
-                    onClick={onConfirm}
-                    variant="contained"
-                    color="primary"
-                    disabled={waitingForWalletConfirmation || creatingSellOrder}
-                >
-                    Confirm
-                </Button>
-            </DialogActions>
+            {waitingForWalletConfirmation || creatingSellOrder ? null : (
+                <DialogActions>
+                    <Button onClick={onClose}>Cancel</Button>
+                    <Button
+                        onClick={onConfirm}
+                        variant="contained"
+                        color="primary"
+                        disabled={waitingForWalletConfirmation || creatingSellOrder}
+                    >
+                        Confirm
+                    </Button>
+                </DialogActions>
+            )}
         </Dialog>
     );
 };

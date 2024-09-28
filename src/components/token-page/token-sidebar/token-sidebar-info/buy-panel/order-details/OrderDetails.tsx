@@ -99,7 +99,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                             >
                                 <Tooltip
                                     placement="left"
-                                    title="Network fee for processing the transaction, the fee unused will be refunded"
+                                    title="Network fee for processing the transaction, the fee unused will be refunded, usually you receive a refund of 4.9 KAS"
                                 >
                                     <IconButton size="small">
                                         <InfoOutlinedIcon

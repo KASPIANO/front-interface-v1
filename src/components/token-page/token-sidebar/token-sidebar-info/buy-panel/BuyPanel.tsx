@@ -12,6 +12,8 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material'; // Import CircularProgress for the spinner
 import { useFetchOrders } from '../../../../../DAL/UseQueriesBackend';
 import { GlobalStyle } from '../../../../../utils/GlobalStyleScrollBar';
+import { useQueryClient } from '@tanstack/react-query';
+import { set } from 'lodash';
 
 interface BuyPanelProps {
     tokenInfo: BackendTokenResponse;
@@ -29,10 +31,12 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const [sortOrder] = useState<'asc' | 'desc'>('asc');
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-    const [timeLeft, setTimeLeft] = useState(240); // 235 seconds = 3 minutes and 55 seconds
+    const [timeLeft, setTimeLeft] = useState(240);
     const [tempWalletAddress, setTempWalletAddress] = useState('');
     const [isProcessingBuyOrder, setIsProcessingBuyOrder] = useState(false);
     const [waitingForWalletConfirmation, setWaitingForWalletConfirmation] = useState(false);
+    const [isProccesing, setIsProcessing] = useState(false);
+    const queryClient = useQueryClient();
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useFetchOrders(tokenInfo, sortBy, sortOrder);
 
@@ -50,6 +54,9 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     useEffect(() => {
+        if (!selectedOrder) {
+            return; // Do nothing if no order is selected
+        }
         const handleTimeout = () => {
             showGlobalSnackbar({
                 message: 'Purchase canceled due to timeout.',
@@ -92,6 +99,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setTempWalletAddress(temporaryWalletAddress);
             setSelectedOrder(order);
             setIsPanelOpen(true);
+            setIsProcessing(false);
         } catch (error) {
             console.error(error);
             showGlobalSnackbar({
@@ -135,6 +143,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 reveal: revealTransactionId,
                 commit: commitTransactionId,
             });
+            // queryClient.invalidateQueries(['orders', tokenInfo.ticker, sortBy, sortOrder]);
+
             setIsProcessingBuyOrder(false);
             setIsPanelOpen(false);
             setSelectedOrder(null);
@@ -148,10 +158,11 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
 
     // Handler to close the drawer
     const handleDrawerClose = async (orderId: string) => {
-        await releaseBuyLock(orderId);
+        releaseBuyLock(orderId);
         setIsPanelOpen(false);
         setSelectedOrder(null);
     };
+
     return (
         <>
             <GlobalStyle />
@@ -172,6 +183,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                         endMessage={<p style={{ textAlign: 'center' }}>No more orders to load.</p>}
                     >
                         <OrderList
+                            isProccesing={isProccesing}
+                            setIsProcessing={setIsProcessing}
                             selectedOrder={selectedOrder}
                             walletConnected={walletConnected}
                             walletBalance={walletBalance}
