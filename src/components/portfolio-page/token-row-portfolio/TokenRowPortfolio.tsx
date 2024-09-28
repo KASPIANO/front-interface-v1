@@ -215,7 +215,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                     />
 
                     <ListItemText
-                        sx={{ width: '12vw' }}
+                        sx={{ width: '13vw' }}
                         primary={
                             <Typography
                                 variant="body1"
@@ -267,10 +267,10 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '2vw',
-                            width: '27.5vw',
+                            gap: '1rem',
+                            width: '26vw',
                             justifyContent: 'center',
-                            paddingRight: '14vw',
+                            paddingRight: '6rem',
                         }}
                     >
                         <Button

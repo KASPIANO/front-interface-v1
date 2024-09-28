@@ -57,15 +57,16 @@ const Navbar: React.FC<NavbarProps> = ({
     useEffect(() => {
         const fetchGas = async () => {
             const gasfee = await gasEstimator('TRANSFER');
-            const kasFee = (gasfee / 100000000).toFixed(5);
+            const kaspaToSompi = 100000000;
+            const kasFee = (gasfee / kaspaToSompi).toFixed(5);
             setGas(kasFee);
         };
 
         // Fetch gas immediately when the component mounts
         fetchGas();
 
-        // Set up an interval to run every 5 seconds
-        const intervalId = setInterval(fetchGas, 5000);
+        // Set up an interval to run every minute
+        const intervalId = setInterval(fetchGas, 60000);
 
         // Clear the interval when the component unmounts
         return () => clearInterval(intervalId);

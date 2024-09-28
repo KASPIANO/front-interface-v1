@@ -24,7 +24,8 @@ interface ConfirmSellDialogProps {
     waitingForWalletConfirmation: boolean;
     creatingSellOrder: boolean;
 }
-
+const MINIMUM_FEE_AMOUNT = 1;
+const MARKETLACE_FEE_PERCENTAGE = 0.02;
 const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
     const {
         waitingForWalletConfirmation,
@@ -44,12 +45,13 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
         }
         onClose();
     };
+    const marketplaceFeeString = `${MARKETLACE_FEE_PERCENTAGE * 100}%`;
     const calculateAmountReceived = () => {
         const total = parseFloat(totalPrice);
-        if (total <= 50) {
-            return (total - 1).toFixed(2); // 20 cents off total price, rounded to 2 decimal places
+        if (total * MARKETLACE_FEE_PERCENTAGE < MINIMUM_FEE_AMOUNT) {
+            return total - MINIMUM_FEE_AMOUNT;
         } else {
-            return (total * 0.98).toFixed(2); // 98% of total price, rounded to 2 decimal places
+            return total - total * MARKETLACE_FEE_PERCENTAGE;
         }
     };
     return (
@@ -91,7 +93,8 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                                 when the token is sold.
                             </Typography>
                             <Typography variant="body2">
-                                • Kaspiano will apply a 2% marketplace fee or 1 KAS.{' '}
+                                • Kaspiano will apply a {marketplaceFeeString} marketplace fee or a minimum fee of{' '}
+                                {MINIMUM_FEE_AMOUNT} KAS.{' '}
                             </Typography>
                         </Box>
                     </>
