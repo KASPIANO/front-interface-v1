@@ -10,26 +10,18 @@ export const createSellOrder = async (
     pricePerToken: number,
     walletAddress: string,
 ): Promise<{ id: string; temporaryWalletAddress: string; status: string }> => {
-    try {
-        const capitalTicker = ticker.toUpperCase();
-        const response = await backendService.post<{ temporaryWalletAddress: string; id: string; status: string }>(
-            `/${P2PCONTROLLER}/sell`,
-            {
-                ticker: capitalTicker,
-                quantity,
-                totalPrice,
-                pricePerToken,
-                walletAddress,
-            },
-        );
-        return response.data;
-    } catch (error) {
-        console.error(
-            `Error creating sell order for ${ticker}:`,
-            error.response ? error.response.data : error.message,
-        );
-        return { id: '', temporaryWalletAddress: '', status: '' }; // Return empty array in case of an error
-    }
+    const capitalTicker = ticker.toUpperCase();
+    const response = await backendService.post<{ temporaryWalletAddress: string; id: string; status: string }>(
+        `/${P2PCONTROLLER}/sell`,
+        {
+            ticker: capitalTicker,
+            quantity,
+            totalPrice,
+            pricePerToken,
+            walletAddress,
+        },
+    );
+    return response.data;
 };
 
 export const startBuyOrder = async (

@@ -5,6 +5,8 @@ import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
 import { gasEstimator, kaspaFeeEstimate } from '../DAL/KaspaApiDal';
 import { KaswareSendKaspaResult } from '../types/Types';
 
+export const USER_REJECTED_TRANSACTION_ERROR_CODE = 4001;
+
 // Utility to detect if KasWare Wallet is installed
 export const isKasWareInstalled = (): boolean => typeof window.kasware !== 'undefined';
 const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
@@ -12,7 +14,7 @@ const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 // const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
 // const MINT_DEPLOY_PRIORITY = 0.005;
 // const MINT_DEPLOY_PRIORITY_SOMPI = MINT_DEPLOY_PRIORITY * KASPA_TO_SOMPI;
-// const MIN_TX_MASS = 0.000001;
+// const MIN_TX_MASS = 0.00000100;
 
 // Method to request account connection
 export const requestAccounts = async (): Promise<string[]> => {
@@ -128,7 +130,7 @@ export const sendKaspa = async (
         let txData;
         let priorityFee = await kaspaFeeEstimate();
         if (priorityFee === 1) {
-            txData = await window.kasware.sendKaspa(toAddress, sompi);
+            priorityFee = 0;
         } else {
             priorityFee = await gasEstimator('KASPA');
             options = { priorityFee };

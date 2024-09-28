@@ -6,77 +6,12 @@ import OrderList from './order-list/OrderList';
 import BuyHeader from './buy-header/BuyHeader';
 import OrderDetails from './order-details/OrderDetails';
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
+import { sendKaspa, USER_REJECTED_TRANSACTION_ERROR_CODE } from '../../../../../utils/KaswareUtils';
 import { startBuyOrder, confirmBuyOrder, releaseBuyLock } from '../../../../../DAL/BackendP2PDAL';
-import { sendKaspa } from '../../../../../utils/KaswareUtils';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material'; // Import CircularProgress for the spinner
 import { useFetchOrders } from '../../../../../DAL/UseQueriesBackend';
 import { GlobalStyle } from '../../../../../utils/GlobalStyleScrollBar';
-
-// mockOrders.ts
-
-// const mockOrders: Order[] = [
-//     {
-//         orderId: 'order1',
-//         quantity: 1000000,
-//         pricePerToken: 0.0001,
-//         totalPrice: 120.5,
-//     },
-//     {
-//         orderId: 'order2',
-//         quantity: 50000,
-//         pricePerToken: 0.002,
-//         totalPrice: 95.3,
-//     },
-//     {
-//         orderId: 'order3',
-//         quantity: 1851852,
-//         pricePerToken: 0.000054,
-//         totalPrice: 102.75,
-//     },
-//     {
-//         orderId: 'order4',
-//         quantity: 25000,
-//         pricePerToken: 0.004,
-//         totalPrice: 87.65,
-//     },
-//     {
-//         orderId: 'order5',
-//         quantity: 200000,
-//         pricePerToken: 0.0005,
-//         totalPrice: 110.2,
-//     },
-//     {
-//         orderId: 'order6',
-//         quantity: 100000,
-//         pricePerToken: 0.001,
-//         totalPrice: 99.99,
-//     },
-//     {
-//         orderId: 'order7',
-//         quantity: 60000,
-//         pricePerToken: 0.00075,
-//         totalPrice: 80.0,
-//     },
-//     {
-//         orderId: 'order8',
-//         quantity: 900000,
-//         pricePerToken: 0.000055,
-//         totalPrice: 70.45,
-//     },
-//     {
-//         orderId: 'order9',
-//         quantity: 133333,
-//         pricePerToken: 0.00075,
-//         totalPrice: 115.6,
-//     },
-//     {
-//         orderId: 'order10',
-//         quantity: 50000000,
-//         pricePerToken: 0.000002,
-//         totalPrice: 130.0,
-//     },
-// ];
 
 interface BuyPanelProps {
     tokenInfo: BackendTokenResponse;
@@ -158,8 +93,9 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setSelectedOrder(order);
             setIsPanelOpen(true);
         } catch (error) {
+            console.error(error);
             showGlobalSnackbar({
-                message: 'Error starting buy order. Please try again.',
+                message: 'Failed to start the buying process. Please try again later.',
                 severity: 'error',
             });
         }
@@ -171,12 +107,17 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         try {
             setWaitingForWalletConfirmation(true);
             paymentTxn = await sendKaspa(tempWalletAddress, sompiAmount);
-        } catch {
-            showGlobalSnackbar({
-                message:
-                    "Payment failed. Please ensure you're using the latest version of the wallet and try to compound your UTXOs before retrying.",
-                severity: 'error',
-            });
+        } catch (err) {
+            console.error(err);
+            if (err?.code !== USER_REJECTED_TRANSACTION_ERROR_CODE) {
+                showGlobalSnackbar({
+                    message:
+                        "Payment failed. Please ensure you're using the latest version of the wallet and try to compound your UTXOs before retrying.",
+                    severity: 'error',
+                });
+            }
+
+            setWaitingForWalletConfirmation(false);
             return;
         }
         setWaitingForWalletConfirmation(false);

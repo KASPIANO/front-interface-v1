@@ -3,7 +3,7 @@ import { kasInfoMainnetService, kasInfoService } from './AxiosInstaces';
 import { delay } from '../utils/Utils';
 
 const KASPA_TRANSACTION_MASS = 3000;
-const KRC20_TRANSACTION_MASS = 3500;
+const KRC20_TRANSACTION_MASS = 3370;
 export const fetchWalletBalance = async (address: string): Promise<number> => {
     try {
         let balanceInKaspa;

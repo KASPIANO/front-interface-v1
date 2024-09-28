@@ -196,24 +196,25 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             });
             return;
         }
-        // Retrieve wallet temp wallert address and order id and set it
-        const { id, temporaryWalletAddress } = await createSellOrder(
-            tokenInfo.ticker,
-            amount,
-            parseInt(totalPrice),
-            parseFloat(pricePerToken),
-            walletAddress,
-        );
-        if (temporaryWalletAddress === '') {
+        try {
+            // Retrieve wallet temp wallert address and order id and set it
+            const { id, temporaryWalletAddress } = await createSellOrder(
+                tokenInfo.ticker,
+                amount,
+                parseInt(totalPrice),
+                parseFloat(pricePerToken),
+                walletAddress,
+            );
+            setIsDialogOpen(true);
+            setOrderId(id);
+            setTempWalletAddress(temporaryWalletAddress);
+        } catch (error) {
+            console.error(error);
             showGlobalSnackbar({
-                message: 'Error creating sell order. Please try again.',
+                message: 'Failed to create sell order for the token. Please try again later.',
                 severity: 'error',
             });
-            return;
         }
-        setIsDialogOpen(true);
-        setOrderId(id);
-        setTempWalletAddress(temporaryWalletAddress);
     };
 
     const handleTransfer = async () => {
