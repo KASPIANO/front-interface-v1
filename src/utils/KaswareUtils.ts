@@ -2,7 +2,7 @@
 
 import Cookies from 'js-cookie';
 import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
-import { gasEstimator, kaspaFeeEstimate } from '../DAL/KaspaApiDal';
+import { gasEstimator, getPriorityFee, kaspaFeeEstimate } from '../DAL/KaspaApiDal';
 import { KaswareSendKaspaResult } from '../types/Types';
 
 export const USER_REJECTED_TRANSACTION_ERROR_CODE = 4001;
@@ -127,16 +127,11 @@ export const sendKaspa = async (
     options?: { priorityFee?: number },
 ): Promise<string> => {
     try {
-        let priorityFee = await kaspaFeeEstimate();
-        if (priorityFee === 1) {
-            priorityFee = 0;
-        } else {
-            priorityFee = await gasEstimator('KASPA');
+        const priorityFee = await getPriorityFee('KASPA');
+        if (priorityFee) {
             options = { priorityFee };
         }
-
         const txData = await window.kasware.sendKaspa(toAddress, sompi, options);
-
         return txData;
     } catch (error) {
         throw error;
@@ -149,15 +144,12 @@ export const sendKaspaToKaspiano = async (
     options?: { priorityFee?: number },
 ): Promise<KaswareSendKaspaResult> => {
     try {
-        let txData;
-        let priorityFee = await kaspaFeeEstimate();
-        if (priorityFee === 1) {
-            txData = await window.kasware.sendKaspa(KASPIANO_WALLET, sompi);
-        } else {
-            priorityFee = await gasEstimator('KASPA');
+        const priorityFee = await getPriorityFee('KASPA');
+        if (priorityFee) {
             options = { priorityFee };
-            txData = await window.kasware.sendKaspa(KASPIANO_WALLET, sompi, options);
         }
+        debugger;
+        const txData = await window.kasware.sendKaspa(KASPIANO_WALLET, sompi, options);
         const parsedTxData = JSON.parse(txData);
         return parsedTxData;
     } catch (error) {
@@ -192,14 +184,9 @@ export const pushTx = async (options: { rawtx: string }): Promise<string> => {
 export const deployKRC20Token = async (inscribeJsonString: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        let txid;
-        let priorityFee = await kaspaFeeEstimate();
-        if (priorityFee === 1) {
-            txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2);
-        } else {
-            priorityFee = await gasEstimator('TRANSFER');
-            txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, priorityFee);
-        }
+        const priorityFee = await getPriorityFee('TRANSFER');
+
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, priorityFee);
         return txid;
     } catch (error) {
         console.error('Failed to deploy KRC20 token:', error);
@@ -212,14 +199,9 @@ export const deployKRC20Token = async (inscribeJsonString: string): Promise<stri
 export const mintKRC20Token = async (inscribeJsonString: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        let txid;
-        let priorityFee = await kaspaFeeEstimate();
-        if (priorityFee === 1) {
-            txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2);
-        } else {
-            priorityFee = await gasEstimator('TRANSFER');
-            txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, priorityFee);
-        }
+        const priorityFee = await getPriorityFee('TRANSFER');
+        debugger;
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, priorityFee);
         return txid;
     } catch (error) {
         console.error('Failed to mint KRC20 token:', error);
@@ -232,14 +214,8 @@ export const mintKRC20Token = async (inscribeJsonString: string): Promise<string
 export const transferKRC20Token = async (inscribeJsonString: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        let txid;
-        let priorityFee = await kaspaFeeEstimate();
-        if (priorityFee === 1) {
-            txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4);
-        } else {
-            priorityFee = await gasEstimator('TRANSFER');
-            txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4, priorityFee);
-        }
+        const priorityFee = await getPriorityFee('TRANSFER');
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4, priorityFee);
         return txid;
     } catch (error) {
         console.error('Failed to transfer KRC20 token:', error);

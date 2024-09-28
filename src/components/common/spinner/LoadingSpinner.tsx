@@ -13,7 +13,8 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ title, size = 40 }) => 
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 1,
+            height: '15vh', // Take the full height of the parent
+            textAlign: 'center',
         }}
     >
         <Typography variant="body1" sx={{ fontWeight: 700, mb: 1, fontSize: '1.3rem' }}>
