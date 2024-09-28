@@ -106,6 +106,10 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     }, [pricePerToken, tokenInfo.price]);
 
     const handleSetPricePerToken = (multiplier: number) => {
+        if (!tokenInfo.price) {
+            showGlobalSnackbar({ message: 'No Token Floor Price Exists', severity: 'error' });
+            return;
+        }
         const newPricePerTokenValue = tokenInfo.price * multiplier;
         const roundedPricePerToken = roundUp(newPricePerTokenValue, 8);
         setPricePerToken(roundedPricePerToken.toString());
@@ -307,16 +311,32 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
 
     const buttons = (
         <Box sx={{ display: 'flex', gap: '0.3rem', mb: '0.5rem', justifyContent: 'center' }}>
-            <StyledButton onClick={() => handleSetPricePerToken(1)} variant="contained">
+            <StyledButton
+                disabled={!tokenInfo.price}
+                onClick={() => handleSetPricePerToken(1)}
+                variant="contained"
+            >
                 Floor
             </StyledButton>
-            <StyledButton onClick={() => handleSetPricePerToken(1.01)} variant="contained">
+            <StyledButton
+                disabled={!tokenInfo.price}
+                onClick={() => handleSetPricePerToken(1.01)}
+                variant="contained"
+            >
                 +1%
             </StyledButton>
-            <StyledButton onClick={() => handleSetPricePerToken(1.05)} variant="contained">
+            <StyledButton
+                disabled={!tokenInfo.price}
+                onClick={() => handleSetPricePerToken(1.05)}
+                variant="contained"
+            >
                 +5%
             </StyledButton>
-            <StyledButton onClick={() => handleSetPricePerToken(1.1)} variant="contained">
+            <StyledButton
+                disabled={!tokenInfo.price}
+                onClick={() => handleSetPricePerToken(1.1)}
+                variant="contained"
+            >
                 +10%
             </StyledButton>
         </Box>
