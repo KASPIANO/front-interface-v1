@@ -7,7 +7,7 @@ import BuyHeader from './buy-header/BuyHeader';
 import OrderDetails from './order-details/OrderDetails';
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import { getOrders, startBuyOrder, confirmBuyOrder, releaseBuyLock } from '../../../../../DAL/BackendP2PDAL';
-import { sendKaspa } from '../../../../../utils/KaswareUtils';
+import { sendKaspa, USER_REJECTED_TRANSACTION_ERROR_CODE } from '../../../../../utils/KaswareUtils';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material'; // Import CircularProgress for the spinner
 
@@ -193,11 +193,15 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             paymentTxn = await sendKaspa(tempWalletAddress, sompiAmount);
         } catch (err) {
             console.error(err);
-            showGlobalSnackbar({
-                message:
-                    "Payment failed. Please ensure you're using the latest version of the wallet and try to compound your UTXOs before retrying.",
-                severity: 'error',
-            });
+            if (err?.code !== USER_REJECTED_TRANSACTION_ERROR_CODE) {
+                showGlobalSnackbar({
+                    message:
+                        "Payment failed. Please ensure you're using the latest version of the wallet and try to compound your UTXOs before retrying.",
+                    severity: 'error',
+                });
+            }
+
+            setWaitingForWalletConfirmation(false);
             return;
         }
         setWaitingForWalletConfirmation(false);
