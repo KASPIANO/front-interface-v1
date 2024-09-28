@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Tooltip, CircularProgress } from '@mui/material';
+import { Box, Tooltip } from '@mui/material';
 import { Order } from '../../../../../../types/Types';
 import { OrderItemPrimary, OrderItemSecondary } from './OrderItem.s';
 import { StyledButton } from '../../sell-panel/SellPanel.s';

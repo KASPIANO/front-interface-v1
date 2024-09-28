@@ -13,7 +13,6 @@ import { CircularProgress } from '@mui/material'; // Import CircularProgress for
 import { useFetchOrders } from '../../../../../DAL/UseQueriesBackend';
 import { GlobalStyle } from '../../../../../utils/GlobalStyleScrollBar';
 import { useQueryClient } from '@tanstack/react-query';
-import { set } from 'lodash';
 
 interface BuyPanelProps {
     tokenInfo: BackendTokenResponse;
@@ -38,7 +37,11 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const [isProccesing, setIsProcessing] = useState(false);
     const queryClient = useQueryClient();
 
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useFetchOrders(tokenInfo, sortBy, sortOrder);
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useFetchOrders(
+        tokenInfo,
+        sortBy,
+        sortOrder,
+    );
 
     const orders = data?.pages.flatMap((page) => page.orders) || [];
 
@@ -109,6 +112,33 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         }
     };
 
+    const fetchAndUpdateTokenInfo = useCallback(async () => {
+        if (!selectedOrder || !selectedOrder.orderId) {
+            console.warn('No valid order selected for removal.');
+            return;
+        }
+
+        queryClient.setQueryData(
+            ['orders', tokenInfo.ticker, sortBy, sortOrder],
+            (oldData: { pages: { orders: Order[] }[] } | undefined) => {
+                if (!oldData || !oldData.pages) {
+                    return oldData; // Return early if data is not available
+                }
+
+                return {
+                    ...oldData,
+                    // Immutably update each page by filtering out the purchased order
+                    pages: oldData.pages.map((page) => ({
+                        ...page,
+                        orders: page.orders
+                            ? page.orders.filter((order) => order.orderId !== selectedOrder.orderId)
+                            : [], // Safeguard if orders array is undefined
+                    })),
+                };
+            },
+        );
+    }, [queryClient, tokenInfo.ticker, sortBy, sortOrder, selectedOrder]);
+
     const handlePurchase = async (order: Order, finalTotal: number) => {
         const sompiAmount = finalTotal * KASPA_TO_SOMPI;
         let paymentTxn = '';
@@ -143,8 +173,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 reveal: revealTransactionId,
                 commit: commitTransactionId,
             });
-            // queryClient.invalidateQueries(['orders', tokenInfo.ticker, sortBy, sortOrder]);
-
+            fetchAndUpdateTokenInfo();
             setIsProcessingBuyOrder(false);
             setIsPanelOpen(false);
             setSelectedOrder(null);
@@ -180,7 +209,15 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                         } // Loading message
                         scrollableTarget="scrollableList"
                         scrollThreshold={0.6}
-                        endMessage={<p style={{ textAlign: 'center' }}>No more orders to load.</p>}
+                        endMessage={
+                            isLoading ? (
+                                <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+                                    <CircularProgress />
+                                </Box>
+                            ) : (
+                                <p style={{ textAlign: 'center' }}>No more orders to load.</p>
+                            )
+                        }
                     >
                         <OrderList
                             isProccesing={isProccesing}
