@@ -72,6 +72,23 @@ export const gasEstimator = async (txType: 'KASPA' | 'TRANSFER'): Promise<number
         return 0;
     }
 };
+
+export const getPriorityFee = async (txType: 'KASPA' | 'TRANSFER'): Promise<number | undefined> => {
+    try {
+        let priorityFee = await kaspaFeeEstimate();
+
+        if (priorityFee === 1) {
+            return undefined; // If priorityFee is 1, return undefined or empty
+        } else {
+            priorityFee = await gasEstimator(txType); // Get the actual fee from gasEstimator
+            return priorityFee;
+        }
+    } catch (error) {
+        console.error('Error calculating priority fee:', error);
+        return undefined; // Fallback in case of error
+    }
+};
+
 export const getTxnInfo = async (txnId: string, maxRetries = 3): Promise<any> => {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
