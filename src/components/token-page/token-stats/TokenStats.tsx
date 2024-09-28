@@ -38,7 +38,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
     const tokenKasPrice = tokenInfo.price ? `${tokenInfo.price.toFixed(7)} / KAS` : '---';
 
     const totalMintedDataToShow =
-        tokenInfo.state === 'finished' ? '100%' : `${(tokenInfo.totalMintedPercent * 100).toFixed(8)}%`;
+        tokenInfo.state === 'finished' ? '100%' : `${(tokenInfo.totalMintedPercent * 100).toFixed(3)}%`;
     return (
         <Card sx={{ height: '20vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -67,7 +67,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                 }}
             >
                 <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '0.8rem' }} align="center">
+                    <Typography sx={{ fontSize: '0.7rem' }} align="center">
                         VOLUME ({tradingDataTimeFrame})
                     </Typography>
                     <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
@@ -77,7 +77,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
 
                 <Divider orientation="vertical" flexItem />
                 <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '0.8rem' }} align="center">
+                    <Typography sx={{ fontSize: '0.7rem' }} align="center">
                         PRICE PER TOKEN ({tradingDataTimeFrame})
                     </Typography>
                     <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
@@ -86,7 +86,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                 </Box>
                 <Divider orientation="vertical" flexItem />
                 <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '0.8rem' }} align="center">
+                    <Typography sx={{ fontSize: '0.7rem' }} align="center">
                         TOTAL MINTED
                     </Typography>
                     <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
@@ -95,7 +95,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                 </Box>
                 <Divider orientation="vertical" flexItem />
                 <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '0.8rem' }} align="center">
+                    <Typography sx={{ fontSize: '0.7rem' }} align="center">
                         HOLDERS
                     </Typography>
                     <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>

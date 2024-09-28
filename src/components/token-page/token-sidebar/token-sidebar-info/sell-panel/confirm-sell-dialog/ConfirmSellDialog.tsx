@@ -8,9 +8,9 @@ import {
     Button,
     Typography,
     Box,
-    CircularProgress,
     Divider,
 } from '@mui/material';
+import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
 
 interface ConfirmSellDialogProps {
     open: boolean;
@@ -54,26 +54,14 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
     };
     return (
         <Dialog open={open} onClose={handleClose}>
-            <DialogTitle sx={{ fontWeight: 'bold' }}>Confirm Sell Order</DialogTitle>
+            <DialogTitle sx={{ fontWeight: 'bold' }}>
+                {waitingForWalletConfirmation || creatingSellOrder ? '' : 'Confirm Sell Order'}
+            </DialogTitle>
             <DialogContent>
                 {waitingForWalletConfirmation ? (
-                    <>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                            <CircularProgress size={24} sx={{ mr: 2 }} />
-                            <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                                Processing transaction...
-                            </Typography>
-                        </Box>
-                    </>
+                    <LoadingSpinner title="Waiting for wallet confirmation..." size={60} />
                 ) : creatingSellOrder ? (
-                    <>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                            <CircularProgress size={24} sx={{ mr: 2 }} />
-                            <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                                Creating sell order...
-                            </Typography>
-                        </Box>
-                    </>
+                    <LoadingSpinner title="Creating sell order..." size={60} />
                 ) : (
                     <>
                         <Box sx={{ mt: 1 }}>

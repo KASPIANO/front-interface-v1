@@ -189,9 +189,9 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             showGlobalSnackbar({ message: 'Insufficient Token balance.', severity: 'error' });
             return;
         }
-        if (parseInt(totalPrice) < 1) {
+        if (parseInt(totalPrice) < 25) {
             showGlobalSnackbar({
-                message: 'Please enter a valid total price has to be more than 1 KAS',
+                message: 'Please enter a valid total price has to be more than 25 KAS',
                 severity: 'error',
             });
             return;
@@ -252,8 +252,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     message: 'Sell order confirmed successfully',
                     severity: 'success',
                 });
-                setCreatingSellOrder(false);
                 setIsDialogOpen(false);
+                setCreatingSellOrder(false);
                 cleanFields();
                 return true;
             } else {
@@ -386,7 +386,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     variant="contained"
                     onClick={handleCreateSellOrder}
                     fullWidth
-                    disabled={!walletConnected}
+                    disabled={!walletConnected || walletTickerBalance === 0}
                 >
                     Create Sell Order
                 </StyledButton>

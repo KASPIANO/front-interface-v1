@@ -120,6 +120,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                     rowGap: '1vh',
                 }}
             >
+                {/* Total Mints */}
                 <Box
                     sx={{
                         display: 'flex',
@@ -131,16 +132,16 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                 >
                     {/* Total Mints */}
                     <Box sx={{ marginRight: '2vw', textAlign: 'center' }}>
-                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 'bold' }}>Total Mints</Typography>
-                        <Typography sx={{ fontSize: '0.8rem' }}>
+                        <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>Total Mints</Typography>
+                        <Typography sx={{ fontSize: '0.7rem' }}>
                             {isSoldOut ? totalMintsPossible : tokenInfo.totalMintTimes} / {totalMintsPossible}
                         </Typography>
                     </Box>
 
                     {/* Mints Left */}
                     <Box sx={{ textAlign: 'center' }}>
-                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 'bold' }}>Mints Left</Typography>
-                        <Typography sx={{ fontSize: '0.8rem' }}>{isSoldOut ? '0' : mintsLeft}</Typography>
+                        <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>Mints Left</Typography>
+                        <Typography sx={{ fontSize: '0.7rem' }}>{isSoldOut ? '0' : mintsLeft}</Typography>
                     </Box>
                 </Box>
                 {/* Right Side: Mint Button */}
@@ -164,6 +165,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                                 fontSize: '0.7rem',
                                 width: '100%',
                             }}
+                            sx={{ mt: '0.5rem' }}
                             disabled={isMintingDisabled || !walletConnected || walletBalance < 1 || isSoldOut}
                         >
                             {isMintingDisabled || isSoldOut ? 'Sold Out' : 'Mint'}
