@@ -13,6 +13,7 @@ import { CircularProgress } from '@mui/material'; // Import CircularProgress for
 import { useFetchOrders } from '../../../../../DAL/UseQueriesBackend';
 import { GlobalStyle } from '../../../../../utils/GlobalStyleScrollBar';
 import { useQueryClient } from '@tanstack/react-query';
+import { isEmptyString } from '../../../../../utils/Utils';
 
 interface BuyPanelProps {
     tokenInfo: BackendTokenResponse;
@@ -145,6 +146,10 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         try {
             setWaitingForWalletConfirmation(true);
             paymentTxn = await sendKaspa(tempWalletAddress, sompiAmount);
+
+            if (isEmptyString(paymentTxn)) {
+                throw new Error('paymentTxn is empty');
+            }
         } catch (err) {
             console.error(err);
             if (err?.code !== USER_REJECTED_TRANSACTION_ERROR_CODE) {
@@ -162,10 +167,21 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         setIsProcessingBuyOrder(true);
         const parsedTxData = JSON.parse(paymentTxn);
         const paymentTxnId = parsedTxData.id;
-        const { confirmed, commitTransactionId, revealTransactionId } = await confirmBuyOrder(
-            order.orderId,
-            paymentTxnId,
-        );
+        let confirmed: boolean;
+        let commitTransactionId: string;
+        let revealTransactionId: string;
+        let priorityFeeTooHigh: boolean;
+
+        try {
+            ({ confirmed, commitTransactionId, revealTransactionId, priorityFeeTooHigh } = await confirmBuyOrder(
+                order.orderId,
+                paymentTxnId,
+            ));
+        } catch (error) {
+            console.error(error);
+            confirmed = false;
+        }
+
         if (confirmed) {
             showGlobalSnackbar({
                 message: 'Purchase successful!',
@@ -178,10 +194,21 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setIsPanelOpen(false);
             setSelectedOrder(null);
         } else {
+            let errorMessage =
+                "Purchase failed in the process. Please wait 10 minutes and contact support if you didn't receive the tokens.";
+
+            if (priorityFeeTooHigh) {
+                errorMessage =
+                    "The network fee is currently too high, so we can't process your order. Your order will be executed when the fee returns to normal.";
+            }
             showGlobalSnackbar({
-                message: 'Purchase failed!',
+                message: errorMessage,
                 severity: 'error',
             });
+
+            setIsProcessingBuyOrder(false);
+            setIsPanelOpen(false);
+            setSelectedOrder(null);
         }
     };
 
