@@ -15,6 +15,7 @@ interface PortfolioTokenGridProps {
     handleChange: () => void;
     lastPortfolioPage: boolean;
     handlePortfolioPagination: (direction: 'next' | 'prev') => void;
+    isLoading: boolean;
 }
 
 enum GridHeaders {
@@ -34,6 +35,7 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
         handleChange,
         lastPortfolioPage,
         handlePortfolioPagination,
+        isLoading,
     } = props;
     const [currentPage, setCurrentPage] = useState<number>(1);
     const handlePrevPage = () => {
@@ -102,7 +104,7 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
                         overflowX: 'hidden',
                     }}
                 >
-                    {tokensList.length > 0
+                    {tokensList.length > 0 && !isLoading
                         ? tokensList.map((token) => (
                               <TokenRowPortfolio
                                   handleChange={handleChange}

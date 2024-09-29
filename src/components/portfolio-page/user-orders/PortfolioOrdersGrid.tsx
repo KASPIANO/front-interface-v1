@@ -7,7 +7,6 @@ import { PrevPageButton, NextPageButton } from '../../krc-20-page/grid-title-sor
 import { StyledPortfolioGridContainer } from './PortfolioOrdersGrid.s';
 import UserOrdersRow from './user-orders-row/UserOrdersRow';
 import {
-    confirmDelistOrder,
     getUSerListings,
     relistSellOrder,
     removeFromMarketplace,
@@ -109,7 +108,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
         }
     };
 
-    const disableNext = () => orders.length < 15;
+    const disableNext = totalCount < 15;
     const tableHeader = (
         <Box
             sx={{
@@ -149,7 +148,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                 <PrevPageButton onClick={handlePrevPage} disabled={currentPage === 1}>
                     Prev
                 </PrevPageButton>
-                <NextPageButton onClick={handleNextPage} disabled={disableNext()}>
+                <NextPageButton onClick={handleNextPage} disabled={disableNext}>
                     Next
                 </NextPageButton>
             </Box>

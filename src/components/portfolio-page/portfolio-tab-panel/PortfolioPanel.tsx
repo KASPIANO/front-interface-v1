@@ -18,6 +18,7 @@ interface PortfolioPanelProps {
     lastPortfolioPage: boolean;
     handlePortfolioPagination: (direction: 'next' | 'prev') => void;
     operationFinished: boolean;
+    isLoading: boolean;
 }
 
 const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
@@ -31,6 +32,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
         lastPortfolioPage,
         handlePortfolioPagination,
         walletAddress,
+        isLoading,
         operationFinished,
     } = props;
     const [value, setValue] = useState('1');
@@ -61,6 +63,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                 </Tabs>
                 <TabPanelStyled value="1">
                     <PortfolioTokenGrid
+                        isLoading={isLoading}
                         handleChange={handleChange}
                         walletBalance={walletBalance}
                         tokensList={tokenList}

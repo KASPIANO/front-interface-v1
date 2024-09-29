@@ -156,6 +156,7 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
                 setWalletAddress={setCurrentWallet}
             />
             <PortfolioPanel
+                isLoading={isLoading}
                 operationFinished={operationFinished}
                 handleChange={handleChange}
                 handlePortfolioPagination={handlePortfolioPagination}
