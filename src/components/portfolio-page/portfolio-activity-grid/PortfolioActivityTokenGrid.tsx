@@ -97,10 +97,18 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
             <Table style={{ width: '60%' }}>
                 <TableHead>
                     <TableRow>
-                        <TableCell sx={{ width: '33%', borderBottom: 0 }}>{GridHeaders.TICKER}</TableCell>
-                        <TableCell sx={{ width: '33%', borderBottom: 0 }}>{GridHeaders.AMOUNT}</TableCell>
-                        <TableCell sx={{ width: '33%', borderBottom: 0 }}>{GridHeaders.TYPE}</TableCell>
-                        <TableCell sx={{ width: '33%', borderBottom: 0 }}>{GridHeaders.TIME}</TableCell>
+                        <TableCell sx={{ width: '33%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.TICKER}
+                        </TableCell>
+                        <TableCell sx={{ width: '33%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.AMOUNT}
+                        </TableCell>
+                        <TableCell sx={{ width: '33%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.TYPE}
+                        </TableCell>
+                        <TableCell sx={{ width: '33%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.TIME}
+                        </TableCell>
                     </TableRow>
                 </TableHead>
             </Table>

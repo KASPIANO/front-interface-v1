@@ -57,11 +57,21 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
             <Table style={{ width: '100%', marginLeft: '0.9vw' }}>
                 <TableHead>
                     <TableRow>
-                        <TableCell sx={{ width: '17%', borderBottom: 0 }}>{GridHeaders.TICKER}</TableCell>
-                        <TableCell sx={{ width: '14.5%', borderBottom: 0 }}>{GridHeaders.PRICE}</TableCell>
-                        <TableCell sx={{ width: '14%', borderBottom: 0 }}>{GridHeaders.BALANCE}</TableCell>
-                        <TableCell sx={{ width: '20%', borderBottom: 0 }}>{GridHeaders.TOTAL}</TableCell>
-                        <TableCell sx={{ width: '15%', borderBottom: 0 }}>{GridHeaders.ACTIONS}</TableCell>
+                        <TableCell sx={{ width: '17%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.TICKER}
+                        </TableCell>
+                        <TableCell sx={{ width: '14.5%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.PRICE}
+                        </TableCell>
+                        <TableCell sx={{ width: '14%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.BALANCE}
+                        </TableCell>
+                        <TableCell sx={{ width: '20%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.TOTAL}
+                        </TableCell>
+                        <TableCell sx={{ width: '15%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.ACTIONS}
+                        </TableCell>
                     </TableRow>
                 </TableHead>
             </Table>

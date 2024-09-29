@@ -207,7 +207,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                         }}
                         primary={
                             <Tooltip title={token.ticker}>
-                                <Typography variant="body1" sx={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
+                                <Typography variant="body1" sx={{ fontSize: '0.75rem', fontWeight: 'bold' }}>
                                     {capitalizeFirstLetter(token.ticker)}
                                 </Typography>
                             </Tooltip>
@@ -220,7 +220,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                             <Typography
                                 variant="body1"
                                 style={{
-                                    fontSize: '0.8rem',
+                                    fontSize: '0.75rem',
                                     fontWeight: 'bold',
                                     display: 'flex',
                                     justifyContent: 'center',
@@ -236,7 +236,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                             <Typography
                                 variant="body1"
                                 style={{
-                                    fontSize: '0.8rem',
+                                    fontSize: '0.75rem',
                                     fontWeight: 'bold',
                                     display: 'flex',
                                     justifyContent: 'center',
@@ -252,7 +252,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                             <Typography
                                 variant="body1"
                                 style={{
-                                    fontSize: '0.8rem',
+                                    fontSize: '0.75rem',
                                     fontWeight: 'bold',
                                     display: 'flex',
                                     justifyContent: 'center',

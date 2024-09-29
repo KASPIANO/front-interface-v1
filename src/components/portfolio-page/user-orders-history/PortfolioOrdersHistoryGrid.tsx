@@ -4,8 +4,8 @@ import { FC, useEffect, useState } from 'react';
 import { Order } from '../../../types/Types';
 import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 import { PrevPageButton, NextPageButton } from '../../krc-20-page/grid-title-sort/GridTitle.s';
-import { StyledPortfolioGridContainer } from './PortfolioOrdersGrid.s';
-import UserOrdersRow from './user-orders-row/UserOrdersRow';
+import { StyledPortfolioGridContainer } from './PortfolioOrdersHistoryGrid.s';
+import UserOrdersRow from './user-orders-history-row/UserOrdersHistoryRow';
 import {
     confirmDelistOrder,
     getUSerListings,
