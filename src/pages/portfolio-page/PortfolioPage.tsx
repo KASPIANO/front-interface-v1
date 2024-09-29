@@ -161,7 +161,6 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
                 handlePortfolioPagination={handlePortfolioPagination}
                 lastPortfolioPage={lastPortfolioPage}
                 walletBalance={walletBalance}
-                isLoading={isLoading}
                 kasPrice={kasPrice}
                 walletConnected={isUserConnected}
                 tokenList={portfolioTokenInfo}

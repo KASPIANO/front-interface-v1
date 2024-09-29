@@ -12,7 +12,6 @@ interface PortfolioPanelProps {
     walletConnected: boolean;
     walletAddress: string | null;
     tokenList: TokenRowPortfolioItem[];
-    isLoading: boolean;
     walletBalance: number;
     tickers: string[];
     handleChange: () => void;
@@ -26,7 +25,6 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
         tokenList,
         kasPrice,
         walletConnected,
-        isLoading,
         walletBalance,
         tickers,
         handleChange,

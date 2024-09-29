@@ -7,9 +7,6 @@ import { StyledPortfolioGridContainer } from './PortfolioActivityTokenGrid.s';
 import TokenRowActivity from '../token-row-activity/TokenRowActivity';
 import { PrevPageButton, NextPageButton } from '../../krc-20-page/grid-title-sort/GridTitle.s';
 import { fetchWalletActivity } from '../../../DAL/Krc20DAL';
-import { useFetchPortfolioActivity } from '../../../DAL/KasplexQueries';
-import { set } from 'lodash';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface PortfolioActivityTokenGridProps {
     kasPrice: number;
@@ -27,101 +24,64 @@ enum GridHeaders {
     TIME = 'TIME',
 }
 
-// const [paginationActivityKey, setPaginationActivityKey] = useState<string | null>(null);
-// const [paginationActivityDirection, setPaginationActivityDirection] = useState<'next' | 'prev' | null>(null);
-// const [activityNext, setActivityNext] = useState<string | null>(null);
-// const [activityPrev, setActivityPrev] = useState<string | null>(null);
-// const [portfolioAssetsActivity, setPortfolioAssetsActivity] = useState<TokenRowActivityItem[]>([]);
-// const [isLoadingActivity, setIsLoadingActivity] = useState<boolean>(false);
-// const [lastActivityPage, setLastActivityPage] = useState<boolean>(false);
-
-// const handleActivityPagination = (direction: 'next' | 'prev') => {
-//     setPortfolioAssetsActivity([]);
-//     setPaginationActivityDirection(direction);
-//     setPaginationActivityKey(direction === 'next' ? activityNext : activityPrev);
-// };
-
-// useEffect(() => {
-//     const fetchActivity = async () => {
-//         setIsLoadingActivity(true);
-//         setPortfolioAssetsActivity([]);
-//         try {
-//             const activityData = await fetchWalletActivity(
-//                 walletAddress,
-//                 paginationActivityKey,
-//                 paginationActivityDirection,
-//             );
-//             setPortfolioAssetsActivity(activityData.activityItems);
-//             setActivityNext(activityData.next); // Save the 'next' key for further requests
-//             setActivityPrev(activityData.prev); // Save the 'prev' key for further requests
-//             const checkNext = await fetchWalletActivity(walletAddress, activityData.next, 'next');
-//             if (checkNext.activityItems.length === 0) {
-//                 setLastActivityPage(true);
-//             } else {
-//                 setLastActivityPage(false);
-//             }
-//         } catch (error) {
-//             console.error('Error fetching activity data:', error);
-//         } finally {
-//             setIsLoadingActivity(false);
-//         }
-//     };
-
-//     if (walletConnected) {
-//         fetchActivity();
-//     }
-
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-// }, [walletAddress, walletConnected, paginationActivityKey, operationFinished]);
-
 const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) => {
     const { kasPrice, walletConnected, walletBalance, walletAddress, operationFinished } = props;
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const [isNextPageEmpty, setIsNextPageEmpty] = useState<boolean>(false); // Tracks if the next page is empty
+    const [paginationActivityKey, setPaginationActivityKey] = useState<string | null>(null);
+    const [paginationActivityDirection, setPaginationActivityDirection] = useState<'next' | 'prev' | null>(null);
+    const [activityNext, setActivityNext] = useState<string | null>(null);
+    const [activityPrev, setActivityPrev] = useState<string | null>(null);
+    const [portfolioAssetsActivity, setPortfolioAssetsActivity] = useState<TokenRowActivityItem[]>([]);
+    const [isLoadingActivity, setIsLoadingActivity] = useState<boolean>(false);
+    const [lastActivityPage, setLastActivityPage] = useState<boolean>(false);
 
-    const [paginationKey, setPaginationKey] = useState<string | null>(null);
-    const [direction, setDirection] = useState<'next' | 'prev' | null>(null);
-    const { data, isFetching, isLoading } = useFetchPortfolioActivity(
-        walletAddress,
-        paginationKey,
-        direction,
-        walletConnected,
-    );
-    const queryClient = useQueryClient();
-
-    const handleNextPage = async () => {
-        if (data?.next) {
-            // Pre-check the next page to see if it has data
-            queryClient.invalidateQueries({
-                queryKey: ['walletActivity', walletAddress], // Ensure you are passing the queryKey inside an object
-            });
-
-            const nextPageResult = await fetchWalletActivity(walletAddress, data.next, 'next');
-
-            // If the next page has no data, prevent the user from navigating further
-            if (nextPageResult.activityItems.length === 0) {
-                setIsNextPageEmpty(true); // No data in the next page
-            } else {
-                // Update pagination key and direction if data is found
-                setPaginationKey(data.next);
-                setDirection('next');
-                setIsNextPageEmpty(false); // Reset if data is present
-                setCurrentPage((prev) => prev + 1);
-            }
-        }
+    const handleActivityPagination = (direction: 'next' | 'prev') => {
+        setPortfolioAssetsActivity([]);
+        setPaginationActivityDirection(direction);
+        setPaginationActivityKey(direction === 'next' ? activityNext : activityPrev);
     };
 
-    // Custom function to fetch the previous page and check if it has data
-    const handlePrevPage = async () => {
-        if (data?.prev && currentPage > 1) {
-            queryClient.invalidateQueries({
-                queryKey: ['walletActivity', walletAddress], // Ensure you are passing the queryKey inside an object
-            });
+    useEffect(() => {
+        const fetchActivity = async () => {
+            setIsLoadingActivity(true);
+            setPortfolioAssetsActivity([]);
+            try {
+                const activityData = await fetchWalletActivity(
+                    walletAddress,
+                    paginationActivityKey,
+                    paginationActivityDirection,
+                );
+                setPortfolioAssetsActivity(activityData.activityItems);
+                setActivityNext(activityData.next); // Save the 'next' key for further requests
+                setActivityPrev(activityData.prev); // Save the 'prev' key for further requests
+                const checkNext = await fetchWalletActivity(walletAddress, activityData.next, 'next');
+                if (checkNext.activityItems.length === 0) {
+                    setLastActivityPage(true);
+                } else {
+                    setLastActivityPage(false);
+                }
+            } catch (error) {
+                console.error('Error fetching activity data:', error);
+            } finally {
+                setIsLoadingActivity(false);
+            }
+        };
 
-            setPaginationKey(data.prev);
-            setDirection('prev');
-            setCurrentPage((prev) => prev - 1);
+        if (walletConnected) {
+            fetchActivity();
         }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [walletAddress, walletConnected, paginationActivityKey, operationFinished]);
+
+    const handleNextPage = () => {
+        setCurrentPage((prev) => prev + 1);
+        handleActivityPagination('next');
+    };
+
+    const handlePrevPage = () => {
+        setCurrentPage((prev) => prev - 1);
+        handleActivityPagination('prev');
     };
 
     const tableHeader = (
@@ -145,11 +105,11 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
                 </TableHead>
             </Table>
             <Box sx={{ display: 'flex', alignItems: 'center', mr: '2vw' }}>
-                <PrevPageButton onClick={handlePrevPage} disabled={!data?.prev || isFetching || currentPage === 1}>
-                    {'Prev'}
+                <PrevPageButton onClick={handlePrevPage} disabled={currentPage === 1}>
+                    Prev
                 </PrevPageButton>
-                <NextPageButton onClick={handleNextPage} disabled={!data?.next || isFetching || isNextPageEmpty}>
-                    {'Next'}
+                <NextPageButton onClick={handleNextPage} disabled={lastActivityPage}>
+                    Next
                 </NextPageButton>
             </Box>
         </Box>
@@ -165,9 +125,9 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
                 </p>
             ) : (
                 <List dense sx={{ width: '100%', overflowX: 'hidden' }}>
-                    {isLoading &&
+                    {isLoadingActivity &&
                         [...Array(5)].map((_, index) => <Skeleton key={index} width={'100%'} height={'12vh'} />)}
-                    {data?.activityItems.map((token) => (
+                    {portfolioAssetsActivity?.map((token) => (
                         <TokenRowActivity
                             token={token}
                             key={token.ticker}
@@ -178,7 +138,7 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
                     ))}
                 </List>
             )}
-            {data?.activityItems.length === 0 && walletConnected && !isFetching && (
+            {portfolioAssetsActivity?.length === 0 && walletConnected && (
                 <p style={{ textAlign: 'center', fontSize: '0.8rem' }}>
                     <b>End of list</b>
                 </p>
