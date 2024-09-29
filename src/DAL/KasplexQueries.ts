@@ -30,7 +30,7 @@ export const useFetchPortfolioActivity = (
             return fetchWalletActivity(walletAddress, paginationKey, direction);
         },
         enabled: walletConnected && !!walletAddress, // Only run if wallet is connected
-        staleTime: 25000, // Cache the data for 25 seconds
+        staleTime: 0, // Cache the data for 25 seconds
         retry: 2, // Retry twice on failure
         refetchOnWindowFocus: false, // Disable refetching on window focus
     });

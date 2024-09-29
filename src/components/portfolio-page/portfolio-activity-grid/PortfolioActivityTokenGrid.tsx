@@ -9,6 +9,7 @@ import { PrevPageButton, NextPageButton } from '../../krc-20-page/grid-title-sor
 import { fetchWalletActivity } from '../../../DAL/Krc20DAL';
 import { useFetchPortfolioActivity } from '../../../DAL/KasplexQueries';
 import { set } from 'lodash';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface PortfolioActivityTokenGridProps {
     kasPrice: number;
@@ -75,9 +76,8 @@ enum GridHeaders {
 
 const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) => {
     const { kasPrice, walletConnected, walletBalance, walletAddress, operationFinished } = props;
-    // const [currentPage, setCurrentPage] = useState<number>(1);
+    const [currentPage, setCurrentPage] = useState<number>(1);
     const [isNextPageEmpty, setIsNextPageEmpty] = useState<boolean>(false); // Tracks if the next page is empty
-    const [isPrevPageEmpty, setIsPrevPageEmpty] = useState<boolean>(false); // Tracks if the next page is empty
 
     const [paginationKey, setPaginationKey] = useState<string | null>(null);
     const [direction, setDirection] = useState<'next' | 'prev' | null>(null);
@@ -87,10 +87,15 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
         direction,
         walletConnected,
     );
+    const queryClient = useQueryClient();
 
     const handleNextPage = async () => {
         if (data?.next) {
             // Pre-check the next page to see if it has data
+            queryClient.invalidateQueries({
+                queryKey: ['walletActivity', walletAddress], // Ensure you are passing the queryKey inside an object
+            });
+
             const nextPageResult = await fetchWalletActivity(walletAddress, data.next, 'next');
 
             // If the next page has no data, prevent the user from navigating further
@@ -101,26 +106,21 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
                 setPaginationKey(data.next);
                 setDirection('next');
                 setIsNextPageEmpty(false); // Reset if data is present
-                setIsPrevPageEmpty(false); // Reset if data is present
+                setCurrentPage((prev) => prev + 1);
             }
         }
     };
 
     // Custom function to fetch the previous page and check if it has data
     const handlePrevPage = async () => {
-        if (data?.prev) {
-            // Pre-check the previous page to see if it has data (optional, as we assume 'prev' has data)
-            const prevPageResult = await fetchWalletActivity(walletAddress, data.prev, 'prev');
+        if (data?.prev && currentPage > 1) {
+            queryClient.invalidateQueries({
+                queryKey: ['walletActivity', walletAddress], // Ensure you are passing the queryKey inside an object
+            });
 
-            if (prevPageResult.activityItems.length === 0) {
-                setIsPrevPageEmpty(true); // Safeguard, should not happen
-            } else {
-                // Update pagination key and direction
-                setPaginationKey(data.prev);
-                setDirection('prev');
-                setIsPrevPageEmpty(false);
-                setIsNextPageEmpty(false);
-            }
+            setPaginationKey(data.prev);
+            setDirection('prev');
+            setCurrentPage((prev) => prev - 1);
         }
     };
 
@@ -145,7 +145,7 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
                 </TableHead>
             </Table>
             <Box sx={{ display: 'flex', alignItems: 'center', mr: '2vw' }}>
-                <PrevPageButton onClick={handlePrevPage} disabled={!data?.prev || isFetching || isPrevPageEmpty}>
+                <PrevPageButton onClick={handlePrevPage} disabled={!data?.prev || isFetching || currentPage === 1}>
                     {'Prev'}
                 </PrevPageButton>
                 <NextPageButton onClick={handleNextPage} disabled={!data?.next || isFetching || isNextPageEmpty}>
