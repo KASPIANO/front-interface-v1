@@ -3,10 +3,9 @@ import { PortfolioLayout } from './PortfolioPageLayout';
 import UserProfile from '../../components/portfolio-page/user-profile/UserProfile';
 import PortfolioPanel from '../../components/portfolio-page/portfolio-tab-panel/PortfolioPanel';
 import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
-import { Order, TokenRowActivityItem, TokenRowPortfolioItem } from '../../types/Types';
-import { fetchWalletActivity, fetchWalletKRC20TokensBalance } from '../../DAL/Krc20DAL';
+import { TokenRowPortfolioItem } from '../../types/Types';
+import { fetchWalletKRC20TokensBalance } from '../../DAL/Krc20DAL';
 import { fetchTokenPortfolio } from '../../DAL/BackendDAL';
-import { getUSerListings } from '../../DAL/BackendP2PDAL';
 
 interface PortfolioPageProps {
     walletAddress: string | null;
@@ -46,25 +45,18 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
     const { walletAddress, backgroundBlur, walletConnected, walletBalance } = props;
     const [kasPrice, setkasPrice] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [isLoadingActivity, setIsLoadingActivity] = useState<boolean>(false);
     const [portfolioAssetTickers, setPortfolioAssetTickers] = useState<string[]>([]);
-    const [portfolioAssetsActivity, setPortfolioAssetsActivity] = useState<TokenRowActivityItem[]>([]);
     const [portfolioTokenInfo, setPortfolioTokenInfo] = useState<TokenRowPortfolioItem[]>([]);
-    const [paginationActivityKey, setPaginationActivityKey] = useState<string | null>(null);
-    const [paginationActivityDirection, setPaginationActivityDirection] = useState<'next' | 'prev' | null>(null);
-    const [activityNext, setActivityNext] = useState<string | null>(null);
-    const [activityPrev, setActivityPrev] = useState<string | null>(null);
+
     const [paginationPortfolioKey, setPaginationPortfolioKey] = useState<string | null>(null);
     const [paginationPortfolioDirection, setPaginationPortfolioDirection] = useState<'next' | 'prev' | null>(null);
     const [portfolioNext, setPortfolioNext] = useState<string | null>(null);
     const [portfolioPrev, setPortfolioPrev] = useState<string | null>(null);
-    const [lastActivityPage, setLastActivityPage] = useState<boolean>(false);
     const [lastPortfolioPage, setLastPortfolioPage] = useState<boolean>(false);
     const [operationFinished, setOperationFinished] = useState<boolean>(false);
     const [portfolioValueKAS, setPortfolioValueKAS] = useState<number>(0);
     const [currentWallet, setCurrentWallet] = useState<string>('');
     const [isUserConnected, setIsUserConnected] = useState<boolean>(false);
-    const [listings, setListings] = useState<Order[]>([]);
 
     useEffect(() => {
         // Update currentWallet when walletAddress changes
@@ -142,52 +134,6 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [walletConnected, operationFinished, paginationPortfolioKey, currentWallet]);
 
-    useEffect(() => {
-        const fetchActivity = async () => {
-            setIsLoadingActivity(true);
-            try {
-                const activityData = await fetchWalletActivity(
-                    currentWallet,
-                    paginationActivityKey,
-                    paginationActivityDirection,
-                );
-                setPortfolioAssetsActivity(activityData.activityItems);
-                setActivityNext(activityData.next); // Save the 'next' key for further requests
-                setActivityPrev(activityData.prev); // Save the 'prev' key for further requests
-                const checkNext = await fetchWalletActivity(currentWallet, activityData.next, 'next');
-                if (checkNext.activityItems.length === 0) {
-                    setLastActivityPage(true);
-                } else {
-                    setLastActivityPage(false);
-                }
-            } catch (error) {
-                console.error('Error fetching activity data:', error);
-            } finally {
-                setIsLoadingActivity(false);
-            }
-        };
-
-        if (isUserConnected) {
-            fetchActivity();
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentWallet, walletConnected, paginationActivityKey, operationFinished]);
-
-    useEffect(() => {
-        if (walletAddress || currentWallet) {
-            getUSerListings(currentWallet).then((data) => {
-                setListings(data);
-            });
-        }
-    }, [walletAddress, currentWallet]);
-
-    const handleActivityPagination = (direction: 'next' | 'prev') => {
-        setPortfolioAssetsActivity([]);
-        setPaginationActivityDirection(direction);
-        setPaginationActivityKey(direction === 'next' ? activityNext : activityPrev);
-    };
-
     const handlePortfolioPagination = (direction: 'next' | 'prev') => {
         setPortfolioTokenInfo([]);
         setPaginationPortfolioDirection(direction);
@@ -210,20 +156,17 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
                 setWalletAddress={setCurrentWallet}
             />
             <PortfolioPanel
-                listings={listings}
+                operationFinished={operationFinished}
                 handleChange={handleChange}
-                handleActivityPagination={handleActivityPagination}
                 handlePortfolioPagination={handlePortfolioPagination}
                 lastPortfolioPage={lastPortfolioPage}
-                lastActivityPage={lastActivityPage}
                 walletBalance={walletBalance}
                 isLoading={isLoading}
-                isLoadingActivity={isLoadingActivity}
                 kasPrice={kasPrice}
                 walletConnected={isUserConnected}
                 tokenList={portfolioTokenInfo}
-                tokensActivityList={portfolioAssetsActivity}
                 tickers={portfolioAssetTickers}
+                walletAddress={currentWallet}
             />
         </PortfolioLayout>
     );

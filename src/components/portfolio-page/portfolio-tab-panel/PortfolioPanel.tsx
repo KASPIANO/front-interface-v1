@@ -2,27 +2,23 @@ import { FC, useState } from 'react';
 import { Tabs } from '@mui/material';
 import TabContext from '@mui/lab/TabContext';
 import { TabPanelContainer, TabPanelStyled, TabStyled } from './PortfolioPanel.s';
-// import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import PortfolioTokenGrid from '../portfolio-token-grid/PortfolioTokenGrid';
-import { Order, TokenRowActivityItem, TokenRowPortfolioItem } from '../../../types/Types';
+import { TokenRowPortfolioItem } from '../../../types/Types';
 import PortfolioActivityTokenGrid from '../portfolio-activity-grid/PortfolioActivityTokenGrid';
-import UserOrdersGrid from '../user-orders/UserOrders';
+import PortfolioOrdersGrid from '../user-orders/PortfolioOrdersGrid';
 
 interface PortfolioPanelProps {
     kasPrice: number;
     walletConnected: boolean;
+    walletAddress: string | null;
     tokenList: TokenRowPortfolioItem[];
     isLoading: boolean;
     walletBalance: number;
-    tokensActivityList: TokenRowActivityItem[];
     tickers: string[];
-    isLoadingActivity: boolean;
-    handleActivityPagination: (direction: 'next' | 'prev') => void;
-    lastActivityPage: boolean;
     handleChange: () => void;
     lastPortfolioPage: boolean;
     handlePortfolioPagination: (direction: 'next' | 'prev') => void;
-    listings: Order[];
+    operationFinished: boolean;
 }
 
 const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
@@ -33,14 +29,11 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
         isLoading,
         walletBalance,
         tickers,
-        tokensActivityList,
-        isLoadingActivity,
-        handleActivityPagination,
-        lastActivityPage,
         handleChange,
         lastPortfolioPage,
         handlePortfolioPagination,
-        listings,
+        walletAddress,
+        operationFinished,
     } = props;
     const [value, setValue] = useState('1');
     // const [paidUser] = useState(false);
@@ -65,19 +58,13 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                 >
                     <TabStyled label="Overview" value="1" />
                     <TabStyled label="Activity" value="2" />
-                    <TabStyled label="Listings" iconPosition="end" value="3" />
-                    {/* <TabStyled
-                        label="Wallet Tracking"
-                        icon={!paidUser && <LockRoundedIcon sx={{ marginBottom: '3px' }} />}
-                        iconPosition="end"
-                        value="4"
-                    /> */}
+                    <TabStyled label="Listings" value="3" />
+                    <TabStyled label="Order HIstory" value="4" />
                 </Tabs>
                 <TabPanelStyled value="1">
                     <PortfolioTokenGrid
                         handleChange={handleChange}
                         walletBalance={walletBalance}
-                        isLoading={isLoading}
                         tokensList={tokenList}
                         kasPrice={kasPrice}
                         walletConnected={walletConnected}
@@ -87,25 +74,22 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                 </TabPanelStyled>
                 <TabPanelStyled value="2">
                     <PortfolioActivityTokenGrid
-                        lastActivityPage={lastActivityPage}
-                        handleActivityPagination={handleActivityPagination}
-                        isLoading={isLoadingActivity}
+                        operationFinished={operationFinished}
                         tickers={tickers}
-                        tokensActivityList={tokensActivityList}
                         walletBalance={walletBalance}
                         kasPrice={kasPrice}
                         walletConnected={walletConnected}
+                        walletAddress={walletAddress}
                     />
                 </TabPanelStyled>
                 <TabPanelStyled value="3">
-                    <UserOrdersGrid
+                    <PortfolioOrdersGrid
                         kasPrice={kasPrice}
                         walletConnected={walletConnected}
-                        isLoading={isLoading}
-                        orders={listings}
+                        walletAddress={walletAddress}
                     />
                 </TabPanelStyled>
-                <TabPanelStyled value="4">Wallet Tracking </TabPanelStyled>
+                <TabPanelStyled value="4">Orders History</TabPanelStyled>
             </TabContext>
         </TabPanelContainer>
     );
