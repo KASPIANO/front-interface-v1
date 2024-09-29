@@ -109,3 +109,18 @@ export const getTxnInfo = async (txnId: string, maxRetries = 3): Promise<any> =>
         }
     }
 };
+
+export const getWalletLastTransactions = async (
+    walletAddress: string = null,
+    limit = 10,
+    offset = 0,
+): Promise<any> => {
+    const response = await kasInfoService.get<any>(
+        `addresses/${walletAddress}/full-transactions?limit=${limit}&offset=${offset}&resolve_previous_outpoints=no`,
+        {
+            timeout: 2 * 60 * 1000,
+        },
+    );
+
+    return response.data;
+};

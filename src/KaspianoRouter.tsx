@@ -11,6 +11,7 @@ import PortfolioPage from './pages/portfolio-page/PortfolioPage';
 import TokenPage from './pages/token-page/TokenPage';
 import { requestAccounts } from './utils/KaswareUtils';
 import TermsOfTrade from './pages/compliance/TermsOfTrade';
+import OrdersManagement from './pages/orders-management/OrdersManagement';
 
 interface KaspianoRouterProps {
     backgroundBlur: boolean;
@@ -104,6 +105,7 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
                 />
             }
         />
+        <Route path="/orders-management/:id" element={<OrdersManagement />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-service" element={<TermsOfService />} />
         <Route path="/trust-safety" element={<TrustSafety />} />
