@@ -239,7 +239,7 @@ export function mapSellOrderStatusToDisplayText(status: SellOrderStatus): string
         [SellOrderStatus.CANCELED]: 'Canceled',
         [SellOrderStatus.SWAP_ERROR]: 'Swap Error',
         [SellOrderStatus.CHECKING_EXPIRED]: 'Checking Expiration',
-        [SellOrderStatus.EXPIRED_UNKNOWN_MONEY_ERROR]: 'Expired: Unknown Money Error',
+        [SellOrderStatus.UNKNOWN_MONEY_ERROR]: 'Unknown Money Error',
         [SellOrderStatus.OFF_MARKETPLACE]: 'Off Marketplace',
         [SellOrderStatus.DELISTING]: 'Delisting in Progress',
         [SellOrderStatus.DELIST_ERROR]: 'Delisting Error',
