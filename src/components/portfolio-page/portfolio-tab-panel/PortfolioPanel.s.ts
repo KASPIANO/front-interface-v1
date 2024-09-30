@@ -7,8 +7,8 @@ export const TabPanelContainer = styled(Box)({
 });
 
 export const TabPanelStyled = styled(TabPanel)({
-    '& .MuiTabPanel-root': {
-        padding: 0,
+    '&.MuiTabPanel-root': {
+        paddingTop: '12px',
     },
 });
 

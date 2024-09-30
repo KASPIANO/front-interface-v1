@@ -2,8 +2,21 @@
 import { useQuery } from '@tanstack/react-query';
 import { countTokens, fetchAllTokens } from './BackendDAL';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { getOrders } from './BackendP2PDAL'; // Adjust the
+import { getOrders, getOrdersHistory } from './BackendP2PDAL'; // Adjust the
 
+export interface UseOrdersHistoryProps {
+    walletAddress: string;
+    currentPage: number;
+    selectedTickers: string[]; // Multi-select filter for tickers
+    sort: { field: string; direction: 'asc' | 'desc' };
+    filters: {
+        startDateTimestamp?: number;
+        endDateTimestamp?: number;
+        minPrice?: number;
+        maxPrice?: number;
+        statuses?: string[];
+    };
+}
 export const useFetchTokens = (
     limit = 50,
     order: string | null = null,
@@ -52,3 +65,43 @@ export const useFetchOrders = (tokenInfo, sortBy, sortOrder) =>
         retry: 2,
         refetchOnWindowFocus: false,
     });
+
+export const useOrdersHistory = ({
+    walletAddress,
+    currentPage,
+    selectedTickers,
+    sort,
+    filters,
+}: UseOrdersHistoryProps) => {
+    const limit = 30; // Limit per page
+
+    return useQuery({
+        queryKey: ['ordersHistory', walletAddress, currentPage, selectedTickers, sort, filters],
+        queryFn: () =>
+            getOrdersHistory(
+                sort,
+                {
+                    limit,
+                    offset: (currentPage - 1) * limit,
+                },
+                {
+                    tickers: selectedTickers.length > 0 ? selectedTickers : undefined, // Filter by selected tickers
+                    totalPrice:
+                        filters.minPrice || filters.maxPrice
+                            ? { min: filters.minPrice, max: filters.maxPrice }
+                            : undefined,
+                    statuses: filters.statuses || undefined,
+                    startDateTimestamp: filters.startDateTimestamp,
+                    endDateTimestamp: filters.endDateTimestamp,
+                    sellerWalletAddresses: [walletAddress],
+                    buyerWalletAddresses: [walletAddress],
+                },
+            ),
+        enabled: !!walletAddress, // Only fetch if wallet address exists
+        select: (data) => ({
+            orders: data.orders,
+            totalCount: data.totalCount,
+            allTickers: data.allTickers, // Add the list of all tickers from the response
+        }),
+    });
+};

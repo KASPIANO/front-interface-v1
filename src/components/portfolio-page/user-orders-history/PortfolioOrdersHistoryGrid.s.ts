@@ -2,7 +2,7 @@ import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 export const StyledPortfolioGridContainer = styled(Box)({
-    height: '63vh',
+    height: '64vh',
     width: '83vw',
     display: 'flex',
     borderRadius: '8px',

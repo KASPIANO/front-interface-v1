@@ -1,4 +1,5 @@
 import { Order } from '../types/Types';
+import { cleanFilters } from '../utils/Utils';
 import { backendService } from './AxiosInstaces';
 
 const P2PCONTROLLER = 'p2p';
@@ -201,9 +202,7 @@ export const confirmDelistOrder = async (
 };
 
 export const getOrdersHistory = async (
-    walletAddress: string,
-    transactionId?: string,
-    sort?: { field?: string; direction?: 'ASC' | 'DESC' }, // Sort object
+    sort?: { field?: string; direction?: 'asc' | 'desc' }, // Sort object
     pagination?: { limit?: number; offset?: number }, // Pagination object
     filters?: {
         // Filters object
@@ -212,16 +211,15 @@ export const getOrdersHistory = async (
         sellerWalletAddresses?: string[];
         buyerWalletAddresses?: string[];
         totalPrice?: { min?: number; max?: number };
-        startDateTimestamp?: string;
-        endDateTimestamp?: string;
+        startDateTimestamp?: number;
+        endDateTimestamp?: number;
     },
 ): Promise<any> => {
+    const cleanedFilters = cleanFilters(filters);
     const response = await backendService.post<any>(`/${P2PCONTROLLER}/getOrdersHistory`, {
-        transactionId,
-        walletAddress,
-        sort: sort || { direction: 'DESC' }, // Default sorting direction (DESC)
-        pagination: pagination || { limit: 10, offset: 0 }, // Default pagination (limit of 10)
-        filters: filters || {}, // Optional filters
+        sort: sort || { direction: 'desc' }, // Default sorting direction (DESC)
+        pagination: pagination || { limit: 20, offset: 0 }, // Default pagination (limit of 10)
+        filters: cleanedFilters || {}, // Optional filters
     });
     return response.data;
 };
