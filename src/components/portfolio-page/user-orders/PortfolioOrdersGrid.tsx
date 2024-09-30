@@ -14,6 +14,7 @@ import {
     updateSellOrder,
 } from '../../../DAL/BackendP2PDAL';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
+import { sendKaspa } from '../../../utils/KaswareUtils';
 
 interface PortfolioOrdersGridProps {
     kasPrice: number;
@@ -29,7 +30,7 @@ enum GridHeaders {
     TOTAL_PRICE = 'TOTAL PRICE',
     ACTION = 'ACTION',
 }
-
+const KASPA_TO_SOMPI = 100000000;
 const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
     const { kasPrice, walletConnected, walletAddress } = props;
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -87,15 +88,45 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
     };
 
     const handleCancelOrder = async (orderId: string) => {
-        const response = await confirmDelistOrder(orderId, walletAddress);
-        if (response.success === false) {
+        const { needMoney, temporaryWalletAddress, confirm } = await confirmDelistOrder(orderId, walletAddress);
+        if (needMoney === true) {
+            try {
+                const txData = await sendKaspa(temporaryWalletAddress, 5 * KASPA_TO_SOMPI);
+                if (txData) {
+                    const parsedTxData = JSON.parse(txData);
+                    const txId = parsedTxData.id;
+                    const { confirm } = await confirmDelistOrder(orderId, walletAddress, txId);
+                    if (confirm) {
+                        showGlobalSnackbar({
+                            message: 'Order removed from marketplace, tokens returned to your wallet',
+                            severity: 'success',
+                        });
+                        setOperationFinished((prev) => !prev);
+                    }
+                } else {
+                    showGlobalSnackbar({
+                        message: 'Error sending Kas for Fees to remove tokens, please try again',
+                        severity: 'success',
+                    });
+                }
+            } catch (error) {
+                showGlobalSnackbar({
+                    message: 'Error removing order from marketplace, please try again',
+                    severity: 'success',
+                });
+            }
         }
-        if (response === '') {
+        if (confirm === true) {
             showGlobalSnackbar({
-                message: 'Order relisted',
+                message: 'Order removed from marketplace, tokens returned to your wallet',
                 severity: 'success',
             });
             setOperationFinished((prev) => !prev);
+        } else {
+            showGlobalSnackbar({
+                message: 'Error removing order from marketplace, please try again',
+                severity: 'success',
+            });
         }
     };
 
