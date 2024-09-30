@@ -44,6 +44,25 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         sortOrder,
     );
 
+    useEffect(() => {
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            if (selectedOrder) {
+                releaseBuyLock(selectedOrder.orderId);
+                setIsPanelOpen(false);
+                setSelectedOrder(null);
+                event.preventDefault();
+            }
+        };
+
+        // Add event listener when component mounts
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        // Cleanup event listener when component unmounts
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [selectedOrder]);
+
     const orders = data?.pages.flatMap((page) => page.orders) || [];
 
     const handleSortChange = useCallback((newSortBy: string) => {

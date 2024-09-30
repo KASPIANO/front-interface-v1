@@ -7,6 +7,7 @@ import { PrevPageButton, NextPageButton } from '../../krc-20-page/grid-title-sor
 import { StyledPortfolioGridContainer } from './PortfolioOrdersGrid.s';
 import UserOrdersRow from './user-orders-row/UserOrdersRow';
 import {
+    confirmDelistOrder,
     getUSerListings,
     relistSellOrder,
     removeFromMarketplace,
@@ -84,18 +85,19 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
             setOperationFinished((prev) => !prev);
         }
     };
-    // const handleCancelOrder = async (orderId: string) => {
-    //     // const response = await confirmDelistOrder(orderId, walletAddress);
-    //     // if (response.success === false) {
-    //     // }
-    //     // if (response === '') {
-    //     //     showGlobalSnackbar({
-    //     //         message: 'Order relisted',
-    //     //         severity: 'success',
-    //     //     });
-    //     //     setOperationFinished((prev) => !prev);
-    //     // }
-    // };
+
+    const handleCancelOrder = async (orderId: string) => {
+        const response = await confirmDelistOrder(orderId, walletAddress);
+        if (response.success === false) {
+        }
+        if (response === '') {
+            showGlobalSnackbar({
+                message: 'Order relisted',
+                severity: 'success',
+            });
+            setOperationFinished((prev) => !prev);
+        }
+    };
 
     const handleEditOrder = async (orderId: string, pricePerToken: number, totalPrice: number) => {
         const response = await updateSellOrder(orderId, walletAddress, pricePerToken, totalPrice);
@@ -174,7 +176,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                     {orders.length > 0 && !loading
                         ? orders.map((order) => (
                               <UserOrdersRow
-                                  //   handleCancelOrder={handleCancelOrder}
+                                  handleCancelOrder={handleCancelOrder}
                                   handleEditOrder={handleEditOrder}
                                   handleRelist={handleRelist}
                                   handleDelist={handleDelist}

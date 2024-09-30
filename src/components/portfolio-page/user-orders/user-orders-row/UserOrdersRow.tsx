@@ -214,7 +214,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                                     variant="contained"
                                     color="primary"
                                     sx={{
-                                        minWidth: '2vw',
+                                        minWidth: '3.5vw',
                                         width: '3vw',
                                         fontSize: '0.6rem',
                                     }}
@@ -229,7 +229,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                                     variant="contained"
                                     color="primary"
                                     sx={{
-                                        minWidth: '2vw',
+                                        minWidth: '3.5vw',
                                         width: '3vw',
                                         fontSize: '0.6rem',
                                     }}
@@ -244,7 +244,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                                     variant="contained"
                                     color="primary"
                                     sx={{
-                                        minWidth: '2vw',
+                                        minWidth: '3.5vw',
                                         width: '3vw',
                                         fontSize: '0.6rem',
                                     }}
@@ -261,7 +261,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                             variant="contained"
                             color="primary"
                             sx={{
-                                minWidth: '2vw',
+                                minWidth: '3.5vw',
                                 width: '3vw',
                                 fontSize: '0.7rem',
                             }}
@@ -314,7 +314,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseEditDialog}>Cancel</Button>
-                    <Button onClick={editOrderHandler}>Edit</Button>
+                    <Button onClick={editOrderHandler}>Save</Button>
                 </DialogActions>
             </Dialog>
         </div>
