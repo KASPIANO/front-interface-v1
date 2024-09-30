@@ -157,7 +157,7 @@ const App = () => {
         if (walletAddress) {
             fetchWalletBalance(walletAddress).then((balance) => setWalletBalance(setWalletBalanceUtil(balance)));
         }
-    }, [walletAddress, walletBalance, network]);
+    }, [walletAddress, walletBalance, network, handleAccountsChanged]);
 
     useEffect(() => {
         const checkExistingConnection = async () => {
