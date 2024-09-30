@@ -117,6 +117,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     message: 'Order already taken. Please select another order.',
                     severity: 'error',
                 });
+                handleTakenOrder();
                 return;
             }
             setTempWalletAddress(temporaryWalletAddress);
@@ -234,6 +235,11 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     // Handler to close the drawer
     const handleDrawerClose = async (orderId: string) => {
         releaseBuyLock(orderId);
+        setIsPanelOpen(false);
+        setSelectedOrder(null);
+    };
+
+    const handleTakenOrder = async () => {
         setIsPanelOpen(false);
         setSelectedOrder(null);
     };
