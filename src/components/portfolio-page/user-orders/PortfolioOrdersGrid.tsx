@@ -7,12 +7,14 @@ import { PrevPageButton, NextPageButton } from '../../krc-20-page/grid-title-sor
 import { StyledPortfolioGridContainer } from './PortfolioOrdersGrid.s';
 import UserOrdersRow from './user-orders-row/UserOrdersRow';
 import {
+    confirmDelistOrder,
     getUSerListings,
     relistSellOrder,
     removeFromMarketplace,
     updateSellOrder,
 } from '../../../DAL/BackendP2PDAL';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
+import { sendKaspa } from '../../../utils/KaswareUtils';
 
 interface PortfolioOrdersGridProps {
     kasPrice: number;
@@ -28,7 +30,7 @@ enum GridHeaders {
     TOTAL_PRICE = 'TOTAL PRICE',
     ACTION = 'ACTION',
 }
-
+const KASPA_TO_SOMPI = 100000000;
 const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
     const { kasPrice, walletConnected, walletAddress } = props;
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -84,18 +86,49 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
             setOperationFinished((prev) => !prev);
         }
     };
-    // const handleCancelOrder = async (orderId: string) => {
-    //     // const response = await confirmDelistOrder(orderId, walletAddress);
-    //     // if (response.success === false) {
-    //     // }
-    //     // if (response === '') {
-    //     //     showGlobalSnackbar({
-    //     //         message: 'Order relisted',
-    //     //         severity: 'success',
-    //     //     });
-    //     //     setOperationFinished((prev) => !prev);
-    //     // }
-    // };
+
+    const handleCancelOrder = async (orderId: string) => {
+        const { needMoney, temporaryWalletAddress, confirm } = await confirmDelistOrder(orderId, walletAddress);
+        if (needMoney === true) {
+            try {
+                const txData = await sendKaspa(temporaryWalletAddress, 5 * KASPA_TO_SOMPI);
+                if (txData) {
+                    const parsedTxData = JSON.parse(txData);
+                    const txId = parsedTxData.id;
+                    const { confirm } = await confirmDelistOrder(orderId, walletAddress, txId);
+                    if (confirm) {
+                        showGlobalSnackbar({
+                            message: 'Order removed from marketplace, tokens returned to your wallet',
+                            severity: 'success',
+                        });
+                        setOperationFinished((prev) => !prev);
+                    }
+                } else {
+                    showGlobalSnackbar({
+                        message: 'Error sending Kas for Fees to remove tokens, please try again',
+                        severity: 'success',
+                    });
+                }
+            } catch (error) {
+                showGlobalSnackbar({
+                    message: 'Error removing order from marketplace, please try again',
+                    severity: 'success',
+                });
+            }
+        }
+        if (confirm === true) {
+            showGlobalSnackbar({
+                message: 'Order removed from marketplace, tokens returned to your wallet',
+                severity: 'success',
+            });
+            setOperationFinished((prev) => !prev);
+        } else {
+            showGlobalSnackbar({
+                message: 'Error removing order from marketplace, please try again',
+                severity: 'success',
+            });
+        }
+    };
 
     const handleEditOrder = async (orderId: string, pricePerToken: number, totalPrice: number) => {
         const response = await updateSellOrder(orderId, walletAddress, pricePerToken, totalPrice);
@@ -174,7 +207,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                     {orders.length > 0 && !loading
                         ? orders.map((order) => (
                               <UserOrdersRow
-                                  //   handleCancelOrder={handleCancelOrder}
+                                  handleCancelOrder={handleCancelOrder}
                                   handleEditOrder={handleEditOrder}
                                   handleRelist={handleRelist}
                                   handleDelist={handleDelist}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button, IconButton, Tooltip, FormControlLabel, Checkbox } from '@mui/material';
+import { Box, Typography, Button, IconButton, Tooltip, FormControlLabel, Checkbox, Link } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Order } from '../../../../../../types/Types';
 import { OrderDetailsItem, OrderItemPrimary } from './OrderDetails.s';
@@ -45,6 +45,23 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
 
     const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setAgreedToTerms(event.target.checked);
+    };
+
+    const navigateToTradeTerms = () => {
+        window.open('/trade-terms', '_blank'); // Opens the "trade-terms" route in a new window
+    };
+
+    const getTooltipMessage = () => {
+        if (!walletConnected) {
+            return 'Please connect your wallet';
+        }
+        if (walletBalance < finalTotal) {
+            return 'Not enough balance';
+        }
+        if (!agreedToTerms) {
+            return 'You must agree to the terms and conditions';
+        }
+        return 'Confirm Purchase'; // Default message when everything is valid
     };
 
     return (
@@ -152,7 +169,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                 }} // Scales down the checkbox
                             />
                         }
-                        label={'I agree with the terms and conditions of this trade'}
+                        label={
+                            <>
+                                {'I agree with the '}
+                                <Link onClick={navigateToTradeTerms} sx={{ cursor: 'pointer' }}>
+                                    terms and conditions
+                                </Link>
+                                {' of this trade'}
+                            </>
+                        }
                         sx={{
                             '& .MuiFormControlLabel-label': { fontSize: '0.7rem', fontWeight: '600' }, // Adjusts the label font size
                         }}
@@ -164,15 +189,19 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                     </Typography>
 
                     {/* Confirm Button */}
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => handlePurchase(order, finalTotal)}
-                        disabled={!walletConnected || walletBalance < finalTotal || !agreedToTerms}
-                        sx={{ width: '100%' }}
-                    >
-                        Confirm Purchase
-                    </Button>
+                    <Tooltip title={getTooltipMessage()}>
+                        <span>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => handlePurchase(order, finalTotal)}
+                                disabled={!walletConnected || walletBalance < finalTotal || !agreedToTerms}
+                                sx={{ width: '100%' }}
+                            >
+                                Confirm Purchase
+                            </Button>
+                        </span>
+                    </Tooltip>
                 </>
             )}
         </Box>

@@ -32,6 +32,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [orderId, setOrderId] = useState<string>('');
     const [tempWalletAddress, setTempWalletAddress] = useState<string>('');
     const [creatingSellOrder, setCreatingSellOrder] = useState<boolean>(false);
+    const [disableSellButton, setDisableSellButton] = useState<boolean>(false);
 
     useEffect(() => {
         fetchWalletKRC20Balance(walletAddress, tokenInfo.ticker).then((balance) => {
@@ -164,10 +165,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         setPricePerToken('');
     };
     const handleCreateSellOrder = async () => {
-        if (!walletConnected) {
-            showGlobalSnackbar({ message: 'Please connect your wallet.', severity: 'error' });
-            return;
-        }
+        setDisableSellButton(true);
         if (priceCurrency === 'USD') {
             setPriceCurrency('KAS');
             if (pricePerToken !== '') {
@@ -187,10 +185,12 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         const amount = parseInt(tokenAmount);
         if (isNaN(amount) || amount <= 0) {
             showGlobalSnackbar({ message: 'Please enter a valid token amount.', severity: 'error' });
+            setDisableSellButton(false);
             return;
         }
         if (amount > walletTickerBalance) {
             showGlobalSnackbar({ message: 'Insufficient Token balance.', severity: 'error' });
+            setDisableSellButton(false);
             return;
         }
         if (parseInt(totalPrice) < 25) {
@@ -198,6 +198,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 message: 'Please enter a valid total price has to be more than 25 KAS',
                 severity: 'error',
             });
+            setDisableSellButton(false);
             return;
         }
         try {
@@ -252,6 +253,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             );
 
             if (confirmation) {
+                setDisableSellButton(false);
                 showGlobalSnackbar({
                     message: 'Sell order confirmed successfully',
                     severity: 'success',
@@ -409,7 +411,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     variant="contained"
                     onClick={handleCreateSellOrder}
                     fullWidth
-                    disabled={!walletConnected || walletTickerBalance === 0}
+                    disabled={!walletConnected || walletTickerBalance === 0 || disableSellButton}
                 >
                     Create Sell Order
                 </StyledButton>
