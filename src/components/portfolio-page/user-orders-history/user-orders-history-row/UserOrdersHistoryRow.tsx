@@ -1,7 +1,9 @@
-import React from 'react';
-import { ListItem, Typography, ListItemText, Tooltip, Divider } from '@mui/material';
+import React, { useState } from 'react';
+import { ListItem, Typography, ListItemText, Tooltip, Divider, ListItemButton } from '@mui/material';
 import { Order } from '../../../../types/Types';
 import { mapSellOrderStatusToDisplayText } from '../../../../utils/Utils';
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
+import { showGlobalSnackbar } from '../../../alert-context/AlertContext';
 
 interface OrdersHIstoryRowProps {
     order: Order;
@@ -11,6 +13,23 @@ interface OrdersHIstoryRowProps {
 
 const OrdersHIstoryRow: React.FC<OrdersHIstoryRowProps> = (props) => {
     const { order, kasPrice } = props;
+    const [, setCopied] = useState(false);
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard
+            .writeText(text)
+            .then(() => {
+                setCopied(true);
+                showGlobalSnackbar({
+                    message: 'Copied to clipboard',
+                    severity: 'success',
+                });
+                setTimeout(() => setCopied(false), 2000);
+            })
+            .catch((err) => {
+                console.error('Failed to copy: ', err);
+            });
+    };
 
     const formatPrice = (price: number) => {
         if (price >= 1) return price.toFixed(2);
@@ -29,7 +48,7 @@ const OrdersHIstoryRow: React.FC<OrdersHIstoryRowProps> = (props) => {
             <ListItem disablePadding sx={{ height: '12vh' }}>
                 {/* Order Ticker */}
                 <ListItemText
-                    sx={{ width: '5vw', marginLeft: '1rem' }}
+                    sx={{ width: '5.5vw', marginLeft: '1rem' }}
                     primary={
                         <Typography variant="body1" sx={{ fontSize: '0.75rem', fontWeight: 'bold' }}>
                             {order.ticker}
@@ -39,7 +58,7 @@ const OrdersHIstoryRow: React.FC<OrdersHIstoryRowProps> = (props) => {
 
                 {/* Created At */}
                 <ListItemText
-                    sx={{ width: '12vw' }}
+                    sx={{ width: '10vw' }}
                     primary={
                         <Typography
                             variant="body1"
@@ -50,7 +69,7 @@ const OrdersHIstoryRow: React.FC<OrdersHIstoryRowProps> = (props) => {
                     }
                 />
                 <ListItemText
-                    sx={{ width: '10vw' }}
+                    sx={{ width: '8vw' }}
                     primary={
                         <Typography variant="body1" sx={{ fontSize: '0.75rem', fontWeight: 'bold' }}>
                             {mapSellOrderStatusToDisplayText(order.status)}
@@ -60,7 +79,7 @@ const OrdersHIstoryRow: React.FC<OrdersHIstoryRowProps> = (props) => {
 
                 {/* Quantity */}
                 <ListItemText
-                    sx={{ width: '6vw' }}
+                    sx={{ width: '7vw' }}
                     primary={
                         <Typography variant="body1" sx={{ fontSize: '0.75rem', fontWeight: 'bold' }}>
                             {order.quantity}
@@ -89,7 +108,7 @@ const OrdersHIstoryRow: React.FC<OrdersHIstoryRowProps> = (props) => {
 
                 {/* Total Price */}
                 <ListItemText
-                    sx={{ width: '15vw' }}
+                    sx={{ width: '6vw' }}
                     primary={
                         <Typography
                             variant="body1"
@@ -115,6 +134,11 @@ const OrdersHIstoryRow: React.FC<OrdersHIstoryRowProps> = (props) => {
                         </Typography>
                     }
                 />
+                <ListItemButton onClick={() => copyToClipboard(order.orderId)} sx={{ width: '2vw' }}>
+                    <Tooltip title="Copy Order ID">
+                        <ContentCopyRoundedIcon fontSize="small" />
+                    </Tooltip>
+                </ListItemButton>
             </ListItem>
             <Divider />
         </div>

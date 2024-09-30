@@ -4,6 +4,9 @@ import { delay } from '../utils/Utils';
 
 const KASPA_TRANSACTION_MASS = 3000;
 const KRC20_TRANSACTION_MASS = 3370;
+const TRADE_TRANSACTION_MASS = 11000;
+const CANCEL_LIMIT_KAS = 0.5;
+const WARNING_LIMIT_KAS = 0.2;
 export const fetchWalletBalance = async (address: string): Promise<number> => {
     try {
         let balanceInKaspa;
@@ -59,13 +62,15 @@ export const kaspaFeeEstimate = async (): Promise<number> => {
     }
 };
 
-export const gasEstimator = async (txType: 'KASPA' | 'TRANSFER'): Promise<number> => {
+export const gasEstimator = async (txType: 'KASPA' | 'TRANSFER' | 'TRADE'): Promise<number> => {
     try {
         const fee = await kaspaFeeEstimate();
         if (txType === 'KASPA') {
             return KASPA_TRANSACTION_MASS * fee;
-        } else {
+        } else if (txType === 'TRANSFER') {
             return KRC20_TRANSACTION_MASS * fee;
+        } else {
+            return TRADE_TRANSACTION_MASS * fee;
         }
     } catch (error) {
         console.error('Error estimating gas:', error);
@@ -73,7 +78,7 @@ export const gasEstimator = async (txType: 'KASPA' | 'TRANSFER'): Promise<number
     }
 };
 
-export const getPriorityFee = async (txType: 'KASPA' | 'TRANSFER'): Promise<number | undefined> => {
+export const getPriorityFee = async (txType: 'KASPA' | 'TRANSFER' | 'TRADE'): Promise<number | undefined> => {
     try {
         let priorityFee = await kaspaFeeEstimate();
 
@@ -123,4 +128,25 @@ export const getWalletLastTransactions = async (
     );
 
     return response.data;
+};
+
+export const highGasLimitExceeded = async () => {
+    const priorityFeeSompi = await getPriorityFee('TRADE');
+    if (!priorityFeeSompi) return false;
+    const kaspaPriorityFee = priorityFeeSompi / 1e8;
+    if (kaspaPriorityFee > CANCEL_LIMIT_KAS) {
+        return true;
+    } else {
+        return false;
+    }
+};
+export const highGasWarning = async () => {
+    const priorityFeeSompi = await getPriorityFee('TRADE');
+    if (!priorityFeeSompi) return false;
+    const kaspaPriorityFee = priorityFeeSompi / 1e8;
+    if (WARNING_LIMIT_KAS < kaspaPriorityFee && kaspaPriorityFee < CANCEL_LIMIT_KAS) {
+        return true;
+    } else {
+        return false;
+    }
 };

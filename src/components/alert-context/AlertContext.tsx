@@ -47,7 +47,7 @@ let showSnackbar: (options: AlertOptions) => void;
 // eslint-disable-next-line react-refresh/only-export-components
 const SnackbarComponent: React.FC = () => {
     const [alert, setAlert] = React.useState<(AlertOptions & { open: boolean }) | null>(null);
-    const [copied, setCopied] = React.useState(false);
+    const [, setCopied] = React.useState(false);
 
     const currentEnv = import.meta.env.VITE_ENV === 'prod' ? 'kaspa_mainnet' : 'kaspa_testnet_10';
     const txnLink =
@@ -64,6 +64,10 @@ const SnackbarComponent: React.FC = () => {
             .writeText(text)
             .then(() => {
                 setCopied(true);
+                showGlobalSnackbar({
+                    message: 'Copied to clipboard',
+                    severity: 'success',
+                });
                 setTimeout(() => setCopied(false), 2000);
             })
             .catch((err) => {
@@ -202,18 +206,6 @@ const SnackbarComponent: React.FC = () => {
                         )}
                     </Box>
                 </Snackbar>
-            )}
-            {copied && (
-                <Snackbar
-                    sx={{
-                        backgroundColor: '#EDF7ED',
-                    }}
-                    open={copied}
-                    autoHideDuration={2000}
-                    onClose={() => setCopied(false)}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                    message="Copied to clipboard!"
-                />
             )}
         </>
     );

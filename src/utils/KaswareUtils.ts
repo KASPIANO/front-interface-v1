@@ -184,8 +184,8 @@ export const deployKRC20Token = async (inscribeJsonString: string): Promise<stri
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
         const priorityFee = await getPriorityFee('TRANSFER');
-
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, priorityFee);
+        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, '', kasPriorityFee);
         return txid;
     } catch (error) {
         console.error('Failed to deploy KRC20 token:', error);
@@ -199,7 +199,8 @@ export const mintKRC20Token = async (inscribeJsonString: string): Promise<string
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
         const priorityFee = await getPriorityFee('TRANSFER');
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, priorityFee);
+        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, '', kasPriorityFee);
         return txid;
     } catch (error) {
         console.error('Failed to mint KRC20 token:', error);
@@ -213,7 +214,8 @@ export const transferKRC20Token = async (inscribeJsonString: string): Promise<st
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
         const priorityFee = await getPriorityFee('TRANSFER');
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4, priorityFee);
+        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4, '', kasPriorityFee);
         return txid;
     } catch (error) {
         console.error('Failed to transfer KRC20 token:', error);
