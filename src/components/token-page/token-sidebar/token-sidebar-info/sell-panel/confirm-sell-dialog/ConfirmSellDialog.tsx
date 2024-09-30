@@ -51,7 +51,7 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
         if (total * MARKETLACE_FEE_PERCENTAGE < MINIMUM_FEE_AMOUNT) {
             return total - MINIMUM_FEE_AMOUNT;
         } else {
-            return total - total * MARKETLACE_FEE_PERCENTAGE;
+            return (total - total * MARKETLACE_FEE_PERCENTAGE).toFixed(2);
         }
     };
     return (

@@ -2,6 +2,7 @@ import { jwtDecode } from 'jwt-decode';
 import moment from 'moment';
 import { getTxnInfo } from '../DAL/KaspaApiDal';
 import { fetchTokenInfo } from '../DAL/Krc20DAL';
+import { SellOrderStatus } from '../types/Types';
 
 export enum ThemeModes {
     DARK = 'dark',
@@ -206,3 +207,44 @@ export const doPolling = async <T>(
 
     return result;
 };
+
+export const cleanFilters = (filters: any) => {
+    if (!filters) return {}; // If filters is undefined, return an empty object
+
+    return Object.keys(filters).reduce(
+        (acc, key) => {
+            const value = filters[key];
+
+            // Skip undefined, null, or empty arrays
+            if (value === undefined || value === null || (Array.isArray(value) && value.length === 0)) {
+                return acc;
+            }
+
+            // Otherwise, include the filter in the new object
+            acc[key] = value;
+            return acc;
+        },
+        {} as Record<string, any>,
+    );
+};
+
+export function mapSellOrderStatusToDisplayText(status: SellOrderStatus): string {
+    const statusMap: Record<SellOrderStatus, string> = {
+        [SellOrderStatus.WAITING_FOR_TOKENS]: 'Waiting for Tokens',
+        [SellOrderStatus.LISTED_FOR_SALE]: 'Listed for Sale',
+        [SellOrderStatus.WAITING_FOR_KAS]: 'Waiting for KAS',
+        [SellOrderStatus.CHECKOUT]: 'Checkout in Progress',
+        [SellOrderStatus.WAITING_FOR_LOW_FEE]: 'Waiting for Low Fee',
+        [SellOrderStatus.COMPLETED]: 'Completed',
+        [SellOrderStatus.CANCELED]: 'Canceled',
+        [SellOrderStatus.SWAP_ERROR]: 'Swap Error',
+        [SellOrderStatus.CHECKING_EXPIRED]: 'Checking Expiration',
+        [SellOrderStatus.EXPIRED_UNKNOWN_MONEY_ERROR]: 'Expired: Unknown Money Error',
+        [SellOrderStatus.OFF_MARKETPLACE]: 'Off Marketplace',
+        [SellOrderStatus.DELISTING]: 'Delisting in Progress',
+        [SellOrderStatus.DELIST_ERROR]: 'Delisting Error',
+        [SellOrderStatus.COMPLETED_DELISTING]: 'Delisting Completed',
+    };
+
+    return statusMap[status] || 'Unknown Status';
+}

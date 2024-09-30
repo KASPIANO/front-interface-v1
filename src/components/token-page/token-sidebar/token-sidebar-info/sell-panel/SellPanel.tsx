@@ -370,14 +370,17 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                         endAdornment: currencyAdornment,
                     }}
                 />
-                {pricePerToken !== '' && tokenInfo.price && (
+                {pricePerToken !== '' && tokenInfo.price !== 0 && (
                     <Typography variant="body2" sx={{ ml: '0.15rem' }}>
                         {'Price per token is '}
                         <Typography
                             component="span"
-                            sx={{ fontWeight: 'bold', color: priceDifference > 0 ? '#4caf50' : '#f44336' }}
+                            sx={{
+                                fontWeight: 'bold',
+                                color: priceDifference > 0 ? '#4caf50' : '#f44336',
+                            }}
                         >
-                            {priceDifference > 0 ? '+' : ''}
+                            {priceDifference > 0 ? '+' : '-'}
                             {priceDifference.toFixed(2)}%
                         </Typography>
                         {' compared to the floor price.'}

@@ -1,21 +1,20 @@
 import { Box, List, Table, TableCell, TableHead, TableRow } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { TokenRowActivityItem } from '../../../types/Types';
 import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 import { StyledPortfolioGridContainer } from './PortfolioActivityTokenGrid.s';
 import TokenRowActivity from '../token-row-activity/TokenRowActivity';
 import { PrevPageButton, NextPageButton } from '../../krc-20-page/grid-title-sort/GridTitle.s';
+import { fetchWalletActivity } from '../../../DAL/Krc20DAL';
 
 interface PortfolioActivityTokenGridProps {
-    tokensActivityList: TokenRowActivityItem[];
     kasPrice: number;
     walletConnected: boolean;
-    isLoading: boolean;
     walletBalance: number;
     tickers: string[];
-    handleActivityPagination: (direction: 'next' | 'prev') => void;
-    lastActivityPage: boolean;
+    walletAddress: string | null;
+    operationFinished: boolean;
 }
 
 enum GridHeaders {
@@ -26,25 +25,65 @@ enum GridHeaders {
 }
 
 const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) => {
-    const {
-        kasPrice,
-        walletConnected,
-        walletBalance,
-        tokensActivityList,
-        handleActivityPagination,
-        lastActivityPage,
-    } = props;
+    const { kasPrice, walletConnected, walletBalance, walletAddress, operationFinished } = props;
     const [currentPage, setCurrentPage] = useState<number>(1);
+    const [paginationActivityKey, setPaginationActivityKey] = useState<string | null>(null);
+    const [paginationActivityDirection, setPaginationActivityDirection] = useState<'next' | 'prev' | null>(null);
+    const [activityNext, setActivityNext] = useState<string | null>(null);
+    const [activityPrev, setActivityPrev] = useState<string | null>(null);
+    const [portfolioAssetsActivity, setPortfolioAssetsActivity] = useState<TokenRowActivityItem[]>([]);
+    const [isLoadingActivity, setIsLoadingActivity] = useState<boolean>(false);
+    const [lastActivityPage, setLastActivityPage] = useState<boolean>(false);
+
+    const handleActivityPagination = (direction: 'next' | 'prev') => {
+        setPortfolioAssetsActivity([]);
+        setPaginationActivityDirection(direction);
+        setPaginationActivityKey(direction === 'next' ? activityNext : activityPrev);
+    };
+
+    useEffect(() => {
+        const fetchActivity = async () => {
+            setIsLoadingActivity(true);
+            setPortfolioAssetsActivity([]);
+            try {
+                const activityData = await fetchWalletActivity(
+                    walletAddress,
+                    paginationActivityKey,
+                    paginationActivityDirection,
+                );
+                setPortfolioAssetsActivity(activityData.activityItems);
+                setActivityNext(activityData.next); // Save the 'next' key for further requests
+                setActivityPrev(activityData.prev); // Save the 'prev' key for further requests
+                const checkNext = await fetchWalletActivity(walletAddress, activityData.next, 'next');
+                if (checkNext.activityItems.length === 0) {
+                    setLastActivityPage(true);
+                } else {
+                    setLastActivityPage(false);
+                }
+            } catch (error) {
+                console.error('Error fetching activity data:', error);
+            } finally {
+                setIsLoadingActivity(false);
+            }
+        };
+
+        if (walletConnected) {
+            fetchActivity();
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [walletAddress, walletConnected, paginationActivityKey, operationFinished]);
+
+    const handleNextPage = () => {
+        setCurrentPage((prev) => prev + 1);
+        handleActivityPagination('next');
+    };
 
     const handlePrevPage = () => {
-        setCurrentPage(currentPage - 1);
+        setCurrentPage((prev) => prev - 1);
         handleActivityPagination('prev');
     };
 
-    const handleNextPage = () => {
-        setCurrentPage(currentPage + 1);
-        handleActivityPagination('next');
-    };
     const tableHeader = (
         <Box
             sx={{
@@ -58,10 +97,18 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
             <Table style={{ width: '60%' }}>
                 <TableHead>
                     <TableRow>
-                        <TableCell sx={{ width: '33%', borderBottom: 0 }}>{GridHeaders.TICKER}</TableCell>
-                        <TableCell sx={{ width: '33%', borderBottom: 0 }}>{GridHeaders.AMOUNT}</TableCell>
-                        <TableCell sx={{ width: '33%', borderBottom: 0 }}>{GridHeaders.TYPE}</TableCell>
-                        <TableCell sx={{ width: '33%', borderBottom: 0 }}>{GridHeaders.TIME}</TableCell>
+                        <TableCell sx={{ width: '33%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.TICKER}
+                        </TableCell>
+                        <TableCell sx={{ width: '33%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.AMOUNT}
+                        </TableCell>
+                        <TableCell sx={{ width: '33%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.TYPE}
+                        </TableCell>
+                        <TableCell sx={{ width: '33%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.TIME}
+                        </TableCell>
                     </TableRow>
                 </TableHead>
             </Table>
@@ -85,28 +132,21 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
                     <b>Please connect your wallet to view the portfolio.</b>
                 </p>
             ) : (
-                <List
-                    dense
-                    sx={{
-                        width: '100%',
-                        overflowX: 'hidden',
-                    }}
-                >
-                    {tokensActivityList.length > 0
-                        ? tokensActivityList.map((token) => (
-                              <TokenRowActivity
-                                  token={token}
-                                  key={token.ticker}
-                                  walletConnected={walletConnected}
-                                  walletBalance={walletBalance}
-                                  kasPrice={kasPrice}
-                              />
-                          ))
-                        : // Replace single Skeleton with multiple Skeletons
-                          [...Array(5)].map((_, index) => <Skeleton key={index} width={'100%'} height={'12vh'} />)}
+                <List dense sx={{ width: '100%', overflowX: 'hidden' }}>
+                    {isLoadingActivity &&
+                        [...Array(5)].map((_, index) => <Skeleton key={index} width={'100%'} height={'12vh'} />)}
+                    {portfolioAssetsActivity?.map((token) => (
+                        <TokenRowActivity
+                            token={token}
+                            key={token.ticker}
+                            walletConnected={walletConnected}
+                            walletBalance={walletBalance}
+                            kasPrice={kasPrice}
+                        />
+                    ))}
                 </List>
             )}
-            {tokensActivityList.length === 0 && walletConnected && (
+            {portfolioAssetsActivity?.length === 0 && walletConnected && (
                 <p style={{ textAlign: 'center', fontSize: '0.8rem' }}>
                     <b>End of list</b>
                 </p>

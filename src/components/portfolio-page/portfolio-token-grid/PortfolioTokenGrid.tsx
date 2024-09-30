@@ -11,11 +11,11 @@ interface PortfolioTokenGridProps {
     tokensList: TokenRowPortfolioItem[];
     kasPrice: number;
     walletConnected: boolean;
-    isLoading: boolean;
     walletBalance: number;
     handleChange: () => void;
     lastPortfolioPage: boolean;
     handlePortfolioPagination: (direction: 'next' | 'prev') => void;
+    isLoading: boolean;
 }
 
 enum GridHeaders {
@@ -35,6 +35,7 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
         handleChange,
         lastPortfolioPage,
         handlePortfolioPagination,
+        isLoading,
     } = props;
     const [currentPage, setCurrentPage] = useState<number>(1);
     const handlePrevPage = () => {
@@ -58,11 +59,21 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
             <Table style={{ width: '100%', marginLeft: '0.9vw' }}>
                 <TableHead>
                     <TableRow>
-                        <TableCell sx={{ width: '17%', borderBottom: 0 }}>{GridHeaders.TICKER}</TableCell>
-                        <TableCell sx={{ width: '14.5%', borderBottom: 0 }}>{GridHeaders.PRICE}</TableCell>
-                        <TableCell sx={{ width: '14%', borderBottom: 0 }}>{GridHeaders.BALANCE}</TableCell>
-                        <TableCell sx={{ width: '20%', borderBottom: 0 }}>{GridHeaders.TOTAL}</TableCell>
-                        <TableCell sx={{ width: '15%', borderBottom: 0 }}>{GridHeaders.ACTIONS}</TableCell>
+                        <TableCell sx={{ width: '17%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.TICKER}
+                        </TableCell>
+                        <TableCell sx={{ width: '14.5%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.PRICE}
+                        </TableCell>
+                        <TableCell sx={{ width: '14%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.BALANCE}
+                        </TableCell>
+                        <TableCell sx={{ width: '20%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.TOTAL}
+                        </TableCell>
+                        <TableCell sx={{ width: '15%', borderBottom: 0, fontSize: '0.8rem', fontWeight: 600 }}>
+                            {GridHeaders.ACTIONS}
+                        </TableCell>
                     </TableRow>
                 </TableHead>
             </Table>
@@ -93,7 +104,7 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
                         overflowX: 'hidden',
                     }}
                 >
-                    {tokensList.length > 0
+                    {tokensList.length > 0 && !isLoading
                         ? tokensList.map((token) => (
                               <TokenRowPortfolio
                                   handleChange={handleChange}

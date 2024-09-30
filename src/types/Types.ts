@@ -291,6 +291,9 @@ export interface Order {
     quantity: number;
     totalPrice: number;
     pricePerToken: number;
+    ticker: string;
+    createdAt: string;
+    status: SellOrderStatus;
 }
 
 export interface SwapTransactionsResult {

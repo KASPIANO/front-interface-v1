@@ -1,4 +1,5 @@
 import { Order } from '../types/Types';
+import { cleanFilters } from '../utils/Utils';
 import { backendService } from './AxiosInstaces';
 
 const P2PCONTROLLER = 'p2p';
@@ -111,25 +112,20 @@ export const getOrders = async (
 };
 
 export const getUSerListings = async (
-    walletAdress: string,
+    walletAddress: string,
     offset = 0,
-    limit = 50,
+    limit = 15,
     sort?: { field: string; direction: string },
-): Promise<any> => {
-    try {
-        const response = await backendService.post<any>(`/${P2PCONTROLLER}/getUserListings`, {
-            walletAdress,
-            pagination: {
-                offset,
-                limit,
-            },
-            sort,
-        });
-        return response.data;
-    } catch (error) {
-        console.error(`Error getUSerListings`, error.response ? error.response.data : error.message);
-        return { confirmed: false }; // Return empty array in case of an error
-    }
+): Promise<{ orders: Order[]; totalCount: number }> => {
+    const response = await backendService.post<any>(`/${P2PCONTROLLER}/getUserListings`, {
+        walletAddress,
+        pagination: {
+            offset,
+            limit,
+        },
+        sort,
+    });
+    return response.data;
 };
 
 export const relistSellOrder = async (orderId: string, walletAddress: string): Promise<any> => {
@@ -141,7 +137,7 @@ export const relistSellOrder = async (orderId: string, walletAddress: string): P
                 walletAddress,
             },
         );
-        return response.data;
+        return response.status;
     } catch (error) {
         console.error(`Error relisting order ${orderId}:`, error.response ? error.response.data : error.message);
         return { confirmed: false }; // Return empty array in case of an error
@@ -153,21 +149,16 @@ export const updateSellOrder = async (
     pricePerToken: number,
     totalPrice: number,
 ): Promise<any> => {
-    try {
-        const response = await backendService.post<any>(
-            `/${P2PCONTROLLER}/updateSellOrder/${orderId}`,
+    const response = await backendService.post<any>(
+        `/${P2PCONTROLLER}/updateSellOrder/${orderId}`,
 
-            {
-                pricePerToken,
-                totalPrice,
-                walletAddress,
-            },
-        );
-        return response.data;
-    } catch (error) {
-        console.error(`Error relisting order ${orderId}:`, error.response ? error.response.data : error.message);
-        return { confirmed: false }; // Return empty array in case of an error
-    }
+        {
+            pricePerToken,
+            totalPrice,
+            walletAddress,
+        },
+    );
+    return response.status;
 };
 export const removeFromMarketplace = async (orderId: string, walletAddress: string): Promise<any> => {
     try {
@@ -196,21 +187,39 @@ export const releaseBuyLock = async (orderId: string): Promise<any> => {
 
 export const confirmDelistOrder = async (
     orderId: string,
-    transactionId: string,
     walletAddress: string,
+    transactionId?: string,
 ): Promise<any> => {
-    try {
-        const response = await backendService.post<any>(
-            `/${P2PCONTROLLER}/confirmDelistOrder/${orderId}`,
+    const response = await backendService.post<any>(
+        `/${P2PCONTROLLER}/confirmDelistOrder/${orderId}`,
 
-            {
-                transactionId,
-                walletAddress,
-            },
-        );
-        return response.data;
-    } catch (error) {
-        console.error(`Error deleting order ${orderId}:`, error.response ? error.response.data : error.message);
-        return { confirmed: false }; // Return empty array in case of an error
-    }
+        {
+            transactionId,
+            walletAddress,
+        },
+    );
+    return response.data;
+};
+
+export const getOrdersHistory = async (
+    sort?: { field?: string; direction?: 'asc' | 'desc' }, // Sort object
+    pagination?: { limit?: number; offset?: number }, // Pagination object
+    filters?: {
+        // Filters object
+        statuses?: string[];
+        tickers?: string[];
+        sellerWalletAddresses?: string[];
+        buyerWalletAddresses?: string[];
+        totalPrice?: { min?: number; max?: number };
+        startDateTimestamp?: number;
+        endDateTimestamp?: number;
+    },
+): Promise<any> => {
+    const cleanedFilters = cleanFilters(filters);
+    const response = await backendService.post<any>(`/${P2PCONTROLLER}/getOrdersHistory`, {
+        sort: sort || { direction: 'desc' }, // Default sorting direction (DESC)
+        pagination: pagination || { limit: 20, offset: 0 }, // Default pagination (limit of 10)
+        filters: cleanedFilters || {}, // Optional filters
+    });
+    return response.data;
 };

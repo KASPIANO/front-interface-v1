@@ -121,7 +121,7 @@ export async function fetchBurntRC20Balance(ticker: string): Promise<number> {
 export async function fetchWalletActivity(
     address: string,
     paginationKey: string | null = null,
-    direction: 'next' | 'prev' | null = null,
+    direction: string | null = null,
 ): Promise<FetchWalletActivityResponse> {
     try {
         // Append pagination direction and key (next/prev) if applicable

@@ -97,3 +97,13 @@ export const GlobalStyleTokenSideBar = createGlobalStyle`
     }
   }
 `;
+
+export const DateStyle = createGlobalStyle`
+    input[type="date"]::-webkit-calendar-picker-indicator {
+    color: red;
+    font-size: 1rem; /* Control the icon size */
+    opacity: 1; /* Ensure the icon is visible */
+    width: 15px;
+    margin-top: 4px; /* Adjust positioning if necessary */
+}
+`;
