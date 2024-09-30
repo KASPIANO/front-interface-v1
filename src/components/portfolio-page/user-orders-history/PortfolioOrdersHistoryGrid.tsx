@@ -17,9 +17,9 @@ import {
     useTheme,
 } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import { FC, useState, ChangeEvent } from 'react';
+import { FC, useState } from 'react';
 import { Order } from '../../../types/Types';
-import { DateStyle, GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
+import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 import { PrevPageButton, NextPageButton } from '../../krc-20-page/grid-title-sort/GridTitle.s';
 import { StyledPortfolioGridContainer } from './PortfolioOrdersHistoryGrid.s';
 import UserOrdersRow from './user-orders-history-row/UserOrdersHistoryRow';
@@ -57,7 +57,7 @@ const PortfolioOrdersHistoryGrid: FC<PortfolioOrdersHistoryGridProps> = ({
         field: SortFields.DATE,
         direction: 'desc',
     });
-    const [filters, setFilters] = useState<{ minPrice?: number; maxPrice?: number; statuses?: string[] }>({});
+    const [filters] = useState<{ minPrice?: number; maxPrice?: number; statuses?: string[] }>({});
     const [minPrice, setMinPrice] = useState<number | string>('');
     const [maxPrice, setMaxPrice] = useState<number | string>('');
     const [startDate, setStartDate] = useState<string>('');
@@ -73,19 +73,6 @@ const PortfolioOrdersHistoryGrid: FC<PortfolioOrdersHistoryGridProps> = ({
             shrink: true,
         },
         sx: { flex: 1 },
-    };
-
-    const dateInputProps = {
-        sx: {
-            flex: 1,
-            '& input::-webkit-calendar-picker-indicator': {
-                color: '#FF0000', // Change this to your desired color
-                opacity: 1, // Ensures the icon is fully opaque
-            },
-            '& input[type="date"]::-moz-calendar-picker-indicator': {
-                color: '#FF0000', // Change this to your desired color for Firefox
-            },
-        },
     };
 
     // Fetch data using the custom hook
