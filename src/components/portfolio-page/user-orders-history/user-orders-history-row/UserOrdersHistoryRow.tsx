@@ -1,5 +1,5 @@
 import React from 'react';
-import { ListItem, Typography, Box, ListItemText, Tooltip, Divider } from '@mui/material';
+import { ListItem, Typography, ListItemText, Tooltip, Divider } from '@mui/material';
 import { Order } from '../../../../types/Types';
 import { mapSellOrderStatusToDisplayText } from '../../../../utils/Utils';
 

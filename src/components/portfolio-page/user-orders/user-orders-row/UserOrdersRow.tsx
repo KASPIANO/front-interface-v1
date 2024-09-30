@@ -22,7 +22,7 @@ interface UserOrdersRowProps {
     handleDelist: (orderId: string) => void;
     handleRelist: (orderId: string) => void;
     handleEditOrder: (orderId: string, pricePerToken: number, totalPrice: number) => void;
-    handleCancelOrder: (orderId: string) => void;
+    handleCancelOrder?: (orderId: string) => void;
 }
 
 const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
