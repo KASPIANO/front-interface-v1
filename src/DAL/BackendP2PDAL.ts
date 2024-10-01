@@ -208,8 +208,8 @@ export const getOrdersHistory = async (
         // Filters object
         statuses?: string[];
         tickers?: string[];
-        sellerWalletAddresses?: string[];
-        buyerWalletAddresses?: string[];
+        isSeller?: boolean;
+        isBuyer?: boolean;
         totalPrice?: { min?: number; max?: number };
         startDateTimestamp?: number;
         endDateTimestamp?: number;
