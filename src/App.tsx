@@ -61,7 +61,7 @@ const App = () => {
                         walletConnected={walletConnected}
                         walletAddress={walletAddress}
                         network={network}
-                        walletBalance={walletBalance.confirmed}
+                        walletBalance={walletBalance}
                         connectWallet={connectWallet}
                         disconnectWallet={disconnectWallet}
                         setBackgroundBlur={setBackgroundBlur}
@@ -73,7 +73,7 @@ const App = () => {
                         network={network}
                         setWalletBalance={setWalletBalance}
                         walletAddress={walletAddress}
-                        walletBalance={walletBalance.confirmed}
+                        walletBalance={walletBalance}
                         walletConnected={walletConnected}
                     />
                     <Footer />

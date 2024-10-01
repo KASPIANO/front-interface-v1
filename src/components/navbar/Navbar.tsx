@@ -48,7 +48,6 @@ const Navbar: React.FC<NavbarProps> = ({
     };
 
     const formatNumberWithCommas = (value: number) => Math.floor(value).toLocaleString();
-
     const handleConnectButton = () => {
         if (walletConnected) disconnectWallet();
         else connectWallet();
