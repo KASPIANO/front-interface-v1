@@ -5,6 +5,7 @@ import { UserVerfication } from '../types/Types';
 import { generateNonce, generateRequestId, generateVerificationMessage } from '../utils/Utils';
 // import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 import { getNetwork, handleSwitchNetwork, isKasWareInstalled } from '../utils/KaswareUtils';
+import { get } from 'lodash';
 
 export const useKasware = () => {
     const [connected, setConnected] = useState(false);
@@ -47,9 +48,10 @@ export const useKasware = () => {
             const userVerificationMessage = generateVerificationMessage(account, nonce, requestDate, requestId);
 
             const userVerification = await signMessage(userVerificationMessage);
-
+            const publicKey = await window.kasware.getPublicKey();
             if (userVerification) {
                 cookies.remove('user');
+                debugger;
                 cookies.set(
                     'user',
                     {
@@ -118,13 +120,11 @@ export const useKasware = () => {
                 setConnected(false);
                 setAccounts([]);
                 setAddress('');
+                setPublicKey('');
                 setBalance(0);
-                cookies.remove('user');
-                localStorage.removeItem('walletAddress');
-                setSignature('');
             }
         },
-        [self, handleUserVerification, cookies],
+        [self, handleUserVerification],
     );
 
     const handleNetworkChanged = useCallback(async (newNetwork: string) => {
@@ -212,6 +212,7 @@ export const useKasware = () => {
                 try {
                     const accounts = await window.kasware.requestAccounts();
                     if (accounts.length > 0 && accounts[0].toLowerCase() === storedAddress.toLowerCase()) {
+                        await getBasicInfo();
                         handleAccountsChanged(accounts, true);
                         await handleNetworkByEnvironment();
                     } else {
