@@ -143,6 +143,8 @@ const App = () => {
     );
 
     const handleDisconnect = useCallback(async () => {
+        const cookies = new Cookies(); // Create an instance of cookies-universal
+        cookies.remove('user');
         const { origin } = window.location;
         await disconnect(origin);
         resetWalletState();
@@ -199,9 +201,8 @@ const App = () => {
     const checkCookie = async () => {
         const cookies = new Cookies(); // Create an instance of cookies-universal
         const cookieValue = cookies.get('user'); // Replace 'myCookie' with your cookie name
-        if (cookieValue && Date.now() > cookieValue.expiresAt) {
+        if (cookieValue && cookieValue && Date.now() > cookieValue.expiresAt) {
             await handleDisconnect();
-            cookies.remove('user');
         }
     };
 
