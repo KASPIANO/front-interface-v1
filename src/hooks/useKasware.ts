@@ -3,6 +3,7 @@ import Cookies from 'universal-cookie';
 import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
 import { UserVerfication } from '../types/Types';
 import { generateNonce, generateRequestId, generateVerificationMessage } from '../utils/Utils';
+import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 
 export const useKasware = () => {
     const [isStarted, setIsStarted] = useState(false);
@@ -161,6 +162,13 @@ export const useKasware = () => {
                     message: 'Wallet connected successfully',
                     severity: 'success',
                     details: `Connected to wallet ${account.substring(0, 9)}....${account.substring(account.length - 4)}`,
+                });
+                showGlobalDialog({
+                    dialogType: 'referral',
+                    dialogProps: {
+                        walletAddress: account,
+                        mode: 'add',
+                    },
                 });
                 return verifiedUser;
             }

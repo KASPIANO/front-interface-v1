@@ -11,7 +11,6 @@ import { ThemeContext } from './main';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
 import { getLocalThemeMode, ThemeModes } from './utils/Utils';
-import ReferralDialog from './components/dialogs/referral/ReferralDialog';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
