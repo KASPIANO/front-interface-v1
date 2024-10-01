@@ -2,6 +2,7 @@ import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import Cookies from 'universal-cookie';
 import { showGlobalSnackbar } from './components/alert-context/AlertContext';
 import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
@@ -15,6 +16,7 @@ import { UserVerfication } from './types/Types';
 import {
     disconnect,
     getNetwork,
+    getPublicKey,
     isKasWareInstalled,
     requestAccounts,
     signMessage,
@@ -74,9 +76,22 @@ const App = () => {
                     requestDate,
                     requestId,
                 );
-
+                const publicKey = await getPublicKey();
                 const userVerification = await signMessage(userVerificationMessage);
+
                 if (userVerification) {
+                    const cookies = new Cookies();
+                    cookies.remove('user');
+                    cookies.set(
+                        'user',
+                        {
+                            message: userVerificationMessage,
+                            publicKey,
+                            signature: userVerification,
+                            expiresAt: Date.now() + 4 * 60 * 60 * 1000,
+                        },
+                        { secure: true },
+                    );
                     const verifiedUser = {
                         userWalletAddress: account,
                         userSignedMessageTxId: userVerification,
@@ -129,6 +144,8 @@ const App = () => {
     );
 
     const handleDisconnect = useCallback(async () => {
+        const cookies = new Cookies(); // Create an instance of cookies-universal
+        cookies.remove('user');
         const { origin } = window.location;
         await disconnect(origin);
         resetWalletState();
@@ -181,6 +198,25 @@ const App = () => {
         checkExistingConnection();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [updateWalletState]);
+
+    const checkCookie = async () => {
+        const cookies = new Cookies(); // Create an instance of cookies-universal
+        const cookieValue = cookies.get('user'); // Replace 'myCookie' with your cookie name
+        if (cookieValue && cookieValue && Date.now() > cookieValue.expiresAt) {
+            await handleDisconnect();
+        }
+    };
+
+    // Set up an interval to check the cookie every 1 minute
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            await checkCookie();
+        }, 1000); // Check every 60,000 milliseconds (1 minute)
+
+        // Cleanup function to clear the interval when component unmounts
+        return () => clearInterval(interval);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleConnectWallet = async () => {
         setIsConnecting(true);
