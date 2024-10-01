@@ -71,7 +71,7 @@ export const getNetwork = async (): Promise<string> => {
 };
 
 // Method to switch network
-export const switchNetwork = async (network: string): Promise<any> => {
+export const handleSwitchNetwork = async (network: string): Promise<any> => {
     try {
         await window.kasware.switchNetwork(network);
         return true;

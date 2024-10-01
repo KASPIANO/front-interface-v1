@@ -3,7 +3,8 @@ import Cookies from 'universal-cookie';
 import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
 import { UserVerfication } from '../types/Types';
 import { generateNonce, generateRequestId, generateVerificationMessage } from '../utils/Utils';
-import { showGlobalDialog } from '../components/dialog-context/DialogContext';
+// import { showGlobalDialog } from '../components/dialog-context/DialogContext';
+import { getNetwork, handleSwitchNetwork } from '../utils/KaswareUtils';
 
 export const useKasware = () => {
     const [isStarted, setIsStarted] = useState(false);
@@ -114,6 +115,7 @@ export const useKasware = () => {
 
     const connectWallet = async () => {
         const result = await window.kasware.requestAccounts();
+        await handleNetworkByEnvironment();
         handleAccountsChanged(result);
     };
 
@@ -163,13 +165,13 @@ export const useKasware = () => {
                     severity: 'success',
                     details: `Connected to wallet ${account.substring(0, 9)}....${account.substring(account.length - 4)}`,
                 });
-                showGlobalDialog({
-                    dialogType: 'referral',
-                    dialogProps: {
-                        walletAddress: account,
-                        mode: 'add',
-                    },
-                });
+                // showGlobalDialog({
+                //     dialogType: 'referral',
+                //     dialogProps: {
+                //         walletAddress: account,
+                //         mode: 'add',
+                //     },
+                // });
                 return verifiedUser;
             }
         } catch (error) {
@@ -186,15 +188,19 @@ export const useKasware = () => {
 
     const handleNetworkByEnvironment = async () => {
         const currentEnv = import.meta.env.VITE_ENV === 'prod' ? 'kaspa_mainnet' : 'kaspa_testnet_10';
-        const getCurrentNetwork = network;
+        const getCurrentNetwork = await getNetwork();
         if (currentEnv !== getCurrentNetwork) {
             showGlobalSnackbar({
                 message: 'Please switch to the correct network',
                 severity: 'error',
             });
-            await switchNetwork(currentEnv).catch(async () => {
+            const reject = await handleSwitchNetwork(currentEnv);
+
+            if (!reject) {
                 await disconnectWallet();
-            });
+            } else {
+                setNetwork(currentEnv);
+            }
         }
     };
 
