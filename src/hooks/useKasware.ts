@@ -5,7 +5,6 @@ import { UserVerfication } from '../types/Types';
 import { generateNonce, generateRequestId, generateVerificationMessage } from '../utils/Utils';
 // import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 import { getNetwork, handleSwitchNetwork, isKasWareInstalled } from '../utils/KaswareUtils';
-import { set } from 'lodash';
 
 export const useKasware = () => {
     const [connected, setConnected] = useState(false);
