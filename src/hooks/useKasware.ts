@@ -102,23 +102,29 @@ export const useKasware = () => {
             if (self.accounts[0] === _accounts[0]) {
                 return;
             }
+
             self.accounts = _accounts;
             if (_accounts.length > 0) {
-                if (!verified) {
-                    handleUserVerification(_accounts[0]);
-                }
+                getBasicInfo();
                 setAccounts(_accounts);
                 setConnected(true);
 
                 setAddress(_accounts[0]);
                 localStorage.setItem('walletAddress', _accounts[0]);
-
-                getBasicInfo();
+                if (!verified) {
+                    handleUserVerification(_accounts[0]);
+                }
             } else {
                 setConnected(false);
+                setAccounts([]);
+                setAddress('');
+                setBalance(0);
+                cookies.remove('user');
+                localStorage.removeItem('walletAddress');
+                setSignature('');
             }
         },
-        [self, handleUserVerification],
+        [self, handleUserVerification, cookies],
     );
 
     const handleNetworkChanged = useCallback(async (newNetwork: string) => {
