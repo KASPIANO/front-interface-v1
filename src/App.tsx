@@ -81,6 +81,7 @@ const App = () => {
 
                 if (userVerification) {
                     const cookies = new Cookies();
+                    cookies.remove('user');
                     cookies.set(
                         'user',
                         {
