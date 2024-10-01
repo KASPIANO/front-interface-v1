@@ -93,8 +93,8 @@ export const useOrdersHistory = ({
                     statuses: filters.statuses || undefined,
                     startDateTimestamp: filters.startDateTimestamp,
                     endDateTimestamp: filters.endDateTimestamp,
-                    sellerWalletAddresses: [walletAddress],
-                    buyerWalletAddresses: [walletAddress],
+                    isSeller: true,
+                    isBuyer: true,
                 },
             ),
         enabled: !!walletAddress, // Only fetch if wallet address exists
