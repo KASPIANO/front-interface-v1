@@ -3,7 +3,7 @@ interface Kasware {
     _selectedAddress: string;
     getAccounts: () => Promise<string[]>;
     getNetwork: () => Promise<string>;
-    switchNetwork: (network: string) => Promise<void>;
+    switchNetwork: (network: string) => Promise<string>;
     disconnect: (origin: string) => Promise<void>;
     getPublicKey: () => Promise<string>;
     getBalance: () => Promise<{ confirmed: number; unconfirmed: number; total: number }>;
