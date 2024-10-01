@@ -39,7 +39,7 @@ const App = () => {
     const [, setIsConnecting] = useState<boolean>(false);
     const [backgroundBlur, setBackgroundBlur] = useState(false);
     const [, setUserVerified] = useState<UserVerfication>(null);
-    const [referralExists, setReferralExists] = useState<boolean | null>(null);
+    const [, setReferralExists] = useState<boolean | null>(null);
     const [openReferralDialog, setOpenReferralDialog] = useState(false);
 
     const toggleThemeMode = () => {
