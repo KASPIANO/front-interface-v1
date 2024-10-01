@@ -47,14 +47,14 @@ export const useKasware = () => {
             const userVerificationMessage = generateVerificationMessage(account, nonce, requestDate, requestId);
 
             const userVerification = await signMessage(userVerificationMessage);
-
+            const publicKeyCookies = await window.kasware.getPublicKey();
             if (userVerification) {
                 cookies.remove('user');
                 cookies.set(
                     'user',
                     {
                         message: userVerificationMessage,
-                        publicKey,
+                        publicKey: publicKeyCookies,
                         signature: userVerification,
                         expiresAt: Date.now() + 4 * 60 * 60 * 1000,
                     },
@@ -118,13 +118,11 @@ export const useKasware = () => {
                 setConnected(false);
                 setAccounts([]);
                 setAddress('');
+                setPublicKey('');
                 setBalance(0);
-                cookies.remove('user');
-                localStorage.removeItem('walletAddress');
-                setSignature('');
             }
         },
-        [self, handleUserVerification, cookies],
+        [handleUserVerification, self],
     );
 
     const handleNetworkChanged = useCallback(async (newNetwork: string) => {
@@ -153,7 +151,8 @@ export const useKasware = () => {
         localStorage.removeItem('walletAddress');
         showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
         cookies.remove('user');
-    }, [handleAccountsChanged, cookies]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         if (isKasWareInstalled()) {
@@ -212,14 +211,17 @@ export const useKasware = () => {
                 try {
                     const accounts = await window.kasware.requestAccounts();
                     if (accounts.length > 0 && accounts[0].toLowerCase() === storedAddress.toLowerCase()) {
+                        await getBasicInfo();
                         handleAccountsChanged(accounts, true);
                         await handleNetworkByEnvironment();
                     } else {
                         localStorage.removeItem('walletAddress');
+                        cookies.remove('user');
                     }
                 } catch (error) {
                     console.error('Error checking existing connection:', error);
                     localStorage.removeItem('walletAddress');
+                    cookies.remove('user');
                 }
             }
         };
