@@ -31,6 +31,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
     const [pricePerToken, setPricePerToken] = React.useState('');
     const [totalPrice, setTotalPrice] = React.useState('');
     const [editError, setEditError] = React.useState('');
+    const [openCancelDialog, setOpenCancelDialog] = React.useState(false);
 
     const handleCloseEditDialog = () => {
         setOpenEditDialog(false);
@@ -110,6 +111,12 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         await handleEditOrder(order.orderId, Number(pricePerToken), Number(totalPrice));
         handleCloseEditDialog();
     };
+
+    const cancelOrderHandler = async (orderId: string) => {
+        handleCancelOrder(orderId);
+        setOpenCancelDialog(false);
+    };
+
     return (
         <div key={order.orderId}>
             <ListItem disablePadding sx={{ height: '12vh' }}>
@@ -240,7 +247,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
 
                             <Tooltip title="Cancel is to retrieve the tokens back to your wallet">
                                 <Button
-                                    onClick={() => handleCancelOrder(order.orderId)}
+                                    onClick={() => setOpenCancelDialog(true)}
                                     variant="contained"
                                     color="primary"
                                     sx={{
@@ -315,6 +322,38 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                 <DialogActions>
                     <Button onClick={handleCloseEditDialog}>Cancel</Button>
                     <Button onClick={editOrderHandler}>Save</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                PaperProps={{
+                    sx: {
+                        width: '40vw',
+                    },
+                }}
+                open={openCancelDialog}
+                onClose={() => setOpenCancelDialog(false)}
+            >
+                <DialogTitle>Cancel Order Process</DialogTitle>
+                <DialogContent>
+                    <Box sx={{ marginBottom: 2 }}>
+                        <Typography variant="body1">
+                            To cancel your order and retrieve your tokens, you will need to send 5 Kas to cover the
+                            expected gas fees. This amount ensures the transaction can be processed on the network.
+                            In most cases, you will receive approximately 4.9 Kas back after the tokens are
+                            successfully sent and the transaction is completed.
+                        </Typography>
+                        <Typography variant="body1" sx={{ marginTop: 2 }}>
+                            This small difference accounts for minor variations in network fees, but the majority
+                            of your sent amount will be returned to your wallet.
+                        </Typography>
+                        <Typography variant="body1" sx={{ marginTop: 2 }}>
+                            Please confirm that you would like to proceed with the cancellation process.
+                        </Typography>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => cancelOrderHandler(order.orderId)}>Cancel Order</Button>
+                    <Button onClick={() => setOpenCancelDialog(false)}>Exit</Button>
                 </DialogActions>
             </Dialog>
         </div>

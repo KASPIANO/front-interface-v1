@@ -10,8 +10,12 @@ interface Kasware {
     sendKaspa: (toAddress: string, sompi: number, options?: { priorityFee?: number }) => Promise<string>;
     signMessage: (msg: string, type?: 'ecdsa' | 'bip322-simple') => Promise<string>;
     pushTx: (options: { rawtx: string }) => Promise<string>;
-    signKRC20Transaction: (inscribeJsonString: string, type: number, priorityFee?: number) => Promise<string>;
-    getKRC20Balance: any;
+    signKRC20Transaction: (
+        inscribeJsonString: string,
+        type: number,
+        destAdd?: string,
+        priorityFee?: number,
+    ) => Promise<string>;
     signKRC20BatchTransferTransaction: (
         inscribeJsonString: string,
         type: number,
