@@ -1,10 +1,12 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Box, Avatar, Typography, Button, useTheme, TextField, alpha } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { ProfileContainer, ProfileDetails } from './UserProfile.s';
 // import XIcon from '@mui/icons-material/X';
 import { shortenAddress } from '../../../utils/Utils';
 import { Stat, StatHelpText, StatNumber } from '@chakra-ui/react';
+import { checkReferralExists, getUserReferral } from '../../../DAL/BackendDAL';
+import ReferralDialog from '../../dialogs/referral/ReferralDialog';
 
 interface UserProfileProps {
     walletAddress: string;
@@ -16,6 +18,42 @@ interface UserProfileProps {
 const UserProfile: FC<UserProfileProps> = (props) => {
     const { walletAddress, portfolioValue, kasPrice, setWalletAddress } = props;
     const theme = useTheme();
+    const [referralExists, setReferralExists] = useState<boolean | null>(null);
+    const [openReferralDialog, setOpenReferralDialog] = useState<boolean>(false);
+    const [referralCode, setReferralCode] = useState<string | null>(null);
+    const [dialogMode, setDialogMode] = useState<'get' | 'add'>('add');
+
+    useEffect(() => {
+        const fetchReferralStatus = async () => {
+            if (walletAddress) {
+                const result = await checkReferralExists(walletAddress);
+                if (result) {
+                    setReferralExists(result.exists);
+                }
+            }
+        };
+        fetchReferralStatus();
+    }, [walletAddress]);
+
+    const handleGetReferralCode = async () => {
+        if (walletAddress) {
+            const result = await getUserReferral(walletAddress);
+            if (result) {
+                setReferralCode(result.referralCode);
+                setDialogMode('get'); // Switch to "get" mode
+                setOpenReferralDialog(true); // Open dialog to show referral code
+            }
+        }
+    };
+
+    const handleOpenReferralDialog = () => {
+        setDialogMode('add'); // Switch to "add" mode
+        setOpenReferralDialog(true);
+    };
+
+    const handleCloseReferralDialog = () => {
+        setOpenReferralDialog(false);
+    };
 
     const handleManualAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newAddress = e.target.value;
@@ -94,6 +132,17 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         >
                             Add
                         </Button> */}
+                        {referralExists === null ? (
+                            <Typography>Loading...</Typography>
+                        ) : referralExists ? (
+                            <Button variant="outlined" size="small" onClick={handleGetReferralCode}>
+                                Get Referral Code
+                            </Button>
+                        ) : (
+                            <Button variant="outlined" size="small" onClick={handleOpenReferralDialog}>
+                                Add Referral Code
+                            </Button>
+                        )}
                     </Box>
                 </ProfileDetails>
             </Box>
@@ -114,6 +163,13 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                     {portfolioValue.change}% */}
                 </StatHelpText>
             </Stat>
+            <ReferralDialog
+                open={openReferralDialog}
+                onClose={handleCloseReferralDialog}
+                walletAddress={walletAddress}
+                referralCode={referralCode} // Pass referral code if exists
+                mode={dialogMode} // Control dialog mode (get vs. add)
+            />
         </ProfileContainer>
     );
 };

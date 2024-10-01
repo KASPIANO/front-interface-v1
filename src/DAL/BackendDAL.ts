@@ -12,6 +12,7 @@ import { backendService } from './AxiosInstaces';
 const KRC20CONTROLLER = 'krc20';
 const P2PCONTROLLER = 'p2p';
 const KRC20METADATA_CONTROLLER = 'krc20metadata';
+const USER_REFERRALS_CONTROLLER = 'referrals';
 const AUTH_CONTROLLER = 'auth';
 
 export type BackendValidationErrorsType = {
@@ -238,5 +239,54 @@ export const getGasEstimator = async (orderId: string): Promise<any> => {
     } catch (error) {
         console.error(`Error deleting order ${orderId}:`, error.response ? error.response.data : error.message);
         return { confirmed: false }; // Return empty array in case of an error
+    }
+};
+
+export const getUserReferral = async (walletAddress: string): Promise<{ referralCode: string } | null> => {
+    try {
+        const response = await backendService.post<{ referralCode: string }>(
+            `/${USER_REFERRALS_CONTROLLER}/get-user-referral`,
+            {
+                walletAddress,
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching referral code:', error);
+        return null;
+    }
+};
+
+export const checkReferralExists = async (walletAddress: string): Promise<{ exists: boolean } | null> => {
+    try {
+        const response = await backendService.post<{ exists: boolean }>(
+            `/${USER_REFERRALS_CONTROLLER}/check-referral-exists`,
+            {
+                walletAddress,
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error checking referral existence:', error);
+        return null;
+    }
+};
+
+export const addReferredBy = async (
+    walletAddress: string,
+    referredBy: string,
+): Promise<{ referred_by: string } | null> => {
+    try {
+        const response = await backendService.post<{ referred_by: string }>(
+            `/${USER_REFERRALS_CONTROLLER}/add-referred-by`,
+            {
+                walletAddress,
+                referredBy,
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error adding referred by information:', error);
+        return null;
     }
 };

@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { showGlobalSnackbar } from './components/alert-context/AlertContext';
 import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
-import { signUser } from './DAL/BackendDAL';
+import { checkReferralExists, signUser } from './DAL/BackendDAL';
 import { fetchWalletBalance } from './DAL/KaspaApiDal';
 import { KaspianoRouter } from './KaspianoRouter';
 import { ThemeContext } from './main';
@@ -28,6 +28,7 @@ import {
     setWalletBalanceUtil,
     ThemeModes,
 } from './utils/Utils';
+import ReferralDialog from './components/dialogs/referral/ReferralDialog';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -38,6 +39,8 @@ const App = () => {
     const [, setIsConnecting] = useState<boolean>(false);
     const [backgroundBlur, setBackgroundBlur] = useState(false);
     const [, setUserVerified] = useState<UserVerfication>(null);
+    const [referralExists, setReferralExists] = useState<boolean | null>(null);
+    const [openReferralDialog, setOpenReferralDialog] = useState(false);
 
     const toggleThemeMode = () => {
         const newMode = themeMode === ThemeModes.DARK ? ThemeModes.LIGHT : ThemeModes.DARK;
@@ -203,8 +206,18 @@ const App = () => {
 
                     // Log the verification result
                     console.log('User Verification:', userVerification, accounts[0]);
+                    if (userVerification) {
+                        // Check referral status
+                        const referralStatus = await checkReferralExists(accounts[0]);
+                        setReferralExists(referralStatus?.exists || false);
 
-                    // Log the verification result
+                        // If referral doesn't exist, show referral dialog after 2 seconds
+                        if (!referralStatus?.exists) {
+                            setTimeout(() => {
+                                setOpenReferralDialog(true);
+                            }, 2000);
+                        }
+                    }
                 } else {
                     // If no accounts, show error message and disconnect
                     showGlobalSnackbar({
@@ -233,6 +246,10 @@ const App = () => {
             // Reset the connecting state
             setIsConnecting(false);
         }
+    };
+
+    const handleCloseReferralDialog = () => {
+        setOpenReferralDialog(false);
     };
 
     const handleNetworkByEnvironment = async () => {
@@ -297,6 +314,12 @@ const App = () => {
                     />
                     <Footer />
                 </BrowserRouter>
+                <ReferralDialog
+                    open={openReferralDialog}
+                    onClose={handleCloseReferralDialog}
+                    walletAddress={walletAddress}
+                    mode="add" // Initial mode is to add a referral code if none exists
+                />
             </ThemeProvider>
         </ThemeContext.Provider>
     ) : null;
