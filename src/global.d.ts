@@ -3,7 +3,7 @@ interface Kasware {
     _selectedAddress: string;
     getAccounts: () => Promise<string[]>;
     getNetwork: () => Promise<string>;
-    switchNetwork: (network: string) => Promise<void>;
+    switchNetwork: (network: string) => Promise<string>;
     disconnect: (origin: string) => Promise<void>;
     getPublicKey: () => Promise<string>;
     getBalance: () => Promise<{ confirmed: number; unconfirmed: number; total: number }>;
@@ -11,6 +11,7 @@ interface Kasware {
     signMessage: (msg: string, type?: 'ecdsa' | 'bip322-simple') => Promise<string>;
     pushTx: (options: { rawtx: string }) => Promise<string>;
     signKRC20Transaction: (inscribeJsonString: string, type: number, priorityFee?: number) => Promise<string>;
+    getKRC20Balance: any;
     signKRC20BatchTransferTransaction: (
         inscribeJsonString: string,
         type: number,
