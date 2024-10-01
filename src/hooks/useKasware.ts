@@ -5,7 +5,6 @@ import { UserVerfication } from '../types/Types';
 import { generateNonce, generateRequestId, generateVerificationMessage } from '../utils/Utils';
 // import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 import { getNetwork, handleSwitchNetwork, isKasWareInstalled } from '../utils/KaswareUtils';
-import { get } from 'lodash';
 
 export const useKasware = () => {
     const [connected, setConnected] = useState(false);
@@ -48,15 +47,14 @@ export const useKasware = () => {
             const userVerificationMessage = generateVerificationMessage(account, nonce, requestDate, requestId);
 
             const userVerification = await signMessage(userVerificationMessage);
-            const publicKey = await window.kasware.getPublicKey();
+            const publicKeyCookies = await window.kasware.getPublicKey();
             if (userVerification) {
                 cookies.remove('user');
-                debugger;
                 cookies.set(
                     'user',
                     {
                         message: userVerificationMessage,
-                        publicKey,
+                        publicKey: publicKeyCookies,
                         signature: userVerification,
                         expiresAt: Date.now() + 4 * 60 * 60 * 1000,
                     },
@@ -124,7 +122,7 @@ export const useKasware = () => {
                 setBalance(0);
             }
         },
-        [self, handleUserVerification],
+        [handleUserVerification, self],
     );
 
     const handleNetworkChanged = useCallback(async (newNetwork: string) => {
@@ -153,7 +151,8 @@ export const useKasware = () => {
         localStorage.removeItem('walletAddress');
         showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
         cookies.remove('user');
-    }, [handleAccountsChanged, cookies]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         if (isKasWareInstalled()) {
@@ -217,10 +216,12 @@ export const useKasware = () => {
                         await handleNetworkByEnvironment();
                     } else {
                         localStorage.removeItem('walletAddress');
+                        cookies.remove('user');
                     }
                 } catch (error) {
                     console.error('Error checking existing connection:', error);
                     localStorage.removeItem('walletAddress');
+                    cookies.remove('user');
                 }
             }
         };
