@@ -5,7 +5,7 @@ import { UserVerfication } from '../types/Types';
 import { generateNonce, generateRequestId, generateVerificationMessage } from '../utils/Utils';
 // import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 import { getNetwork, handleSwitchNetwork, isKasWareInstalled } from '../utils/KaswareUtils';
-import { getUserReferral } from '../DAL/BackendDAL';
+import { checkReferralExists } from '../DAL/BackendDAL';
 import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 
 export const useKasware = () => {
@@ -240,8 +240,8 @@ export const useKasware = () => {
                 severity: 'success',
             });
             handleAccountsChanged(result);
-            const { refferedBy } = await getUserReferral(result[0]);
-            if (!refferedBy) {
+            const referralExists = await checkReferralExists(result[0]);
+            if (!referralExists.exists) {
                 showGlobalDialog({
                     dialogType: 'referral',
                     dialogProps: {

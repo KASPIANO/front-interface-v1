@@ -215,7 +215,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                         overflowX: 'hidden',
                     }}
                 >
-                    {orders.length > 0 && !loading
+                    {!loading
                         ? orders.map((order) => (
                               <UserOrdersRow
                                   cancelOrderWaitingPayment={cancelOrderWaitingPayment}

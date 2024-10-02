@@ -54,7 +54,7 @@ const Footer: React.FC = () => (
 
                 {/* Links Section */}
                 <Grid item container xs={8} md={8} sm={8} lg={8}>
-                    <Grid item xs={4} md={4} sm={4} lg={4}>
+                    <Grid item xs={3} md={3} sm={3} lg={3}>
                         <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             App
                         </Typography>
@@ -71,7 +71,7 @@ const Footer: React.FC = () => (
                         </FooterList>
                     </Grid>
 
-                    {/* <Grid item xs={4}>
+                    <Grid item xs={3} md={3} sm={3} lg={3}>
                         <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             Company
                         </Typography>
@@ -79,12 +79,9 @@ const Footer: React.FC = () => (
                             <li>
                                 <FooterLink href="/team">Team</FooterLink>
                             </li>
-                            <li>
-                                <FooterLink>Whitepaper</FooterLink>
-                            </li>
                         </FooterList>
-                    </Grid> */}
-                    <Grid item xs={4} md={4} sm={4} lg={4}>
+                    </Grid>
+                    <Grid item xs={3} md={3} sm={3} lg={3}>
                         <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             Need Help?
                         </Typography>
@@ -94,7 +91,7 @@ const Footer: React.FC = () => (
                             </li>
                         </FooterList>
                     </Grid>
-                    <Grid item xs={4} md={4} sm={4} lg={4}>
+                    <Grid item xs={3} md={3} sm={3} lg={3}>
                         <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             Resources
                         </Typography>
