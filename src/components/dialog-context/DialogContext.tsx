@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { Dialog, DialogActions, Button } from '@mui/material';
+import { Dialog, ThemeProvider } from '@mui/material';
 import { createRoot } from 'react-dom/client';
 import ReferralDialog from '../dialogs/referral/ReferralDialog';
+import { ThemeContext } from '../../main';
+import { darkTheme } from '../../theme/DarkTheme';
+import { lightTheme } from '../../theme/LightTheme';
+import { getLocalThemeMode, ThemeModes } from '../../utils/Utils';
 
 interface DialogOptions {
     dialogType: 'referral' | null;
@@ -13,6 +17,13 @@ let showDialog: (options: DialogOptions) => void;
 // eslint-disable-next-line react-refresh/only-export-components
 const DialogComponent: React.FC = () => {
     const [dialog, setDialog] = useState<DialogOptions>({ dialogType: null });
+    const [themeMode, setThemeMode] = useState(getLocalThemeMode());
+
+    const toggleThemeMode = () => {
+        const newMode = themeMode === ThemeModes.DARK ? ThemeModes.LIGHT : ThemeModes.DARK;
+        localStorage.setItem('theme_mode', newMode);
+        setThemeMode(newMode);
+    };
 
     showDialog = (options: DialogOptions) => {
         setDialog({ ...options });
@@ -31,6 +42,7 @@ const DialogComponent: React.FC = () => {
                         onClose={handleClose}
                         walletAddress={dialog.dialogProps.walletAddress}
                         referralCode={dialog.dialogProps.referralCode}
+                        setRefferedBy={dialog.dialogProps.setRefferedBy}
                         mode={dialog.dialogProps.mode}
                     />
                 );
@@ -39,20 +51,17 @@ const DialogComponent: React.FC = () => {
         }
     };
 
-    return (
-        <>
-            {dialog.dialogType && (
-                <Dialog open={true} onClose={handleClose}>
-                    {renderDialogContent()}
-                    <DialogActions>
-                        <Button onClick={handleClose} color="secondary">
-                            Close
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-            )}
-        </>
-    );
+    return themeMode ? (
+        <ThemeContext.Provider value={{ themeMode, toggleThemeMode }}>
+            <ThemeProvider theme={themeMode === ThemeModes.DARK ? darkTheme : lightTheme}>
+                {dialog.dialogType && (
+                    <Dialog open={true} onClose={handleClose}>
+                        {renderDialogContent()}
+                    </Dialog>
+                )}
+            </ThemeProvider>
+        </ThemeContext.Provider>
+    ) : null;
 };
 
 const dialogDiv = document.createElement('div');

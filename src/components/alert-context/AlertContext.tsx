@@ -135,7 +135,7 @@ const SnackbarComponent: React.FC = () => {
                         {alert.kasware && (
                             <Typography
                                 sx={{
-                                    fontSize: '1.5rem',
+                                    fontSize: '1rem',
                                     color: alertIconColors[alert.severity],
                                     opacity: 0.8,
                                     fontWeight: 'bold',

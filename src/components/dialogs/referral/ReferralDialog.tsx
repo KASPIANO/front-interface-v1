@@ -3,7 +3,6 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
     Button,
     TextField,
@@ -16,7 +15,7 @@ import {
     Redeem as RedeemIcon,
     ContentCopyRounded as ContentCopyRoundedIcon,
 } from '@mui/icons-material';
-import { addReferredBy } from '../../../DAL/BackendDAL';
+import { addReferredBy, getUserReferral } from '../../../DAL/BackendDAL';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 
 interface ReferralDialogProps {
@@ -25,11 +24,21 @@ interface ReferralDialogProps {
     walletAddress: string;
     referralCode?: string | null; // Used to display referral code if it exists
     mode: 'get' | 'add'; // To control the mode of the dialog (get vs. add referral)
+    setRefferedBy?: (referredBy: string) => void;
 }
 
-const ReferralDialog: React.FC<ReferralDialogProps> = ({ open, onClose, walletAddress, referralCode, mode }) => {
+const ReferralDialog: React.FC<ReferralDialogProps> = ({
+    open,
+    onClose,
+    walletAddress,
+    referralCode,
+    mode,
+    setRefferedBy,
+}) => {
     const [referredByCode, setReferredByCode] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
+    const [retrievedReferralCode, setRetrievedReferralCode] = useState<string | null>(referralCode || null);
+
     const [, setCopied] = useState(false);
 
     // Copy referral code to clipboard
@@ -52,14 +61,48 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({ open, onClose, walletAd
     // Add referred by code
     const handleAddReferredBy = async () => {
         setLoading(true);
+
         const result = await addReferredBy(walletAddress, referredByCode);
         if (result) {
-            alert('Referred by code added successfully!');
-            setReferredByCode('');
+            if (setRefferedBy) {
+                setRefferedBy(referredByCode);
+            }
+            showGlobalSnackbar({
+                message: 'Referred by code added successfully!',
+                severity: 'success',
+            });
         } else {
-            alert('Failed to add referred by code.');
+            showGlobalSnackbar({
+                message: 'Failed to add referred by code.',
+                severity: 'error',
+            });
         }
+        setReferredByCode('');
         setLoading(false);
+        onClose();
+    };
+
+    const handleGetReferralCode = async () => {
+        setLoading(true);
+        try {
+            const result = await getUserReferral(walletAddress); // Call the correct service function
+            if (result && result.referralCode) {
+                setRetrievedReferralCode(result.referralCode); // Set the retrieved referral code
+                showGlobalSnackbar({
+                    message: 'Referral code retrieved successfully.',
+                    severity: 'success',
+                });
+            } else {
+                throw new Error('Referral code not found.');
+            }
+        } catch (error) {
+            showGlobalSnackbar({
+                message: 'Failed to retrieve referral code.',
+                severity: 'error',
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -70,40 +113,58 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({ open, onClose, walletAd
                     {mode === 'get' ? (
                         <Typography variant="h6">Your Referral Code</Typography>
                     ) : (
-                        <Typography variant="h6">Referral System</Typography>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                width: '100%', // Full width
+                                justifyContent: 'space-between', // Align Typography and Button with space in-between
+                                alignItems: 'center', // Vertically center the Typography and Button
+                            }}
+                        >
+                            <Typography variant="h6">Referral System</Typography>
+                            <Button
+                                sx={{ marginLeft: 'auto' }}
+                                variant="outlined"
+                                color="secondary"
+                                onClick={
+                                    retrievedReferralCode
+                                        ? () => copyToClipboard(retrievedReferralCode)
+                                        : handleGetReferralCode
+                                }
+                                disabled={loading}
+                                endIcon={retrievedReferralCode && <ContentCopyRoundedIcon fontSize="small" />}
+                            >
+                                {retrievedReferralCode ? retrievedReferralCode : 'Get Referral Code'}
+                            </Button>
+                        </Box>
                     )}
                 </Box>
             </DialogTitle>
             <DialogContent>
                 {mode === 'get' && referralCode ? (
-                    <DialogContentText>
-                        <Box display="flex" alignItems="center" justifyContent="center">
-                            <AccountIcon fontSize="large" style={{ marginRight: 10 }} />
-                            <Typography>
-                                Your Referral Code: <strong>{referralCode}</strong>
-                            </Typography>
-                            <IconButton
-                                onClick={() => copyToClipboard(referralCode)}
-                                aria-label="Copy Referral Code"
-                                sx={{ marginLeft: 1 }}
-                            >
-                                <ContentCopyRoundedIcon />
-                            </IconButton>
-                        </Box>
-                    </DialogContentText>
+                    <Box display="flex" alignItems="center" justifyContent="center">
+                        <AccountIcon fontSize="large" style={{ marginRight: 10 }} />
+                        <Typography>
+                            <strong>{referralCode}</strong>
+                        </Typography>
+                        <IconButton
+                            onClick={() => copyToClipboard(referralCode)}
+                            aria-label="Copy Referral Code"
+                            sx={{ marginLeft: 1 }}
+                        >
+                            <ContentCopyRoundedIcon />
+                        </IconButton>
+                    </Box>
                 ) : (
                     <>
-                        <DialogContentText>
-                            <Box display="flex" alignItems="center">
-                                <AccountIcon fontSize="large" style={{ marginRight: 10 }} />
-                                <Typography>
-                                    Welcome to our referral program! Share your referral code with others, and when
-                                    they sign up, both of you will earn points. The more you share, the more you
-                                    earn!
-                                </Typography>
-                            </Box>
-                        </DialogContentText>
-                        <Box marginTop={2} display="flex" flexDirection="column" alignItems="center">
+                        <Box display="flex" alignItems="center">
+                            <AccountIcon fontSize="large" style={{ marginRight: 10 }} />
+                            <Typography>
+                                Welcome to our referral program! Share your referral code with others, and when
+                                they sign up, both of you will earn points. The more you share, the more you earn!
+                            </Typography>
+                        </Box>
+                        <Box marginTop={1} display="flex" flexDirection="column" alignItems="center">
                             {/* Input field to add a referral code */}
                             <TextField
                                 label="Referral Code"
@@ -127,7 +188,7 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({ open, onClose, walletAd
                     </>
                 )}
             </DialogContent>
-            <DialogActions>
+            <DialogActions sx={{ paddingTop: 0 }}>
                 <Button onClick={onClose} color="secondary">
                     Close
                 </Button>

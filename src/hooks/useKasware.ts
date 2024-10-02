@@ -5,6 +5,8 @@ import { UserVerfication } from '../types/Types';
 import { generateNonce, generateRequestId, generateVerificationMessage } from '../utils/Utils';
 // import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 import { getNetwork, handleSwitchNetwork, isKasWareInstalled } from '../utils/KaswareUtils';
+import { getUserReferral } from '../DAL/BackendDAL';
+import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 
 export const useKasware = () => {
     const [connected, setConnected] = useState(false);
@@ -75,13 +77,6 @@ export const useKasware = () => {
 
                 // Show a success message with part of the wallet address
 
-                // showGlobalDialog({
-                //     dialogType: 'referral',
-                //     dialogProps: {
-                //         walletAddress: account,
-                //         mode: 'add',
-                //     },
-                // });
                 return verifiedUser;
             }
         } catch (error) {
@@ -94,6 +89,7 @@ export const useKasware = () => {
             await disconnectWallet();
             return null;
         }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -244,6 +240,16 @@ export const useKasware = () => {
                 severity: 'success',
             });
             handleAccountsChanged(result);
+            const { refferedBy } = await getUserReferral(result[0]);
+            if (!refferedBy) {
+                showGlobalDialog({
+                    dialogType: 'referral',
+                    dialogProps: {
+                        walletAddress: result[0],
+                        mode: 'add',
+                    },
+                });
+            }
         } else {
             showGlobalSnackbar({
                 message: 'KasWare not installed',
