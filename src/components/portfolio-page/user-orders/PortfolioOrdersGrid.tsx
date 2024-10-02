@@ -15,6 +15,7 @@ import {
 } from '../../../DAL/BackendP2PDAL';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { sendKaspa } from '../../../utils/KaswareUtils';
+import { set } from 'lodash';
 
 interface PortfolioOrdersGridProps {
     kasPrice: number;
@@ -38,6 +39,8 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [totalCount, setTotalCount] = useState<number>(0);
     const [operationFinished, setOperationFinished] = useState<boolean>(false);
+    const [cancelOrderWaitingPayment, setCancelOrderWaitingPayment] = useState<boolean>(false);
+    const [cancelOrderWaitingConfirmation, setCancelOrderWaitingConfirmation] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchUserOrders = async () => {
@@ -91,12 +94,16 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
         const { needMoney, temporaryWalletAddress, confirm } = await confirmDelistOrder(orderId, walletAddress);
         if (needMoney === true) {
             try {
+                setCancelOrderWaitingPayment(true);
                 const txData = await sendKaspa(temporaryWalletAddress, 5 * KASPA_TO_SOMPI);
                 if (txData) {
+                    setCancelOrderWaitingPayment(false);
+                    setCancelOrderWaitingConfirmation(true);
                     const parsedTxData = JSON.parse(txData);
                     const txId = parsedTxData.id;
                     const { confirm } = await confirmDelistOrder(orderId, walletAddress, txId);
                     if (confirm) {
+                        setCancelOrderWaitingConfirmation(false);
                         showGlobalSnackbar({
                             message: 'Order removed from marketplace, tokens returned to your wallet',
                             severity: 'success',
@@ -108,12 +115,15 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                         message: 'Error sending Kas for Fees to remove tokens, please try again',
                         severity: 'success',
                     });
+                    setCancelOrderWaitingPayment(false);
                 }
             } catch (error) {
                 showGlobalSnackbar({
                     message: 'Error removing order from marketplace, please try again',
-                    severity: 'success',
+                    severity: 'error',
                 });
+                setCancelOrderWaitingPayment(false);
+                setCancelOrderWaitingConfirmation(false);
             }
         }
         if (confirm === true) {
@@ -122,10 +132,12 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                 severity: 'success',
             });
             setOperationFinished((prev) => !prev);
+            setCancelOrderWaitingPayment(false);
+            setCancelOrderWaitingConfirmation(false);
         } else {
             showGlobalSnackbar({
                 message: 'Error removing order from marketplace, please try again',
-                severity: 'success',
+                severity: 'error',
             });
         }
     };
@@ -207,6 +219,8 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                     {orders.length > 0 && !loading
                         ? orders.map((order) => (
                               <UserOrdersRow
+                                  cancelOrderWaitingPayment={cancelOrderWaitingPayment}
+                                  cancelOrderWaitingConfirmation={cancelOrderWaitingConfirmation}
                                   handleCancelOrder={handleCancelOrder}
                                   handleEditOrder={handleEditOrder}
                                   handleRelist={handleRelist}
