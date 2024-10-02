@@ -60,7 +60,7 @@ export const useKasware = () => {
                         signature: userVerification,
                         expiresAt: Date.now() + 4 * 60 * 60 * 1000,
                     },
-                    { secure: true },
+                    { secure: true, sameSite: 'none', path: '/' },
                 );
                 const verifiedUser = {
                     userWalletAddress: account,
