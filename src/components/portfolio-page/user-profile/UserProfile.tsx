@@ -5,8 +5,10 @@ import { ProfileContainer, ProfileDetails } from './UserProfile.s';
 // import XIcon from '@mui/icons-material/X';
 import { shortenAddress } from '../../../utils/Utils';
 import { Stat, StatHelpText, StatNumber } from '@chakra-ui/react';
-import { checkReferralExists, getUserReferral } from '../../../DAL/BackendDAL';
-import ReferralDialog from '../../dialogs/referral/ReferralDialog';
+import { getUserReferral } from '../../../DAL/BackendDAL';
+import { showGlobalDialog } from '../../dialog-context/DialogContext';
+import { ContentCopyRounded as ContentCopyRoundedIcon } from '@mui/icons-material';
+import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 
 interface UserProfileProps {
     walletAddress: string;
@@ -18,41 +20,52 @@ interface UserProfileProps {
 const UserProfile: FC<UserProfileProps> = (props) => {
     const { walletAddress, portfolioValue, kasPrice, setWalletAddress } = props;
     const theme = useTheme();
-    const [referralExists, setReferralExists] = useState<boolean | null>(null);
-    const [openReferralDialog, setOpenReferralDialog] = useState<boolean>(false);
     const [referralCode, setReferralCode] = useState<string | null>(null);
-    const [dialogMode, setDialogMode] = useState<'get' | 'add'>('add');
+    const [refferedBy, setRefferedBy] = useState<string | null>(null);
+    const [, setCopied] = useState(false);
 
     useEffect(() => {
         const fetchReferralStatus = async () => {
             if (walletAddress) {
-                const result = await checkReferralExists(walletAddress);
-                if (result) {
-                    setReferralExists(result.exists);
+                setReferralCode(null);
+                setRefferedBy(null);
+                const result = await getUserReferral(walletAddress);
+                if (result.referralCode) {
+                    setReferralCode(result.referralCode);
+                    setRefferedBy(result.refferedBy);
                 }
             }
         };
         fetchReferralStatus();
     }, [walletAddress]);
 
-    const handleGetReferralCode = async () => {
-        if (walletAddress) {
-            const result = await getUserReferral(walletAddress);
-            if (result) {
-                setReferralCode(result.referralCode);
-                setDialogMode('get'); // Switch to "get" mode
-                setOpenReferralDialog(true); // Open dialog to show referral code
-            }
-        }
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard
+            .writeText(text)
+            .then(() => {
+                setCopied(true);
+                showGlobalSnackbar({
+                    message: 'Copied to clipboard',
+                    severity: 'success',
+                });
+                setTimeout(() => setCopied(false), 2000);
+            })
+            .catch((err) => {
+                console.error('Failed to copy: ', err);
+            });
     };
 
     const handleOpenReferralDialog = () => {
-        setDialogMode('add'); // Switch to "add" mode
-        setOpenReferralDialog(true);
-    };
-
-    const handleCloseReferralDialog = () => {
-        setOpenReferralDialog(false);
+        if (walletAddress) {
+            showGlobalDialog({
+                dialogType: 'referral',
+                dialogProps: {
+                    walletAddress,
+                    mode: 'add',
+                    setRefferedBy,
+                },
+            });
+        }
     };
 
     const handleManualAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,9 +112,10 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                             onChange={handleManualAddressChange}
                             sx={{
                                 minWidth: '3rem',
+                                fontSize: '0.8rem',
 
                                 '& .MuiOutlinedInput-root': {
-                                    height: '2.4rem', // Adjust as needed
+                                    height: '2.2rem', // Adjust as needed
 
                                     '& fieldset': {
                                         borderColor: alpha(theme.palette.primary.main, 0.7),
@@ -132,14 +146,18 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         >
                             Add
                         </Button> */}
-                        {referralExists === null ? (
-                            <Typography>Loading...</Typography>
-                        ) : referralExists ? (
-                            <Button variant="outlined" size="small" onClick={handleGetReferralCode}>
-                                Get Referral Code
+                        {referralCode && (
+                            <Button
+                                variant="outlined"
+                                size="medium"
+                                endIcon={<ContentCopyRoundedIcon fontSize="small" />}
+                                onClick={() => copyToClipboard(referralCode)}
+                            >
+                                Referral Code : {referralCode}
                             </Button>
-                        ) : (
-                            <Button variant="outlined" size="small" onClick={handleOpenReferralDialog}>
+                        )}
+                        {!refferedBy && (
+                            <Button variant="outlined" size="medium" onClick={handleOpenReferralDialog}>
                                 Add Referral Code
                             </Button>
                         )}
@@ -163,13 +181,6 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                     {portfolioValue.change}% */}
                 </StatHelpText>
             </Stat>
-            <ReferralDialog
-                open={openReferralDialog}
-                onClose={handleCloseReferralDialog}
-                walletAddress={walletAddress}
-                referralCode={referralCode} // Pass referral code if exists
-                mode={dialogMode} // Control dialog mode (get vs. add)
-            />
         </ProfileContainer>
     );
 };

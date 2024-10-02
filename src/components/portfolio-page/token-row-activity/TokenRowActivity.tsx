@@ -1,5 +1,6 @@
 import { Divider, ListItem, ListItemText, Tooltip, Typography } from '@mui/material';
 import { FC } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { TokenRowActivityItem } from '../../../types/Types';
 import { capitalizeFirstLetter } from '../../../utils/Utils';
 
@@ -12,9 +13,10 @@ interface TokenRowActivityProps {
 
 const TokenRowActivity: FC<TokenRowActivityProps> = (props) => {
     const { token } = props;
+    const id = uuidv4();
 
     return (
-        <div key={token.ticker}>
+        <div key={token.ticker + id}>
             <ListItem disablePadding sx={{ height: '12vh', marginLeft: '1.4vw' }}>
                 <ListItemText
                     sx={{

@@ -242,9 +242,11 @@ export const getGasEstimator = async (orderId: string): Promise<any> => {
     }
 };
 
-export const getUserReferral = async (walletAddress: string): Promise<{ referralCode: string } | null> => {
+export const getUserReferral = async (
+    walletAddress: string,
+): Promise<{ referralCode: string; refferedBy: string } | null> => {
     try {
-        const response = await backendService.post<{ referralCode: string }>(
+        const response = await backendService.post<{ referralCode: string; refferedBy: string }>(
             `/${USER_REFERRALS_CONTROLLER}/get-user-referral`,
             {
                 walletAddress,
