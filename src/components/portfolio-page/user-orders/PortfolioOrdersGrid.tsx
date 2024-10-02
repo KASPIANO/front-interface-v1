@@ -15,7 +15,6 @@ import {
 } from '../../../DAL/BackendP2PDAL';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { sendKaspa } from '../../../utils/KaswareUtils';
-import { set } from 'lodash';
 
 interface PortfolioOrdersGridProps {
     kasPrice: number;
