@@ -2,8 +2,8 @@ import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import { Autocomplete, Avatar, Box, InputAdornment, MenuItem, Skeleton } from '@mui/material';
 import axios, { CancelTokenSource } from 'axios';
 import { debounce } from 'lodash';
-import React, { FC, useCallback, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { searchToken } from '../../DAL/BackendDAL';
 import { TokenSearchItems } from '../../types/Types';
 import { GlobalStyleAutoComplete, GlobalStyleTokenSideBar } from '../../utils/GlobalStyleScrollBar';
@@ -18,6 +18,7 @@ const styles = `
 
 interface TokenSearchProps {
     setBackgroundBlur: (isFocused: boolean) => void;
+    isMobile?: boolean;
 }
 
 const TokenSearch: FC<TokenSearchProps> = (props) => {
@@ -30,9 +31,31 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
     const navigate = useNavigate();
     const [isTransitioning, setIsTransitioning] = useState(false);
     const transitionDuration = 200;
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.pathname === '/KRC-20') {
+            setSearchValue(''); // Clear the search value
+        }
+    }, [location.pathname]); // Trigger this useEffect whenever the path changes
 
     const cancelTokenRef = useRef<CancelTokenSource>(null);
-
+    const handleKeyDown = (event: React.KeyboardEvent) => {
+        if (event.key === 'Escape') {
+            setIsFocused(false);
+            setShowOptions(false);
+            setBackgroundBlur(false);
+        } else if (event.key === 'Enter') {
+            // Handle Enter key press
+            if (tokens.length > 0) {
+                navigate(`/token/${tokens[0].ticker}`);
+                setIsFocused(false);
+                setShowOptions(false);
+                setBackgroundBlur(false);
+                setSearchValue('');
+            }
+        }
+    };
     const loadingArray = useRef(
         Array(5)
             .fill(null)
@@ -107,7 +130,7 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
     );
 
     const handleTokenSelect = (_event: any, value: TokenSearchItems | null) => {
-        if (value) {
+        if (value && value.ticker) {
             navigate(`/token/${value.ticker}`);
             setIsFocused(false);
             setShowOptions(false);
@@ -125,6 +148,7 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
             <Box
                 sx={{
                     marginRight: '1.5vw',
+                    display: props.isMobile ? { xs: 'flex', md: 'none' } : { xs: 'none', md: 'flex' },
                 }}
             >
                 <style>{styles}</style>
@@ -146,6 +170,7 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
                     freeSolo
                     filterOptions={(x) => x}
                     inputValue={searchValue}
+                    onKeyDown={handleKeyDown}
                     onInputChange={handleSearchChange}
                     getOptionLabel={(option: TokenSearchItems) => (option.ticker ? option.ticker : '')}
                     onChange={handleTokenSelect}
@@ -176,6 +201,7 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
                     )}
                     renderInput={(params) => (
                         <SearchContainer
+                            onKeyDown={handleKeyDown}
                             {...params}
                             onFocus={handleFocus}
                             onBlur={handleBlur}
@@ -189,6 +215,7 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
                                         <SearchRoundedIcon sx={{ fontSize: '0.8rem' }} />
                                     </InputAdornment>
                                 ),
+                                onKeyDown: handleKeyDown,
                                 sx: {
                                     height: isFocused ? '5vh' : '3.5vh',
                                     display: 'flex',
