@@ -8,6 +8,8 @@ import { checkReferralExists } from '../DAL/BackendDAL';
 import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 import { getNetwork, handleSwitchNetwork, isKasWareInstalled } from '../utils/KaswareUtils';
 
+const cookieDomain = process.env.NODE_ENV === 'production' ? '.kaspiano.com' : undefined;
+
 export const useKasware = () => {
     const [connected, setConnected] = useState(false);
     const [accounts, setAccounts] = useState<string[]>([]);
@@ -64,6 +66,7 @@ export const useKasware = () => {
                         httpOnly: true,
                         secure: process.env.NODE_ENV === 'production', // Only use secure in production
                         sameSite: 'none', // Required for cross-origin requests
+                        domain: cookieDomain, // Set domain only in production
                         path: '/',
                     },
                 );
