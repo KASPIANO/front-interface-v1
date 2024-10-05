@@ -62,13 +62,7 @@ export const useKasware = () => {
                         signature: userVerification,
                         expiresAt: Date.now() + 4 * 60 * 60 * 1000,
                     },
-                    {
-                        httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production', // Only use secure in production
-                        sameSite: 'none', // Required for cross-origin requests
-                        domain: cookieDomain, // Set domain only in production
-                        path: '/',
-                    },
+                    { secure: true, sameSite: 'none', path: '/' },
                 );
                 const verifiedUser = {
                     userWalletAddress: account,
