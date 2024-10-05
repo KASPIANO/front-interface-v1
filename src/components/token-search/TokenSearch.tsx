@@ -18,7 +18,7 @@ const styles = `
 
 interface TokenSearchProps {
     setBackgroundBlur: (isFocused: boolean) => void;
-    isMobile: boolean;
+    isMobile?: boolean;
 }
 
 const TokenSearch: FC<TokenSearchProps> = (props) => {
