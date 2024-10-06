@@ -73,7 +73,7 @@ const Footer: React.FC = () => (
 
                     <Grid item xs={3} md={3} sm={3} lg={3}>
                         <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
-                            Company
+                            About us
                         </Typography>
                         <FooterList>
                             <li>
