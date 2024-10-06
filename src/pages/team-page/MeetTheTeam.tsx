@@ -7,7 +7,7 @@ const teamMembers = [
     {
         name: 'Sione Milhem',
         position: 'Founder & CEO',
-        image: 'https://example.com/sione.jpg', // Replace with actual image URL
+        image: 'https://krc20data.s3.amazonaws.com/verified/sione.jpg', // Replace with actual image URL
         description:
             "Sione is an entrepreneur and computer scientist with deep expertise in blockchain technology. A member of the Kaspa community since 2022, Sione has been involved in every aspect of Kaspiano's development, from ideation to launch.",
         twitter: 'https://x.com/cryptosione',
@@ -16,7 +16,7 @@ const teamMembers = [
     {
         name: 'Avidan Abitbol',
         position: 'Co-Founder & Development Lead',
-        image: 'https://example.com/avidan.jpg', // Replace with actual image URL
+        image: 'https://krc20data.s3.amazonaws.com/verified/avidan.jpg', // Replace with actual image URL
         description:
             'Avidan is a seasoned member of the Kaspa community with extensive experience in management and business development. As co-founder of Kaspiano, he leads the development efforts, overseeing architecture and aligning technical execution with company goals.',
         twitter: 'https://x.com/avidanab',
@@ -24,7 +24,7 @@ const teamMembers = [
     {
         name: 'Gilad',
         position: 'Senior Full Stack Developer',
-        image: 'https://example.com/gilad.jpg', // Replace with actual image URL
+        image: 'https://krc20data.s3.amazonaws.com/verified/gilad.png', // Replace with actual image URL
         description:
             "Gilad is a highly skilled Full Stack Developer, focusing on backend development and contributing to Kaspiano's success, including Rug Score calculations and Kaspa blockchain integration.",
         twitter: 'https://x.com/giladkas',
@@ -32,7 +32,7 @@ const teamMembers = [
     {
         name: 'Abraham Milhem',
         position: 'Community, Partnerships, & Social Media Manager',
-        image: 'https://example.com/abraham.jpg', // Replace with actual image URL
+        image: 'https://krc20data.s3.amazonaws.com/verified/abi.jpeg', // Replace with actual image URL
         description:
             'Abraham excels at building engaged communities in the crypto space, focusing on keeping Kaspiano transparent and community-driven, ensuring all feedback is heard and addressed.',
         twitter: 'https://x.com/BabyKrakennn',
@@ -41,7 +41,7 @@ const teamMembers = [
     {
         name: 'Dor Zion',
         position: 'Senior Developer',
-        image: 'https://example.com/dor.jpg', // Replace with actual image URL
+        image: 'https://krc20data.s3.amazonaws.com/verified/dorzi.png', // Replace with actual image URL
         description:
             'Dor began his career in the Israeli military’s elite tech units and played a key role in system architecture and development across various startups and corporations.',
         twitter: 'https://x.com/zion_dor',
@@ -49,14 +49,14 @@ const teamMembers = [
     {
         name: 'Ben Brizovsky',
         position: 'Senior Developer',
-        image: 'https://example.com/ben.jpg', // Replace with actual image URL
+        image: 'https://krc20data.s3.amazonaws.com/verified/benbo.png', // Replace with actual image URL
         description:
             "With a passion for development, Ben has been instrumental in building Kaspiano's back-end infrastructure and API, integrating key data with MongoDB.",
     },
     {
         name: 'Arnon',
         position: 'Senior Software Engineer',
-        image: 'https://example.com/arnon.jpg', // Replace with actual image URL
+        image: 'https://krc20data.s3.amazonaws.com/verified/arnon.png', // Replace with actual image URL
         description:
             "Arnon specializes in back-end infrastructure, DevOps, and workflow automation, ensuring that Kaspiano's system can scale efficiently while remaining performant.",
         twitter: 'https://x.com/ArnonHillel',
