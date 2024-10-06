@@ -90,7 +90,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
     };
 
     const handleCancelOrder = async (orderId: string) => {
-        const { needMoney, temporaryWalletAddress, confirm } = await confirmDelistOrder(orderId, walletAddress);
+        const { needMoney, temporaryWalletAddress, confirmed } = await confirmDelistOrder(orderId, walletAddress);
         if (needMoney === true) {
             try {
                 setCancelOrderWaitingPayment(true);
@@ -100,9 +100,8 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                     setCancelOrderWaitingConfirmation(true);
                     const parsedTxData = JSON.parse(txData);
                     const txId = parsedTxData.id;
-                    const { confirm } = await confirmDelistOrder(orderId, walletAddress, txId);
-                    if (confirm) {
-                        setCancelOrderWaitingConfirmation(false);
+                    const { confirmed } = await confirmDelistOrder(orderId, walletAddress, txId);
+                    if (confirmed) {
                         showGlobalSnackbar({
                             message: 'Order removed from marketplace, tokens returned to your wallet',
                             severity: 'success',
@@ -124,8 +123,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                 setCancelOrderWaitingPayment(false);
                 setCancelOrderWaitingConfirmation(false);
             }
-        }
-        if (confirm === true) {
+        } else if (confirmed === true) {
             showGlobalSnackbar({
                 message: 'Order removed from marketplace, tokens returned to your wallet',
                 severity: 'success',
@@ -220,6 +218,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                               <UserOrdersRow
                                   cancelOrderWaitingPayment={cancelOrderWaitingPayment}
                                   cancelOrderWaitingConfirmation={cancelOrderWaitingConfirmation}
+                                  setCancelOrderWaitingConfirmation={setCancelOrderWaitingConfirmation}
                                   handleCancelOrder={handleCancelOrder}
                                   handleEditOrder={handleEditOrder}
                                   handleRelist={handleRelist}

@@ -26,6 +26,7 @@ interface UserOrdersRowProps {
     handleCancelOrder?: (orderId: string) => void;
     cancelOrderWaitingConfirmation: boolean;
     cancelOrderWaitingPayment: boolean;
+    setCancelOrderWaitingConfirmation: (value: boolean) => void;
 }
 
 const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
@@ -38,6 +39,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         handleCancelOrder,
         cancelOrderWaitingConfirmation,
         cancelOrderWaitingPayment,
+        setCancelOrderWaitingConfirmation,
     } = props;
     const [openEditDialog, setOpenEditDialog] = React.useState(false);
     const [pricePerToken, setPricePerToken] = React.useState('');
@@ -127,6 +129,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
     const cancelOrderHandler = async (orderId: string) => {
         await handleCancelOrder(orderId);
         setOpenCancelDialog(false);
+        setCancelOrderWaitingConfirmation(false);
     };
 
     return (
@@ -345,36 +348,43 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                 open={openCancelDialog}
                 onClose={() => setOpenCancelDialog(false)}
             >
-                <DialogTitle>Cancel Order Process</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>
+                    {cancelOrderWaitingPayment || cancelOrderWaitingConfirmation ? '' : 'Cancel Order Process'}
+                </DialogTitle>
                 <DialogContent>
                     {/* Conditionally show the loading spinner or the content based on the state */}
                     {cancelOrderWaitingPayment ? (
-                        <LoadingSpinner title="Waiting for payment in wallet" />
+                        <LoadingSpinner title="Waiting for payment in wallet" size={60} />
                     ) : cancelOrderWaitingConfirmation ? (
-                        <LoadingSpinner title="Waiting for confirmation" />
+                        <LoadingSpinner title="Waiting for confirmation" size={60} />
                     ) : (
                         <Box sx={{ marginBottom: 2 }}>
                             <Typography variant="body1">
-                                To cancel your order and retrieve your tokens, you will need to send 5 Kas to cover
-                                the expected gas fees. This amount ensures the transaction can be processed on the
-                                network. In most cases, you will receive approximately 4.9 Kas back after the
-                                tokens are successfully sent and the transaction is completed.
+                                To cancel your order and retrieve your tokens, you will need to send{' '}
+                                <strong>5 Kas</strong> to cover the expected gas fees. This ensures the transaction
+                                can be processed smoothly on the network.{' '}
+                                <strong>In most cases, you will receive approximately 4.9 Kas back</strong> after
+                                the tokens are successfully sent and the transaction is completed.
                             </Typography>
                             <Typography variant="body1" sx={{ marginTop: 2 }}>
-                                This small difference accounts for minor variations in network fees, but the
-                                majority of your sent amount will be returned to your wallet.
+                                The <strong>small difference</strong> accounts for minor fluctuations in network
+                                fees, but rest assured,{' '}
+                                <strong>the majority of your sent amount will be returned to your wallet</strong>.
                             </Typography>
                             <Typography variant="body1" sx={{ marginTop: 2 }}>
-                                Please confirm that you would like to proceed with the cancellation process.
+                                Please confirm if you wish to proceed with the cancellation process.
                             </Typography>
                         </Box>
                     )}
                 </DialogContent>
-
-                <DialogActions>
-                    <Button onClick={() => cancelOrderHandler(order.orderId)}>Cancel Order</Button>
-                    <Button onClick={() => setOpenCancelDialog(false)}>Exit</Button>
-                </DialogActions>
+                {cancelOrderWaitingConfirmation || cancelOrderWaitingPayment ? null : (
+                    <DialogActions>
+                        <Button onClick={() => cancelOrderHandler(order.orderId)} variant="contained">
+                            Cancel Order
+                        </Button>
+                        <Button onClick={() => setOpenCancelDialog(false)}>Exit</Button>
+                    </DialogActions>
+                )}
             </Dialog>
         </div>
     );
