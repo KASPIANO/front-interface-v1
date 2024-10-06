@@ -3,7 +3,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
 import { Avatar, Drawer, IconButton, List, ListItem, ListItemText, Tooltip, Typography } from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../../main';
 import { ThemeModes } from '../../utils/Utils';
 import TokenSearch from '../token-search/TokenSearch';
@@ -36,10 +36,13 @@ const Navbar: React.FC<NavbarProps> = ({
     const [gas, setGas] = useState('');
     const navigate = useNavigate();
     const isDarkMode = themeContext.themeMode === ThemeModes.DARK;
+    const location = useLocation();
 
     useEffect(() => {
-        setActivePage(window.location.pathname);
-    }, []);
+        const pathWithoutSlash = window.location.pathname.replace(/^\//, '');
+        console.log(pathWithoutSlash);
+        setActivePage(pathWithoutSlash);
+    }, [location]);
 
     const handleNavButtonClick = (page: string) => {
         setActivePage(page);
@@ -140,7 +143,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
             {/* Full Navigation for Larger Screens */}
             <NavCenter sx={{ display: { xs: 'none', md: 'flex' } }}>
-                {['KRC-20   ', 'deploy', 'portfolio', 'airdrop'].map((page) => (
+                {['KRC-20', 'deploy', 'portfolio', 'airdrop'].map((page) => (
                     <NavButton
                         key={page}
                         isActive={activePage === page}

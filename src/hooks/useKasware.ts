@@ -47,7 +47,7 @@ export const useKasware = () => {
             const requestId = generateRequestId();
             const requestDate = new Date().toISOString();
             const userVerificationMessage = generateVerificationMessage(account, nonce, requestDate, requestId);
-
+            const domain = import.meta.env.VITE_ENV === 'local' ? '' : '.kaspiano.com';
             const userVerification = await signMessage(userVerificationMessage);
             const publicKeyCookies = await window.kasware.getPublicKey();
             if (userVerification) {
@@ -60,7 +60,7 @@ export const useKasware = () => {
                         signature: userVerification,
                         expiresAt: Date.now() + 4 * 60 * 60 * 1000,
                     },
-                    { secure: true, sameSite: 'none', path: '/', domain: '.kaspiano.com' },
+                    { secure: true, sameSite: 'none', path: '/', domain },
                 );
                 const verifiedUser = {
                     userWalletAddress: account,

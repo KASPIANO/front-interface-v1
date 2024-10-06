@@ -25,7 +25,7 @@ interface ConfirmSellDialogProps {
     creatingSellOrder: boolean;
 }
 const MINIMUM_FEE_AMOUNT = 1;
-const MARKETLACE_FEE_PERCENTAGE = 0.02;
+const MARKETLACE_FEE_PERCENTAGE = 0.025;
 const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
     const {
         waitingForWalletConfirmation,

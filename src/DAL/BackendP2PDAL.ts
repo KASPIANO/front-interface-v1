@@ -189,7 +189,7 @@ export const confirmDelistOrder = async (
     orderId: string,
     walletAddress: string,
     transactionId?: string,
-): Promise<{ needMoney: boolean; temporaryWalletAddress: string; confirm: boolean }> => {
+): Promise<{ needMoney: boolean; temporaryWalletAddress: string; confirmed: boolean; transactions: any }> => {
     const response = await backendService.post<any>(
         `/${P2PCONTROLLER}/confirmDelistOrder/${orderId}`,
 
