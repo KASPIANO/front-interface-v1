@@ -9,8 +9,6 @@ import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
 import { transferKRC20Token } from '../../../../../utils/KaswareUtils';
 import { confirmSellOrder, createSellOrder } from '../../../../../DAL/BackendP2PDAL';
 import { doPolling } from '../../../../../utils/Utils';
-import { set } from 'lodash';
-import { parse } from 'path';
 
 interface SellPanelProps {
     tokenInfo: BackendTokenResponse;
