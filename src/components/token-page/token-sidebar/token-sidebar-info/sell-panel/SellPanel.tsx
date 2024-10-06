@@ -33,12 +33,13 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [tempWalletAddress, setTempWalletAddress] = useState<string>('');
     const [creatingSellOrder, setCreatingSellOrder] = useState<boolean>(false);
     const [disableSellButton, setDisableSellButton] = useState<boolean>(false);
+    const [finishedSellOrder, setFinishedSellOrder] = useState<boolean>(false);
 
     useEffect(() => {
         fetchWalletKRC20Balance(walletAddress, tokenInfo.ticker).then((balance) => {
             setWalletTickerBalance(balance);
         });
-    }, [walletAddress, tokenInfo.ticker]);
+    }, [walletAddress, tokenInfo.ticker, finishedSellOrder]);
 
     const handleTokenAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const amountStr = e.target.value;
@@ -261,6 +262,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 setIsDialogOpen(false);
                 setCreatingSellOrder(false);
                 cleanFields();
+                setFinishedSellOrder((prev) => !prev);
                 return true;
             } else {
                 showGlobalSnackbar({

@@ -27,6 +27,8 @@ interface UserOrdersRowProps {
     cancelOrderWaitingConfirmation: boolean;
     cancelOrderWaitingPayment: boolean;
     setCancelOrderWaitingConfirmation: (value: boolean) => void;
+    loadingOrderId: string | null;
+    setLoadingOrderId: (orderId: string | null) => void;
 }
 
 const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
@@ -40,6 +42,8 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         cancelOrderWaitingConfirmation,
         cancelOrderWaitingPayment,
         setCancelOrderWaitingConfirmation,
+        setLoadingOrderId,
+        loadingOrderId,
     } = props;
     const [openEditDialog, setOpenEditDialog] = React.useState(false);
     const [pricePerToken, setPricePerToken] = React.useState('');
@@ -52,6 +56,12 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         setPricePerToken('');
         setTotalPrice('');
         setEditError('');
+    };
+
+    const delistHandler = async (orderId: string) => {
+        setLoadingOrderId(orderId); // Set the loading state for the specific orderId
+        await handleDelist(orderId);
+        setLoadingOrderId(null); // Reset the loading state
     };
 
     const formatPrice = (price: number) => {
@@ -277,20 +287,23 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                         </>
                     )}
 
-                    {order.status === SellOrderStatus.LISTED_FOR_SALE && (
-                        <Button
-                            onClick={() => handleDelist(order.orderId)}
-                            variant="contained"
-                            color="primary"
-                            sx={{
-                                minWidth: '3.5vw',
-                                width: '3vw',
-                                fontSize: '0.7rem',
-                            }}
-                        >
-                            Delist
-                        </Button>
-                    )}
+                    {order.status === SellOrderStatus.LISTED_FOR_SALE &&
+                        (loadingOrderId === order.orderId ? (
+                            <LoadingSpinner size={20} />
+                        ) : (
+                            <Button
+                                onClick={() => delistHandler(order.orderId)}
+                                variant="contained"
+                                color="primary"
+                                sx={{
+                                    minWidth: '3.5vw',
+                                    width: '3vw',
+                                    fontSize: '0.7rem',
+                                }}
+                            >
+                                Delist
+                            </Button>
+                        ))}
                 </Box>
             </ListItem>
             <Divider />

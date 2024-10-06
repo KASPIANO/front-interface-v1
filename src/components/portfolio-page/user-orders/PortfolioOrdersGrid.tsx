@@ -40,6 +40,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
     const [operationFinished, setOperationFinished] = useState<boolean>(false);
     const [cancelOrderWaitingPayment, setCancelOrderWaitingPayment] = useState<boolean>(false);
     const [cancelOrderWaitingConfirmation, setCancelOrderWaitingConfirmation] = useState<boolean>(false);
+    const [loadingOrderId, setLoadingOrderId] = useState<string | null>('');
 
     useEffect(() => {
         const fetchUserOrders = async () => {
@@ -71,6 +72,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
     const handleDelist = async (orderId: string) => {
         const response = await removeFromMarketplace(orderId, walletAddress);
         if (response.success) {
+            setLoadingOrderId(null);
             showGlobalSnackbar({
                 message: 'Order removed from marketplace',
                 severity: 'success',
@@ -227,6 +229,8 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                                   order={order}
                                   walletConnected={walletConnected}
                                   kasPrice={kasPrice}
+                                  loadingOrderId={loadingOrderId}
+                                  setLoadingOrderId={setLoadingOrderId}
                               />
                           ))
                         : // Replace single Skeleton with multiple Skeletons

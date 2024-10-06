@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 
 interface LoadingSpinnerProps {
-    title: string;
+    title?: string;
     size?: number; // Spinner size, optional with default value
 }
 
