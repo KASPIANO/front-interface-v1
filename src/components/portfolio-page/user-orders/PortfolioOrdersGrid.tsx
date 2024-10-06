@@ -40,6 +40,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
     const [operationFinished, setOperationFinished] = useState<boolean>(false);
     const [cancelOrderWaitingPayment, setCancelOrderWaitingPayment] = useState<boolean>(false);
     const [cancelOrderWaitingConfirmation, setCancelOrderWaitingConfirmation] = useState<boolean>(false);
+    const [loadingOrderId, setLoadingOrderId] = useState<string | null>('');
 
     useEffect(() => {
         const fetchUserOrders = async () => {
@@ -71,6 +72,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
     const handleDelist = async (orderId: string) => {
         const response = await removeFromMarketplace(orderId, walletAddress);
         if (response.success) {
+            setLoadingOrderId(null);
             showGlobalSnackbar({
                 message: 'Order removed from marketplace',
                 severity: 'success',
@@ -81,6 +83,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
     const handleRelist = async (orderId: string) => {
         const response = await relistSellOrder(orderId, walletAddress);
         if (response === 201) {
+            setLoadingOrderId(null);
             showGlobalSnackbar({
                 message: 'Order relisted successfully',
                 severity: 'success',
@@ -95,6 +98,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
             try {
                 setCancelOrderWaitingPayment(true);
                 const txData = await sendKaspa(temporaryWalletAddress, 5 * KASPA_TO_SOMPI);
+
                 if (txData) {
                     setCancelOrderWaitingPayment(false);
                     setCancelOrderWaitingConfirmation(true);
@@ -129,6 +133,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                 severity: 'success',
             });
             setOperationFinished((prev) => !prev);
+            setLoadingOrderId(null);
             setCancelOrderWaitingPayment(false);
             setCancelOrderWaitingConfirmation(false);
         } else {
@@ -227,6 +232,8 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                                   order={order}
                                   walletConnected={walletConnected}
                                   kasPrice={kasPrice}
+                                  loadingOrderId={loadingOrderId}
+                                  setLoadingOrderId={setLoadingOrderId}
                               />
                           ))
                         : // Replace single Skeleton with multiple Skeletons

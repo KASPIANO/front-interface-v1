@@ -33,15 +33,23 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [tempWalletAddress, setTempWalletAddress] = useState<string>('');
     const [creatingSellOrder, setCreatingSellOrder] = useState<boolean>(false);
     const [disableSellButton, setDisableSellButton] = useState<boolean>(false);
+    const [finishedSellOrder, setFinishedSellOrder] = useState<boolean>(false);
+    const [amountError, setAmountError] = useState<string>('');
+    const [pricePerTokenError, setPricePerTokenError] = useState<string>('');
 
     useEffect(() => {
         fetchWalletKRC20Balance(walletAddress, tokenInfo.ticker).then((balance) => {
             setWalletTickerBalance(balance);
         });
-    }, [walletAddress, tokenInfo.ticker]);
+    }, [walletAddress, tokenInfo.ticker, finishedSellOrder]);
 
     const handleTokenAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const amountStr = e.target.value;
+        if (amountStr.includes('.')) {
+            setAmountError('Please enter a rounded number without decimals.');
+            return;
+        }
+        setAmountError('');
         setTokenAmount(amountStr);
 
         const amount = parseInt(amountStr);
@@ -57,6 +65,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 setTotalPrice(newTotalPrice.toString());
             }
         } else {
+            setTokenAmount('');
             setPricePerToken('');
             setTotalPrice('');
         }
@@ -65,9 +74,18 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     // Handle changes in total price
     const handleTotalPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const priceStr = e.target.value;
-        setTotalPrice(priceStr);
+        let totalRounded;
+        if (priceStr.includes('.')) {
+            setTotalPrice(parseFloat(priceStr).toFixed(0));
+            totalRounded = parseFloat(priceStr).toFixed(0);
+            setPricePerTokenError('Please enter a rounded number without decimals.');
+        } else {
+            totalRounded = priceStr;
+            setTotalPrice(priceStr);
+            setPricePerTokenError('');
+        }
 
-        const total = parseFloat(priceStr);
+        const total = parseFloat(totalRounded);
         const amount = parseInt(tokenAmount);
 
         if (!isNaN(total)) {
@@ -164,21 +182,22 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         setTotalPrice('');
         setPricePerToken('');
     };
+
     const handleCreateSellOrder = async () => {
         setDisableSellButton(true);
         if (priceCurrency === 'USD') {
             setPriceCurrency('KAS');
-            if (pricePerToken !== '') {
-                const pricePerTokenValue = parseFloat(pricePerToken);
-                const priceInKAS = pricePerTokenValue / kasPrice;
-                const roundedPriceInKAS = roundUp(priceInKAS, 8);
-                setPricePerToken(roundedPriceInKAS.toString());
-            }
             if (totalPrice !== '') {
                 const totalPriceValue = parseFloat(totalPrice);
                 const totalInKAS = totalPriceValue / kasPrice;
                 const roundedTotalInKAS = roundUp(totalInKAS, 8);
                 setTotalPrice(roundedTotalInKAS.toString());
+            }
+            if (pricePerToken !== '') {
+                const pricePerTokenValue = parseFloat(pricePerToken);
+                const priceInKAS = pricePerTokenValue / kasPrice;
+                const roundedPriceInKAS = roundUp(priceInKAS, 8);
+                setPricePerToken(roundedPriceInKAS.toString());
             }
         }
 
@@ -261,6 +280,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 setIsDialogOpen(false);
                 setCreatingSellOrder(false);
                 cleanFields();
+                setFinishedSellOrder((prev) => !prev);
                 return true;
             } else {
                 showGlobalSnackbar({
@@ -352,6 +372,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     value={tokenAmount}
                     onChange={handleTokenAmountChange}
                     fullWidth
+                    error={!!amountError}
+                    helperText={amountError}
                 />
 
                 <StyledTextField
@@ -362,6 +384,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     InputProps={{
                         endAdornment: currencyAdornment,
                     }}
+                    error={!!pricePerTokenError}
+                    helperText={pricePerTokenError}
                 />
                 <StyledTextField
                     label={`Price per Token (${priceCurrency})`}
