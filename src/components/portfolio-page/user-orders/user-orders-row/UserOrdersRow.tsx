@@ -50,8 +50,12 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
     const [totalPrice, setTotalPrice] = React.useState('');
     const [editError, setEditError] = React.useState('');
     const [openCancelDialog, setOpenCancelDialog] = React.useState(false);
+    const [isCancelOrderLoading, setIsCancelOrderLoading] = React.useState(false);
+    const [isEditOrderLoading, setIsEditOrderLoading] = React.useState(false);
 
     const handleCloseEditDialog = () => {
+        if (isEditOrderLoading) return;
+        setLoadingOrderId(null);
         setOpenEditDialog(false);
         setPricePerToken('');
         setTotalPrice('');
@@ -61,6 +65,11 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
     const delistHandler = async (orderId: string) => {
         setLoadingOrderId(orderId); // Set the loading state for the specific orderId
         await handleDelist(orderId);
+        setLoadingOrderId(null); // Reset the loading state
+    };
+    const relistHandler = async (orderId: string) => {
+        setLoadingOrderId(orderId); // Set the loading state for the specific orderId
+        await handleRelist(orderId);
         setLoadingOrderId(null); // Reset the loading state
     };
 
@@ -131,8 +140,9 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
             setEditError('Total price must be at least 25 KAS.');
             return;
         }
-
+        setIsEditOrderLoading(true);
         await handleEditOrder(order.orderId, Number(pricePerToken), Number(totalPrice));
+        setIsEditOrderLoading(false);
         handleCloseEditDialog();
     };
 
@@ -140,6 +150,18 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         await handleCancelOrder(orderId);
         setOpenCancelDialog(false);
         setCancelOrderWaitingConfirmation(false);
+        setIsCancelOrderLoading(false);
+    };
+
+    const hadleOpenCancelDialog = (orderId: string) => {
+        setIsCancelOrderLoading(true);
+        setLoadingOrderId(orderId);
+        setOpenCancelDialog(true);
+    };
+
+    const handleCancelCloseDialog = () => {
+        if (cancelOrderWaitingPayment || cancelOrderWaitingConfirmation) return;
+        setOpenCancelDialog(false);
     };
 
     return (
@@ -241,18 +263,22 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                     {order.status === SellOrderStatus.OFF_MARKETPLACE && (
                         <>
                             <Tooltip title="Relist is to put the order back to sell">
-                                <Button
-                                    onClick={() => handleRelist(order.orderId)}
-                                    variant="contained"
-                                    color="primary"
-                                    sx={{
-                                        minWidth: '3.5vw',
-                                        width: '3vw',
-                                        fontSize: '0.6rem',
-                                    }}
-                                >
-                                    Relist
-                                </Button>
+                                {loadingOrderId === order.orderId ? (
+                                    <LoadingSpinner size={20} />
+                                ) : (
+                                    <Button
+                                        onClick={() => relistHandler(order.orderId)}
+                                        variant="contained"
+                                        color="primary"
+                                        sx={{
+                                            minWidth: '3.5vw',
+                                            width: '3vw',
+                                            fontSize: '0.6rem',
+                                        }}
+                                    >
+                                        Relist
+                                    </Button>
+                                )}
                             </Tooltip>
 
                             <Tooltip title="Edit is to change the order details">
@@ -271,18 +297,22 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                             </Tooltip>
 
                             <Tooltip title="Cancel is to retrieve the tokens back to your wallet">
-                                <Button
-                                    onClick={() => setOpenCancelDialog(true)}
-                                    variant="contained"
-                                    color="primary"
-                                    sx={{
-                                        minWidth: '3.5vw',
-                                        width: '3vw',
-                                        fontSize: '0.6rem',
-                                    }}
-                                >
-                                    Cancel
-                                </Button>
+                                {loadingOrderId === order.orderId && isCancelOrderLoading ? (
+                                    <LoadingSpinner size={20} />
+                                ) : (
+                                    <Button
+                                        onClick={() => hadleOpenCancelDialog(order.orderId)}
+                                        variant="contained"
+                                        color="primary"
+                                        sx={{
+                                            minWidth: '3.5vw',
+                                            width: '3vw',
+                                            fontSize: '0.6rem',
+                                        }}
+                                    >
+                                        Cancel
+                                    </Button>
+                                )}
                             </Tooltip>
                         </>
                     )}
@@ -316,41 +346,49 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                 open={openEditDialog}
                 onClose={handleCloseEditDialog}
             >
-                <DialogTitle>Edit Order - Amount of Tokens: {order.quantity}</DialogTitle>
+                <DialogTitle>
+                    {isEditOrderLoading ? '' : `Edit Order - Amount of Tokens: ${order.quantity}`}
+                </DialogTitle>
                 <DialogContent>
-                    <>
-                        <TextField
-                            margin="dense"
-                            id="totalPrice"
-                            label="Total Price"
-                            type="text"
-                            fullWidth
-                            variant="outlined"
-                            value={totalPrice}
-                            onChange={handleTotalPriceChange}
-                            error={!!editError}
-                            helperText={editError || ''}
-                        />
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="pricePerToken"
-                            label="Price Per Token"
-                            type="text"
-                            fullWidth
-                            variant="outlined"
-                            value={pricePerToken}
-                            onChange={handlePricePerTokenChange}
-                            error={!!editError}
-                        />
+                    {isEditOrderLoading ? (
+                        <LoadingSpinner title="Editing Order..." size={45} />
+                    ) : (
+                        <>
+                            <TextField
+                                margin="dense"
+                                id="totalPrice"
+                                label="Total Price"
+                                type="text"
+                                fullWidth
+                                variant="outlined"
+                                value={totalPrice}
+                                onChange={handleTotalPriceChange}
+                                error={!!editError}
+                                helperText={editError || ''}
+                            />
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="pricePerToken"
+                                label="Price Per Token"
+                                type="text"
+                                fullWidth
+                                variant="outlined"
+                                value={pricePerToken}
+                                onChange={handlePricePerTokenChange}
+                                error={!!editError}
+                            />
+                        </>
+                    )}
 
-                        {/* Total Price Field */}
-                    </>
+                    {/* Total Price Field */}
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseEditDialog}>Cancel</Button>
-                    <Button onClick={editOrderHandler}>Save</Button>
-                </DialogActions>
+                {isEditOrderLoading ? null : (
+                    <DialogActions>
+                        <Button onClick={handleCloseEditDialog}>Cancel</Button>
+                        <Button onClick={editOrderHandler}>Save</Button>
+                    </DialogActions>
+                )}
             </Dialog>
             <Dialog
                 PaperProps={{
@@ -359,7 +397,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                     },
                 }}
                 open={openCancelDialog}
-                onClose={() => setOpenCancelDialog(false)}
+                onClose={handleCancelCloseDialog}
             >
                 <DialogTitle sx={{ fontWeight: 'bold' }}>
                     {cancelOrderWaitingPayment || cancelOrderWaitingConfirmation ? '' : 'Cancel Order Process'}

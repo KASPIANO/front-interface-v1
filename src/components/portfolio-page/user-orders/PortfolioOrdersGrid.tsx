@@ -83,6 +83,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
     const handleRelist = async (orderId: string) => {
         const response = await relistSellOrder(orderId, walletAddress);
         if (response === 201) {
+            setLoadingOrderId(null);
             showGlobalSnackbar({
                 message: 'Order relisted successfully',
                 severity: 'success',
@@ -97,6 +98,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
             try {
                 setCancelOrderWaitingPayment(true);
                 const txData = await sendKaspa(temporaryWalletAddress, 5 * KASPA_TO_SOMPI);
+
                 if (txData) {
                     setCancelOrderWaitingPayment(false);
                     setCancelOrderWaitingConfirmation(true);
@@ -131,6 +133,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                 severity: 'success',
             });
             setOperationFinished((prev) => !prev);
+            setLoadingOrderId(null);
             setCancelOrderWaitingPayment(false);
             setCancelOrderWaitingConfirmation(false);
         } else {
