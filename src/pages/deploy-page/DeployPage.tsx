@@ -491,7 +491,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
 
                 if (token) {
                     try {
-                        await fetchTokenByTicker(tokenKRC20Details.ticker, walletAddress, false);
+                        await fetchTokenByTicker(tokenKRC20Details.ticker, walletAddress, true);
                     } catch (error) {
                         console.error('Failed to refresh token data:', error);
                     }

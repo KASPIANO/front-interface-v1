@@ -363,8 +363,11 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                                 To cancel your order and retrieve your tokens, you will need to send{' '}
                                 <strong>5 Kas</strong> to cover the expected gas fees. This ensures the transaction
                                 can be processed smoothly on the network.{' '}
-                                <strong>In most cases, you will receive approximately 4.9 Kas back</strong> after
-                                the tokens are successfully sent and the transaction is completed.
+                                <strong>
+                                    In most cases, you will receive approximately 4.9 Kas back, depends on network
+                                    fees
+                                </strong>{' '}
+                                after the tokens are successfully sent and the transaction is completed.
                             </Typography>
                             <Typography variant="body1" sx={{ marginTop: 2 }}>
                                 The <strong>small difference</strong> accounts for minor fluctuations in network
