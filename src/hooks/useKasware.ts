@@ -19,6 +19,7 @@ export const useKasware = () => {
     const [userVerified, setUserVerified] = useState<UserVerfication>(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const cookies = new Cookies();
+    const domain: string = import.meta.env.VITE_ENV === 'local' ? 'localhost' : '.kaspiano.com';
 
     const getBasicInfo = async () => {
         const { kasware } = window;
@@ -60,7 +61,12 @@ export const useKasware = () => {
                         signature: userVerification,
                         expiresAt: Date.now() + 4 * 60 * 60 * 1000,
                     },
-                    { secure: true, sameSite: 'none', path: '/', domain: '.kaspiano.com' },
+                    {
+                        secure: true,
+                        sameSite: 'none',
+                        path: '/',
+                        domain,
+                    },
                 );
                 const verifiedUser = {
                     userWalletAddress: account,
