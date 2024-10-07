@@ -133,33 +133,6 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         }
     };
 
-    const fetchAndUpdateTokenInfo = useCallback(async () => {
-        if (!selectedOrder || !selectedOrder.orderId) {
-            console.warn('No valid order selected for removal.');
-            return;
-        }
-
-        queryClient.setQueryData(
-            ['orders', tokenInfo.ticker, sortBy, sortOrder],
-            (oldData: { pages: { orders: Order[] }[] } | undefined) => {
-                if (!oldData || !oldData.pages) {
-                    return oldData; // Return early if data is not available
-                }
-
-                return {
-                    ...oldData,
-                    // Immutably update each page by filtering out the purchased order
-                    pages: oldData.pages.map((page) => ({
-                        ...page,
-                        orders: page.orders
-                            ? page.orders.filter((order) => order.orderId !== selectedOrder.orderId)
-                            : [], // Safeguard if orders array is undefined
-                    })),
-                };
-            },
-        );
-    }, [queryClient, tokenInfo.ticker, sortBy, sortOrder, selectedOrder]);
-
     const handlePurchase = async (order: Order, finalTotal: number) => {
         const sompiAmount = finalTotal * KASPA_TO_SOMPI;
         let paymentTxn = '';
@@ -209,7 +182,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 reveal: revealTransactionId,
                 commit: commitTransactionId,
             });
-            fetchAndUpdateTokenInfo();
+            queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker, sortBy, sortOrder] });
             setIsProcessingBuyOrder(false);
             setIsPanelOpen(false);
             setSelectedOrder(null);
