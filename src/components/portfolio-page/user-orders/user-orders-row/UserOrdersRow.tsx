@@ -52,6 +52,9 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
     const [openCancelDialog, setOpenCancelDialog] = React.useState(false);
     const [isCancelOrderLoading, setIsCancelOrderLoading] = React.useState(false);
     const [isEditOrderLoading, setIsEditOrderLoading] = React.useState(false);
+    const [isRelistLoading, setIsRelistLoading] = React.useState(false);
+    const [cancelDialogButtonLoader, setCancelDialogButtonLoader] = React.useState(false);
+    const [pricePerTokenError, setPricePerTokenError] = React.useState('');
 
     const handleCloseEditDialog = () => {
         if (isEditOrderLoading) return;
@@ -68,8 +71,10 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         setLoadingOrderId(null); // Reset the loading state
     };
     const relistHandler = async (orderId: string) => {
+        setIsRelistLoading(true);
         setLoadingOrderId(orderId); // Set the loading state for the specific orderId
         await handleRelist(orderId);
+        setIsRelistLoading(false);
         setLoadingOrderId(null); // Reset the loading state
     };
 
@@ -87,9 +92,18 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
 
     const handleTotalPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const totalStr = e.target.value;
-        setTotalPrice(totalStr);
+        let totalRounded;
+        if (totalStr.includes('.')) {
+            setTotalPrice(parseFloat(totalStr).toFixed(0));
+            totalRounded = parseFloat(totalStr).toFixed(0);
+            setPricePerTokenError('Please enter a rounded number without decimals.');
+        } else {
+            totalRounded = totalStr;
+            setTotalPrice(totalStr);
+            setPricePerTokenError('');
+        }
 
-        const total = parseFloat(totalStr);
+        const total = parseFloat(totalRounded);
         const amount = order.quantity; // The amount is fixed as per your requirement
 
         if (!isNaN(total)) {
@@ -147,10 +161,12 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
     };
 
     const cancelOrderHandler = async (orderId: string) => {
+        setIsCancelOrderLoading(false);
+        setCancelDialogButtonLoader(true);
         await handleCancelOrder(orderId);
+        setCancelDialogButtonLoader(false);
         setOpenCancelDialog(false);
         setCancelOrderWaitingConfirmation(false);
-        setIsCancelOrderLoading(false);
     };
 
     const hadleOpenCancelDialog = (orderId: string) => {
@@ -161,6 +177,8 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
 
     const handleCancelCloseDialog = () => {
         if (cancelOrderWaitingPayment || cancelOrderWaitingConfirmation) return;
+        setIsCancelOrderLoading(false);
+        setLoadingOrderId(null);
         setOpenCancelDialog(false);
     };
 
@@ -262,46 +280,31 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                 >
                     {order.status === SellOrderStatus.OFF_MARKETPLACE && (
                         <>
-                            <Tooltip title="Relist is to put the order back to sell">
-                                {loadingOrderId === order.orderId ? (
+                            <Tooltip title="Relist the item for sale">
+                                {loadingOrderId === order.orderId && isRelistLoading ? (
                                     <LoadingSpinner size={20} />
                                 ) : (
-                                    <Button
-                                        onClick={() => relistHandler(order.orderId)}
-                                        variant="contained"
-                                        color="primary"
-                                        sx={{
-                                            minWidth: '3.5vw',
-                                            width: '3vw',
-                                            fontSize: '0.6rem',
-                                        }}
-                                    >
-                                        Relist
-                                    </Button>
+                                    !isCancelOrderLoading && (
+                                        <Button
+                                            onClick={() => relistHandler(order.orderId)}
+                                            variant="contained"
+                                            color="primary"
+                                            sx={{
+                                                minWidth: '3.5vw',
+                                                width: '3vw',
+                                                fontSize: '0.6rem',
+                                            }}
+                                        >
+                                            Relist
+                                        </Button>
+                                    )
                                 )}
                             </Tooltip>
 
                             <Tooltip title="Edit is to change the order details">
-                                <Button
-                                    onClick={() => setOpenEditDialog(true)}
-                                    variant="contained"
-                                    color="primary"
-                                    sx={{
-                                        minWidth: '3.5vw',
-                                        width: '3vw',
-                                        fontSize: '0.6rem',
-                                    }}
-                                >
-                                    Edit
-                                </Button>
-                            </Tooltip>
-
-                            <Tooltip title="Cancel is to retrieve the tokens back to your wallet">
-                                {loadingOrderId === order.orderId && isCancelOrderLoading ? (
-                                    <LoadingSpinner size={20} />
-                                ) : (
+                                {isCancelOrderLoading || isRelistLoading ? null : (
                                     <Button
-                                        onClick={() => hadleOpenCancelDialog(order.orderId)}
+                                        onClick={() => setOpenEditDialog(true)}
                                         variant="contained"
                                         color="primary"
                                         sx={{
@@ -310,8 +313,28 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                                             fontSize: '0.6rem',
                                         }}
                                     >
-                                        Cancel
+                                        Edit
                                     </Button>
+                                )}
+                            </Tooltip>
+                            <Tooltip title="Cancel is to retrieve the tokens back to your wallet">
+                                {loadingOrderId === order.orderId && isCancelOrderLoading ? (
+                                    <LoadingSpinner size={20} />
+                                ) : (
+                                    !isRelistLoading && (
+                                        <Button
+                                            onClick={() => hadleOpenCancelDialog(order.orderId)}
+                                            variant="contained"
+                                            color="primary"
+                                            sx={{
+                                                minWidth: '3.5vw',
+                                                width: '3vw',
+                                                fontSize: '0.6rem',
+                                            }}
+                                        >
+                                            Cancel
+                                        </Button>
+                                    )
                                 )}
                             </Tooltip>
                         </>
@@ -363,8 +386,8 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                                 variant="outlined"
                                 value={totalPrice}
                                 onChange={handleTotalPriceChange}
-                                error={!!editError}
-                                helperText={editError || ''}
+                                error={!!editError || !!pricePerTokenError}
+                                helperText={editError || pricePerTokenError || ''}
                             />
                             <TextField
                                 autoFocus
@@ -433,10 +456,14 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                 </DialogContent>
                 {cancelOrderWaitingConfirmation || cancelOrderWaitingPayment ? null : (
                     <DialogActions>
-                        <Button onClick={() => cancelOrderHandler(order.orderId)} variant="contained">
-                            Cancel Order
-                        </Button>
-                        <Button onClick={() => setOpenCancelDialog(false)}>Exit</Button>
+                        {cancelDialogButtonLoader ? (
+                            <LoadingSpinner size={20} />
+                        ) : (
+                            <Button onClick={() => cancelOrderHandler(order.orderId)} variant="contained">
+                                Cancel Order
+                            </Button>
+                        )}
+                        <Button onClick={handleCancelCloseDialog}>Exit</Button>
                     </DialogActions>
                 )}
             </Dialog>

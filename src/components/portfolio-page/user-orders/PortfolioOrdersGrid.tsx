@@ -117,15 +117,28 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                         message: 'Error sending Kas for Fees to remove tokens, please try again',
                         severity: 'success',
                     });
+                    setLoadingOrderId(null);
                     setCancelOrderWaitingPayment(false);
+                    setCancelOrderWaitingConfirmation(false);
                 }
             } catch (error) {
-                showGlobalSnackbar({
-                    message: 'Error removing order from marketplace, please try again',
-                    severity: 'error',
-                });
-                setCancelOrderWaitingPayment(false);
-                setCancelOrderWaitingConfirmation(false);
+                if (error.code === 4001) {
+                    showGlobalSnackbar({
+                        message: 'Transaction rejected by user',
+                        severity: 'error',
+                    });
+                    setLoadingOrderId(null);
+                    setCancelOrderWaitingPayment(false);
+                    setCancelOrderWaitingConfirmation(false);
+                } else {
+                    showGlobalSnackbar({
+                        message: 'Error removing order from marketplace, please try again',
+                        severity: 'error',
+                    });
+                    setLoadingOrderId(null);
+                    setCancelOrderWaitingPayment(false);
+                    setCancelOrderWaitingConfirmation(false);
+                }
             }
         } else if (confirmed === true) {
             showGlobalSnackbar({
