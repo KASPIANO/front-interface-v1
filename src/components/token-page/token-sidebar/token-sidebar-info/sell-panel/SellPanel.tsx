@@ -96,6 +96,14 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             setPricePerToken('');
         }
     };
+    const handleTotalPriceDecimals = (totalPrice) => {
+        if (totalPrice.includes('.')) {
+            setTotalPrice(parseFloat(totalPrice).toFixed(0));
+            return parseFloat(totalPrice).toFixed(0);
+        } else {
+            return totalPrice;
+        }
+    };
 
     const handlePricePerTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const priceStr = e.target.value;
@@ -107,7 +115,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         if (!isNaN(pricePerTokenValue)) {
             if (!isNaN(amount) && amount > 0) {
                 const newTotalPrice = pricePerTokenValue * amount;
-                setTotalPrice(newTotalPrice.toString());
+                const fixedTotalPrice = handleTotalPriceDecimals(newTotalPrice.toString());
+                setTotalPrice(fixedTotalPrice);
             }
         } else {
             setTotalPrice('');
