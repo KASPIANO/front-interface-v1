@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, IconButton, InputAdornment, Typography } from '@mui/material';
+import { Box, IconButton, InputAdornment, Tooltip, Typography } from '@mui/material';
 import { BackendTokenResponse, TransferObj } from '../../../../../types/Types';
 import { StyledButton, StyledSellPanel, StyledTextField } from './SellPanel.s';
 import { fetchWalletKRC20Balance } from '../../../../../DAL/Krc20DAL';
@@ -430,15 +430,30 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     >{`${walletTickerBalance} ${tokenInfo.ticker}`}</Typography>
                 </Box>
 
-                <StyledButton
-                    sx={{ marginTop: 'auto' }}
-                    variant="contained"
-                    onClick={handleCreateSellOrder}
-                    fullWidth
-                    disabled={!walletConnected || walletTickerBalance === 0 || disableSellButton}
+                <Tooltip
+                    title={
+                        !walletConnected
+                            ? 'Connect your wallet to create a sell order'
+                            : walletTickerBalance === 0
+                              ? 'You do not have enough tokens to create a sell order'
+                              : disableSellButton
+                                ? 'Sell order creation is currently disabled'
+                                : ''
+                    }
                 >
-                    Create Sell Order
-                </StyledButton>
+                    <span style={{ marginTop: 'auto' }}>
+                        {/* Wrapping in a <span> to avoid Tooltip being disabled when the button is disabled */}
+                        <StyledButton
+                            sx={{ marginTop: 'auto' }}
+                            variant="contained"
+                            onClick={handleCreateSellOrder}
+                            fullWidth
+                            disabled={!walletConnected || walletTickerBalance === 0 || disableSellButton}
+                        >
+                            Create Sell Order
+                        </StyledButton>
+                    </span>
+                </Tooltip>
             </StyledSellPanel>
             <ConfirmSellDialog
                 creatingSellOrder={creatingSellOrder}
