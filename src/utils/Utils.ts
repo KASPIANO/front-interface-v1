@@ -27,7 +27,7 @@ export function formatPrice(price, decimals = 7) {
 export const getLocalThemeMode = () =>
     localStorage.getItem('theme_mode') ? (localStorage.getItem('theme_mode') as ThemeModes) : ThemeModes.DARK;
 
-export const setNewBalanceUtil = (balanceInKaspa: number) =>
+export const setWalletBalanceUtil = (balanceInKaspa: number) =>
     isNaN(balanceInKaspa) ? 0 : parseFloat(balanceInKaspa.toFixed(4));
 
 export function simplifyNumber(value) {
