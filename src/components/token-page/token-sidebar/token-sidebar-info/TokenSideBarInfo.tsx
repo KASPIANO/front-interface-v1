@@ -33,7 +33,6 @@ interface TokenSideBarInfoProps {
     walletAddress: string | null;
     walletConnected: boolean;
     walletBalance: number;
-    setWalletBalance: (balance: number) => void;
     kasPrice: number;
 }
 
@@ -41,8 +40,7 @@ interface TokenSideBarInfoProps {
 //     'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-LDSP-Dark-Full-Color.png';
 
 const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
-    const { tokenInfo, setTokenInfo, walletAddress, walletConnected, walletBalance, setWalletBalance, kasPrice } =
-        props;
+    const { tokenInfo, setTokenInfo, walletAddress, walletConnected, walletBalance, kasPrice } = props;
     const [showTokenInfoDialog, setShowTokenInfoDialog] = useState(false);
     const [showSentimentLoader, setShowSentimentLoader] = useState(false);
     const [selectedSentiment, setSelectedSentiment] = useState<string>(null);
@@ -75,9 +73,9 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         setSocials((prevSocials) => {
             if (tokenInfo.metadata?.socials) {
                 return {
-                    telegram: tokenInfo.metadata.socials.telegram || '',
-                    website: tokenInfo.metadata.socials.website || '',
-                    x: tokenInfo.metadata.socials.x || '',
+                    telegram: tokenInfo?.metadata?.socials?.telegram || '',
+                    website: tokenInfo?.metadata?.socials?.website || '',
+                    x: tokenInfo?.metadata?.socials?.x || '',
                 };
             }
             return prevSocials;
@@ -296,7 +294,6 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                 onClose={() => setShowTokenInfoDialog(false)}
                 walletConnected={walletConnected}
                 setTokenInfo={setTokenInfo}
-                setWalletBalance={setWalletBalance}
                 walletBalance={walletBalance}
                 walletAddress={walletAddress}
                 ticker={tokenInfo.ticker}

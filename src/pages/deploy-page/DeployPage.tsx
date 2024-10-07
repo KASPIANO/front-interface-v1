@@ -9,7 +9,6 @@ import {
     sendServerRequestAndSetErrorsIfNeeded,
     updateTokenMetadata,
 } from '../../DAL/BackendDAL';
-import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
 import {
     clearFieldErrors,
     clearFieldErrorsAndSetFieldValue,
@@ -24,7 +23,6 @@ import {
     delay,
     isEmptyString,
     isEmptyStringOrArray,
-    setWalletBalanceUtil,
 } from '../../utils/Utils';
 import {
     DeployForm,
@@ -47,7 +45,6 @@ interface DeployPageProps {
     walletBalance: number;
     backgroundBlur: boolean;
     walletConnected: boolean;
-    setWalletBalance: (balance: number) => void;
     walletAddress: string | null;
 }
 
@@ -56,7 +53,7 @@ const VERIFICATION_FEE_KAS = 1250;
 const VERIFICATION_FEE_SOMPI = VERIFICATION_FEE_KAS * KASPA_TO_SOMPI;
 
 const DeployPage: FC<DeployPageProps> = (props) => {
-    const { walletBalance, backgroundBlur, walletConnected, walletAddress, setWalletBalance } = props;
+    const { walletBalance, backgroundBlur, walletConnected, walletAddress } = props;
     const [tokenName, setTokenName] = useState('');
     const [validatedTokenName, setValidatedTokenName] = useState('');
     const [totalSupply, setTotalSupply] = useState('');
@@ -347,9 +344,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
 
         console.log('metadataUpdateFeeTransactionId', metadataUpdateFeeTransactionId);
 
-        const balance = await fetchWalletBalance(walletAddress);
-        setWalletBalance(setWalletBalanceUtil(balance));
-
         if (currentMetadataPaymentTransactionId) {
             setIsUpdateMetadataLoading(true);
 
@@ -503,8 +497,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                         message: 'Token deployed successfully',
                         severity: 'success',
                     });
-                    const balance = await fetchWalletBalance(walletAddress);
-                    setWalletBalance(setWalletBalanceUtil(balance));
 
                     console.log(inscribeJsonString);
                     console.log('Deployment successful, txid:', txid);

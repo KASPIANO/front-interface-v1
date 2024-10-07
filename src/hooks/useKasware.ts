@@ -40,7 +40,6 @@ export const useKasware = () => {
         const { kasware } = window;
         kasware.getBalance().then((balance) => {
             const kasAmount = balance.total / 1e8;
-            console.log('new kasAmount', kasAmount);
             setBalance(kasAmount);
         });
     }, []);
@@ -288,7 +287,6 @@ export const useKasware = () => {
         switchNetwork,
         connectWallet,
         signMessage,
-        setWalletBalance: setBalance,
         handleNetworkChange,
         setNewBalance,
     };

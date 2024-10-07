@@ -14,8 +14,8 @@ const TokenHeader: FC<TokenHeaderProps> = (props) => {
         <TitleHeaderContainer>
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem' }}>
                 <Avatar
-                    alt={tokenInfo.ticker}
-                    src={tokenInfo.metadata.logoUrl}
+                    alt={tokenInfo?.ticker}
+                    src={tokenInfo?.metadata?.logoUrl}
                     sx={{ height: '4rem', width: '4rem' }}
                 />
                 <Title>{tokenInfo.ticker}</Title>
