@@ -9,6 +9,7 @@ import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
 import { transferKRC20Token } from '../../../../../utils/KaswareUtils';
 import { confirmSellOrder, createSellOrder } from '../../../../../DAL/BackendP2PDAL';
 import { doPolling } from '../../../../../utils/Utils';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 
 interface SellPanelProps {
     tokenInfo: BackendTokenResponse;
@@ -36,6 +37,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [finishedSellOrder, setFinishedSellOrder] = useState<boolean>(false);
     const [amountError, setAmountError] = useState<string>('');
     const [pricePerTokenError, setPricePerTokenError] = useState<string>('');
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         fetchWalletKRC20Balance(walletAddress, tokenInfo.ticker).then((balance) => {
@@ -289,6 +291,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 setIsDialogOpen(false);
                 setCreatingSellOrder(false);
                 cleanFields();
+                queryClient.invalidateQueries({ queryKey: ['orders'] });
                 setFinishedSellOrder((prev) => !prev);
                 return true;
             } else {
