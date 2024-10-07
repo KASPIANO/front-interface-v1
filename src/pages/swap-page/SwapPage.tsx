@@ -17,7 +17,6 @@ interface SwapPageProps {
     showNotification: boolean;
     setShowNotification: (value: boolean) => void;
     setWalletAddress: (value: string | null) => void;
-    setWalletBalance: (value: number) => void;
 }
 
 // const tokens = [
@@ -49,19 +48,19 @@ const SwapPage: FC<SwapPageProps> = (props) => {
     //     const handleAccountsChanged = async (accounts: string[]) => {
     //         if (accounts.length === 0) {
     //             setWalletAddress(null);
-    //             setWalletBalance(0);
+    //             setNewBalance(0);
     //             setReceivingBalance(0);
     //             localStorage.removeItem('isWalletConnected');
     //         } else {
     //             setWalletAddress(accounts[0]);
     //             const balance = await fetchWalletBalance(accounts[0]);
-    //             setWalletBalance(setWalletBalanceUtil(balance));
+    //             setNewBalance(setNewBalanceUtil(balance));
     //         }
     //     };
 
     //     const handleDisconnect = () => {
     //         setWalletAddress(null);
-    //         setWalletBalance(0);
+    //         setNewBalance(0);
     //         setReceivingBalance(0);
     //         localStorage.removeItem('isWalletConnected');
     //     };
@@ -74,7 +73,7 @@ const SwapPage: FC<SwapPageProps> = (props) => {
     //             if (selectedAddress) {
     //                 setWalletAddress(selectedAddress);
     //                 const balance = await fetchWalletBalance(selectedAddress);
-    //                 setWalletBalance(setWalletBalanceUtil(balance));
+    //                 setNewBalance(setNewBalanceUtil(balance));
     //                 setShowNotification(true);
     //                 setTimeout(() => setShowNotification(false), 5000);
     //             }

@@ -9,11 +9,10 @@ export interface BatchTransferPageProps {
     backgroundBlur: boolean;
     walletAddress: string | null;
     walletBalance: number;
-    setWalletBalance: (balance: number) => void;
 }
 
 const BatchTransferPage: FC<BatchTransferPageProps> = (props) => {
-    const { walletConnected, backgroundBlur, walletAddress, setWalletBalance, walletBalance } = props;
+    const { walletConnected, backgroundBlur, walletAddress, walletBalance } = props;
 
     return (
         <Container
@@ -29,7 +28,6 @@ const BatchTransferPage: FC<BatchTransferPageProps> = (props) => {
             <BatchTransfer
                 walletConnected={walletConnected}
                 walletAddress={walletAddress}
-                setWalletBalance={setWalletBalance}
                 walletBalance={walletBalance}
             />
         </Container>

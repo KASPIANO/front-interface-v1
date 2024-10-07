@@ -21,7 +21,6 @@ interface KaspianoRouterProps {
     walletBalance: number;
     network: any;
     handleNetworkChange: any;
-    setWalletBalance: any;
 }
 
 export const KaspianoRouter: FC<KaspianoRouterProps> = ({
@@ -31,7 +30,6 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
     walletBalance,
     network,
     handleNetworkChange,
-    setWalletBalance,
 }) => (
     <Routes>
         <Route
@@ -65,7 +63,6 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
                     walletAddress={walletAddress}
                     connectWallet={requestAccounts}
                     handleNetworkChange={handleNetworkChange}
-                    setWalletBalance={setWalletBalance}
                     walletBalance={walletBalance}
                     walletConnected={walletConnected}
                 />
@@ -78,7 +75,6 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
                     walletBalance={walletBalance}
                     backgroundBlur={backgroundBlur}
                     walletConnected={walletConnected}
-                    setWalletBalance={setWalletBalance}
                     walletAddress={walletAddress}
                 />
             }
@@ -99,7 +95,6 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
             element={
                 <BatchTransferPage
                     walletBalance={walletBalance}
-                    setWalletBalance={setWalletBalance}
                     walletAddress={walletAddress}
                     backgroundBlur={backgroundBlur}
                     walletConnected={walletConnected}

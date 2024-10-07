@@ -10,7 +10,6 @@ interface RugScoreProps {
     score: number | null;
     xHandle: boolean;
     onRecalculate: () => void;
-    setWalletBalance: (balance: number) => void;
     walletBalance: number;
     ticker: string;
     walletConnected: boolean;
@@ -24,7 +23,6 @@ const RugScore: FC<RugScoreProps> = (props) => {
         score,
         xHandle,
         onRecalculate,
-        setWalletBalance,
         walletBalance,
         ticker,
         walletConnected,
@@ -127,7 +125,6 @@ const RugScore: FC<RugScoreProps> = (props) => {
                 onClose={() => setShowInfoForm(false)}
                 walletConnected={walletConnected}
                 setTokenInfo={setTokenInfo}
-                setWalletBalance={setWalletBalance}
                 walletBalance={walletBalance}
                 walletAddress={walletAddress}
                 ticker={ticker}
