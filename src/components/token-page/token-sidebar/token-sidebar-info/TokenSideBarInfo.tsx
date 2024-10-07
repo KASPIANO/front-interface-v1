@@ -73,9 +73,9 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         setSocials((prevSocials) => {
             if (tokenInfo.metadata?.socials) {
                 return {
-                    telegram: tokenInfo.metadata.socials.telegram || '',
-                    website: tokenInfo.metadata.socials.website || '',
-                    x: tokenInfo.metadata.socials.x || '',
+                    telegram: tokenInfo?.metadata?.socials?.telegram || '',
+                    website: tokenInfo?.metadata?.socials?.website || '',
+                    x: tokenInfo?.metadata?.socials?.x || '',
                 };
             }
             return prevSocials;
