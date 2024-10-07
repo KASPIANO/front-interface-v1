@@ -3,6 +3,7 @@ import { Box, Tooltip } from '@mui/material';
 import { Order } from '../../../../../../types/Types';
 import { OrderItemPrimary, OrderItemSecondary } from './OrderItem.s';
 import { StyledButton } from '../../sell-panel/SellPanel.s';
+import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
 
 interface OrderItemProps {
     order: Order;
@@ -16,12 +17,15 @@ interface OrderItemProps {
 
 const OrderItem: React.FC<OrderItemProps> = (props) => {
     const { order, onSelect, kasPrice, selectedOrder, isProccesing, setIsProcessing } = props;
+    const [localSelectedOrder, setLocalSelectedOrder] = React.useState<Order | null>(null);
 
     // const floorPriceDifference = ((order.pricePerToken - floorPrice) / floorPrice) * 100;
 
-    const handleSelect = (order: Order) => {
+    const handleSelect = async (order: Order) => {
+        setLocalSelectedOrder(order);
         setIsProcessing(true);
-        onSelect(order);
+        await onSelect(order);
+        setLocalSelectedOrder(null);
     };
 
     const formatPrice = (price: number) => {
@@ -73,22 +77,26 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                 </Box>
                 {/* Buy/Close Button */}
                 <Box>
-                    <StyledButton
-                        variant="contained"
-                        onClick={() => handleSelect(order)}
-                        disabled={disableButton}
-                        size="small"
-                        sx={{
-                            fontSize: '0.5rem',
+                    {localSelectedOrder && localSelectedOrder.orderId === order.orderId ? (
+                        <LoadingSpinner size={15} boxStyle={{ height: '5vh' }} />
+                    ) : (
+                        <StyledButton
+                            variant="contained"
+                            onClick={() => handleSelect(order)}
+                            disabled={disableButton}
+                            size="small"
+                            sx={{
+                                fontSize: '0.5rem',
 
-                            '&.MuiButton-root': {
-                                padding: '0.4rem',
-                                minWidth: '0.5rem',
-                            },
-                        }}
-                    >
-                        Buy
-                    </StyledButton>
+                                '&.MuiButton-root': {
+                                    padding: '0.4rem',
+                                    minWidth: '0.5rem',
+                                },
+                            }}
+                        >
+                            Buy
+                        </StyledButton>
+                    )}
                 </Box>
             </Box>
         </Box>
