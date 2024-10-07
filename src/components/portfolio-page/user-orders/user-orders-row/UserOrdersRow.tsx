@@ -119,6 +119,14 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
             setEditError('');
         }
     };
+    const handleTotalPriceDecimals = (totalPrice) => {
+        if (totalPrice.includes('.')) {
+            setTotalPrice(parseFloat(totalPrice).toFixed(0));
+            return parseFloat(totalPrice).toFixed(0);
+        } else {
+            return totalPrice;
+        }
+    };
 
     const handlePricePerTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const priceStr = e.target.value;
@@ -130,7 +138,8 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         if (!isNaN(pricePerTokenValue)) {
             const newTotalPrice = pricePerTokenValue * amount;
             if (newTotalPrice >= 25) {
-                setTotalPrice(newTotalPrice.toFixed(2)); // Calculate total price
+                const fixedPrice = handleTotalPriceDecimals(newTotalPrice.toString());
+                setTotalPrice(fixedPrice); // Calculate total price
                 setEditError(''); // Clear error if any
             } else {
                 setEditError('Total price must be at least 25 KAS.');
