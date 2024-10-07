@@ -75,9 +75,19 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
             }}
         >
             {waitingForWalletConfirmation ? (
-                <LoadingSpinner title="Waiting for wallet confirmation..." size={45} />
+                <LoadingSpinner
+                    title="Waiting for wallet confirmation..."
+                    size={70}
+                    boxStyle={{ marginTop: '2rem' }}
+                    titleStyle={{ marginBottom: '2rem' }}
+                />
             ) : isProcessingBuyOrder ? (
-                <LoadingSpinner title="Processing your order..." size={45} />
+                <LoadingSpinner
+                    title="Processing your order..."
+                    size={70}
+                    boxStyle={{ marginTop: '2rem' }}
+                    titleStyle={{ marginBottom: '2rem' }}
+                />
             ) : (
                 <>
                     {/* Close Button */}
