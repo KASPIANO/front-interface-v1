@@ -15,6 +15,8 @@ export interface UseOrdersHistoryProps {
         minPrice?: number;
         maxPrice?: number;
         statuses?: string[];
+        isSeller?: boolean;
+        isBuyer?: boolean;
     };
 }
 export const useFetchTokens = (
@@ -93,8 +95,8 @@ export const useOrdersHistory = ({
                     statuses: filters.statuses || undefined,
                     startDateTimestamp: filters.startDateTimestamp,
                     endDateTimestamp: filters.endDateTimestamp,
-                    isSeller: true,
-                    isBuyer: true,
+                    isSeller: filters.isSeller,
+                    isBuyer: filters.isBuyer,
                 },
             ),
         enabled: !!walletAddress, // Only fetch if wallet address exists

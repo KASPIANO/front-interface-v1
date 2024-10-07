@@ -18,17 +18,23 @@ import {
 } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import { FC, useState } from 'react';
-import { Order } from '../../../types/Types';
+import { filterSellOrderStatuses, Order } from '../../../types/Types';
 import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 import { PrevPageButton, NextPageButton } from '../../krc-20-page/grid-title-sort/GridTitle.s';
 import { StyledPortfolioGridContainer } from './PortfolioOrdersHistoryGrid.s';
 import UserOrdersRow from './user-orders-history-row/UserOrdersHistoryRow';
 import { useOrdersHistory } from '../../../DAL/UseQueriesBackend';
+import { mapSellOrderStatusToDisplayText } from '../../../utils/Utils';
 
 interface PortfolioOrdersHistoryGridProps {
     kasPrice: number;
     walletConnected: boolean;
     walletAddress: string | null;
+}
+enum FilterByWallet {
+    Both = 'both',
+    Buyer = 'buyer',
+    Seller = 'seller',
 }
 
 enum GridHeaders {
@@ -46,6 +52,7 @@ enum SortFields {
     QUANTITY = 'quantity',
     TOTAL_PRICE = 'totalPrice',
 }
+
 const PortfolioOrdersHistoryGrid: FC<PortfolioOrdersHistoryGridProps> = ({
     kasPrice,
     walletConnected,
@@ -53,6 +60,7 @@ const PortfolioOrdersHistoryGrid: FC<PortfolioOrdersHistoryGridProps> = ({
 }) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [selectedTickers, setSelectedTickers] = useState<string[]>([]); // Multi-select tickers filter
+    const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]); // Multi-select tickers filter
     const [sort, setSort] = useState<{ field: string; direction: 'asc' | 'desc' }>({
         field: SortFields.DATE,
         direction: 'desc',
@@ -62,6 +70,9 @@ const PortfolioOrdersHistoryGrid: FC<PortfolioOrdersHistoryGridProps> = ({
     const [maxPrice, setMaxPrice] = useState<number | string>('');
     const [startDate, setStartDate] = useState<string>('');
     const [endDate, setEndDate] = useState<string>('');
+    const [isSeller, setIsSeller] = useState<boolean>(true);
+    const [isBuyer, setIsBuyer] = useState<boolean>(true);
+    const [filterBy, setFilterBy] = useState<FilterByWallet>(FilterByWallet.Both);
     const theme = useTheme();
 
     const commonTextFieldProps = {
@@ -87,6 +98,9 @@ const PortfolioOrdersHistoryGrid: FC<PortfolioOrdersHistoryGridProps> = ({
             maxPrice: maxPrice ? parseFloat(maxPrice as string) : undefined,
             startDateTimestamp: startDate ? new Date(startDate).getTime() : undefined,
             endDateTimestamp: endDate ? new Date(endDate).getTime() : undefined,
+            statuses: selectedStatuses,
+            isSeller,
+            isBuyer,
         },
     });
     const orders = data?.orders || [];
@@ -98,10 +112,36 @@ const PortfolioOrdersHistoryGrid: FC<PortfolioOrdersHistoryGridProps> = ({
         const value = event.target.value as string[];
         setSelectedTickers(value);
     };
+    const handleStatusesChange = (event: SelectChangeEvent<string[]>) => {
+        const value = event.target.value as string[];
+        setSelectedStatuses(value);
+    };
 
     const handleSortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const [field, direction] = e.target.value.split('-');
         setSort({ field: field as SortFields, direction: direction as 'asc' | 'desc' });
+    };
+
+    const handleFilterBy = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value as FilterByWallet;
+        setFilterBy(value);
+
+        switch (value) {
+            case FilterByWallet.Both:
+                setIsSeller(true);
+                setIsBuyer(true);
+                break;
+            case FilterByWallet.Buyer:
+                setIsSeller(false);
+                setIsBuyer(true);
+                break;
+            case FilterByWallet.Seller:
+                setIsSeller(true);
+                setIsBuyer(false);
+                break;
+            default:
+                break;
+        }
     };
 
     const handlePrevPage = () => setCurrentPage(currentPage - 1);
@@ -127,8 +167,8 @@ const PortfolioOrdersHistoryGrid: FC<PortfolioOrdersHistoryGridProps> = ({
                 <InputLabel
                     id="tickers-multi-select-label"
                     sx={{
-                        fontSize: '0.8rem',
-                        top: '-0.5rem',
+                        fontSize: '0.7rem',
+                        top: '-0.4rem',
                         '&.Mui-focused': {
                             top: '0.1rem',
                         },
@@ -173,6 +213,63 @@ const PortfolioOrdersHistoryGrid: FC<PortfolioOrdersHistoryGridProps> = ({
                     ))}
                 </Select>
             </FormControl>
+            <FormControl fullWidth sx={{ flex: 1, height: '2.2rem' }}>
+                <InputLabel
+                    id="statutes-multi-select-label"
+                    sx={{
+                        fontSize: '0.7rem',
+                        top: '-0.4rem',
+                        '&.Mui-focused': {
+                            top: '0.1rem',
+                        },
+                    }}
+                >
+                    Filter by Status
+                </InputLabel>
+                <Select
+                    labelId="statutes-multi-select-label"
+                    multiple
+                    label="Filter by Status"
+                    value={selectedStatuses}
+                    onChange={handleStatusesChange}
+                    renderValue={(selected) =>
+                        (selected as string[])
+                            .map((status) => mapSellOrderStatusToDisplayText(status as any))
+                            .join(', ')
+                    }
+                    sx={{
+                        fontSize: '0.75rem',
+                        height: '2.2rem',
+                    }}
+                    MenuProps={{
+                        PaperProps: {
+                            style: { fontSize: '0.75rem' },
+                        },
+                    }}
+                >
+                    {Object.values(filterSellOrderStatuses).map((status) => (
+                        <MenuItem
+                            key={status}
+                            value={status}
+                            sx={{ fontSize: '0.75rem', padding: 0, paddingLeft: '5px', paddingRight: '5px' }}
+                        >
+                            <Checkbox
+                                sx={{
+                                    '& .MuiSvgIcon-root': {
+                                        fontSize: '0.9rem',
+                                        color: theme.palette.primary.main,
+                                    },
+                                }}
+                                checked={selectedStatuses.indexOf(status) > -1}
+                            />
+                            <ListItemText
+                                primary={mapSellOrderStatusToDisplayText(status)}
+                                primaryTypographyProps={{ fontSize: '0.75rem' }}
+                            />
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
 
             {/* Date Range Pickers */}
             <TextField
@@ -210,7 +307,7 @@ const PortfolioOrdersHistoryGrid: FC<PortfolioOrdersHistoryGridProps> = ({
                 onChange={(e) => setMinPrice(e.target.value)}
                 InputProps={{ inputProps: { min: 0 }, sx: { fontSize: '0.75rem' } }}
                 InputLabelProps={{ style: { fontSize: '0.8rem' } }}
-                sx={{ flex: 1 }}
+                sx={{ flex: 0.8 }}
             />
             <TextField
                 label="Max Price"
@@ -218,10 +315,50 @@ const PortfolioOrdersHistoryGrid: FC<PortfolioOrdersHistoryGridProps> = ({
                 onChange={(e) => setMaxPrice(e.target.value)}
                 InputProps={{ inputProps: { min: 0 }, sx: { fontSize: '0.75rem' } }}
                 InputLabelProps={{ style: { fontSize: '0.8rem' } }}
-                sx={{ flex: 1 }}
+                sx={{ flex: 0.8 }}
             />
 
             {/* Sort Dropdown */}
+            <Tooltip title="Filter orders by your role: Seller or Buyer" placement="top">
+                <TextField
+                    select
+                    label="Filter by"
+                    variant="outlined"
+                    onChange={handleFilterBy}
+                    value={filterBy}
+                    sx={{ flex: 1 }}
+                    InputLabelProps={{ shrink: true, style: { fontSize: '0.8rem', top: '0.1rem' } }}
+                    InputProps={{
+                        style: { fontSize: '0.75rem' }, // Set font size for TextField
+                    }}
+                    SelectProps={{
+                        MenuProps: {
+                            PaperProps: {
+                                style: { fontSize: '0.75rem' }, // Set font size for MenuItems
+                            },
+                        },
+                    }}
+                >
+                    <MenuItem
+                        value={FilterByWallet.Both}
+                        sx={{ fontSize: '0.75rem', padding: 0, paddingLeft: '10px', paddingTop: '5px' }}
+                    >
+                        Both
+                    </MenuItem>
+                    <MenuItem
+                        value={FilterByWallet.Buyer}
+                        sx={{ fontSize: '0.75rem', padding: 0, paddingLeft: '10px', paddingTop: '5px' }}
+                    >
+                        Buyer
+                    </MenuItem>
+                    <MenuItem
+                        value={FilterByWallet.Seller}
+                        sx={{ fontSize: '0.75rem', padding: 0, paddingLeft: '10px', paddingTop: '5px' }}
+                    >
+                        Seller
+                    </MenuItem>
+                </TextField>
+            </Tooltip>
             <TextField
                 select
                 label="Sort by"
