@@ -21,7 +21,7 @@ const App = () => {
         network,
         connectWallet,
         disconnectWallet,
-        setWalletBalance,
+        setNewBalance,
         handleNetworkChange,
     } = useKasware();
 
@@ -47,8 +47,13 @@ const App = () => {
             await checkCookie();
         }, 1000); // Check every 60,000 milliseconds (1 minute)
 
+        const updateTokensInterval = setInterval(setNewBalance, 10 * 1000);
+
         // Cleanup function to clear the interval when component unmounts
-        return () => clearInterval(interval);
+        return () => {
+            clearInterval(interval);
+            clearInterval(updateTokensInterval);
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -71,7 +76,6 @@ const App = () => {
                         backgroundBlur={backgroundBlur}
                         handleNetworkChange={handleNetworkChange}
                         network={network}
-                        setWalletBalance={setWalletBalance}
                         walletAddress={walletAddress}
                         walletBalance={walletBalance}
                         walletConnected={walletConnected}

@@ -1,11 +1,9 @@
 import { FC, useEffect, useState } from 'react';
 import { Box, Button, Card, Tooltip, Typography } from '@mui/material';
 import { BackendTokenResponse } from '../../../types/Types';
-import { getCurrentAccount, mintKRC20Token } from '../../../utils/KaswareUtils';
+import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { fetchTokenByTicker } from '../../../DAL/BackendDAL';
-import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
-import { setWalletBalanceUtil } from '../../../utils/Utils';
 
 interface MintingComponentProps {
     tokenInfo: BackendTokenResponse;
@@ -13,11 +11,10 @@ interface MintingComponentProps {
     walletBalance: number;
     walletAddress: string | null;
     setTokenInfo: (tokenInfo: BackendTokenResponse) => void;
-    setWalletBalance: (balance: number) => void;
 }
 
 const MintingComponent: FC<MintingComponentProps> = (props) => {
-    const { tokenInfo, walletConnected, walletBalance, setWalletBalance, setTokenInfo, walletAddress } = props;
+    const { tokenInfo, walletConnected, walletBalance, setTokenInfo, walletAddress } = props;
     // Calculate the total mints possible and mints left
     const [mintSuccessful, setMintSuccessful] = useState(false);
     const totalMintableSupply = tokenInfo.totalSupply - tokenInfo.preMintedSupply;
@@ -30,10 +27,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
         if (mintSuccessful) {
             const timer = setTimeout(async () => {
                 try {
-                    const account = await getCurrentAccount();
                     const updatedTokenData = await fetchTokenByTicker(tokenInfo.ticker, walletAddress, true);
-                    const balance = await fetchWalletBalance(account);
-                    setWalletBalance(setWalletBalanceUtil(balance));
                     setTokenInfo(updatedTokenData);
                     setMintSuccessful(false);
                 } catch (error) {

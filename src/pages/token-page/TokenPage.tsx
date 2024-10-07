@@ -21,13 +21,12 @@ interface TokenPageProps {
     handleNetworkChange: (network: string) => void;
     network: string;
     backgroundBlur: boolean;
-    setWalletBalance: (balance: number) => void;
     walletBalance: number;
     walletConnected: boolean;
 }
 
 const TokenPage: FC<TokenPageProps> = (props) => {
-    const { walletConnected, walletBalance, walletAddress, setWalletBalance, backgroundBlur } = props;
+    const { walletConnected, walletBalance, walletAddress, backgroundBlur } = props;
     const { ticker } = useParams();
     const [tokenInfo, setTokenInfo] = useState<BackendTokenResponse>(null);
     const [tokenXHandle, setTokenXHandle] = useState(false);
@@ -148,7 +147,6 @@ const TokenPage: FC<TokenPageProps> = (props) => {
                     walletConnected={walletConnected}
                     walletAddress={walletAddress}
                     setTokenInfo={setTokenInfo}
-                    setWalletBalance={setWalletBalance}
                 />,
             )}
             {getComponentToShow(
@@ -159,7 +157,6 @@ const TokenPage: FC<TokenPageProps> = (props) => {
                     score={rugScoreParse}
                     onRecalculate={recalculateRugScoreAndShow}
                     xHandle={tokenXHandle}
-                    setWalletBalance={setWalletBalance}
                     walletAddress={walletAddress}
                     setTokenInfo={setTokenInfo}
                     isLoadingRugScore={recalculateRugScoreLoading}
@@ -176,7 +173,6 @@ const TokenPage: FC<TokenPageProps> = (props) => {
                     walletConnected={walletConnected}
                     walletAddress={walletAddress}
                     walletBalance={walletBalance}
-                    setWalletBalance={setWalletBalance}
                 />,
                 '91vh',
             )}
