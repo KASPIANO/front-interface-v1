@@ -9,7 +9,7 @@ import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
 import { transferKRC20Token } from '../../../../../utils/KaswareUtils';
 import { confirmSellOrder, createSellOrder } from '../../../../../DAL/BackendP2PDAL';
 import { doPolling } from '../../../../../utils/Utils';
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface SellPanelProps {
     tokenInfo: BackendTokenResponse;
