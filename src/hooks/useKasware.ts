@@ -36,6 +36,15 @@ export const useKasware = () => {
         setNetwork(network);
     };
 
+    const setNewBalance = useCallback(() => {
+        const { kasware } = window;
+        kasware.getBalance().then((balance) => {
+            const kasAmount = balance.total / 1e8;
+            console.log('new kasAmount', kasAmount);
+            setBalance(kasAmount);
+        });
+    }, []);
+
     const selfRef = useRef<{ accounts: string[] }>({
         accounts: [],
     });
@@ -164,42 +173,6 @@ export const useKasware = () => {
         }
     }, [handleAccountsChanged, handleNetworkChanged, disconnectWallet]);
 
-    // useEffect(() => {
-    //     if (!isStarted) {
-    //         async function checkKasware() {
-    //             let { kasware } = window;
-
-    //             for (let i = 1; i < 10 && !kasware; i += 1) {
-    //                 await new Promise((resolve) => setTimeout(resolve, 100 * i));
-    //                 // eslint-disable-next-line prefer-destructuring
-    //                 kasware = window.kasware;
-    //             }
-
-    //             if (kasware) {
-    //                 setKaswareInstalled(true);
-    //             } else if (!kasware) return;
-
-    //             kasware.getAccounts().then((accounts: string[]) => {
-    //                 handleAccountsChanged(accounts);
-    //             });
-
-    //             kasware.on('accountsChanged', handleAccountsChanged);
-    //             kasware.on('networkChanged', handleNetworkChanged);
-    //             kasware.on('disconnect', disconnectWallet);
-
-    //             return () => {
-    //                 kasware.removeListener('accountsChanged', handleAccountsChanged);
-    //                 kasware.removeListener('networkChanged', handleNetworkChanged);
-    //                 kasware.removeListener('disconnect', disconnectWallet);
-    //             };
-    //         }
-
-    //         checkKasware().then();
-    //         setIsStarted(true);
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, []);
-
     useEffect(() => {
         const checkExistingConnection = async () => {
             const storedAddress = localStorage.getItem('walletAddress');
@@ -317,5 +290,6 @@ export const useKasware = () => {
         signMessage,
         setWalletBalance: setBalance,
         handleNetworkChange,
+        setNewBalance,
     };
 };
