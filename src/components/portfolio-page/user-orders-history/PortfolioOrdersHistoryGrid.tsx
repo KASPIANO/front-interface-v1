@@ -148,7 +148,7 @@ const PortfolioOrdersHistoryGrid: FC<PortfolioOrdersHistoryGridProps> = ({
     const handleNextPage = () => setCurrentPage(currentPage + 1);
 
     // Calculate total number of pages
-    const totalPages = Math.ceil(totalCount / 50); // 20 items per page
+    const totalPages = Math.ceil(totalCount / 30); // 30 items per page
 
     const disableNext = () => currentPage >= totalPages;
     const filtersAndSort = (

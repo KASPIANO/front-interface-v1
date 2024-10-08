@@ -1,20 +1,20 @@
 import { Box, List, Table, TableCell, TableHead, TableRow, Tooltip } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import { FC, useEffect, useState } from 'react';
-import { Order } from '../../../types/Types';
+import { FC, useState } from 'react';
 import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 import { PrevPageButton, NextPageButton } from '../../krc-20-page/grid-title-sort/GridTitle.s';
 import { StyledPortfolioGridContainer } from './PortfolioOrdersGrid.s';
 import UserOrdersRow from './user-orders-row/UserOrdersRow';
 import {
     confirmDelistOrder,
-    getUSerListings,
     relistSellOrder,
     removeFromMarketplace,
     updateSellOrder,
 } from '../../../DAL/BackendP2PDAL';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { sendKaspa } from '../../../utils/KaswareUtils';
+import { useQueryClient } from '@tanstack/react-query';
+import { useUserListings } from '../../../DAL/UseQueriesBackend';
 
 interface PortfolioOrdersGridProps {
     kasPrice: number;
@@ -31,64 +31,45 @@ enum GridHeaders {
     ACTION = 'ACTION',
 }
 const KASPA_TO_SOMPI = 100000000;
+const LIMIT = 10;
 const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
     const { kasPrice, walletConnected, walletAddress } = props;
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const [orders, setOrders] = useState<Order[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [totalCount, setTotalCount] = useState<number>(0);
-    const [operationFinished, setOperationFinished] = useState<boolean>(false);
     const [cancelOrderWaitingPayment, setCancelOrderWaitingPayment] = useState<boolean>(false);
     const [cancelOrderWaitingConfirmation, setCancelOrderWaitingConfirmation] = useState<boolean>(false);
     const [loadingOrderId, setLoadingOrderId] = useState<string | null>('');
+    const offset = (currentPage - 1) * LIMIT;
+    const queryClient = useQueryClient();
 
-    useEffect(() => {
-        const fetchUserOrders = async () => {
-            if (orders.length === 0) {
-                setLoading(true);
-            }
-            getUSerListings(walletAddress).then((data) => {
-                setOrders(data.orders);
-                setTotalCount(data.totalCount);
-                setLoading(false);
-            });
-        };
-        if (walletConnected) {
-            fetchUserOrders();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [walletAddress, walletConnected, operationFinished]);
+    const { data, isLoading } = useUserListings(walletAddress, offset);
 
-    const handlePrevPage = () => {
-        setCurrentPage(currentPage - 1);
-        // handlePortfolioPagination('prev');
-    };
+    const totalCount = data?.totalCount || 0;
+    const totalPages = Math.ceil(totalCount / LIMIT);
+    const orders = data?.listings || [];
+    const handlePrevPage = () => setCurrentPage(currentPage - 1);
+    const handleNextPage = () => setCurrentPage(currentPage + 1);
 
-    const handleNextPage = () => {
-        setCurrentPage(currentPage + 1);
-        // handlePortfolioPagination('next');
-    };
+    // Calculate total number of pages
 
+    const disableNext = () => currentPage >= totalPages;
     const handleDelist = async (orderId: string) => {
         const response = await removeFromMarketplace(orderId, walletAddress);
         if (response.success) {
-            setLoadingOrderId(null);
             showGlobalSnackbar({
                 message: 'Order removed from marketplace',
                 severity: 'success',
             });
-            setOperationFinished((prev) => !prev);
+            queryClient.invalidateQueries({ queryKey: ['userListings', walletAddress] });
         }
     };
     const handleRelist = async (orderId: string) => {
         const response = await relistSellOrder(orderId, walletAddress);
         if (response === 201) {
-            setLoadingOrderId(null);
             showGlobalSnackbar({
                 message: 'Order relisted successfully',
                 severity: 'success',
             });
-            setOperationFinished((prev) => !prev);
+            queryClient.invalidateQueries({ queryKey: ['userListings', walletAddress] });
         }
     };
 
@@ -110,7 +91,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                             message: 'Order removed from marketplace, tokens returned to your wallet',
                             severity: 'success',
                         });
-                        setOperationFinished((prev) => !prev);
+                        queryClient.invalidateQueries({ queryKey: ['userListings', walletAddress] });
                     }
                 } else {
                     showGlobalSnackbar({
@@ -145,7 +126,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                 message: 'Order removed from marketplace, tokens returned to your wallet',
                 severity: 'success',
             });
-            setOperationFinished((prev) => !prev);
+            queryClient.invalidateQueries({ queryKey: ['userListings', walletAddress] });
             setLoadingOrderId(null);
             setCancelOrderWaitingPayment(false);
             setCancelOrderWaitingConfirmation(false);
@@ -164,11 +145,10 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                 message: 'Order Edited Successfully',
                 severity: 'success',
             });
-            setOperationFinished((prev) => !prev);
+            queryClient.invalidateQueries({ queryKey: ['userListings', walletAddress] });
         }
     };
 
-    const disableNext = totalCount < 15;
     const tableHeader = (
         <Box
             sx={{
@@ -208,7 +188,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                 <PrevPageButton onClick={handlePrevPage} disabled={currentPage === 1}>
                     Prev
                 </PrevPageButton>
-                <NextPageButton onClick={handleNextPage} disabled={disableNext}>
+                <NextPageButton onClick={handleNextPage} disabled={disableNext()}>
                     Next
                 </NextPageButton>
             </Box>
@@ -231,9 +211,11 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                         overflowX: 'hidden',
                     }}
                 >
-                    {!loading
+                    {!isLoading
                         ? orders.map((order) => (
                               <UserOrdersRow
+                                  walletAddress={walletAddress}
+                                  offset={offset}
                                   cancelOrderWaitingPayment={cancelOrderWaitingPayment}
                                   cancelOrderWaitingConfirmation={cancelOrderWaitingConfirmation}
                                   setCancelOrderWaitingConfirmation={setCancelOrderWaitingConfirmation}

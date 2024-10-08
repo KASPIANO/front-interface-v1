@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { countTokens, fetchAllTokens } from './BackendDAL';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { getOrders, getOrdersHistory } from './BackendP2PDAL'; // Adjust the
+import { getOrders, getOrdersHistory, getUSerListings } from './BackendP2PDAL'; // Adjust the
 
 export interface UseOrdersHistoryProps {
     walletAddress: string;
@@ -107,3 +107,15 @@ export const useOrdersHistory = ({
         }),
     });
 };
+
+export const useUserListings = (walletAddress, offset = 0) =>
+    useQuery({
+        queryKey: ['userListings', walletAddress, offset],
+        queryFn: () => getUSerListings(walletAddress, offset, LIMIT),
+
+        enabled: !!walletAddress,
+        select: (data) => ({
+            listings: data.orders,
+            totalCount: data.totalCount,
+        }),
+    });
