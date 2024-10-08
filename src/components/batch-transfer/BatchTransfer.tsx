@@ -208,7 +208,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 </Box>
             </Typography>
 
-            <Button variant="contained" onClick={handlePayment} sx={{ marginBottom: '2vh' }}>
+            <Button variant="contained" onClick={handlePayment} sx={{ marginBottom: '2vh' }} disabled={true}>
                 Pay 500 KAS
             </Button>
             <Box sx={{ marginBottom: '1.3vh' }}>
