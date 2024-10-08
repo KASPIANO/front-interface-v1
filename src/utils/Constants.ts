@@ -3,3 +3,7 @@ export enum Network {
     TESTNET = 'testnet',
     DEVNET = 'devnet',
 }
+
+export const LOCAL_STORAGE_KEYS = {
+    REFFERAL_CODE: 'referralCode',
+}

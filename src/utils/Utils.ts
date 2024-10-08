@@ -130,6 +130,12 @@ export const verifyPaymentTransaction = async (
     // If both checks pass
     return true;
 };
+
+export const isValidWalletAddress = (address: string): boolean => {
+    const regex = /^(kaspa|kaspatest):q[a-z0-9]{54,90}$/;
+    return regex.test(address);
+};
+
 export const isEmptyString = (value: string): boolean => !value || value.trim() === '';
 
 export const isEmptyArray = <T>(value: T[]): boolean => !value || value.length === 0;
