@@ -64,18 +64,22 @@ export const confirmBuyOrder = async (
     transactionId: string,
 ): Promise<{
     confirmed: boolean;
-    commitTransactionId: string;
-    revealTransactionId: string;
-    sellerTransactionId: string;
-    buyerTransactionId: string;
-    priorityFeeTooHigh?: boolean;
-}> => {
-    const response = await backendService.post<{
-        confirmed: boolean;
+    transactions: {
         commitTransactionId: string;
         revealTransactionId: string;
         sellerTransactionId: string;
         buyerTransactionId: string;
+    };
+    priorityFeeTooHigh?: boolean;
+}> => {
+    const response = await backendService.post<{
+        confirmed: boolean;
+        transactions: {
+            commitTransactionId: string;
+            revealTransactionId: string;
+            sellerTransactionId: string;
+            buyerTransactionId: string;
+        };
         priorityFeeTooHigh?: boolean;
     }>(`/${P2PCONTROLLER}/confirmBuyOrder/${orderId}`, {
         transactionId,
