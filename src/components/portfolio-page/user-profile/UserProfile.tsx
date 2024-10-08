@@ -40,7 +40,6 @@ const UserProfile: FC<UserProfileProps> = (props) => {
 
     useEffect(() => {
         debouncedSetCurrentWalletRef.current = debounce((value) => {
-            console.log('setting');
             setCurrentWalletToCheck(value);
         }, 500);
 

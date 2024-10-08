@@ -80,7 +80,7 @@ const Footer: React.FC = () => (
                                 <FooterLink href="/team">Team</FooterLink>
                             </li>
                             <li>
-                                <FooterLink href="/faq">FAQs</FooterLink>
+                                <FooterLink href="/faqs">FAQs</FooterLink>
                             </li>
                         </FooterList>
                     </Grid>

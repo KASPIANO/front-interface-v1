@@ -52,9 +52,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     };
 
     const handleTokenBalanceVerification = async (addresses: string[]) => {
-        console.log(amount);
         const balance = await fetchWalletKRC20Balance(walletAddress, ticker);
-        console.log('Balance:', balance);
         if (balance >= parseInt(amount) * addresses.length) {
             return true;
         } else {
@@ -114,8 +112,6 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         const jsonStr = JSON.stringify(transferObj);
 
         try {
-            console.log('Signing batch transfer:', jsonStr, addresses);
-
             const txid = await signKRC20BatchTransfer(jsonStr, addresses);
             setTxid(txid);
             clearFields();
@@ -150,7 +146,6 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         }
         const paymentTxn = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
 
-        console.log('Payment txn:', paymentTxn);
         const paymentTxnId = paymentTxn.id;
 
         if (!paymentTxnId) {
@@ -163,6 +158,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             showGlobalSnackbar({
                 message: 'Payment successful',
                 severity: 'success',
+                txIds: [paymentTxnId],
             });
             setPaymentTxnId(paymentTxnId);
             setPaymentMade(true);
@@ -212,7 +208,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 </Box>
             </Typography>
 
-            <Button variant="contained" onClick={handlePayment} sx={{ marginBottom: '2vh' }} disabled={true}>
+            <Button variant="contained" onClick={handlePayment} sx={{ marginBottom: '2vh' }}>
                 Pay 500 KAS
             </Button>
             <Box sx={{ marginBottom: '1.3vh' }}>

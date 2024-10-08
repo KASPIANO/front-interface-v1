@@ -65,7 +65,6 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
         try {
             const mint = await mintKRC20Token(inscribeJsonString);
             if (mint) {
-                console.log(mint);
                 const { commitId, revealId } = JSON.parse(mint);
                 showGlobalSnackbar({
                     message: 'Token minted successfully',

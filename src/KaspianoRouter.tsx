@@ -13,6 +13,7 @@ import { requestAccounts } from './utils/KaswareUtils';
 import TermsOfTrade from './pages/compliance/TermsOfTrade';
 import OrdersManagement from './pages/orders-management/OrdersManagement';
 import TeamPage from './pages/team-page/MeetTheTeam';
+import FAQ from './pages/faqs/Faqs';
 
 interface KaspianoRouterProps {
     backgroundBlur: boolean;
@@ -108,6 +109,7 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
         <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/trade-terms" element={<TermsOfTrade />} />
         <Route path="/team" element={<TeamPage />} />
+        <Route path="/faqs" element={<FAQ />} />
         <Route path="*" element={<div>404 - Not Found</div>} />
     </Routes>
 );

@@ -109,7 +109,6 @@ export const getTxnInfo = async (txnId: string, maxRetries = 3): Promise<any> =>
                 return {};
             }
 
-            console.log(`Retrying in 3 seconds...`);
             await delay(3000); // Wait for 3 seconds before the next attempt
         }
     }

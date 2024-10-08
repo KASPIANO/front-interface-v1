@@ -259,8 +259,7 @@ export const useKasware = () => {
     const handleNetworkByEnvironment = async () => {
         const currentEnv = import.meta.env.VITE_ENV === 'prod' ? 'kaspa_mainnet' : 'kaspa_testnet_10';
         const getCurrentNetwork = await getNetwork();
-        console.log('currentEnv', currentEnv);
-        console.log('getCurrentNetwork', getCurrentNetwork);
+
         if (currentEnv !== getCurrentNetwork) {
             showGlobalSnackbar({
                 message: 'Please switch to the correct network',

@@ -167,7 +167,6 @@ export const checkTokenDeployment = async (ticker: string): Promise<boolean> => 
 
     while (retryCount < maxRetries) {
         try {
-            console.log('Checking token deployment:', ticker, retryCount);
             const token = await fetchTokenInfo(ticker, true); // Make API call to check token info
 
             if (token && token.state === 'deployed') {
