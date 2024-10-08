@@ -22,6 +22,9 @@ const App = () => {
         connectWallet,
         disconnectWallet,
         setNewBalance,
+        isUserReferralFinishedLoading,
+        updateAndGetUserReferral,
+        userReferral,
     } = useKasware();
 
     const [backgroundBlur, setBackgroundBlur] = useState(false);
@@ -78,6 +81,9 @@ const App = () => {
                         walletBalance={walletBalance}
                         walletConnected={walletConnected}
                         connectWallet={connectWallet}
+                        isUserReferralFinishedLoading={isUserReferralFinishedLoading}
+                        updateAndGetUserReferral={updateAndGetUserReferral}
+                        userReferral={userReferral}
                     />
                     <Footer />
                 </BrowserRouter>
