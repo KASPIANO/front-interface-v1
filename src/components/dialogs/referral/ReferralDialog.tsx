@@ -103,7 +103,17 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+        <Dialog
+            open={open}
+            onClose={(_event, reason) => {
+                // Prevent closing the dialog when clicking outside or pressing the Escape key
+                if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                    onClose();
+                }
+            }}
+            maxWidth="sm"
+            fullWidth
+        >
             <DialogTitle>
                 <Box display="flex" alignItems="center">
                     <RedeemIcon fontSize="large" style={{ marginRight: 10 }} />
