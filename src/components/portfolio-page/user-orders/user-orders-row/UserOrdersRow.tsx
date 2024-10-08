@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { Order, SellOrderStatus } from '../../../../types/Types';
 import LoadingSpinner from '../../../common/spinner/LoadingSpinner';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface UserOrdersRowProps {
     order: Order;
@@ -29,6 +30,8 @@ interface UserOrdersRowProps {
     setCancelOrderWaitingConfirmation: (value: boolean) => void;
     loadingOrderId: string | null;
     setLoadingOrderId: (orderId: string | null) => void;
+    offset: number;
+    walletAddress: string;
 }
 
 const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
@@ -44,6 +47,8 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         setCancelOrderWaitingConfirmation,
         setLoadingOrderId,
         loadingOrderId,
+        offset,
+        walletAddress,
     } = props;
     const [openEditDialog, setOpenEditDialog] = React.useState(false);
     const [pricePerToken, setPricePerToken] = React.useState('');
@@ -55,7 +60,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
     const [isRelistLoading, setIsRelistLoading] = React.useState(false);
     const [cancelDialogButtonLoader, setCancelDialogButtonLoader] = React.useState(false);
     const [pricePerTokenError, setPricePerTokenError] = React.useState('');
-
+    const queryClient = useQueryClient();
     const handleCloseEditDialog = () => {
         if (isEditOrderLoading) return;
         setLoadingOrderId(null);
@@ -66,17 +71,67 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
     };
 
     const delistHandler = async (orderId: string) => {
-        setLoadingOrderId(orderId); // Set the loading state for the specific orderId
-        await handleDelist(orderId);
-        setLoadingOrderId(null); // Reset the loading state
+        setLoadingOrderId(orderId);
+
+        // Optimistically update the order status
+
+        try {
+            await handleDelist(orderId);
+            queryClient.setQueryData(
+                ['userListings', walletAddress, offset],
+                (oldData: { orders: Order[] } | undefined) => {
+                    if (!oldData) return oldData;
+
+                    const newOrders = oldData.orders.map((order) => {
+                        if (order.orderId === orderId) {
+                            return { ...order, status: SellOrderStatus.OFF_MARKETPLACE };
+                        }
+                        return order;
+                    });
+
+                    return { ...oldData, orders: newOrders };
+                },
+            );
+        } catch (error) {
+            // Revert the optimistic update on error
+            queryClient.invalidateQueries({ queryKey: ['userListings', walletAddress, offset] });
+            // Optionally show an error message to the user
+        } finally {
+            setLoadingOrderId(null);
+        }
     };
+
     const relistHandler = async (orderId: string) => {
         setIsRelistLoading(true);
-        setLoadingOrderId(orderId); // Set the loading state for the specific orderId
-        await handleRelist(orderId);
-        setIsRelistLoading(false);
-        setLoadingOrderId(null); // Reset the loading state
+        setLoadingOrderId(orderId);
+        try {
+            await handleRelist(orderId);
+            queryClient.setQueryData(
+                ['userListings', walletAddress, offset],
+                (oldData: { orders: Order[] } | undefined) => {
+                    if (!oldData) return oldData;
+
+                    const newOrders = oldData.orders.map((order) => {
+                        if (order.orderId === orderId) {
+                            return { ...order, status: SellOrderStatus.LISTED_FOR_SALE };
+                        }
+                        return order;
+                    });
+
+                    return { ...oldData, orders: newOrders };
+                },
+            );
+        } catch (error) {
+            // Revert the optimistic update on error
+            queryClient.invalidateQueries({ queryKey: ['userListings', walletAddress, offset] });
+            // Optionally show an error message to the user
+        } finally {
+            setIsRelistLoading(false);
+            setLoadingOrderId(null);
+        }
     };
+
+    // Reset the loading state
 
     const formatPrice = (price: number) => {
         if (price >= 1) return price.toFixed(2);
@@ -282,9 +337,9 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '1rem',
-                        width: '24vw',
+                        width: '23vw',
                         justifyContent: 'center',
-                        paddingRight: '9rem',
+                        paddingRight: '8rem',
                     }}
                 >
                     {order.status === SellOrderStatus.OFF_MARKETPLACE && (

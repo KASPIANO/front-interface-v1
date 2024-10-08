@@ -449,7 +449,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                             : walletTickerBalance === 0
                               ? 'You do not have enough tokens to create a sell order'
                               : disableSellButton
-                                ? 'Sell order creation is currently disabled'
+                                ? 'Creating Your Sell Order...'
                                 : ''
                     }
                 >
@@ -462,7 +462,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                             fullWidth
                             disabled={!walletConnected || walletTickerBalance === 0 || disableSellButton}
                         >
-                            Create Sell Order
+                            {disableSellButton ? 'Creating Your Sell Order...' : 'Create Sell Order'}
                         </StyledButton>
                     </span>
                 </Tooltip>

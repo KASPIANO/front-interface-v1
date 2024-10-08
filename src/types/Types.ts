@@ -319,3 +319,15 @@ export enum SellOrderStatus {
     DELIST_ERROR = 'DELIST_ERROR',
     COMPLETED_DELISTING = 'COMPLETED_DELISTING',
 }
+export type FilterSellOrderStatus =
+    | SellOrderStatus.LISTED_FOR_SALE
+    | SellOrderStatus.COMPLETED
+    | SellOrderStatus.OFF_MARKETPLACE
+    | SellOrderStatus.COMPLETED_DELISTING;
+
+export const filterSellOrderStatuses: FilterSellOrderStatus[] = [
+    SellOrderStatus.LISTED_FOR_SALE,
+    SellOrderStatus.COMPLETED,
+    SellOrderStatus.OFF_MARKETPLACE,
+    SellOrderStatus.COMPLETED_DELISTING,
+];

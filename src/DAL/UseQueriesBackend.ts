@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { countTokens, fetchAllTokens } from './BackendDAL';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { getOrders, getOrdersHistory } from './BackendP2PDAL'; // Adjust the
+import { getOrders, getOrdersHistory, getUSerListings } from './BackendP2PDAL'; // Adjust the
 
 export interface UseOrdersHistoryProps {
     walletAddress: string;
@@ -15,6 +15,8 @@ export interface UseOrdersHistoryProps {
         minPrice?: number;
         maxPrice?: number;
         statuses?: string[];
+        isSeller?: boolean;
+        isBuyer?: boolean;
     };
 }
 export const useFetchTokens = (
@@ -61,7 +63,7 @@ export const useFetchOrders = (tokenInfo, sortBy, sortOrder) =>
             // Return undefined if there are no more orders to fetch
             lastPage.hasMore ? lastPage.nextOffset : undefined,
         initialPageParam: 0, // Add this line
-        staleTime: 20000,
+        staleTime: 10000,
         retry: 2,
         refetchOnWindowFocus: false,
     });
@@ -93,8 +95,8 @@ export const useOrdersHistory = ({
                     statuses: filters.statuses || undefined,
                     startDateTimestamp: filters.startDateTimestamp,
                     endDateTimestamp: filters.endDateTimestamp,
-                    isSeller: true,
-                    isBuyer: true,
+                    isSeller: filters.isSeller,
+                    isBuyer: filters.isBuyer,
                 },
             ),
         enabled: !!walletAddress, // Only fetch if wallet address exists
@@ -105,3 +107,15 @@ export const useOrdersHistory = ({
         }),
     });
 };
+
+export const useUserListings = (walletAddress, offset = 0) =>
+    useQuery({
+        queryKey: ['userListings', walletAddress, offset],
+        queryFn: () => getUSerListings(walletAddress, offset, LIMIT),
+
+        enabled: !!walletAddress,
+        select: (data) => ({
+            listings: data.orders,
+            totalCount: data.totalCount,
+        }),
+    });
