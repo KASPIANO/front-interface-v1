@@ -90,13 +90,13 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
             const result = await transferKRC20Token(jsonStringified);
             setWalletConfirmation(false);
             if (result) {
-                const { commit, reveal } = JSON.parse(result);
+                const { commitId, revealId } = JSON.parse(result);
 
                 showGlobalSnackbar({
                     message: 'Token transferred successfully',
                     severity: 'success',
-                    commit,
-                    reveal,
+                    commitId,
+                    revealId,
                 });
                 handleChange();
                 handleTransferDialogClose();
@@ -135,12 +135,12 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
         try {
             const mint = await mintKRC20Token(inscribeJsonString);
             if (mint) {
-                const { commit, reveal } = JSON.parse(mint);
+                const { commitId, revealId } = JSON.parse(mint);
                 showGlobalSnackbar({
                     message: 'Token Mint successfully',
                     severity: 'success',
-                    commit,
-                    reveal,
+                    commitId,
+                    revealId,
                 });
             }
             handleChange();

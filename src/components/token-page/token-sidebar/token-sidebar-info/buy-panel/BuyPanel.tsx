@@ -163,13 +163,12 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         let confirmed: boolean;
         let commitTransactionId: string;
         let revealTransactionId: string;
+        let buyerTransactionId: string;
         let priorityFeeTooHigh: boolean;
 
         try {
-            ({ confirmed, commitTransactionId, revealTransactionId, priorityFeeTooHigh } = await confirmBuyOrder(
-                order.orderId,
-                paymentTxnId,
-            ));
+            ({ confirmed, commitTransactionId, revealTransactionId, priorityFeeTooHigh, buyerTransactionId } =
+                await confirmBuyOrder(order.orderId, paymentTxnId));
         } catch (error) {
             console.error(error);
             confirmed = false;
@@ -179,8 +178,9 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             showGlobalSnackbar({
                 message: 'Purchase successful!',
                 severity: 'success',
-                reveal: revealTransactionId,
-                commit: commitTransactionId,
+                revealId: revealTransactionId,
+                commitId: commitTransactionId,
+                txIds: [buyerTransactionId],
             });
             queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker, sortBy, sortOrder] });
             setIsProcessingBuyOrder(false);

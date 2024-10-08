@@ -13,9 +13,10 @@ interface AlertOptions {
     message: string;
     severity: AlertSeverity;
     details?: string;
-    commit?: string;
-    reveal?: string;
+    commitId?: string;
+    revealId?: string;
     kasware?: boolean;
+    txIds?: string[];
 }
 
 const alertColors = {
@@ -152,7 +153,7 @@ const SnackbarComponent: React.FC = () => {
                             </Typography>
                         )}
 
-                        {alert.commit && (
+                        {alert.commitId && (
                             <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
                                 <Typography
                                     sx={{
@@ -165,20 +166,20 @@ const SnackbarComponent: React.FC = () => {
                                 >
                                     Commit Txn:{' '}
                                     <a
-                                        href={`${txnLink}${alert.commit}`}
+                                        href={`${txnLink}${alert.commitId}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         style={{ textDecoration: 'none', color: alertIconColors[alert.severity] }}
                                     >
-                                        {alert.commit.slice(0, 10)}...
+                                        {alert.commitId.slice(0, 10)}...
                                     </a>
                                 </Typography>
-                                <IconButton size="small" onClick={() => copyToClipboard(alert.commit)}>
+                                <IconButton size="small" onClick={() => copyToClipboard(alert.commitId)}>
                                     <ContentCopyRoundedIcon fontSize="small" />
                                 </IconButton>
                             </Box>
                         )}
-                        {alert.reveal && (
+                        {alert.revealId && (
                             <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
                                 <Typography
                                     sx={{
@@ -191,19 +192,45 @@ const SnackbarComponent: React.FC = () => {
                                 >
                                     Reveal Txn:{' '}
                                     <a
-                                        href={`${txnLink}${alert.reveal}`}
+                                        href={`${txnLink}${alert.revealId}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         style={{ textDecoration: 'none', color: alertIconColors[alert.severity] }}
                                     >
-                                        {alert.reveal.slice(0, 10)}...
+                                        {alert.revealId.slice(0, 10)}...
                                     </a>
                                 </Typography>
-                                <IconButton size="small" onClick={() => copyToClipboard(alert.reveal)}>
+                                <IconButton size="small" onClick={() => copyToClipboard(alert.revealId)}>
                                     <ContentCopyRoundedIcon fontSize="small" />
                                 </IconButton>
                             </Box>
                         )}
+                        {alert.txIds?.map((txId) => (
+                            <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }} key={txId}>
+                                <Typography
+                                    sx={{
+                                        fontSize: '0.875rem',
+                                        color: alertIconColors[alert.severity],
+                                        opacity: 0.8,
+                                        wordBreak: 'break-all',
+                                        overflowWrap: 'break-word',
+                                    }}
+                                >
+                                    Txn:{' '}
+                                    <a
+                                        href={`${txnLink}${txId}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ textDecoration: 'none', color: alertIconColors[alert.severity] }}
+                                    >
+                                        {txId.slice(0, 10)}...
+                                    </a>
+                                </Typography>
+                                <IconButton size="small" onClick={() => copyToClipboard(txId)}>
+                                    <ContentCopyRoundedIcon fontSize="small" />
+                                </IconButton>
+                            </Box>
+                        ))}
                     </Box>
                 </Snackbar>
             )}

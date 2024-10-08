@@ -268,13 +268,12 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             setWalletConfirmation(false);
             setCreatingSellOrder(true);
             if (result) {
-                const { commit, reveal } = JSON.parse(result);
-
+                const { commitId, revealId } = JSON.parse(result);
                 showGlobalSnackbar({
                     message: 'Token transferred successfully',
                     severity: 'success',
-                    commit,
-                    reveal,
+                    commitId,
+                    revealId,
                 });
             }
             const confirmation = await doPolling(
