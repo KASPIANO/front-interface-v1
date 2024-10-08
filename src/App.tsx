@@ -22,7 +22,6 @@ const App = () => {
         connectWallet,
         disconnectWallet,
         setNewBalance,
-        handleNetworkChange,
     } = useKasware();
 
     const [backgroundBlur, setBackgroundBlur] = useState(false);
@@ -74,7 +73,6 @@ const App = () => {
                     />
                     <KaspianoRouter
                         backgroundBlur={backgroundBlur}
-                        handleNetworkChange={handleNetworkChange}
                         network={network}
                         walletAddress={walletAddress}
                         walletBalance={walletBalance}

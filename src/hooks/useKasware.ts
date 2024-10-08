@@ -6,7 +6,7 @@ import { generateNonce, generateRequestId, generateVerificationMessage } from '.
 // import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 import { addReferredBy, checkReferralExists } from '../DAL/BackendDAL';
 import { showGlobalDialog } from '../components/dialog-context/DialogContext';
-import { getNetwork, handleSwitchNetwork, isKasWareInstalled } from '../utils/KaswareUtils';
+import { getNetwork, isKasWareInstalled } from '../utils/KaswareUtils';
 import { LOCAL_STORAGE_KEYS } from '../utils/Constants';
 
 export const useKasware = () => {
@@ -130,10 +130,9 @@ export const useKasware = () => {
         [handleUserVerification, self],
     );
 
-    const handleNetworkChanged = useCallback(async (newNetwork: string) => {
+    const handleNetworkChange = useCallback(async (newNetwork) => {
         if (network !== newNetwork) {
             try {
-                setNetwork(network);
                 await handleNetworkByEnvironment();
                 showGlobalSnackbar({ message: `Switched to ${newNetwork}`, severity: 'success' });
                 getBasicInfo();
@@ -162,16 +161,16 @@ export const useKasware = () => {
     useEffect(() => {
         if (isKasWareInstalled()) {
             window.kasware.on('accountsChanged', handleAccountsChanged);
-            window.kasware.on('networkChanged', handleNetworkChanged);
+            window.kasware.on('networkChanged', handleNetworkChange);
             window.kasware.on('disconnect', disconnectWallet);
 
             return () => {
                 window.kasware.removeListener('accountsChanged', handleAccountsChanged);
-                window.kasware.removeListener('networkChanged', handleNetworkChanged);
+                window.kasware.removeListener('networkChanged', handleNetworkChange);
                 window.kasware.removeListener('disconnect', disconnectWallet);
             };
         }
-    }, [handleAccountsChanged, handleNetworkChanged, disconnectWallet]);
+    }, [handleAccountsChanged, handleNetworkChange, disconnectWallet]);
 
     useEffect(() => {
         const checkExistingConnection = async () => {
@@ -199,9 +198,18 @@ export const useKasware = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const switchNetwork = async (e) => {
-        const network = await window.kasware.switchNetwork(e.target.value);
-        setNetwork(network);
+    const handleSwitchNetwork = async (network) => {
+        try {
+            await window.kasware.switchNetwork(network);
+            setNetwork(network);
+            return true;
+        } catch (error) {
+            if (error.code === 4001) {
+                return false;
+            }
+            console.error(error);
+            throw error;
+        }
     };
 
     const connectWallet = async () => {
@@ -251,6 +259,8 @@ export const useKasware = () => {
     const handleNetworkByEnvironment = async () => {
         const currentEnv = import.meta.env.VITE_ENV === 'prod' ? 'kaspa_mainnet' : 'kaspa_testnet_10';
         const getCurrentNetwork = await getNetwork();
+        console.log('currentEnv', currentEnv);
+        console.log('getCurrentNetwork', getCurrentNetwork);
         if (currentEnv !== getCurrentNetwork) {
             showGlobalSnackbar({
                 message: 'Please switch to the correct network',
@@ -260,26 +270,6 @@ export const useKasware = () => {
 
             if (!reject) {
                 await disconnectWallet();
-            } else {
-                setNetwork(currentEnv);
-            }
-        }
-    };
-
-    const handleNetworkChange = async (newNetwork) => {
-        if (network !== newNetwork) {
-            try {
-                await switchNetwork(newNetwork);
-                setNetwork(newNetwork);
-                await handleNetworkByEnvironment();
-                showGlobalSnackbar({ message: `Switched to ${newNetwork}`, severity: 'success' });
-            } catch (error) {
-                console.error('Error switching network:', error);
-                showGlobalSnackbar({
-                    message: 'Failed to switch network',
-                    severity: 'error',
-                    details: error.message,
-                });
             }
         }
     };
@@ -295,7 +285,6 @@ export const useKasware = () => {
         signature,
         userVerified,
         disconnectWallet,
-        switchNetwork,
         connectWallet,
         signMessage,
         handleNetworkChange,
