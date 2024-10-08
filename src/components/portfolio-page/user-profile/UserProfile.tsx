@@ -2,14 +2,13 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { Box, Avatar, Typography, Button, useTheme, TextField, alpha } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { ProfileContainer, ProfileDetails } from './UserProfile.s';
-import XIcon from '@mui/icons-material/X';
 import { isEmptyString, isValidWalletAddress, shortenAddress } from '../../../utils/Utils';
 import { Stat, StatHelpText, StatNumber } from '@chakra-ui/react';
-import { getUserReferral } from '../../../DAL/BackendDAL';
 import { showGlobalDialog } from '../../dialog-context/DialogContext';
 import { ContentCopyRounded as ContentCopyRoundedIcon } from '@mui/icons-material';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { debounce } from 'lodash';
+import { UserReferral } from '../../../types/Types';
 
 interface UserProfileProps {
     walletAddress: string;
@@ -18,6 +17,9 @@ interface UserProfileProps {
     kasPrice: number;
     setCurrentWalletToCheck: (address: string) => void;
     connectWallet: () => void;
+    updateAndGetUserReferral: (referredBy?: string) => Promise<UserReferral> | null;
+    userReferral: UserReferral | null;
+    isUserReferralFinishedLoading: boolean;
 }
 
 const UserProfile: FC<UserProfileProps> = (props) => {
@@ -28,11 +30,11 @@ const UserProfile: FC<UserProfileProps> = (props) => {
         setCurrentWalletToCheck,
         currentWalletToCheck,
         connectWallet,
+        updateAndGetUserReferral,
+        userReferral,
+        isUserReferralFinishedLoading,
     } = props;
     const theme = useTheme();
-    const [referralCode, setReferralCode] = useState<string | null>(null);
-    const [referredBy, setReferredBy] = useState<string | null>(null);
-    const [isReferralCodeLoaded, setIsReferralCodeLoaded] = useState<boolean>(false);
     const [, setCopied] = useState(false);
     const [walletAddressError, setWalletAddressError] = useState<string | null>(null);
     const [walletInputValue, setWalletInputValue] = useState<string>(walletAddress);
@@ -41,6 +43,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     const debouncedSetCurrentWalletRef = useRef(null);
 
     useEffect(() => {
+        setCurrentWalletToCheck(walletAddress);
         debouncedSetCurrentWalletRef.current = debounce((value) => {
             setCurrentWalletToCheck(value);
         }, 500);
@@ -52,21 +55,11 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     }, []);
 
     useEffect(() => {
-        const fetchReferralStatus = async () => {
-            if (walletAddress) {
-                setReferralCode(null);
-                setWalletInputValue(currentWalletToCheck);
-                const result = await getUserReferral(walletAddress);
-                if (result.referralCode) {
-                    setReferralCode(result.referralCode);
-                    setReferredBy(result.refferedBy);
-                }
-
-                setIsReferralCodeLoaded(true);
-            }
-        };
-        fetchReferralStatus();
-    }, [walletAddress, currentWalletToCheck]);
+        if (walletInputValue !== currentWalletToCheck) {
+            setWalletInputValue(currentWalletToCheck);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentWalletToCheck]);
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard
@@ -95,7 +88,8 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                 dialogProps: {
                     walletAddress,
                     mode: 'add',
-                    setReferralCode: setReferredBy,
+                    updateAndGetUserReferral,
+                    userReferral,
                 },
             });
         }
@@ -201,31 +195,33 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         >
                             Add
                         </Button> */}
-                        {!isEmptyString(referralCode) && (
+                        {!isEmptyString(userReferral?.code) && (
                             <Button
                                 variant="outlined"
                                 size="medium"
                                 endIcon={<ContentCopyRoundedIcon fontSize="small" />}
-                                onClick={() => copyToClipboard(referralCode)}
+                                onClick={() => copyToClipboard(userReferral?.code)}
                             >
-                                Your Referral Code : {referralCode}
+                                Your Referral Code : {userReferral?.code}
                             </Button>
                         )}
-                        {!isEmptyString(referralCode) && (
+                        {!isEmptyString(userReferral?.code) && (
                             <Button
                                 variant="outlined"
                                 size="medium"
                                 endIcon={<ContentCopyRoundedIcon fontSize="small" />}
-                                onClick={() => copyToClipboard(createReferralLink(referralCode))}
+                                onClick={() => copyToClipboard(createReferralLink(userReferral?.code))}
                             >
                                 Copy Your Referral Link
                             </Button>
                         )}
-                        {isEmptyString(referredBy) && !isEmptyString(walletAddress) && isReferralCodeLoaded && (
-                            <Button variant="outlined" size="medium" onClick={handleOpenReferralDialog}>
-                                Apply Referral Code
-                            </Button>
-                        )}
+                        {isEmptyString(userReferral?.referredBy) &&
+                            !isEmptyString(walletAddress) &&
+                            isUserReferralFinishedLoading && (
+                                <Button variant="outlined" size="medium" onClick={handleOpenReferralDialog}>
+                                    Apply Referral Code
+                                </Button>
+                            )}
                     </Box>
                 </ProfileDetails>
             </Box>

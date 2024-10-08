@@ -14,6 +14,7 @@ import TermsOfTrade from './pages/compliance/TermsOfTrade';
 import OrdersManagement from './pages/orders-management/OrdersManagement';
 import TeamPage from './pages/team-page/MeetTheTeam';
 import FAQ from './pages/faqs/Faqs';
+import { UserReferral } from './types/Types';
 
 interface KaspianoRouterProps {
     backgroundBlur: boolean;
@@ -22,6 +23,9 @@ interface KaspianoRouterProps {
     walletBalance: number;
     network: any;
     connectWallet: () => void;
+    updateAndGetUserReferral: (referredBy?: string) => Promise<UserReferral> | null;
+    userReferral: UserReferral | null;
+    isUserReferralFinishedLoading: boolean;
 }
 
 export const KaspianoRouter: FC<KaspianoRouterProps> = ({
@@ -31,6 +35,9 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
     walletBalance,
     network,
     connectWallet,
+    isUserReferralFinishedLoading,
+    updateAndGetUserReferral,
+    userReferral,
 }) => (
     <Routes>
         <Route
@@ -88,6 +95,9 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
                     backgroundBlur={backgroundBlur}
                     walletConnected={walletConnected}
                     connectWallet={connectWallet}
+                    isUserReferralFinishedLoading={isUserReferralFinishedLoading}
+                    updateAndGetUserReferral={updateAndGetUserReferral}
+                    userReferral={userReferral}
                 />
             }
         />

@@ -331,3 +331,9 @@ export const filterSellOrderStatuses: FilterSellOrderStatus[] = [
     SellOrderStatus.OFF_MARKETPLACE,
     SellOrderStatus.COMPLETED_DELISTING,
 ];
+
+export type UserReferral = {
+    code: string;
+    referredBy?: string;
+    isNew?: boolean;
+};

@@ -5,6 +5,7 @@ import {
     TokenListItemResponse,
     TokenSearchItems,
     TokenSentiment,
+    UserReferral,
     VerifiedUser,
 } from '../types/Types';
 import { backendService } from './AxiosInstaces';
@@ -242,53 +243,10 @@ export const getGasEstimator = async (orderId: string): Promise<any> => {
     }
 };
 
-export const getUserReferral = async (
-    walletAddress: string,
-): Promise<{ referralCode: string; refferedBy: string } | null> => {
-    try {
-        const response = await backendService.post<{ referralCode: string; refferedBy: string }>(
-            `/${USER_REFERRALS_CONTROLLER}/get-user-referral`,
-            {
-                walletAddress,
-            },
-        );
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching referral code:', error);
-        return null;
-    }
-};
-
-export const checkReferralExists = async (walletAddress: string): Promise<{ exists: boolean } | null> => {
-    try {
-        const response = await backendService.post<{ exists: boolean }>(
-            `/${USER_REFERRALS_CONTROLLER}/check-referral-exists`,
-            {
-                walletAddress,
-            },
-        );
-        return response.data;
-    } catch (error) {
-        console.error('Error checking referral existence:', error);
-        return null;
-    }
-};
-
-export const addReferredBy = async (
-    walletAddress: string,
-    referredBy: string,
-): Promise<{ referred_by: string } | null> => {
-    try {
-        const response = await backendService.post<{ referred_by: string }>(
-            `/${USER_REFERRALS_CONTROLLER}/add-referred-by`,
-            {
-                walletAddress,
-                referredBy,
-            },
-        );
-        return response.data;
-    } catch (error) {
-        console.error('Error adding referred by information:', error);
-        return null;
-    }
+export const getUserReferral = async (walletAddress: string, referredBy?: string): Promise<UserReferral> => {
+    const response = await backendService.post<UserReferral>(`/${USER_REFERRALS_CONTROLLER}/user-referral`, {
+        walletAddress,
+        referredBy,
+    });
+    return response.data;
 };
