@@ -229,8 +229,6 @@ export const useKasware = () => {
             try {
                 const referralCode = await updateAndGetUserReferral(localStorageReferralCode);
 
-                setIsUserReferralFinishedLoading(true);
-
                 if (referralCode.isNew && isEmptyString(referralCode.referredBy)) {
                     showGlobalDialog({
                         dialogType: 'referral',
@@ -245,6 +243,8 @@ export const useKasware = () => {
             } catch (error) {
                 console.error('Error getting referral info: ', error);
             }
+
+            setIsUserReferralFinishedLoading(true);
         };
         if (!isEmptyString(address)) {
             updateFirstUserReferral();
