@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Cookies from 'universal-cookie';
 import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
-import { UserVerfication } from '../types/Types';
-import { generateNonce, generateRequestId, generateVerificationMessage } from '../utils/Utils';
+import { UserReferral, UserVerfication } from '../types/Types';
+import { generateNonce, generateRequestId, generateVerificationMessage, isEmptyString } from '../utils/Utils';
 // import { showGlobalDialog } from '../components/dialog-context/DialogContext';
-import { addReferredBy, checkReferralExists } from '../DAL/BackendDAL';
 import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 import { getNetwork, isKasWareInstalled } from '../utils/KaswareUtils';
 import { LOCAL_STORAGE_KEYS } from '../utils/Constants';
+import { getUserReferral } from '../DAL/BackendDAL';
 
 export const useKasware = () => {
     const [connected, setConnected] = useState(false);
@@ -18,6 +18,9 @@ export const useKasware = () => {
     const [network, setNetwork] = useState('mainnet');
     const [signature, setSignature] = useState('');
     const [userVerified, setUserVerified] = useState<UserVerfication>(null);
+    const [userReferral, setUserReferral] = useState<UserReferral | null>(null);
+    const [isUserReferralFinishedLoading, setIsUserReferralFinishedLoading] = useState(false);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const cookies = new Cookies();
 
@@ -212,6 +215,43 @@ export const useKasware = () => {
         }
     };
 
+    const updateAndGetUserReferral = async (referredBy?: string): Promise<UserReferral> => {
+        const result = await getUserReferral(address, referredBy);
+        setUserReferral(result);
+
+        return result;
+    };
+
+    useEffect(() => {
+        const updateFirstUserReferral = async () => {
+            const localStorageReferralCode = localStorage.getItem(LOCAL_STORAGE_KEYS.REFFERAL_CODE);
+
+            try {
+                const referralCode = await updateAndGetUserReferral(localStorageReferralCode);
+
+                if (referralCode.isNew && isEmptyString(referralCode.referredBy)) {
+                    showGlobalDialog({
+                        dialogType: 'referral',
+                        dialogProps: {
+                            walletAddress: address,
+                            mode: 'add',
+                            updateAndGetUserReferral,
+                            userReferral,
+                        },
+                    });
+                }
+            } catch (error) {
+                console.error('Error getting referral info: ', error);
+            }
+
+            setIsUserReferralFinishedLoading(true);
+        };
+        if (!isEmptyString(address)) {
+            updateFirstUserReferral();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [address]);
+
     const connectWallet = async () => {
         if (isKasWareInstalled()) {
             await handleNetworkByEnvironment();
@@ -221,26 +261,6 @@ export const useKasware = () => {
                 severity: 'success',
             });
             handleAccountsChanged(result);
-            const referralExists = await checkReferralExists(result[0]);
-            if (!referralExists.exists) {
-                const localStorageReferralCode = localStorage.getItem(LOCAL_STORAGE_KEYS.REFFERAL_CODE);
-
-                if (localStorageReferralCode) {
-                    addReferredBy(result[0], localStorageReferralCode).then((result) => {
-                        if (!result) {
-                            console.error('Failed to add referral code');
-                        }
-                    });
-                } else {
-                    showGlobalDialog({
-                        dialogType: 'referral',
-                        dialogProps: {
-                            walletAddress: result[0],
-                            mode: 'add',
-                        },
-                    });
-                }
-            }
         } else {
             showGlobalSnackbar({
                 message: 'KasWare not installed',
@@ -289,5 +309,8 @@ export const useKasware = () => {
         signMessage,
         handleNetworkChange,
         setNewBalance,
+        userReferral,
+        updateAndGetUserReferral,
+        isUserReferralFinishedLoading,
     };
 };

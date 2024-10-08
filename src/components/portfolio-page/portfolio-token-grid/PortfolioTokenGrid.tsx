@@ -51,7 +51,6 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
         handlePortfolioPagination('next');
     };
 
-    console.log('currentWalletToCheck', currentWalletToCheck);
     const tableHeader = (
         <Box
             sx={{

@@ -3,7 +3,7 @@ import { PortfolioLayout } from './PortfolioPageLayout';
 import UserProfile from '../../components/portfolio-page/user-profile/UserProfile';
 import PortfolioPanel from '../../components/portfolio-page/portfolio-tab-panel/PortfolioPanel';
 import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
-import { TokenRowPortfolioItem } from '../../types/Types';
+import { TokenRowPortfolioItem, UserReferral } from '../../types/Types';
 import { fetchWalletKRC20TokensBalance } from '../../DAL/Krc20DAL';
 import { fetchTokenPortfolio } from '../../DAL/BackendDAL';
 import { isEmptyString } from '../../utils/Utils';
@@ -14,6 +14,9 @@ interface PortfolioPageProps {
     walletConnected: boolean;
     walletBalance: number;
     connectWallet: () => void;
+    updateAndGetUserReferral: (referredBy?: string) => Promise<UserReferral> | null;
+    userReferral: UserReferral | null;
+    isUserReferralFinishedLoading: boolean;
 }
 
 // const portfolioValue: PortfolioValue = {
@@ -44,7 +47,16 @@ interface PortfolioPageProps {
 // ];
 
 const PortfolioPage: FC<PortfolioPageProps> = (props) => {
-    const { walletAddress, backgroundBlur, walletConnected, walletBalance, connectWallet } = props;
+    const {
+        walletAddress,
+        backgroundBlur,
+        walletConnected,
+        walletBalance,
+        connectWallet,
+        updateAndGetUserReferral,
+        isUserReferralFinishedLoading,
+        userReferral,
+    } = props;
     const [kasPrice, setkasPrice] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [portfolioAssetTickers, setPortfolioAssetTickers] = useState<string[]>([]);
@@ -162,6 +174,9 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
                 kasPrice={kasPrice}
                 setCurrentWalletToCheck={setCurrentWalletToCheck}
                 connectWallet={connectWallet}
+                isUserReferralFinishedLoading={isUserReferralFinishedLoading}
+                updateAndGetUserReferral={updateAndGetUserReferral}
+                userReferral={userReferral}
             />
             <PortfolioPanel
                 isLoading={isLoading}
