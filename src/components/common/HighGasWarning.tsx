@@ -1,21 +1,22 @@
-import WarningIcon from '@mui/icons-material/Warning';
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import WarningIcon from '@mui/icons-material/Warning';
+import { Box, Typography, Tooltip } from '@mui/material';
 
 export const HighGasWarning: React.FC = () => (
     <Box
         sx={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: '#fff4e5', // Light yellow background
-            padding: '10px',
-            borderRadius: '8px',
+            padding: '4px 6px',
+            borderRadius: '4px',
+            border: '1px solid orange',
         }}
     >
-        <WarningIcon sx={{ color: 'orange', marginRight: '10px' }} />
-        <Typography variant="body1" sx={{ color: 'orange' }}>
-            Gas fees are currently high. We recommend waiting for the fees to decrease. However, you may still
-            continue with the process if you wish to proceed at the current fee rates.
-        </Typography>
+        <Tooltip title="Gas fees are currently high. It's recommended to wait for them to decrease. However, you can proceed if you accept the current fees.">
+            <span style={{ display: 'flex', alignItems: 'center' }}>
+                <WarningIcon sx={{ color: 'orange', marginRight: '6px', fontSize: '0.8rem' }} />
+                <Typography variant="body2" sx={{ color: 'orange', fontWeight: 'bold', fontSize: '0.6rem' }}>
+                    High Gas Warning
+                </Typography>
+            </span>
+        </Tooltip>
     </Box>
 );

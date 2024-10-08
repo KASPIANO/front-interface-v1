@@ -1,5 +1,5 @@
 // ConfirmSellDialog.tsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -11,6 +11,8 @@ import {
     Divider,
 } from '@mui/material';
 import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
+import { HighGasWarning } from '../../../../../common/HighGasWarning';
+import { highGasWarning } from '../../../../../../DAL/KaspaApiDal';
 
 interface ConfirmSellDialogProps {
     open: boolean;
@@ -39,6 +41,17 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
         priceCurrency,
         creatingSellOrder,
     } = props;
+    const [showHighGasWarning, setShowHighGasWarning] = useState(false);
+    useEffect(() => {
+        const checkGasLimits = async () => {
+            const isHighGasWarning = await highGasWarning('TRANSFER');
+
+            setShowHighGasWarning(isHighGasWarning);
+        };
+
+        checkGasLimits();
+    }, []);
+
     const handleClose = () => {
         if (waitingForWalletConfirmation || creatingSellOrder) {
             return; // Prevent closing if waiting
@@ -57,7 +70,10 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
     return (
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle sx={{ fontWeight: 'bold' }}>
-                {waitingForWalletConfirmation || creatingSellOrder ? '' : 'Confirm Sell Order'}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {waitingForWalletConfirmation || creatingSellOrder ? '' : 'Confirm Sell Order'}
+                    {showHighGasWarning && <HighGasWarning />}
+                </Box>
             </DialogTitle>
             <DialogContent>
                 {waitingForWalletConfirmation ? (

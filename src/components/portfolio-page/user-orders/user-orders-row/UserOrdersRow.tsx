@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     ListItem,
     Typography,
@@ -16,6 +16,8 @@ import {
 import { Order, SellOrderStatus } from '../../../../types/Types';
 import LoadingSpinner from '../../../common/spinner/LoadingSpinner';
 import { useQueryClient } from '@tanstack/react-query';
+import { highGasWarning } from '../../../../DAL/KaspaApiDal';
+import { HighGasWarning } from '../../../common/HighGasWarning';
 
 interface UserOrdersRowProps {
     order: Order;
@@ -50,16 +52,18 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         offset,
         walletAddress,
     } = props;
-    const [openEditDialog, setOpenEditDialog] = React.useState(false);
-    const [pricePerToken, setPricePerToken] = React.useState('');
-    const [totalPrice, setTotalPrice] = React.useState('');
-    const [editError, setEditError] = React.useState('');
-    const [openCancelDialog, setOpenCancelDialog] = React.useState(false);
-    const [isCancelOrderLoading, setIsCancelOrderLoading] = React.useState(false);
-    const [isEditOrderLoading, setIsEditOrderLoading] = React.useState(false);
-    const [isRelistLoading, setIsRelistLoading] = React.useState(false);
-    const [cancelDialogButtonLoader, setCancelDialogButtonLoader] = React.useState(false);
-    const [pricePerTokenError, setPricePerTokenError] = React.useState('');
+    const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [pricePerToken, setPricePerToken] = useState('');
+    const [totalPrice, setTotalPrice] = useState('');
+    const [editError, setEditError] = useState('');
+    const [openCancelDialog, setOpenCancelDialog] = useState(false);
+    const [isCancelOrderLoading, setIsCancelOrderLoading] = useState(false);
+    const [isEditOrderLoading, setIsEditOrderLoading] = useState(false);
+    const [isRelistLoading, setIsRelistLoading] = useState(false);
+    const [cancelDialogButtonLoader, setCancelDialogButtonLoader] = useState(false);
+    const [pricePerTokenError, setPricePerTokenError] = useState('');
+    const [showHighGasWarning, setShowHighGasWarning] = useState(false);
+
     const queryClient = useQueryClient();
     const handleCloseEditDialog = () => {
         if (isEditOrderLoading) return;
@@ -69,6 +73,16 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         setTotalPrice('');
         setEditError('');
     };
+
+    useEffect(() => {
+        const checkGasLimits = async () => {
+            const isHighGasWarning = await highGasWarning('TRANSFER');
+
+            setShowHighGasWarning(isHighGasWarning);
+        };
+
+        checkGasLimits();
+    }, [isCancelOrderLoading]);
 
     const delistHandler = async (orderId: string) => {
         setLoadingOrderId(orderId);
@@ -487,7 +501,10 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                 onClose={handleCancelCloseDialog}
             >
                 <DialogTitle sx={{ fontWeight: 'bold' }}>
-                    {cancelOrderWaitingPayment || cancelOrderWaitingConfirmation ? '' : 'Cancel Order Process'}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        {cancelOrderWaitingPayment || cancelOrderWaitingConfirmation ? '' : 'Cancel Order Process'}
+                        {showHighGasWarning && <HighGasWarning />}
+                    </Box>
                 </DialogTitle>
                 <DialogContent>
                     {/* Conditionally show the loading spinner or the content based on the state */}

@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, IconButton, Tooltip, FormControlLabel, Checkbox, Link } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Order } from '../../../../../../types/Types';
 import { OrderDetailsItem, OrderItemPrimary } from './OrderDetails.s';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
+import { highGasLimitExceeded, highGasWarning } from '../../../../../../DAL/KaspaApiDal';
+import { GasLimitExceeded } from '../../../../../common/HighGasLimitExceeded';
+import { HighGasWarning } from '../../../../../common/HighGasWarning';
 
 interface OrderDetailsProps {
     order: Order;
@@ -31,6 +34,8 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
         isProcessingBuyOrder,
     } = props;
     const [agreedToTerms, setAgreedToTerms] = useState(false);
+    const [showHighGasWarning, setShowHighGasWarning] = useState(false);
+    const [showGasLimitExceeded, setShowGasLimitExceeded] = useState(false);
     // Fee Calculations
     const networkFee = 5; // Fixed network fee
     const finalTotal = order.totalPrice + networkFee;
@@ -42,6 +47,18 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
         const secs = (seconds % 60).toString().padStart(2, '0');
         return `${minutes}:${secs}`;
     };
+
+    useEffect(() => {
+        const checkGasLimits = async () => {
+            const isHighGasWarning = await highGasWarning();
+            const isGasLimitExceeded = await highGasLimitExceeded();
+
+            setShowHighGasWarning(isHighGasWarning);
+            setShowGasLimitExceeded(isGasLimitExceeded);
+        };
+
+        checkGasLimits();
+    }, []);
 
     const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setAgreedToTerms(event.target.checked);
@@ -94,6 +111,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                     <Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <Typography sx={{ fontWeight: '700' }}>Order Details</Typography>
+                            <Box sx={{ marginLeft: 'auto' }}>
+                                {showGasLimitExceeded && <GasLimitExceeded />}
+                                {showHighGasWarning && !showGasLimitExceeded && <HighGasWarning />}
+                            </Box>
                             <IconButton onClick={() => onClose(order.orderId)}>
                                 <CloseIcon
                                     sx={{
