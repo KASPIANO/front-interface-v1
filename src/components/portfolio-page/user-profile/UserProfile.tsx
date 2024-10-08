@@ -191,9 +191,9 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                             />
                         )}
 
-                        <Button variant="outlined" endIcon={<XIcon />}>
+                        {/* <Button variant="outlined" endIcon={<XIcon />}>
                             Add
-                        </Button>
+                        </Button> */}
                         {/* <Button
                             variant="outlined"
                             size="small"
