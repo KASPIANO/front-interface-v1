@@ -8,6 +8,7 @@ import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 import { getNetwork, isKasWareInstalled } from '../utils/KaswareUtils';
 import { LOCAL_STORAGE_KEYS } from '../utils/Constants';
 import { getUserReferral } from '../DAL/BackendDAL';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const useKasware = () => {
     const [connected, setConnected] = useState(false);
@@ -20,7 +21,7 @@ export const useKasware = () => {
     const [userVerified, setUserVerified] = useState<UserVerfication>(null);
     const [userReferral, setUserReferral] = useState<UserReferral | null>(null);
     const [isUserReferralFinishedLoading, setIsUserReferralFinishedLoading] = useState(false);
-
+    const queryClient = useQueryClient();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const cookies = new Cookies();
 
@@ -113,6 +114,8 @@ export const useKasware = () => {
 
             self.accounts = _accounts;
             if (_accounts.length > 0) {
+                queryClient.invalidateQueries({ queryKey: ['userListings'] });
+                queryClient.invalidateQueries({ queryKey: ['ordersHistory'] });
                 getBasicInfo();
                 setAccounts(_accounts);
                 setConnected(true);
