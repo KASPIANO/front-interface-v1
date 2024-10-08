@@ -155,6 +155,7 @@ export const useKasware = () => {
         const { origin } = window.location;
         await window.kasware.disconnect(origin);
         handleAccountsChanged([]);
+        setUserReferral(null);
         localStorage.removeItem('walletAddress');
         showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
         cookies.remove('user');
