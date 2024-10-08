@@ -4,9 +4,10 @@ import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
 import { UserVerfication } from '../types/Types';
 import { generateNonce, generateRequestId, generateVerificationMessage } from '../utils/Utils';
 // import { showGlobalDialog } from '../components/dialog-context/DialogContext';
-import { checkReferralExists } from '../DAL/BackendDAL';
+import { addReferredBy, checkReferralExists } from '../DAL/BackendDAL';
 import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 import { getNetwork, handleSwitchNetwork, isKasWareInstalled } from '../utils/KaswareUtils';
+import { LOCAL_STORAGE_KEYS } from '../utils/Constants';
 
 export const useKasware = () => {
     const [connected, setConnected] = useState(false);
@@ -214,13 +215,23 @@ export const useKasware = () => {
             handleAccountsChanged(result);
             const referralExists = await checkReferralExists(result[0]);
             if (!referralExists.exists) {
-                showGlobalDialog({
-                    dialogType: 'referral',
-                    dialogProps: {
-                        walletAddress: result[0],
-                        mode: 'add',
-                    },
-                });
+                const localStorageReferralCode = localStorage.getItem(LOCAL_STORAGE_KEYS.REFFERAL_CODE);
+
+                if (localStorageReferralCode) {
+                    addReferredBy(result[0], localStorageReferralCode).then((result) => {
+                        if (!result) {
+                            console.error('Failed to add referral code');
+                        }
+                    });
+                } else {
+                    showGlobalDialog({
+                        dialogType: 'referral',
+                        dialogProps: {
+                            walletAddress: result[0],
+                            mode: 'add',
+                        },
+                    });
+                }
             }
         } else {
             showGlobalSnackbar({

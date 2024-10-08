@@ -20,6 +20,7 @@ interface PortfolioPanelProps {
     handlePortfolioPagination: (direction: 'next' | 'prev') => void;
     operationFinished: boolean;
     isLoading: boolean;
+    currentWalletToCheck: string;
 }
 
 const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
@@ -35,6 +36,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
         walletAddress,
         isLoading,
         operationFinished,
+        currentWalletToCheck,
     } = props;
     const [value, setValue] = useState('1');
     // const [paidUser] = useState(false);
@@ -72,6 +74,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                         walletConnected={walletConnected}
                         lastPortfolioPage={lastPortfolioPage}
                         handlePortfolioPagination={handlePortfolioPagination}
+                        currentWalletToCheck={currentWalletToCheck}
                     />
                 </TabPanelStyled>
                 <TabPanelStyled value="2">
@@ -82,6 +85,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                         kasPrice={kasPrice}
                         walletConnected={walletConnected}
                         walletAddress={walletAddress}
+                        currentWalletToCheck={currentWalletToCheck}
                     />
                 </TabPanelStyled>
                 <TabPanelStyled value="3">

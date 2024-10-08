@@ -21,6 +21,7 @@ interface KaspianoRouterProps {
     walletBalance: number;
     network: any;
     handleNetworkChange: any;
+    connectWallet: () => void;
 }
 
 export const KaspianoRouter: FC<KaspianoRouterProps> = ({
@@ -30,6 +31,7 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
     walletBalance,
     network,
     handleNetworkChange,
+    connectWallet,
 }) => (
     <Routes>
         <Route
@@ -87,6 +89,7 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
                     walletAddress={walletAddress}
                     backgroundBlur={backgroundBlur}
                     walletConnected={walletConnected}
+                    connectWallet={connectWallet}
                 />
             }
         />

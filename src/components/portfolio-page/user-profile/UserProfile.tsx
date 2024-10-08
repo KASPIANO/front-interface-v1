@@ -1,43 +1,71 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { Box, Avatar, Typography, Button, useTheme, TextField, alpha } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { ProfileContainer, ProfileDetails } from './UserProfile.s';
 // import XIcon from '@mui/icons-material/X';
-import { shortenAddress } from '../../../utils/Utils';
+import { isEmptyString, isValidWalletAddress, shortenAddress } from '../../../utils/Utils';
 import { Stat, StatHelpText, StatNumber } from '@chakra-ui/react';
 import { getUserReferral } from '../../../DAL/BackendDAL';
 import { showGlobalDialog } from '../../dialog-context/DialogContext';
 import { ContentCopyRounded as ContentCopyRoundedIcon } from '@mui/icons-material';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
+import { debounce } from 'lodash';
 
 interface UserProfileProps {
     walletAddress: string;
+    currentWalletToCheck: string;
     portfolioValue: number;
     kasPrice: number;
-    setWalletAddress: (address: string) => void;
+    setCurrentWalletToCheck: (address: string) => void;
+    connectWallet: () => void;
 }
 
 const UserProfile: FC<UserProfileProps> = (props) => {
-    const { walletAddress, portfolioValue, kasPrice, setWalletAddress } = props;
+    const {
+        walletAddress,
+        portfolioValue,
+        kasPrice,
+        setCurrentWalletToCheck,
+        currentWalletToCheck,
+        connectWallet,
+    } = props;
     const theme = useTheme();
     const [referralCode, setReferralCode] = useState<string | null>(null);
-    const [refferedBy, setRefferedBy] = useState<string | null>(null);
+    const [referredBy, setReferredBy] = useState<string | null>(null);
+    const [isReferralCodeLoaded, setIsReferralCodeLoaded] = useState<boolean>(false);
     const [, setCopied] = useState(false);
+    const [walletAddressError, setWalletAddressError] = useState<string | null>(null);
+    const [walletInputValue, setWalletInputValue] = useState<string>(walletAddress);
+    const debouncedSetCurrentWalletRef = useRef(null);
+
+    useEffect(() => {
+        debouncedSetCurrentWalletRef.current = debounce((value) => {
+            console.log('setting');
+            setCurrentWalletToCheck(value);
+        }, 500);
+
+        return () => {
+            debouncedSetCurrentWalletRef.current.cancel();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         const fetchReferralStatus = async () => {
             if (walletAddress) {
                 setReferralCode(null);
-                setRefferedBy(null);
+                setWalletInputValue(currentWalletToCheck);
                 const result = await getUserReferral(walletAddress);
                 if (result.referralCode) {
                     setReferralCode(result.referralCode);
-                    setRefferedBy(result.refferedBy);
+                    setReferredBy(result.refferedBy);
                 }
+
+                setIsReferralCodeLoaded(true);
             }
         };
         fetchReferralStatus();
-    }, [walletAddress]);
+    }, [walletAddress, currentWalletToCheck]);
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard
@@ -62,7 +90,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                 dialogProps: {
                     walletAddress,
                     mode: 'add',
-                    setRefferedBy,
+                    setReferralCode: setReferredBy,
                 },
             });
         }
@@ -70,7 +98,20 @@ const UserProfile: FC<UserProfileProps> = (props) => {
 
     const handleManualAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newAddress = e.target.value;
-        setWalletAddress(newAddress);
+
+        setWalletInputValue(newAddress);
+
+        if (isValidWalletAddress(newAddress)) {
+            setWalletAddressError(null);
+            debouncedSetCurrentWalletRef.current(newAddress);
+        } else {
+            setWalletAddressError('Please enter a valid wallet address');
+        }
+    };
+
+    const createReferralLink = (code) => {
+        const url = new URL(window.location.href);
+        return `${url.origin}/?ref=${code}`;
     };
 
     const handleCopy = () => {
@@ -93,10 +134,10 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                 <ProfileDetails>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Button
-                            onClick={handleCopy}
+                            onClick={walletAddress ? handleCopy : connectWallet}
                             variant="outlined"
                             size="small"
-                            endIcon={<ContentCopyIcon fontSize="small" />}
+                            endIcon={walletAddress ? <ContentCopyIcon fontSize="small" /> : <></>}
                             startIcon={<img style={{ height: '5vh', width: '5vh' }} src={kaspaIcon} alt="Kaspa" />}
                             sx={{
                                 color: theme.palette.text.secondary,
@@ -104,37 +145,46 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         >
                             {walletAddress ? shortenAddress(walletAddress) : 'Connect Wallet'}
                         </Button>
-                        <TextField
-                            label="Kaspa Wallet Address"
-                            variant="outlined"
-                            size="small"
-                            value={walletAddress}
-                            onChange={handleManualAddressChange}
-                            sx={{
-                                minWidth: '3rem',
-                                fontSize: '0.8rem',
+                        {isEmptyString(walletAddress) && (
+                            <TextField
+                                label="Kaspa Wallet Address"
+                                variant="outlined"
+                                size="small"
+                                value={walletInputValue}
+                                onChange={handleManualAddressChange}
+                                error={!!walletAddressError}
+                                helperText={walletAddressError}
+                                sx={{
+                                    minWidth: '3rem',
+                                    fontSize: '0.8rem',
+                                    position: 'relative',
 
-                                '& .MuiOutlinedInput-root': {
-                                    height: '2.2rem', // Adjust as needed
+                                    '& .MuiOutlinedInput-root': {
+                                        height: '2.2rem', // Adjust as needed
 
-                                    '& fieldset': {
-                                        borderColor: alpha(theme.palette.primary.main, 0.7),
+                                        '& fieldset': {
+                                            borderColor: alpha(theme.palette.primary.main, 0.7),
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: alpha(theme.palette.primary.main, 0.7),
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: alpha(theme.palette.primary.main, 0.7),
+                                        },
                                     },
-                                    '&:hover fieldset': {
-                                        borderColor: alpha(theme.palette.primary.main, 0.7),
+                                    '& .MuiInputLabel-root': {
+                                        color: theme.palette.text.secondary,
                                     },
-                                    '&.Mui-focused fieldset': {
-                                        borderColor: alpha(theme.palette.primary.main, 0.7),
+                                    '& .MuiInputLabel-root.Mui-focused': {
+                                        color: alpha(theme.palette.primary.main, 0.7),
                                     },
-                                },
-                                '& .MuiInputLabel-root': {
-                                    color: theme.palette.text.secondary,
-                                },
-                                '& .MuiInputLabel-root.Mui-focused': {
-                                    color: alpha(theme.palette.primary.main, 0.7),
-                                },
-                            }}
-                        />
+                                    '& .MuiFormHelperText-root': {
+                                        position: 'absolute',
+                                        bottom: '-20px',
+                                    },
+                                }}
+                            />
+                        )}
 
                         {/* <Button variant="outlined" endIcon={<XIcon />}>
                             Add
@@ -146,19 +196,29 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         >
                             Add
                         </Button> */}
-                        {referralCode && (
+                        {!isEmptyString(referralCode) && (
                             <Button
                                 variant="outlined"
                                 size="medium"
                                 endIcon={<ContentCopyRoundedIcon fontSize="small" />}
                                 onClick={() => copyToClipboard(referralCode)}
                             >
-                                Referral Code : {referralCode}
+                                Your Referral Code : {referralCode}
                             </Button>
                         )}
-                        {!refferedBy && (
+                        {!isEmptyString(referralCode) && (
+                            <Button
+                                variant="outlined"
+                                size="medium"
+                                endIcon={<ContentCopyRoundedIcon fontSize="small" />}
+                                onClick={() => copyToClipboard(createReferralLink(referralCode))}
+                            >
+                                Copy Your Referral Link
+                            </Button>
+                        )}
+                        {isEmptyString(referredBy) && !isEmptyString(walletAddress) && isReferralCodeLoaded && (
                             <Button variant="outlined" size="medium" onClick={handleOpenReferralDialog}>
-                                Add Referral Code
+                                Apply Referral Code
                             </Button>
                         )}
                     </Box>

@@ -79,6 +79,7 @@ const App = () => {
                         walletAddress={walletAddress}
                         walletBalance={walletBalance}
                         walletConnected={walletConnected}
+                        connectWallet={connectWallet}
                     />
                     <Footer />
                 </BrowserRouter>

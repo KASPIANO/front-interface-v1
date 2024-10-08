@@ -6,6 +6,7 @@ import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 import { StyledPortfolioGridContainer } from './PortfolioTokenGrid.s';
 import TokenRowPortfolio from '../token-row-portfolio/TokenRowPortfolio';
 import { PrevPageButton, NextPageButton } from '../../krc-20-page/grid-title-sort/GridTitle.s';
+import { isEmptyString } from '../../../utils/Utils';
 
 interface PortfolioTokenGridProps {
     tokensList: TokenRowPortfolioItem[];
@@ -16,6 +17,7 @@ interface PortfolioTokenGridProps {
     lastPortfolioPage: boolean;
     handlePortfolioPagination: (direction: 'next' | 'prev') => void;
     isLoading: boolean;
+    currentWalletToCheck: string;
 }
 
 enum GridHeaders {
@@ -36,6 +38,7 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
         lastPortfolioPage,
         handlePortfolioPagination,
         isLoading,
+        currentWalletToCheck,
     } = props;
     const [currentPage, setCurrentPage] = useState<number>(1);
     const handlePrevPage = () => {
@@ -47,6 +50,8 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
         setCurrentPage(currentPage + 1);
         handlePortfolioPagination('next');
     };
+
+    console.log('currentWalletToCheck', currentWalletToCheck);
     const tableHeader = (
         <Box
             sx={{
@@ -92,9 +97,9 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
         <StyledPortfolioGridContainer>
             <GlobalStyle />
             {tableHeader}
-            {!walletConnected ? (
+            {!walletConnected && isEmptyString(currentWalletToCheck) ? (
                 <p style={{ textAlign: 'center', fontSize: '0.8rem', marginTop: '10vh' }}>
-                    <b>Please connect your wallet to view the portfolio.</b>
+                    <b>Please connect your wallet or enter a Kaspa wallet address to view the portfolio.</b>
                 </p>
             ) : (
                 <List

@@ -24,7 +24,7 @@ interface ReferralDialogProps {
     walletAddress: string;
     referralCode?: string | null; // Used to display referral code if it exists
     mode: 'get' | 'add'; // To control the mode of the dialog (get vs. add referral)
-    setRefferedBy?: (referredBy: string) => void;
+    setReferralCode?: (referredBy: string) => void;
 }
 
 const ReferralDialog: React.FC<ReferralDialogProps> = ({
@@ -33,7 +33,7 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({
     walletAddress,
     referralCode,
     mode,
-    setRefferedBy,
+    setReferralCode,
 }) => {
     const [referredByCode, setReferredByCode] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -64,8 +64,8 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({
 
         const result = await addReferredBy(walletAddress, referredByCode);
         if (result) {
-            if (setRefferedBy) {
-                setRefferedBy(referredByCode);
+            if (setReferralCode) {
+                setReferralCode(referredByCode);
             }
             showGlobalSnackbar({
                 message: 'Referred by code added successfully!',
