@@ -1,17 +1,5 @@
 import { FC, useEffect, useRef, useState } from 'react';
-import {
-    Box,
-    Avatar,
-    Typography,
-    Button,
-    useTheme,
-    TextField,
-    alpha,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-} from '@mui/material';
+import { Box, Avatar, Typography, Button, useTheme, TextField, alpha } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { ProfileContainer, ProfileDetails } from './UserProfile.s';
 import XIcon from '@mui/icons-material/X';
@@ -48,8 +36,8 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     const [, setCopied] = useState(false);
     const [walletAddressError, setWalletAddressError] = useState<string | null>(null);
     const [walletInputValue, setWalletInputValue] = useState<string>(walletAddress);
-    const [openXDialog, setOpenXDialog] = useState(false);
-    const [xUrl, setXUrl] = useState('');
+    // const [openXDialog, setOpenXDialog] = useState(false);
+    // const [xUrl, setXUrl] = useState('');
     const debouncedSetCurrentWalletRef = useRef(null);
 
     useEffect(() => {
@@ -96,9 +84,9 @@ const UserProfile: FC<UserProfileProps> = (props) => {
             });
     };
 
-    const handleAddXUrl = () => {
-        // todo
-    };
+    // const handleAddXUrl = () => {
+    //     // todo
+    // };
 
     const handleOpenReferralDialog = () => {
         if (walletAddress) {
@@ -258,7 +246,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                     {portfolioValue.change}% */}
                 </StatHelpText>
             </Stat>
-            <Dialog
+            {/* <Dialog
                 PaperProps={{
                     sx: {
                         width: '40vw',
@@ -285,7 +273,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                     <Button onClick={() => setOpenXDialog(false)}>Cancel</Button>
                     <Button onClick={handleAddXUrl}>Save</Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog> */}
         </ProfileContainer>
     );
 };
