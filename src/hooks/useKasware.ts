@@ -135,7 +135,7 @@ export const useKasware = () => {
             try {
                 setNetwork(network);
                 await handleNetworkByEnvironment();
-                showGlobalSnackbar({ message: `Switched to ${network}`, severity: 'success' });
+                showGlobalSnackbar({ message: `Switched to ${newNetwork}`, severity: 'success' });
                 getBasicInfo();
             } catch (error) {
                 console.error('Error switching network:', error);
