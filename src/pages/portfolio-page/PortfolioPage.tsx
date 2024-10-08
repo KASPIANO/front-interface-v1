@@ -149,8 +149,15 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
         if ((isUserConnected && !isEmptyString(walletAddress)) || !isEmptyString(currentWalletToCheck)) {
             fetchPortfolioData();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [walletConnected, operationFinished, paginationPortfolioKey, currentWalletToCheck]);
+    }, [
+        walletConnected,
+        operationFinished,
+        paginationPortfolioKey,
+        currentWalletToCheck,
+        isUserConnected,
+        walletAddress,
+        paginationPortfolioDirection,
+    ]);
 
     const handlePortfolioPagination = (direction: 'next' | 'prev') => {
         setPortfolioTokenInfo([]);
