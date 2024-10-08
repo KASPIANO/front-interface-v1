@@ -109,7 +109,6 @@ export const getTxnInfo = async (txnId: string, maxRetries = 3): Promise<any> =>
                 return {};
             }
 
-            console.log(`Retrying in 3 seconds...`);
             await delay(3000); // Wait for 3 seconds before the next attempt
         }
     }
@@ -140,13 +139,18 @@ export const highGasLimitExceeded = async () => {
         return false;
     }
 };
-export const highGasWarning = async () => {
+
+export const highGasWarning = async (type: 'TRANSFER' | '' = '') => {
     const priorityFeeSompi = await getPriorityFee('TRADE');
     if (!priorityFeeSompi) return false;
+
     const kaspaPriorityFee = priorityFeeSompi / 1e8;
-    if (WARNING_LIMIT_KAS < kaspaPriorityFee && kaspaPriorityFee < CANCEL_LIMIT_KAS) {
-        return true;
-    } else {
-        return false;
+
+    if (type === 'TRANSFER') {
+        // For TRANSFER type, just check if priority fee is greater than WARNING_LIMIT_KAS
+        return kaspaPriorityFee > WARNING_LIMIT_KAS;
     }
+
+    // For other types, check if the priority fee is between WARNING_LIMIT_KAS and CANCEL_LIMIT_KAS
+    return WARNING_LIMIT_KAS < kaspaPriorityFee && kaspaPriorityFee < CANCEL_LIMIT_KAS;
 };

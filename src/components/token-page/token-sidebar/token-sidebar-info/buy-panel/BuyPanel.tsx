@@ -161,26 +161,33 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         const parsedTxData = JSON.parse(paymentTxn);
         const paymentTxnId = parsedTxData.id;
         let confirmed: boolean;
-        let commitTransactionId: string;
-        let revealTransactionId: string;
+        let transactions: {
+            commitTransactionId: string;
+            revealTransactionId: string;
+            sellerTransactionId: string;
+            buyerTransactionId: string;
+        } = {
+            commitTransactionId: '',
+            revealTransactionId: '',
+            sellerTransactionId: '',
+            buyerTransactionId: '',
+        };
         let priorityFeeTooHigh: boolean;
 
         try {
-            ({ confirmed, commitTransactionId, revealTransactionId, priorityFeeTooHigh } = await confirmBuyOrder(
-                order.orderId,
-                paymentTxnId,
-            ));
+            ({ confirmed, transactions, priorityFeeTooHigh } = await confirmBuyOrder(order.orderId, paymentTxnId));
         } catch (error) {
             console.error(error);
             confirmed = false;
         }
-
+        const { revealTransactionId, commitTransactionId, buyerTransactionId } = transactions;
         if (confirmed) {
             showGlobalSnackbar({
                 message: 'Purchase successful!',
                 severity: 'success',
-                reveal: revealTransactionId,
-                commit: commitTransactionId,
+                revealId: revealTransactionId,
+                commitId: commitTransactionId,
+                txIds: [buyerTransactionId],
             });
             queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker, sortBy, sortOrder] });
             setIsProcessingBuyOrder(false);

@@ -51,7 +51,6 @@ const RugScoreDialog: FC<RugScoreDialogProps> = ({ open, onClose, onAddTwitterHa
             return;
         }
         if (!error) {
-            console.log('instantVerification:', instantVerification);
             onAddTwitterHandle(twitterHandle, instantVerification);
             onClose();
             setTwitterHandle('');

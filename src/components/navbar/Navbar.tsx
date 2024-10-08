@@ -40,7 +40,6 @@ const Navbar: React.FC<NavbarProps> = ({
 
     useEffect(() => {
         const pathWithoutSlash = window.location.pathname.replace(/^\//, '');
-        console.log(pathWithoutSlash);
         setActivePage(pathWithoutSlash);
     }, [location]);
 

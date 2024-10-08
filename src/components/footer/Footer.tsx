@@ -79,6 +79,9 @@ const Footer: React.FC = () => (
                             <li>
                                 <FooterLink href="/team">Team</FooterLink>
                             </li>
+                            <li>
+                                <FooterLink href="/faqs">FAQs</FooterLink>
+                            </li>
                         </FooterList>
                     </Grid>
                     <Grid item xs={3} md={3} sm={3} lg={3}>

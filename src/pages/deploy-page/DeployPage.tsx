@@ -331,6 +331,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             showGlobalSnackbar({
                 message: 'Payment successful',
                 severity: 'success',
+                txIds: [metadataUpdateFeeTransactionId],
             });
         } catch (error) {
             console.log(error);

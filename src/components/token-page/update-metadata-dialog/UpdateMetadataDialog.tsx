@@ -54,8 +54,6 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
 
     const handleTokenListing = async (): Promise<boolean> => {
         if (!tokenMetadataDetails) return;
-        console.log('Token metadata:', tokenMetadataDetails);
-        console.log('VERIFICATION_FEE_KAS', VERIFICATION_FEE_KAS);
 
         let currentMetadataPaymentTransactionId = updateMetadataPaymentTransactionId;
 
@@ -80,6 +78,7 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
             showGlobalSnackbar({
                 message: 'Payment successful',
                 severity: 'success',
+                txIds: [metadataUpdateFeeTransactionId],
             });
         } catch (error) {
             console.log(error);
@@ -90,8 +89,6 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
 
             return false;
         }
-
-        console.log('metadataUpdateFeeTransactionId', metadataUpdateFeeTransactionId);
 
         if (currentMetadataPaymentTransactionId) {
             setIsUpdateMetadataLoading(true);

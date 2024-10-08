@@ -2,7 +2,6 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { Box, Avatar, Typography, Button, useTheme, TextField, alpha } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { ProfileContainer, ProfileDetails } from './UserProfile.s';
-// import XIcon from '@mui/icons-material/X';
 import { isEmptyString, isValidWalletAddress, shortenAddress } from '../../../utils/Utils';
 import { Stat, StatHelpText, StatNumber } from '@chakra-ui/react';
 import { showGlobalDialog } from '../../dialog-context/DialogContext';
@@ -39,6 +38,8 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     const [, setCopied] = useState(false);
     const [walletAddressError, setWalletAddressError] = useState<string | null>(null);
     const [walletInputValue, setWalletInputValue] = useState<string>(walletAddress);
+    // const [openXDialog, setOpenXDialog] = useState(false);
+    // const [xUrl, setXUrl] = useState('');
     const debouncedSetCurrentWalletRef = useRef(null);
 
     useEffect(() => {
@@ -75,6 +76,10 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                 console.error('Failed to copy: ', err);
             });
     };
+
+    // const handleAddXUrl = () => {
+    //     // todo
+    // };
 
     const handleOpenReferralDialog = () => {
         if (walletAddress) {
@@ -237,6 +242,34 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                     {portfolioValue.change}% */}
                 </StatHelpText>
             </Stat>
+            {/* <Dialog
+                PaperProps={{
+                    sx: {
+                        width: '40vw',
+                    },
+                }}
+                open={openXDialog}
+                onClose={() => setOpenXDialog(false)}
+            >
+                <DialogTitle>Add X/Twitter URL</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="Url"
+                        label="X/Twitter URL"
+                        type="text"
+                        fullWidth
+                        variant="outlined"
+                        value={xUrl}
+                        onChange={(e) => setXUrl(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenXDialog(false)}>Cancel</Button>
+                    <Button onClick={handleAddXUrl}>Save</Button>
+                </DialogActions>
+            </Dialog> */}
         </ProfileContainer>
     );
 };
