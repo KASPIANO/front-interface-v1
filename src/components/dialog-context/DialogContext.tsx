@@ -42,7 +42,7 @@ const DialogComponent: React.FC = () => {
                         onClose={handleClose}
                         walletAddress={dialog.dialogProps.walletAddress}
                         referralCode={dialog.dialogProps.referralCode}
-                        setRefferedBy={dialog.dialogProps.setRefferedBy}
+                        setReferralCode={dialog.dialogProps.setReferralCode}
                         mode={dialog.dialogProps.mode}
                     />
                 );

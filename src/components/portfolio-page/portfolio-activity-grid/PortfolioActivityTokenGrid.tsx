@@ -7,6 +7,7 @@ import { StyledPortfolioGridContainer } from './PortfolioActivityTokenGrid.s';
 import TokenRowActivity from '../token-row-activity/TokenRowActivity';
 import { PrevPageButton, NextPageButton } from '../../krc-20-page/grid-title-sort/GridTitle.s';
 import { fetchWalletActivity } from '../../../DAL/Krc20DAL';
+import { isEmptyString } from '../../../utils/Utils';
 
 interface PortfolioActivityTokenGridProps {
     kasPrice: number;
@@ -15,6 +16,7 @@ interface PortfolioActivityTokenGridProps {
     tickers: string[];
     walletAddress: string | null;
     operationFinished: boolean;
+    currentWalletToCheck: string;
 }
 
 enum GridHeaders {
@@ -25,7 +27,8 @@ enum GridHeaders {
 }
 
 const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) => {
-    const { kasPrice, walletConnected, walletBalance, walletAddress, operationFinished } = props;
+    const { kasPrice, walletConnected, walletBalance, walletAddress, operationFinished, currentWalletToCheck } =
+        props;
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [paginationActivityKey, setPaginationActivityKey] = useState<string | null>(null);
     const [paginationActivityDirection, setPaginationActivityDirection] = useState<'next' | 'prev' | null>(null);
@@ -45,16 +48,17 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
         const fetchActivity = async () => {
             setIsLoadingActivity(true);
             setPortfolioAssetsActivity([]);
+            const walletToFetchTo = walletConnected ? walletAddress : currentWalletToCheck;
             try {
                 const activityData = await fetchWalletActivity(
-                    walletAddress,
+                    walletToFetchTo,
                     paginationActivityKey,
                     paginationActivityDirection,
                 );
                 setPortfolioAssetsActivity(activityData.activityItems);
                 setActivityNext(activityData.next); // Save the 'next' key for further requests
                 setActivityPrev(activityData.prev); // Save the 'prev' key for further requests
-                const checkNext = await fetchWalletActivity(walletAddress, activityData.next, 'next');
+                const checkNext = await fetchWalletActivity(walletToFetchTo, activityData.next, 'next');
                 if (checkNext.activityItems.length === 0) {
                     setLastActivityPage(true);
                 } else {
@@ -67,12 +71,12 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
             }
         };
 
-        if (walletConnected) {
+        if ((walletConnected && !isEmptyString(walletAddress)) || !isEmptyString(currentWalletToCheck)) {
             fetchActivity();
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [walletAddress, walletConnected, paginationActivityKey, operationFinished]);
+    }, [walletAddress, walletConnected, paginationActivityKey, operationFinished, currentWalletToCheck]);
 
     const handleNextPage = () => {
         setCurrentPage((prev) => prev + 1);
@@ -127,9 +131,9 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
         <StyledPortfolioGridContainer>
             <GlobalStyle />
             {tableHeader}
-            {!walletConnected ? (
+            {!walletConnected && isEmptyString(currentWalletToCheck) ? (
                 <p style={{ textAlign: 'center', fontSize: '0.8rem', marginTop: '10vh' }}>
-                    <b>Please connect your wallet to view the portfolio.</b>
+                    <b>Please connect your wallet or enter a Kaspa wallet address to view the portfolio.</b>
                 </p>
             ) : (
                 <List dense sx={{ width: '100%', overflowX: 'hidden' }}>

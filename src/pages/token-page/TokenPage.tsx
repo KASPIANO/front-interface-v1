@@ -18,7 +18,6 @@ import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
 interface TokenPageProps {
     walletAddress: string | null;
     connectWallet?: () => void;
-    handleNetworkChange: (network: string) => void;
     network: string;
     backgroundBlur: boolean;
     walletBalance: number;
