@@ -10,8 +10,6 @@ interface OrderListProps {
     walletConnected: boolean;
     onOrderSelect: (order: Order) => void;
     selectedOrder: Order | null;
-    isProccesing: boolean;
-    setIsProcessing: (value: boolean) => void;
     setSelectedOrder: (order: Order) => void;
 }
 
@@ -21,8 +19,7 @@ const OrderList: React.FC<OrderListProps> = ({
     floorPrice,
     kasPrice,
     selectedOrder,
-    isProccesing,
-    setIsProcessing,
+
     setSelectedOrder,
 }) => (
     <div style={{ width: '100%' }}>
@@ -32,8 +29,6 @@ const OrderList: React.FC<OrderListProps> = ({
         {orders.map((order) => (
             <OrderItem
                 setSelectedOrder={setSelectedOrder}
-                isProccesing={isProccesing}
-                setIsProcessing={setIsProcessing}
                 selectedOrder={selectedOrder}
                 onSelect={onOrderSelect}
                 key={order.orderId}

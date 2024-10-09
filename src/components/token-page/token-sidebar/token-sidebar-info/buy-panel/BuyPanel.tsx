@@ -35,10 +35,9 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const [tempWalletAddress, setTempWalletAddress] = useState('');
     const [isProcessingBuyOrder, setIsProcessingBuyOrder] = useState(false);
     const [waitingForWalletConfirmation, setWaitingForWalletConfirmation] = useState(false);
-    const [isProccesing, setIsProcessing] = useState(false);
     const queryClient = useQueryClient();
 
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useFetchOrders(
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isFetching } = useFetchOrders(
         tokenInfo,
         sortBy,
         sortOrder,
@@ -123,7 +122,6 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             }
             setTempWalletAddress(temporaryWalletAddress);
             setIsPanelOpen(true);
-            setIsProcessing(false);
         } catch (error) {
             console.error(error);
             showGlobalSnackbar({
@@ -189,7 +187,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 commitId: commitTransactionId,
                 txIds: [buyerTransactionId],
             });
-            queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker, sortBy, sortOrder] });
+            queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker] });
             setIsProcessingBuyOrder(false);
             setIsPanelOpen(false);
             setSelectedOrder(null);
@@ -227,7 +225,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     sortBy={sortBy}
                     onSortChange={handleSortChange}
                     ticker={tokenInfo.ticker}
-                    isLoading={isLoading}
+                    isLoading={isFetching}
                 />
                 <div id="scrollableList" style={{ overflow: 'auto', height: '64vh' }}>
                     <InfiniteScroll
@@ -264,8 +262,6 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     >
                         <OrderList
                             setSelectedOrder={setSelectedOrder}
-                            isProccesing={isProccesing}
-                            setIsProcessing={setIsProcessing}
                             selectedOrder={selectedOrder}
                             walletConnected={walletConnected}
                             walletBalance={walletBalance}

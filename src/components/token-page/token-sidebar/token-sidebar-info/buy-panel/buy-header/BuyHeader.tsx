@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Tooltip, Typography, CircularProgress } from '@mui/material';
+import { Box, Tooltip, Typography, CircularProgress, Icon, IconButton } from '@mui/material';
 import { StyledButton } from './BuyHeader.s';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useQueryClient } from '@tanstack/react-query';
@@ -55,16 +55,17 @@ const BuyHeader: React.FC<BuyHeaderProps> = ({ sortBy, onSortChange, ticker, isL
                 >
                     Total Price
                 </StyledButton>
-                {isLoading ? (
-                    <CircularProgress size={20} />
-                ) : (
-                    <Tooltip title="Refresh the list of tokens">
-                        <RefreshIcon
-                            sx={{ cursor: 'pointer', fontSize: '1.2rem', marginLeft: 'auto' }}
-                            onClick={() => handleRefresh()}
-                        />
-                    </Tooltip>
-                )}
+                <Box sx={{ marginLeft: 'auto' }}>
+                    {isLoading ? (
+                        <CircularProgress size={20} />
+                    ) : (
+                        <Tooltip title="Refresh the list of tokens">
+                            <IconButton onClick={handleRefresh}>
+                                <RefreshIcon sx={{ cursor: 'pointer', fontSize: '1.2rem' }} />
+                            </IconButton>
+                        </Tooltip>
+                    )}
+                </Box>
             </Box>
 
             <Box
