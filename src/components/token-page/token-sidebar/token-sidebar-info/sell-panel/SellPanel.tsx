@@ -147,8 +147,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         const amount = parseInt(tokenAmount);
         if (!isNaN(amount) && amount > 0) {
             const newTotalPrice = newPricePerTokenValue * amount;
-            const roundedTotalPrice = roundUp(newTotalPrice, 8);
-            setTotalPrice(roundedTotalPrice.toString());
+            const roundedTotalPrice = handleTotalPriceDecimals(newTotalPrice.toString());
+            setTotalPrice(roundedTotalPrice);
         }
     };
 

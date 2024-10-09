@@ -1,15 +1,22 @@
 import React from 'react';
 import { Box, Tooltip, Typography } from '@mui/material';
 import { StyledButton } from './BuyHeader.s';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface BuyHeaderProps {
     sortBy: string;
     onSortChange: (sortBy: string) => void;
+    ticker: string;
 }
 
-const BuyHeader: React.FC<BuyHeaderProps> = ({ sortBy, onSortChange }) => {
+const BuyHeader: React.FC<BuyHeaderProps> = ({ sortBy, onSortChange, ticker }) => {
+    const queryClient = useQueryClient();
     const handleSortChange = (sortOption: string) => {
         onSortChange(sortOption);
+    };
+    const handleRefresh = () => {
+        queryClient.invalidateQueries({ queryKey: ['orders', ticker] });
     };
 
     return (
@@ -47,6 +54,12 @@ const BuyHeader: React.FC<BuyHeaderProps> = ({ sortBy, onSortChange }) => {
                 >
                     Total Price
                 </StyledButton>
+                <Tooltip title="Refresh the list of tokens">
+                    <RefreshIcon
+                        sx={{ cursor: 'pointer', fontSize: '1.2rem', marginLeft: 'auto' }}
+                        onClick={() => handleRefresh()}
+                    />
+                </Tooltip>
             </Box>
 
             <Box

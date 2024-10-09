@@ -117,7 +117,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     message: 'Order already taken. Please select another order.',
                     severity: 'error',
                 });
-                handleTakenOrder();
+                setSelectedOrder(null);
+                setIsPanelOpen(false);
                 return;
             }
             setTempWalletAddress(temporaryWalletAddress);
@@ -219,16 +220,11 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         setSelectedOrder(null);
     };
 
-    const handleTakenOrder = async () => {
-        setIsPanelOpen(false);
-        setSelectedOrder(null);
-    };
-
     return (
         <>
             <GlobalStyle />
             <Box sx={{ width: '100%' }}>
-                <BuyHeader sortBy={sortBy} onSortChange={handleSortChange} />
+                <BuyHeader sortBy={sortBy} onSortChange={handleSortChange} ticker={tokenInfo.ticker} />
                 <div id="scrollableList" style={{ overflow: 'auto', height: '64vh' }}>
                     <InfiniteScroll
                         dataLength={orders.length} // Length of the current data

@@ -37,34 +37,69 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
     };
 
     useEffect(() => {
-        const calculatePercentages = async () => {
-            const burnWalletAddress = 'kaspa:qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqkx9awp4e';
-            const holdersToCalculate = (tokenInfo.topHolders || [])
-                .filter((holder) => holder.address !== burnWalletAddress) // Omit the burn wallet address
-                .slice(0, tokenHoldersToShow);
-            const { totalSupply } = tokenInfo;
-            const burntWalletBalance = await fetchBurntRC20Balance(tokenInfo.ticker);
-            const totalSupplyAdjusted = burntWalletBalance ? totalSupply - burntWalletBalance : totalSupply;
-            setTotalSupplyAfterBurn(totalSupplyAdjusted);
+        if (tokenInfo) {
+            const calculatePercentages = async () => {
+                const burnWalletAddress = 'kaspa:qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqkx9awp4e';
 
-            const totalHolding = holdersToCalculate.map((h) => h.balance).reduce((acc, curr) => acc + curr, 0);
+                try {
+                    // Filter top holders, excluding the burn wallet address
+                    const holdersToCalculate = (tokenInfo.topHolders || [])
+                        .filter((holder) => holder.address !== burnWalletAddress)
+                        .slice(0, tokenHoldersToShow);
 
-            const totalPercentage = (totalHolding / totalSupplyAdjusted) * 100;
-            const totalPercentageFixed = totalPercentage ? totalPercentage.toFixed(2) : '---';
-            const totalPercentageString = totalPercentageFixed === '---' ? '---' : `${totalPercentageFixed}%`;
-            setTopHoldersPercentage(totalPercentageString);
-        };
+                    const { totalSupply } = tokenInfo;
 
-        calculatePercentages();
+                    // Fetch burnt wallet balance with error handling
+                    let burntWalletBalance = 0;
+                    try {
+                        burntWalletBalance = await fetchBurntRC20Balance(tokenInfo.ticker);
+                    } catch (e) {
+                        console.error('Error fetching burnt wallet balance:', e);
+                    }
+
+                    const totalSupplyAdjusted = burntWalletBalance
+                        ? totalSupply - burntWalletBalance
+                        : totalSupply;
+                    setTotalSupplyAfterBurn(totalSupplyAdjusted);
+
+                    // Calculate total holding and percentage
+                    const totalHolding = holdersToCalculate
+                        .map((h) => h.balance)
+                        .reduce((acc, curr) => acc + curr, 0);
+                    const totalPercentage = (totalHolding / totalSupplyAdjusted) * 100;
+                    const totalPercentageFixed = totalPercentage ? totalPercentage.toFixed(2) : '---';
+                    const totalPercentageString =
+                        totalPercentageFixed === '---' ? '---' : `${totalPercentageFixed}%`;
+
+                    // Set state with calculated percentage
+                    setTopHoldersPercentage(totalPercentageString);
+                } catch (error) {
+                    console.error('Error calculating percentages:', error);
+                }
+            };
+
+            // Call the async function inside the useEffect
+            calculatePercentages();
+        }
     }, [tokenHoldersToShow, tokenInfo, totalSupplyAfterBurn]);
 
     useEffect(() => {
         const fetchDevWalletPercentage = async () => {
-            const devWalletBalance = await fetchDevWalletBalance(tokenInfo.ticker, tokenInfo.devWallet);
-            const devWalletPercent = devWalletBalance === 0 ? 0 : (devWalletBalance / totalSupplyAfterBurn) * 100;
-            setDevWalletPercentage(`${devWalletPercent.toFixed(2)}%`);
+            try {
+                // Fetch dev wallet balance and calculate the percentage
+                const devWalletBalance = await fetchDevWalletBalance(tokenInfo.ticker, tokenInfo.devWallet);
+                const devWalletPercent =
+                    devWalletBalance === 0 ? 0 : (devWalletBalance / totalSupplyAfterBurn) * 100;
+                setDevWalletPercentage(`${devWalletPercent.toFixed(2)}%`);
+            } catch (error) {
+                console.error('Error fetching dev wallet percentage:', error);
+            }
         };
-        fetchDevWalletPercentage();
+
+        // Execute the async function
+        if (tokenInfo) {
+            fetchDevWalletPercentage();
+        }
     }, [totalSupplyAfterBurn, tokenInfo]);
 
     return (
