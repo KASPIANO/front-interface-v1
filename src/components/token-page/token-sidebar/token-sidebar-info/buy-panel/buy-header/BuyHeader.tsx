@@ -78,7 +78,7 @@ const BuyHeader: React.FC<BuyHeaderProps> = ({ sortBy, onSortChange, ticker, isL
                     borderBottom: '0.5px solid  rgba(111, 199, 186, 0.5)',
                 }}
             >
-                <Tooltip title="Total Amount of Tokens for Sale">
+                <Tooltip title={`Total Amount of ${ticker} Tokens for Sale`}>
                     <Typography variant="subtitle2" sx={{ width: '22%', fontWeight: 'bold' }}>
                         Amount
                     </Typography>
