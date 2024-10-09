@@ -10,6 +10,8 @@ import {
     TokenItem,
     TokenList,
 } from './TokenSearchModal.s';
+import { isEmptyString } from '../../../utils/Utils';
+import { DEFAULT_TOKEN_LOGO_URL } from '../../../utils/Constants';
 
 interface Token {
     symbol: string;
@@ -44,7 +46,10 @@ const TokenSearchModal: React.FC<TokenSearchModalProps> = ({ tokens, onClose, on
                 <TokenList>
                     {filteredTokens.map((token) => (
                         <TokenItem key={token.symbol} onClick={() => onSelect(token)}>
-                            <TokenImage src={token.logoURI} alt={token.name} />
+                            <TokenImage
+                                src={isEmptyString(token.logoURI) ? DEFAULT_TOKEN_LOGO_URL : token.logoURI}
+                                alt={token.name}
+                            />
                             {token.name}
                         </TokenItem>
                     ))}
