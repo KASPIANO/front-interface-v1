@@ -55,7 +55,10 @@ const BuyHeader: React.FC<BuyHeaderProps> = ({ sortBy, onSortChange, ticker }) =
                     Total Price
                 </StyledButton>
                 <Tooltip title="Refresh the list of tokens">
-                    <RefreshIcon sx={{ cursor: 'pointer', fontSize: '1rem' }} onClick={() => handleRefresh()} />
+                    <RefreshIcon
+                        sx={{ cursor: 'pointer', fontSize: '1.2rem', marginLeft: 'auto' }}
+                        onClick={() => handleRefresh()}
+                    />
                 </Tooltip>
             </Box>
 
