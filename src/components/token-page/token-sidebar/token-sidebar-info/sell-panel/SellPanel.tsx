@@ -64,7 +64,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 setPricePerToken(newPricePerToken.toString());
             } else if (!isNaN(pricePerTokenValue)) {
                 const newTotalPrice = pricePerTokenValue * amount;
-                setTotalPrice(newTotalPrice.toString());
+                const fixedTotalPrice = handleTotalPriceDecimals(newTotalPrice.toString());
+                setTotalPrice(fixedTotalPrice);
             }
         } else {
             setTokenAmount('');
@@ -138,6 +139,10 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const handleSetPricePerToken = (multiplier: number) => {
         if (!tokenInfo.price) {
             showGlobalSnackbar({ message: 'No Token Floor Price Exists', severity: 'error' });
+            return;
+        }
+        if (tokenAmount === '') {
+            showGlobalSnackbar({ message: 'Please enter a valid token amount.', severity: 'error' });
             return;
         }
         const newPricePerTokenValue = tokenInfo.price * multiplier;
