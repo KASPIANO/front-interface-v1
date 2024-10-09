@@ -13,19 +13,19 @@ interface OrderItemProps {
     selectedOrder: Order | null;
     isProccesing: boolean;
     setIsProcessing: (value: boolean) => void;
+    setSelectedOrder;
 }
 
 const OrderItem: React.FC<OrderItemProps> = (props) => {
-    const { order, onSelect, kasPrice, selectedOrder, isProccesing, setIsProcessing } = props;
-    const [localSelectedOrder, setLocalSelectedOrder] = React.useState<Order | null>(null);
+    const { order, onSelect, kasPrice, selectedOrder, isProccesing, setIsProcessing, setSelectedOrder } = props;
 
     // const floorPriceDifference = ((order.pricePerToken - floorPrice) / floorPrice) * 100;
 
     const handleSelect = async (order: Order) => {
-        setLocalSelectedOrder(order);
+        setSelectedOrder(order);
         setIsProcessing(true);
         await onSelect(order);
-        setLocalSelectedOrder(null);
+        setSelectedOrder(null);
     };
 
     const formatPrice = (price: number) => {
@@ -77,7 +77,7 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                 </Box>
                 {/* Buy/Close Button */}
                 <Box>
-                    {localSelectedOrder && localSelectedOrder.orderId === order.orderId ? (
+                    {selectedOrder && selectedOrder.orderId === order.orderId ? (
                         <LoadingSpinner size={15} boxStyle={{ height: '5vh' }} />
                     ) : (
                         <StyledButton

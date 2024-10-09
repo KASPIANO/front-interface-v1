@@ -259,6 +259,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                         }
                     >
                         <OrderList
+                            setSelectedOrder={setSelectedOrder}
                             isProccesing={isProccesing}
                             setIsProcessing={setIsProcessing}
                             selectedOrder={selectedOrder}

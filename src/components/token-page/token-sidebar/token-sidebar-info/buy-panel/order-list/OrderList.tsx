@@ -12,6 +12,7 @@ interface OrderListProps {
     selectedOrder: Order | null;
     isProccesing: boolean;
     setIsProcessing: (value: boolean) => void;
+    setSelectedOrder: (order: Order) => void;
 }
 
 const OrderList: React.FC<OrderListProps> = ({
@@ -22,6 +23,7 @@ const OrderList: React.FC<OrderListProps> = ({
     selectedOrder,
     isProccesing,
     setIsProcessing,
+    setSelectedOrder,
 }) => (
     <div style={{ width: '100%' }}>
         {/* Header Row */}
@@ -29,6 +31,7 @@ const OrderList: React.FC<OrderListProps> = ({
         {/* Order Items */}
         {orders.map((order) => (
             <OrderItem
+                setSelectedOrder={setSelectedOrder}
                 isProccesing={isProccesing}
                 setIsProcessing={setIsProcessing}
                 selectedOrder={selectedOrder}
