@@ -21,9 +21,11 @@ import {
     formatDate,
     formatNumberWithCommas,
     formatPrice,
+    isEmptyString,
     simplifyNumber,
 } from '../../../utils/Utils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
+import { DEFAULT_TOKEN_LOGO_URL } from '../../../utils/Constants';
 
 interface TokenRowProps {
     token: TokenListItemResponse;
@@ -119,7 +121,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             }}
                             variant="square"
                             alt={token.ticker}
-                            src={token.logoUrl}
+                            src={isEmptyString(token.logoUrl) ? DEFAULT_TOKEN_LOGO_URL : token.logoUrl}
                         />
                     </ListItemAvatar>
 

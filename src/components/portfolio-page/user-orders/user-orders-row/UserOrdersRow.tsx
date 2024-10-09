@@ -188,36 +188,36 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
             setEditError('');
         }
     };
-    const handleTotalPriceDecimals = (totalPrice) => {
-        if (totalPrice.includes('.')) {
-            setTotalPrice(parseFloat(totalPrice).toFixed(0));
-            return parseFloat(totalPrice).toFixed(0);
-        } else {
-            return totalPrice;
-        }
-    };
+    // const handleTotalPriceDecimals = (totalPrice) => {
+    //     if (totalPrice.includes('.')) {
+    //         setTotalPrice(parseFloat(totalPrice).toFixed(0));
+    //         return parseFloat(totalPrice).toFixed(0);
+    //     } else {
+    //         return totalPrice;
+    //     }
+    // };
 
-    const handlePricePerTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const priceStr = e.target.value;
-        setPricePerToken(priceStr);
+    // const handlePricePerTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const priceStr = e.target.value;
+    //     setPricePerToken(priceStr);
 
-        const pricePerTokenValue = parseFloat(priceStr);
-        const amount = order.quantity;
+    //     const pricePerTokenValue = parseFloat(priceStr);
+    //     const amount = order.quantity;
 
-        if (!isNaN(pricePerTokenValue)) {
-            const newTotalPrice = pricePerTokenValue * amount;
-            if (newTotalPrice >= 25) {
-                const fixedPrice = handleTotalPriceDecimals(newTotalPrice.toString());
-                setTotalPrice(fixedPrice); // Calculate total price
-                setEditError(''); // Clear error if any
-            } else {
-                setEditError('Total price must be at least 25 KAS.');
-            }
-        } else {
-            setTotalPrice('');
-            setEditError('');
-        }
-    };
+    //     if (!isNaN(pricePerTokenValue)) {
+    //         const newTotalPrice = pricePerTokenValue * amount;
+    //         if (newTotalPrice >= 25) {
+    //             const fixedPrice = handleTotalPriceDecimals(newTotalPrice.toString());
+    //             setTotalPrice(fixedPrice); // Calculate total price
+    //             setEditError(''); // Clear error if any
+    //         } else {
+    //             setEditError('Total price must be at least 25 KAS.');
+    //         }
+    //     } else {
+    //         setTotalPrice('');
+    //         setEditError('');
+    //     }
+    // };
 
     const editOrderHandler = async () => {
         if (pricePerToken === '' || totalPrice === '') {
@@ -456,9 +456,10 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                     ) : (
                         <>
                             <TextField
+                                autoFocus
                                 margin="dense"
                                 id="totalPrice"
-                                label="Total Price"
+                                label="Total Price (KAS)"
                                 type="text"
                                 fullWidth
                                 variant="outlined"
@@ -468,15 +469,14 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                                 helperText={editError || pricePerTokenError || ''}
                             />
                             <TextField
-                                autoFocus
                                 margin="dense"
                                 id="pricePerToken"
-                                label="Price Per Token"
+                                label="Price Per Token (KAS)"
                                 type="text"
                                 fullWidth
                                 variant="outlined"
                                 value={pricePerToken}
-                                onChange={handlePricePerTokenChange}
+                                disabled
                                 error={!!editError}
                             />
                         </>

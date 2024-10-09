@@ -8,6 +8,8 @@ import { searchToken } from '../../DAL/BackendDAL';
 import { TokenSearchItems } from '../../types/Types';
 import { GlobalStyleAutoComplete, GlobalStyleTokenSideBar } from '../../utils/GlobalStyleScrollBar';
 import { SearchContainer } from './TokenSearch.s';
+import { isEmptyString } from '../../utils/Utils';
+import { DEFAULT_TOKEN_LOGO_URL } from '../../utils/Constants';
 
 const styles = `
   input[type="search"]::-webkit-search-cancel-button {
@@ -183,7 +185,7 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
                             ) : (
                                 <Avatar
                                     key={`${option.ticker}-avatar`}
-                                    src={option.logo}
+                                    src={isEmptyString(option.logo) ? DEFAULT_TOKEN_LOGO_URL : option.logo}
                                     alt={option.ticker}
                                     sx={{ width: 24, height: 24, mr: 1 }}
                                 />
