@@ -1,5 +1,5 @@
 import { Skeleton } from '@mui/material';
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import TokenHeader from '../../components/token-page/token-header/TokenHeader';
 import TokenSideBar from '../../components/token-page/token-sidebar/TokenSideBar';
@@ -31,7 +31,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const [tokenXHandle, setTokenXHandle] = useState(false);
     const [recalculateRugScoreLoading, setRecalculateRugScoreLoading] = useState(false);
     const [kasPrice, setkasPrice] = useState(0);
-    const [priceHistory, setPriceHistory] = useState([]);
+    const [priceHistory, setPriceHistory] = useState(undefined);
     const [currentTicker] = useState<string>(ticker);
 
     useEffect(() => {
@@ -90,17 +90,16 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         fetchPriceHistory();
 
         const interval = setInterval(fetchPriceHistory, 900000);
-
         return () => clearInterval(interval);
     }, [ticker, currentTicker]);
 
-    const tokenData = tokenInfo;
+    const tokenData = useMemo(() => tokenInfo, [tokenInfo]);
 
     const getComponentToShow = (component: JSX.Element, height?: string, width?: string) =>
         tokenData ? component : <Skeleton variant="rectangular" height={height} width={width} />;
 
     const getComponentGraphToShow = (component: JSX.Element, height?: string, width?: string) =>
-        priceHistory.length > 0 ? component : <Skeleton variant="rectangular" height={height} width={width} />;
+        priceHistory ? component : <Skeleton variant="rectangular" height={height} width={width} />;
 
     const rugScoreParse = tokenInfo?.metadata?.rugScore === 0 ? null : tokenInfo?.metadata?.rugScore;
 
