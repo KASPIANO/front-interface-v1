@@ -85,11 +85,21 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
 
     useEffect(() => {
         const fetchDevWalletPercentage = async () => {
-            const devWalletBalance = await fetchDevWalletBalance(tokenInfo.ticker, tokenInfo.devWallet);
-            const devWalletPercent = devWalletBalance === 0 ? 0 : (devWalletBalance / totalSupplyAfterBurn) * 100;
-            setDevWalletPercentage(`${devWalletPercent.toFixed(2)}%`);
+            try {
+                // Fetch dev wallet balance and calculate the percentage
+                const devWalletBalance = await fetchDevWalletBalance(tokenInfo.ticker, tokenInfo.devWallet);
+                const devWalletPercent =
+                    devWalletBalance === 0 ? 0 : (devWalletBalance / totalSupplyAfterBurn) * 100;
+                setDevWalletPercentage(`${devWalletPercent.toFixed(2)}%`);
+            } catch (error) {
+                console.error('Error fetching dev wallet percentage:', error);
+            }
         };
-        fetchDevWalletPercentage();
+
+        // Execute the async function
+        if (tokenInfo) {
+            fetchDevWalletPercentage();
+        }
     }, [totalSupplyAfterBurn, tokenInfo]);
 
     return (
