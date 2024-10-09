@@ -19,9 +19,10 @@ import { FC, useState } from 'react';
 import { mintKRC20Token, transferKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { TokenRowPortfolioItem, TransferObj } from '../../../types/Types';
-import { capitalizeFirstLetter } from '../../../utils/Utils';
+import { capitalizeFirstLetter, isEmptyString } from '../../../utils/Utils';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
+import { DEFAULT_TOKEN_LOGO_URL } from '../../../utils/Constants';
 
 interface TokenRowPortfolioProps {
     token: TokenRowPortfolioItem;
@@ -197,7 +198,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                             }}
                             variant="square"
                             alt={token.ticker}
-                            src={token.logoUrl}
+                            src={isEmptyString(token.logoUrl) ? DEFAULT_TOKEN_LOGO_URL : token.logoUrl}
                         />
                     </ListItemAvatar>
 

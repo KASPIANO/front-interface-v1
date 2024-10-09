@@ -38,6 +38,9 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [finishedSellOrder, setFinishedSellOrder] = useState<boolean>(false);
     const [amountError, setAmountError] = useState<string>('');
     const [pricePerTokenError, setPricePerTokenError] = useState<string>('');
+    const [isPriceFromButton, setIsPriceFromButton] = useState<boolean>(false);
+    const [showButtonsTooltip, setShowButtonsTooltip] = useState<boolean>(false);
+    const [showInputTooltip, setShowInputTooltip] = useState<boolean>(false);
     const queryClient = useQueryClient();
 
     useEffect(() => {
@@ -47,6 +50,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     }, [walletAddress, tokenInfo.ticker, finishedSellOrder]);
 
     const handleTokenAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setIsPriceFromButton(false);
         const amountStr = e.target.value;
         if (amountStr.includes('.')) {
             setAmountError('Please enter a rounded number without decimals.');
@@ -77,14 +81,15 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
 
     // Handle changes in total price
     const handleTotalPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setIsPriceFromButton(false);
         const priceStr = e.target.value;
         let totalRounded;
-        if (priceStr.includes('.')) {
+        if (priceStr.includes('.') && priceCurrency === 'KAS') {
             setTotalPrice(parseFloat(priceStr).toFixed(0));
             totalRounded = parseFloat(priceStr).toFixed(0);
             setPricePerTokenError('Please enter a rounded number without decimals.');
         } else {
-            totalRounded = priceStr;
+            totalRounded = roundUp(priceStr, 8);
             setTotalPrice(priceStr);
             setPricePerTokenError('');
         }
@@ -94,7 +99,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
 
         if (!isNaN(total)) {
             if (!isNaN(amount) && amount > 0) {
-                setPricePerToken((total / amount).toString());
+                setPricePerToken(roundUp(total / amount, 8).toString());
             }
         } else {
             setPricePerToken('');
@@ -109,33 +114,42 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         }
     };
 
-    const handlePricePerTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const priceStr = e.target.value;
-        setPricePerToken(priceStr);
+    // const handlePricePerTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const priceStr = e.target.value;
+    //     setPricePerToken(priceStr);
 
-        const pricePerTokenValue = parseFloat(priceStr);
-        const amount = parseFloat(tokenAmount);
+    //     const pricePerTokenValue = parseFloat(priceStr);
+    //     const amount = parseFloat(tokenAmount);
 
-        if (!isNaN(pricePerTokenValue)) {
-            if (!isNaN(amount) && amount > 0) {
-                const newTotalPrice = pricePerTokenValue * amount;
-                const fixedTotalPrice = handleTotalPriceDecimals(newTotalPrice.toString());
-                setTotalPrice(fixedTotalPrice);
-            }
-        } else {
-            setTotalPrice('');
-        }
-    };
+    //     if (!isNaN(pricePerTokenValue)) {
+    //         if (!isNaN(amount) && amount > 0) {
+    //             const newTotalPrice = pricePerTokenValue * amount;
+    //             const fixedTotalPrice = handleTotalPriceDecimals(newTotalPrice.toString());
+    //             setTotalPrice(fixedTotalPrice);
+    //         }
+    //     } else {
+    //         setTotalPrice('');
+    //     }
+    // };
 
     useEffect(() => {
-        const pricePerTokenValue = parseFloat(pricePerToken);
+        let pricePerTokenValue = parseFloat(pricePerToken);
+
+        if (priceCurrency === 'USD') {
+            const priceInKAS = pricePerTokenValue / kasPrice;
+            const roundedPriceInKAS = roundUp(priceInKAS, 8);
+
+            pricePerTokenValue = roundedPriceInKAS;
+        }
+
         if (!isNaN(pricePerTokenValue) && tokenInfo.price) {
             const diff = ((pricePerTokenValue - tokenInfo.price) / tokenInfo.price) * 100;
             setPriceDifference(diff);
         } else {
             setPriceDifference(0);
         }
-    }, [pricePerToken, tokenInfo.price]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pricePerToken, totalPrice, tokenInfo.price]);
 
     const handleSetPricePerToken = (multiplier: number) => {
         if (!tokenInfo.price) {
@@ -146,16 +160,13 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             showGlobalSnackbar({ message: 'Please enter a valid token amount.', severity: 'error' });
             return;
         }
-        const newPricePerTokenValue = tokenInfo.price * multiplier;
-        const roundedPricePerToken = roundUp(newPricePerTokenValue, 8);
-        setPricePerToken(roundedPricePerToken.toString());
 
         const amount = parseInt(tokenAmount);
-        if (!isNaN(amount) && amount > 0) {
-            const newTotalPrice = newPricePerTokenValue * amount;
-            const roundedTotalPrice = handleTotalPriceDecimals(newTotalPrice.toString());
-            setTotalPrice(roundedTotalPrice);
-        }
+        const newTotalPrice = Number(handleTotalPriceDecimals((tokenInfo.price * multiplier * amount).toString()));
+        const roundedPricePerToken = roundUp(newTotalPrice / amount, 8);
+        setPricePerToken(roundedPricePerToken.toString());
+        setTotalPrice(String(newTotalPrice));
+        setIsPriceFromButton(true);
     };
 
     function roundUp(value, decimals) {
@@ -170,12 +181,12 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             if (pricePerToken !== '') {
                 const pricePerTokenValue = parseFloat(pricePerToken);
                 const priceInUSD = pricePerTokenValue * kasPrice;
-                setPricePerToken(priceInUSD.toString());
+                setPricePerToken(roundUp(priceInUSD, 8).toString());
             }
             if (totalPrice !== '') {
                 const totalPriceValue = parseFloat(totalPrice);
                 const totalInUSD = totalPriceValue * kasPrice;
-                setTotalPrice(totalInUSD.toString());
+                setTotalPrice(roundUp(totalInUSD, 8).toString());
             }
         } else {
             // Convert prices back to KAS
@@ -189,8 +200,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             if (totalPrice !== '') {
                 const totalPriceValue = parseFloat(totalPrice);
                 const totalInKAS = totalPriceValue / kasPrice;
-                const roundedTotalInKAS = roundUp(totalInKAS, 8);
-                setTotalPrice(roundedTotalInKAS.toString());
+                const roundedTotalInKAS = handleTotalPriceDecimals(totalInKAS.toString());
+                setTotalPrice(String(roundedTotalInKAS));
             }
         }
     };
@@ -360,36 +371,45 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     );
 
     const buttons = (
-        <Box sx={{ display: 'flex', gap: '0.3rem', mb: '0.5rem', justifyContent: 'center' }}>
-            <StyledButton
-                disabled={!tokenInfo.price}
-                onClick={() => handleSetPricePerToken(1)}
-                variant="contained"
-            >
-                Floor
-            </StyledButton>
-            <StyledButton
-                disabled={!tokenInfo.price}
-                onClick={() => handleSetPricePerToken(1.01)}
-                variant="contained"
-            >
-                +1%
-            </StyledButton>
-            <StyledButton
-                disabled={!tokenInfo.price}
-                onClick={() => handleSetPricePerToken(1.05)}
-                variant="contained"
-            >
-                +5%
-            </StyledButton>
-            <StyledButton
-                disabled={!tokenInfo.price}
-                onClick={() => handleSetPricePerToken(1.1)}
-                variant="contained"
-            >
-                +10%
-            </StyledButton>
-        </Box>
+        <Tooltip
+            title="The USD price will be rounded to the nearest whole Kaspa (KAS) number based on the specified percentage"
+            placement="top"
+            open={showButtonsTooltip}
+            disableHoverListener
+            onMouseEnter={() => setShowButtonsTooltip(true)}
+            onMouseLeave={() => setShowButtonsTooltip(false)}
+        >
+            <Box sx={{ display: 'flex', gap: '0.3rem', mb: '0.5rem', justifyContent: 'center' }}>
+                <StyledButton
+                    disabled={!tokenInfo.price}
+                    onClick={() => handleSetPricePerToken(1)}
+                    variant="contained"
+                >
+                    Floor
+                </StyledButton>
+                <StyledButton
+                    disabled={!tokenInfo.price}
+                    onClick={() => handleSetPricePerToken(1.01)}
+                    variant="contained"
+                >
+                    +1%
+                </StyledButton>
+                <StyledButton
+                    disabled={!tokenInfo.price}
+                    onClick={() => handleSetPricePerToken(1.05)}
+                    variant="contained"
+                >
+                    +5%
+                </StyledButton>
+                <StyledButton
+                    disabled={!tokenInfo.price}
+                    onClick={() => handleSetPricePerToken(1.1)}
+                    variant="contained"
+                >
+                    +10%
+                </StyledButton>
+            </Box>
+        </Tooltip>
     );
     return (
         <>
@@ -404,41 +424,63 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     helperText={amountError}
                 />
 
-                <StyledTextField
-                    label={`Total Price (${priceCurrency})`}
-                    value={totalPrice}
-                    onChange={handleTotalPriceChange}
-                    fullWidth
-                    InputProps={{
-                        endAdornment: currencyAdornment,
-                    }}
-                    error={!!pricePerTokenError}
-                    helperText={pricePerTokenError}
-                />
+                <Tooltip
+                    title={
+                        priceCurrency === 'KAS'
+                            ? 'Must be a whole number'
+                            : 'The USD price will be rounded to the nearest whole Kaspa (KAS) number'
+                    }
+                    placement="top"
+                    open={showInputTooltip}
+                    disableHoverListener
+                    onMouseEnter={() => setShowInputTooltip(true)}
+                    onMouseLeave={() => setShowInputTooltip(false)}
+                >
+                    <StyledTextField
+                        label={`Total Price (${priceCurrency})`}
+                        value={totalPrice}
+                        onChange={handleTotalPriceChange}
+                        fullWidth
+                        InputProps={{
+                            endAdornment: currencyAdornment,
+                        }}
+                        error={!!pricePerTokenError}
+                        helperText={pricePerTokenError}
+                    />
+                </Tooltip>
                 <StyledTextField
                     label={`Price per Token (${priceCurrency})`}
                     value={pricePerToken}
-                    onChange={handlePricePerTokenChange}
+                    // onChange={handlePricePerTokenChange}
+                    disabled={true}
                     fullWidth
                     InputProps={{
                         endAdornment: currencyAdornment,
                     }}
                 />
-                {pricePerToken !== '' && tokenInfo.price !== 0 && (
-                    <Typography variant="body2" sx={{ ml: '0.15rem' }}>
-                        {'Price per token is '}
-                        <Typography
-                            component="span"
-                            sx={{
-                                fontWeight: 'bold',
-                                color: priceDifference > 0 ? '#4caf50' : '#f44336',
-                            }}
-                        >
-                            {priceDifference > 0 ? '+' : '-'}
-                            {priceDifference.toFixed(2)}%
-                        </Typography>
-                        {' compared to the floor price.'}
+                {isPriceFromButton && priceDifference < -1 && pricePerToken !== '' && tokenInfo.price !== 0 ? (
+                    <Typography variant="body2" sx={{ ml: '0.15rem', color: '#f44336' }}>
+                        The current token amount is too low. Please add more tokens to ensure accurate total price
+                        calculations.
                     </Typography>
+                ) : (
+                    pricePerToken !== '' &&
+                    tokenInfo.price !== 0 && (
+                        <Typography variant="body2" sx={{ ml: '0.15rem' }}>
+                            {'Price per token is '}
+                            <Typography
+                                component="span"
+                                sx={{
+                                    fontWeight: 'bold',
+                                    color: priceDifference > 0 ? '#4caf50' : '#f44336',
+                                }}
+                            >
+                                {priceDifference > 0 ? '+' : ''}
+                                {priceDifference.toFixed(2)}%
+                            </Typography>
+                            {' compared to the floor price.'}
+                        </Typography>
+                    )
                 )}
                 <Box
                     sx={{
