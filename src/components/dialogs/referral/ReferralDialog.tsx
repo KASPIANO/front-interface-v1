@@ -80,28 +80,6 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({
         }
     };
 
-    const handleGetReferralCode = async () => {
-        setLoading(true);
-        try {
-            const result = await updateAndGetUserReferral(); // Call the correct service function
-            if (result && result.code) {
-                showGlobalSnackbar({
-                    message: 'Referral code retrieved successfully.',
-                    severity: 'success',
-                });
-            } else {
-                throw new Error('Referral code not found.');
-            }
-        } catch (error) {
-            showGlobalSnackbar({
-                message: 'Failed to retrieve referral code.',
-                severity: 'error',
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
     return (
         <Dialog
             open={open}
