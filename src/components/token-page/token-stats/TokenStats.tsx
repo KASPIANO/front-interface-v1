@@ -1,7 +1,8 @@
 import { FC, useState } from 'react';
-import { Box, Card, Divider, Typography } from '@mui/material';
+import { Box, Card, Divider, Skeleton, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
 import { BackendTokenResponse } from '../../../types/Types';
+import { useFetchStats } from '../../../DAL/UseQueriesBackend';
 
 interface TokenStatsProps {
     tokenInfo: BackendTokenResponse;
@@ -31,14 +32,36 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 1],
     );
 
+    const { data: stats, isLoading: loading } = useFetchStats(tokenInfo.ticker, tradingDataTimeFrame)
+
     const updateTradingDataTimeFrame = (value: string) => {
         setTradingDataTimeFrame(value);
     };
 
-    const tokenKasPrice = tokenInfo.price ? `${tokenInfo.price.toFixed(7)} / KAS` : '---';
+    const StatsDisplay = ({ label, value, change, fontStyle=null }) => (
+        <Box sx={{ textAlign: 'center'}}>
+            <Typography sx={{ fontSize: '0.9rem' }} align="center">
+                {label}
+            </Typography>
+            <Typography align="center" sx={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
+                {value}
+            </Typography>
+            {change !== undefined && (
+                <Typography
+                    align="center"
+                    fontStyle={fontStyle}
+                    sx={{
+                        fontSize: '0.6rem'
+                    }}
+                >
+                    {change}
+                </Typography>
+            )}
+        </Box>
+    );
 
-    const totalMintedDataToShow =
-        tokenInfo.state === 'finished' ? '100%' : `${(tokenInfo.totalMintedPercent * 100).toFixed(3)}%`;
+    //  const totalMintedDataToShow =
+    //      tokenInfo.state === 'finished' ? '100%' : `${(tokenInfo.totalMintedPercent * 100).toFixed(8)}%`;
     return (
         <Card sx={{ height: '20vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -57,52 +80,37 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     onChange={updateTradingDataTimeFrame}
                 />
             </Box>
-            <Box
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    marginTop: '3vh',
-                    columnGap: '2vw',
-                    justifyContent: 'center',
-                }}
-            >
-                <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '0.7rem' }} align="center">
-                        VOLUME ({tradingDataTimeFrame})
-                    </Typography>
-                    <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
-                        {tokenInfo.volume ? `$${tokenInfo.volume}` : '---'}
-                    </Typography>
-                </Box>
+            {loading ? <Skeleton key={1} width={'100%'} height={'11vh'} /> :
+                stats && <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginTop: '2vh',
+                        columnGap: '1.5vw',
+                        justifyContent: 'center',
+                    }}
+                >
+                   <StatsDisplay label={`VOLUME (${tradingDataTimeFrame})`} value={stats.volume ? `$${stats.volume}` : '---'} change={'---'} />
 
-                <Divider orientation="vertical" flexItem />
-                <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '0.7rem' }} align="center">
-                        PRICE PER TOKEN ({tradingDataTimeFrame})
-                    </Typography>
-                    <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
-                        {tokenKasPrice}
-                    </Typography>
-                </Box>
-                <Divider orientation="vertical" flexItem />
-                <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '0.7rem' }} align="center">
-                        TOTAL MINTED
-                    </Typography>
-                    <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
-                        {totalMintedDataToShow}
-                    </Typography>
-                </Box>
-                <Divider orientation="vertical" flexItem />
-                <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '0.7rem' }} align="center">
-                        HOLDERS
-                    </Typography>
-                    <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
-                        {tokenInfo.totalHolders}
-                    </Typography>
-                </Box>
-            </Box>
+                    <Divider orientation="vertical" flexItem />
+
+                    <StatsDisplay label={`PRICE PER TOKEN (${tradingDataTimeFrame})`}
+                        value={stats.historicalPrice !== undefined ? `${stats.historicalPrice.toFixed(7)} / KAS` : '---'}
+                        change={stats.changes?.priceChange ? `${stats.changes.priceChange.toFixed(7)} / KAS` : '---'}
+                        fontStyle={{color: stats.changes.priceChange < 0 ? 'red' : 'green'}} />
+
+                    <Divider orientation="vertical" flexItem />
+
+                    <StatsDisplay label="TOTAL MINTED" value={stats.historicalTotalMints || "---"} change={stats.changes.mintsChange || "---"} />
+                    
+                    <Divider orientation="vertical" flexItem />
+                    
+                    <StatsDisplay label="HOLDERS"
+                                  value={stats.historicalTotalHolders} 
+                                  change={stats.changes.holdersChange} 
+                                  fontStyle={{color: stats.changes.holdersChange < 0 ? 'red' : 'green'}} />
+                </Box>}
+
         </Card>
     );
 };

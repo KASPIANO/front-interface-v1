@@ -245,3 +245,15 @@ export const getUserReferral = async (walletAddress: string, referredBy?: string
     });
     return response.data;
 };
+export const fetchTickerStats = async (ticker: string, timeInterval:string): Promise<any> => {
+    try {
+        const capitalTicker = ticker.toUpperCase();
+        const response = await backendService.get<{ data: { volume: number; date: string } }>(
+            `/${KRC20CONTROLLER}/stats/?ticker=${capitalTicker}&timeInterval=${timeInterval}`,
+        );
+        return response.data? response.data[0]: undefined;
+    } catch (error) {
+        console.error(`Error fetching price for ${ticker}:`, error.response ? error.response.data : error.message);
+        return undefined; // Return empty array in case of an error
+    }
+};
