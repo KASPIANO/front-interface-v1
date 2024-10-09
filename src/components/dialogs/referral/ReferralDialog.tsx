@@ -129,23 +129,6 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({
                             }}
                         >
                             <Typography variant="h6">Referral System</Typography>
-                            <Button
-                                sx={{ marginLeft: 'auto' }}
-                                variant="outlined"
-                                color="secondary"
-                                onClick={
-                                    userReferral && userReferral.code
-                                        ? () => copyToClipboard(userReferral.code)
-                                        : handleGetReferralCode
-                                }
-                                disabled={loading}
-                                endIcon={
-                                    userReferral &&
-                                    userReferral.code && <ContentCopyRoundedIcon fontSize="small" />
-                                }
-                            >
-                                {userReferral && userReferral.code ? userReferral.code : 'Get Referral Code'}
-                            </Button>
                         </Box>
                     )}
                 </Box>
@@ -178,7 +161,9 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({
                         </Box>
                         <Box marginTop={1} display="flex" flexDirection="column" alignItems="center">
                             {/* Input field to add a referral code */}
-                            <Typography variant="h6">Add Referral Code</Typography>
+                            <Typography variant="h6" align="center" gutterBottom>
+                                Add Referral Code given to you by the user or community, if you have one!
+                            </Typography>
                             <TextField
                                 label="Referral Code"
                                 variant="outlined"
@@ -202,7 +187,7 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({
                 )}
             </DialogContent>
             <DialogActions sx={{ paddingTop: 0 }}>
-                <Button onClick={onClose} color="secondary">
+                <Button onClick={onClose} color="secondary" variant="contained">
                     Close
                 </Button>
             </DialogActions>
