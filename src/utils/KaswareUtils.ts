@@ -6,6 +6,7 @@ import { gasEstimator, getPriorityFee, kaspaFeeEstimate } from '../DAL/KaspaApiD
 import { KaswareSendKaspaResult } from '../types/Types';
 
 export const USER_REJECTED_TRANSACTION_ERROR_CODE = 4001;
+export const MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION = 21;
 
 // Utility to detect if KasWare Wallet is installed
 export const isKasWareInstalled = (): boolean => typeof window.kasware !== 'undefined';

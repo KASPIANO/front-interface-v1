@@ -101,6 +101,7 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                             tokenInfo={tokenInfo}
                             kasPrice={kasPrice}
                             walletAddress={walletAddress}
+                            walletBalance={walletBalance}
                         />
                         {/* <Typography variant="h5">Coming Soon</Typography> */}
                     </TabPanel>

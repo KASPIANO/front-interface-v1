@@ -6,7 +6,7 @@ import { fetchWalletKRC20Balance } from '../../../../../DAL/Krc20DAL';
 import { SwapHoriz } from '@mui/icons-material'; // MUI icon for swap
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
-import { transferKRC20Token } from '../../../../../utils/KaswareUtils';
+import { MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION, transferKRC20Token } from '../../../../../utils/KaswareUtils';
 import { confirmSellOrder, createSellOrder } from '../../../../../DAL/BackendP2PDAL';
 import { doPolling } from '../../../../../utils/Utils';
 import { useQueryClient } from '@tanstack/react-query';
@@ -16,12 +16,13 @@ interface SellPanelProps {
     kasPrice: number;
     walletAddress: string | null;
     walletConnected;
+    walletBalance: number;
 }
 
 const KASPA_TO_SOMPI = 100000000;
 
 const SellPanel: React.FC<SellPanelProps> = (props) => {
-    const { tokenInfo, kasPrice, walletAddress, walletConnected } = props;
+    const { tokenInfo, kasPrice, walletAddress, walletConnected, walletBalance } = props;
     const [tokenAmount, setTokenAmount] = useState<string>(''); // Changed to string
     const [totalPrice, setTotalPrice] = useState<string>(''); // Changed to string
     const [pricePerToken, setPricePerToken] = useState<string>(''); // Changed to string
@@ -223,6 +224,16 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             setDisableSellButton(false);
             return;
         }
+
+        if (walletBalance <= MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION) {
+            showGlobalSnackbar({
+                message: `Minimum wallet balance need to be ${MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION} KAS in order to transfer the tokens.`,
+                severity: 'error',
+            });
+            setDisableSellButton(false);
+            return;
+        }
+
         if (parseInt(totalPrice) < 25) {
             showGlobalSnackbar({
                 message: 'Please enter a valid total price has to be more than 25 KAS',
@@ -313,6 +324,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
 
     const handleCloseDialog = () => {
         setIsDialogOpen(false);
+        setDisableSellButton(false);
     };
 
     const currencyAdornment = (
