@@ -64,15 +64,10 @@ export async function fetchTokenByTicker(
         params['wallet'] = wallet;
     }
 
-    try {
-        const response = await backendService.get<BackendTokenResponse>(`/${KRC20CONTROLLER}/${capitalTicker}`, {
-            params,
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching token from backend:', error);
-        return {} as BackendTokenResponse;
-    }
+    const response = await backendService.get<BackendTokenResponse>(`/${KRC20CONTROLLER}/${capitalTicker}`, {
+        params,
+    });
+    return response.data;
 }
 
 export async function countTokens(): Promise<number> {
