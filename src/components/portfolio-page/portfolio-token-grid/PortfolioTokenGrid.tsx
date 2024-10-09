@@ -108,7 +108,7 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
                         overflowX: 'hidden',
                     }}
                 >
-                    {tokensList.length > 0 && !isLoading
+                    {!isLoading
                         ? tokensList.map((token) => (
                               <TokenRowPortfolio
                                   handleChange={handleChange}
@@ -123,11 +123,13 @@ const PortfolioTokenGrid: FC<PortfolioTokenGridProps> = (props) => {
                           [...Array(5)].map((_, index) => <Skeleton key={index} width={'100%'} height={'12vh'} />)}
                 </List>
             )}
-            {tokensList.length === 0 && walletConnected && (
-                <p style={{ textAlign: 'center', fontSize: '0.8rem' }}>
-                    <b>End of list</b>
-                </p>
-            )}
+            {!isLoading &&
+                tokensList.length === 0 &&
+                (!isEmptyString(currentWalletToCheck) || walletConnected) && (
+                    <p style={{ textAlign: 'center', fontSize: '0.8rem' }}>
+                        <b>End of list</b>
+                    </p>
+                )}
         </StyledPortfolioGridContainer>
     );
 };
