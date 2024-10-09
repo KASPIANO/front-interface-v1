@@ -122,7 +122,6 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 return;
             }
             setTempWalletAddress(temporaryWalletAddress);
-            setSelectedOrder(order);
             setIsPanelOpen(true);
             setIsProcessing(false);
         } catch (error) {
