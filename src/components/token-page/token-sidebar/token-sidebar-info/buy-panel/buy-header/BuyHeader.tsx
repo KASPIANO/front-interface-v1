@@ -78,17 +78,19 @@ const BuyHeader: React.FC<BuyHeaderProps> = ({ sortBy, onSortChange, ticker, isL
                     borderBottom: '0.5px solid  rgba(111, 199, 186, 0.5)',
                 }}
             >
-                <Typography variant="subtitle2" sx={{ width: '22%', fontWeight: 'bold' }}>
-                    Amount
-                </Typography>
+                <Tooltip title={`Total Amount of ${ticker} Tokens for Sale`}>
+                    <Typography variant="subtitle2" sx={{ width: '22%', fontWeight: 'bold' }}>
+                        Amount
+                    </Typography>
+                </Tooltip>
                 <Tooltip title="Price per token">
                     <Typography variant="subtitle2" sx={{ width: '22%', fontWeight: 'bold' }}>
                         Price
                     </Typography>
                 </Tooltip>
                 <Tooltip title="Total KAS requested for the tokens">
-                    <Typography variant="subtitle2" sx={{ width: '20%', fontWeight: 'bold' }}>
-                        Total
+                    <Typography variant="subtitle2" sx={{ width: '25%', fontWeight: 'bold' }}>
+                        Total Price
                     </Typography>
                 </Tooltip>
                 <Typography variant="subtitle2" sx={{ width: '10%' }} /> {/* Empty space for the button */}

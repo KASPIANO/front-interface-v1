@@ -80,28 +80,6 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({
         }
     };
 
-    const handleGetReferralCode = async () => {
-        setLoading(true);
-        try {
-            const result = await updateAndGetUserReferral(); // Call the correct service function
-            if (result && result.code) {
-                showGlobalSnackbar({
-                    message: 'Referral code retrieved successfully.',
-                    severity: 'success',
-                });
-            } else {
-                throw new Error('Referral code not found.');
-            }
-        } catch (error) {
-            showGlobalSnackbar({
-                message: 'Failed to retrieve referral code.',
-                severity: 'error',
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
     return (
         <Dialog
             open={open}
@@ -129,23 +107,6 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({
                             }}
                         >
                             <Typography variant="h6">Referral System</Typography>
-                            <Button
-                                sx={{ marginLeft: 'auto' }}
-                                variant="outlined"
-                                color="secondary"
-                                onClick={
-                                    userReferral && userReferral.code
-                                        ? () => copyToClipboard(userReferral.code)
-                                        : handleGetReferralCode
-                                }
-                                disabled={loading}
-                                endIcon={
-                                    userReferral &&
-                                    userReferral.code && <ContentCopyRoundedIcon fontSize="small" />
-                                }
-                            >
-                                {userReferral && userReferral.code ? userReferral.code : 'Get Referral Code'}
-                            </Button>
                         </Box>
                     )}
                 </Box>
@@ -170,12 +131,17 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({
                         <Box display="flex" alignItems="center">
                             <AccountIcon fontSize="large" style={{ marginRight: 10 }} />
                             <Typography>
-                                Welcome to our referral program! Share your referral code with others, and when
-                                they sign up, both of you will earn points. The more you share, the more you earn!
+                                Welcome to our referral program! Share your referral code with others, and earn
+                                points when they sign up. The more you share, the more you earn! You can also
+                                manage your referral codes and access your unique referral link directly from your
+                                portfolio. Start sharing and boost your rewards!
                             </Typography>
                         </Box>
                         <Box marginTop={1} display="flex" flexDirection="column" alignItems="center">
                             {/* Input field to add a referral code */}
+                            <Typography variant="h6" align="center" gutterBottom>
+                                Add Referral Code given to you by the user or community, if you have one!
+                            </Typography>
                             <TextField
                                 label="Referral Code"
                                 variant="outlined"
@@ -199,7 +165,7 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({
                 )}
             </DialogContent>
             <DialogActions sx={{ paddingTop: 0 }}>
-                <Button onClick={onClose} color="secondary">
+                <Button onClick={onClose} color="secondary" variant="contained">
                     Close
                 </Button>
             </DialogActions>
