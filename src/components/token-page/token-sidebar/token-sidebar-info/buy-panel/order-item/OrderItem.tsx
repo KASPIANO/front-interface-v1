@@ -11,21 +11,18 @@ interface OrderItemProps {
     kasPrice: number;
     onSelect: (order: Order) => void;
     selectedOrder: Order | null;
-    isProccesing: boolean;
-    setIsProcessing: (value: boolean) => void;
+
+    setSelectedOrder;
 }
 
 const OrderItem: React.FC<OrderItemProps> = (props) => {
-    const { order, onSelect, kasPrice, selectedOrder, isProccesing, setIsProcessing } = props;
-    const [localSelectedOrder, setLocalSelectedOrder] = React.useState<Order | null>(null);
+    const { order, onSelect, kasPrice, selectedOrder, setSelectedOrder } = props;
 
     // const floorPriceDifference = ((order.pricePerToken - floorPrice) / floorPrice) * 100;
 
     const handleSelect = async (order: Order) => {
-        setLocalSelectedOrder(order);
-        setIsProcessing(true);
+        setSelectedOrder(order);
         await onSelect(order);
-        setLocalSelectedOrder(null);
     };
 
     const formatPrice = (price: number) => {
@@ -40,7 +37,6 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
         }
     };
 
-    const disableButton = selectedOrder !== null || isProccesing;
     return (
         <Box sx={{ borderBottom: '0.5px solid  rgba(111, 199, 186, 0.5)', width: '100%', padding: '10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -77,13 +73,13 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                 </Box>
                 {/* Buy/Close Button */}
                 <Box>
-                    {localSelectedOrder && localSelectedOrder.orderId === order.orderId ? (
+                    {selectedOrder && selectedOrder.orderId === order.orderId ? (
                         <LoadingSpinner size={15} boxStyle={{ height: '5vh' }} />
                     ) : (
                         <StyledButton
                             variant="contained"
                             onClick={() => handleSelect(order)}
-                            disabled={disableButton}
+                            disabled={selectedOrder !== null}
                             size="small"
                             sx={{
                                 fontSize: '0.5rem',

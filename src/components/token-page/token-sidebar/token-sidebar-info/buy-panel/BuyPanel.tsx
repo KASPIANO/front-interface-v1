@@ -35,10 +35,9 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const [tempWalletAddress, setTempWalletAddress] = useState('');
     const [isProcessingBuyOrder, setIsProcessingBuyOrder] = useState(false);
     const [waitingForWalletConfirmation, setWaitingForWalletConfirmation] = useState(false);
-    const [isProccesing, setIsProcessing] = useState(false);
     const queryClient = useQueryClient();
 
-    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useFetchOrders(
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isFetching } = useFetchOrders(
         tokenInfo,
         sortBy,
         sortOrder,
@@ -122,9 +121,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 return;
             }
             setTempWalletAddress(temporaryWalletAddress);
-            setSelectedOrder(order);
             setIsPanelOpen(true);
-            setIsProcessing(false);
         } catch (error) {
             console.error(error);
             showGlobalSnackbar({
@@ -190,7 +187,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 commitId: commitTransactionId,
                 txIds: [buyerTransactionId],
             });
-            queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker, sortBy, sortOrder] });
+            queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker] });
             setIsProcessingBuyOrder(false);
             setIsPanelOpen(false);
             setSelectedOrder(null);
@@ -224,7 +221,12 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         <>
             <GlobalStyle />
             <Box sx={{ width: '100%' }}>
-                <BuyHeader sortBy={sortBy} onSortChange={handleSortChange} ticker={tokenInfo.ticker} />
+                <BuyHeader
+                    sortBy={sortBy}
+                    onSortChange={handleSortChange}
+                    ticker={tokenInfo.ticker}
+                    isLoading={isFetching}
+                />
                 <div id="scrollableList" style={{ overflow: 'auto', height: '64vh' }}>
                     <InfiniteScroll
                         dataLength={orders.length} // Length of the current data
@@ -259,8 +261,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                         }
                     >
                         <OrderList
-                            isProccesing={isProccesing}
-                            setIsProcessing={setIsProcessing}
+                            setSelectedOrder={setSelectedOrder}
                             selectedOrder={selectedOrder}
                             walletConnected={walletConnected}
                             walletBalance={walletBalance}

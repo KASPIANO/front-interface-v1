@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Tooltip, Typography, CircularProgress, IconButton } from '@mui/material';
 import { StyledButton } from './BuyHeader.s';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useQueryClient } from '@tanstack/react-query';
@@ -8,9 +8,10 @@ interface BuyHeaderProps {
     sortBy: string;
     onSortChange: (sortBy: string) => void;
     ticker: string;
+    isLoading: boolean;
 }
 
-const BuyHeader: React.FC<BuyHeaderProps> = ({ sortBy, onSortChange, ticker }) => {
+const BuyHeader: React.FC<BuyHeaderProps> = ({ sortBy, onSortChange, ticker, isLoading }) => {
     const queryClient = useQueryClient();
     const handleSortChange = (sortOption: string) => {
         onSortChange(sortOption);
@@ -54,12 +55,17 @@ const BuyHeader: React.FC<BuyHeaderProps> = ({ sortBy, onSortChange, ticker }) =
                 >
                     Total Price
                 </StyledButton>
-                <Tooltip title="Refresh the list of tokens">
-                    <RefreshIcon
-                        sx={{ cursor: 'pointer', fontSize: '1.2rem', marginLeft: 'auto' }}
-                        onClick={() => handleRefresh()}
-                    />
-                </Tooltip>
+                <Box sx={{ marginLeft: 'auto' }}>
+                    {isLoading ? (
+                        <CircularProgress size={20} />
+                    ) : (
+                        <Tooltip title="Refresh the list of tokens">
+                            <IconButton onClick={handleRefresh}>
+                                <RefreshIcon sx={{ cursor: 'pointer', fontSize: '1.2rem' }} />
+                            </IconButton>
+                        </Tooltip>
+                    )}
+                </Box>
             </Box>
 
             <Box
