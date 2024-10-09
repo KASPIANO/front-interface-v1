@@ -170,8 +170,10 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({
                         <Box display="flex" alignItems="center">
                             <AccountIcon fontSize="large" style={{ marginRight: 10 }} />
                             <Typography>
-                                Welcome to our referral program! Share your referral code with others, and when
-                                they sign up, both of you will earn points. The more you share, the more you earn!
+                                Welcome to our referral program! Share your referral code with others, and earn
+                                points when they sign up. The more you share, the more you earn! You can also
+                                manage your referral codes and access your unique referral link directly from your
+                                portfolio. Start sharing and boost your rewards!
                             </Typography>
                         </Box>
                         <Box marginTop={1} display="flex" flexDirection="column" alignItems="center">
