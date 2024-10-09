@@ -64,7 +64,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
 
     useEffect(() => {
         if (tokenInfo) {
-            setTokenXHandle(!!tokenInfo.metadata.socials?.x);
+            setTokenXHandle(!!tokenInfo?.metadata.socials?.x);
         }
     }, [tokenInfo]);
 

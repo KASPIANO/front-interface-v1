@@ -71,7 +71,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
 
     useEffect(() => {
         setSocials((prevSocials) => {
-            if (tokenInfo.metadata?.socials) {
+            if (tokenInfo?.metadata?.socials) {
                 return {
                     telegram: tokenInfo?.metadata?.socials?.telegram || '',
                     website: tokenInfo?.metadata?.socials?.website || '',
@@ -144,7 +144,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
             }}
         >
             <TokenProfileContainer>
-                {tokenInfo.metadata?.bannerUrl || tokenInfo.metadata?.socials?.x ? (
+                {tokenInfo?.metadata?.bannerUrl || tokenInfo?.metadata?.socials?.x ? (
                     tokenInfo.metadata?.bannerUrl ? (
                         <Box
                             component="img"
@@ -239,7 +239,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                 </Stack>
             </Box>
             <Box padding={'10px'} sx={{ paddingTop: '5px' }}>
-                {tokenInfo.metadata?.description || tokenInfo.metadata?.socials?.x ? (
+                {tokenInfo?.metadata?.description || tokenInfo?.metadata?.socials?.x ? (
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                         <Typography variant="body2" fontWeight={500}>
                             Description:
