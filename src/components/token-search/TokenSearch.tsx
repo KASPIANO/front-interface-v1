@@ -34,10 +34,11 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
     const location = useLocation();
 
     useEffect(() => {
-        if (location.pathname === '/KRC-20') {
-            setSearchValue(''); // Clear the search value
+        if (location.pathname !== '/token') {
+            setSearchValue(''); // Clear the search value if not on /token
         }
-    }, [location.pathname]); // Trigger this useEffect whenever the path changes
+    }, [location.pathname]);
+    // Trigger this useEffect whenever the path changes
 
     const cancelTokenRef = useRef<CancelTokenSource>(null);
     const handleKeyDown = (event: React.KeyboardEvent) => {

@@ -2,6 +2,7 @@ import { jwtDecode } from 'jwt-decode';
 import moment from 'moment';
 import { getTxnInfo } from '../DAL/KaspaApiDal';
 import { fetchTokenInfo } from '../DAL/Krc20DAL';
+import { SellOrderStatus } from '../types/Types';
 
 export enum ThemeModes {
     DARK = 'dark',
@@ -67,6 +68,24 @@ export function generateNonce() {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
+export const generateVerificationMessage = (account: string, nonce: string, date: string, requestId: string) => `
+    kaspiano.com wants you to sign in with your Kaspa account:
+    
+    ${account}
+    
+    Welcome to Kaspiano. Signing is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give Kaspiano permission to perform any transactions with your wallet.
+    
+    URI: https://kaspiano.com
+    
+    Version: 1
+    
+    Nonce: ${nonce}
+    
+    Issued At: ${date}
+    
+    Request ID: ${requestId}
+            `;
+
 // Function to generate a unique request ID
 export function generateRequestId() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -111,6 +130,12 @@ export const verifyPaymentTransaction = async (
     // If both checks pass
     return true;
 };
+
+export const isValidWalletAddress = (address: string): boolean => {
+    const regex = /^(kaspa|kaspatest):q[a-z0-9]{54,90}$/;
+    return regex.test(address);
+};
+
 export const isEmptyString = (value: string): boolean => !value || value.trim() === '';
 
 export const isEmptyArray = <T>(value: T[]): boolean => !value || value.length === 0;
@@ -142,7 +167,6 @@ export const checkTokenDeployment = async (ticker: string): Promise<boolean> => 
 
     while (retryCount < maxRetries) {
         try {
-            console.log('Checking token deployment:', ticker, retryCount);
             const token = await fetchTokenInfo(ticker, true); // Make API call to check token info
 
             if (token && token.state === 'deployed') {
@@ -165,3 +189,67 @@ export const kasToSompi = (kas: number): number => {
     const sompi = (kas * 1e8).toFixed(0);
     return parseFloat(sompi);
 };
+
+export const doPolling = async <T>(
+    fn: () => Promise<T>,
+    endFunction: (T) => boolean,
+    interval = 3000,
+    maxRetries = -1,
+): Promise<T> => {
+    let result: T = await fn();
+    let currentRetries = 0;
+
+    while (!(await endFunction(result))) {
+        await new Promise((resolve) => setTimeout(resolve, interval));
+        currentRetries++;
+
+        if (currentRetries === maxRetries) {
+            throw new Error('Max retries reached');
+        }
+
+        result = await fn();
+    }
+
+    return result;
+};
+
+export const cleanFilters = (filters: any) => {
+    if (!filters) return {}; // If filters is undefined, return an empty object
+
+    return Object.keys(filters).reduce(
+        (acc, key) => {
+            const value = filters[key];
+
+            // Skip undefined, null, or empty arrays
+            if (value === undefined || value === null || (Array.isArray(value) && value.length === 0)) {
+                return acc;
+            }
+
+            // Otherwise, include the filter in the new object
+            acc[key] = value;
+            return acc;
+        },
+        {} as Record<string, any>,
+    );
+};
+
+export function mapSellOrderStatusToDisplayText(status: SellOrderStatus): string {
+    const statusMap: Record<SellOrderStatus, string> = {
+        [SellOrderStatus.WAITING_FOR_TOKENS]: 'Waiting for Tokens',
+        [SellOrderStatus.LISTED_FOR_SALE]: 'Listed for Sale',
+        [SellOrderStatus.WAITING_FOR_KAS]: 'Waiting for KAS',
+        [SellOrderStatus.CHECKOUT]: 'Checkout in Progress',
+        [SellOrderStatus.WAITING_FOR_LOW_FEE]: 'Waiting for Low Fee',
+        [SellOrderStatus.COMPLETED]: 'Completed',
+        [SellOrderStatus.CANCELED]: 'Canceled',
+        [SellOrderStatus.SWAP_ERROR]: 'Swap Error',
+        [SellOrderStatus.CHECKING_EXPIRED]: 'Checking Expiration',
+        [SellOrderStatus.UNKNOWN_MONEY_ERROR]: 'Unknown Money Error',
+        [SellOrderStatus.OFF_MARKETPLACE]: 'Off Marketplace',
+        [SellOrderStatus.DELISTING]: 'Delisting in Progress',
+        [SellOrderStatus.DELIST_ERROR]: 'Delisting Error',
+        [SellOrderStatus.COMPLETED_DELISTING]: 'Delisting Completed',
+    };
+
+    return statusMap[status] || 'Unknown Status';
+}

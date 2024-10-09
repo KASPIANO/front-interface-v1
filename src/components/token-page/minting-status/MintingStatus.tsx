@@ -1,11 +1,9 @@
 import { FC, useEffect, useState } from 'react';
 import { Box, Button, Card, Tooltip, Typography } from '@mui/material';
 import { BackendTokenResponse } from '../../../types/Types';
-import { getCurrentAccount, mintKRC20Token } from '../../../utils/KaswareUtils';
+import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { fetchTokenByTicker } from '../../../DAL/BackendDAL';
-import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
-import { setWalletBalanceUtil } from '../../../utils/Utils';
 
 interface MintingComponentProps {
     tokenInfo: BackendTokenResponse;
@@ -13,11 +11,10 @@ interface MintingComponentProps {
     walletBalance: number;
     walletAddress: string | null;
     setTokenInfo: (tokenInfo: BackendTokenResponse) => void;
-    setWalletBalance: (balance: number) => void;
 }
 
 const MintingComponent: FC<MintingComponentProps> = (props) => {
-    const { tokenInfo, walletConnected, walletBalance, setWalletBalance, setTokenInfo, walletAddress } = props;
+    const { tokenInfo, walletConnected, walletBalance, setTokenInfo, walletAddress } = props;
     // Calculate the total mints possible and mints left
     const [mintSuccessful, setMintSuccessful] = useState(false);
     const totalMintableSupply = tokenInfo.totalSupply - tokenInfo.preMintedSupply;
@@ -30,10 +27,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
         if (mintSuccessful) {
             const timer = setTimeout(async () => {
                 try {
-                    const account = await getCurrentAccount();
-                    const updatedTokenData = await fetchTokenByTicker(tokenInfo.ticker, walletAddress, false);
-                    const balance = await fetchWalletBalance(account);
-                    setWalletBalance(setWalletBalanceUtil(balance));
+                    const updatedTokenData = await fetchTokenByTicker(tokenInfo.ticker, walletAddress, true);
                     setTokenInfo(updatedTokenData);
                     setMintSuccessful(false);
                 } catch (error) {
@@ -71,13 +65,12 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
         try {
             const mint = await mintKRC20Token(inscribeJsonString);
             if (mint) {
-                console.log(mint);
-                const { commit, reveal } = JSON.parse(mint);
+                const { commitId, revealId } = JSON.parse(mint);
                 showGlobalSnackbar({
                     message: 'Token minted successfully',
                     severity: 'success',
-                    commit,
-                    reveal,
+                    commitId,
+                    revealId,
                 });
             }
             setMintSuccessful(true);
@@ -99,7 +92,11 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
             }}
         >
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold' }}>
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ fontWeight: 'bold', fontSize: '0.75rem' }}
+                >
                     MINT STATUS
                 </Typography>
                 <Typography color="text.secondary" sx={{ fontWeight: 500, fontSize: '0.7rem' }}>
@@ -116,6 +113,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                     rowGap: '1vh',
                 }}
             >
+                {/* Total Mints */}
                 <Box
                     sx={{
                         display: 'flex',
@@ -127,16 +125,16 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                 >
                     {/* Total Mints */}
                     <Box sx={{ marginRight: '2vw', textAlign: 'center' }}>
-                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 'bold' }}>Total Mints</Typography>
-                        <Typography sx={{ fontSize: '0.8rem' }}>
+                        <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>Total Mints</Typography>
+                        <Typography sx={{ fontSize: '0.7rem' }}>
                             {isSoldOut ? totalMintsPossible : tokenInfo.totalMintTimes} / {totalMintsPossible}
                         </Typography>
                     </Box>
 
                     {/* Mints Left */}
                     <Box sx={{ textAlign: 'center' }}>
-                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 'bold' }}>Mints Left</Typography>
-                        <Typography sx={{ fontSize: '0.8rem' }}>{isSoldOut ? '0' : mintsLeft}</Typography>
+                        <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>Mints Left</Typography>
+                        <Typography sx={{ fontSize: '0.7rem' }}>{isSoldOut ? '0' : mintsLeft}</Typography>
                     </Box>
                 </Box>
                 {/* Right Side: Mint Button */}
@@ -160,6 +158,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                                 fontSize: '0.7rem',
                                 width: '100%',
                             }}
+                            sx={{ mt: '0.5rem' }}
                             disabled={isMintingDisabled || !walletConnected || walletBalance < 1 || isSoldOut}
                         >
                             {isMintingDisabled || isSoldOut ? 'Sold Out' : 'Mint'}

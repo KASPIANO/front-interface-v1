@@ -13,7 +13,6 @@ const useSSE = (walletId: string) => {
 
         // Handle incoming messages
         eventSource.onmessage = (event) => {
-            debugger;
             const data = JSON.parse(event.data);
             setEvents((prevEvents) => [...prevEvents, data]);
         };

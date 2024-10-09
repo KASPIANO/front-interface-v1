@@ -285,3 +285,55 @@ export interface KaswareSendKaspaResult {
     subnetworkId: string;
     version: number;
 }
+
+export interface Order {
+    orderId: string;
+    quantity: number;
+    totalPrice: number;
+    pricePerToken: number;
+    ticker: string;
+    createdAt: string;
+    status: SellOrderStatus;
+}
+
+export interface SwapTransactionsResult {
+    readonly commitTransactionId?: string;
+    readonly revealTransactionId?: string;
+    readonly sellerTransactionId?: string;
+    readonly buyerTransactionId?: string;
+}
+
+export enum SellOrderStatus {
+    WAITING_FOR_TOKENS = 'WAITING_FOR_TOKENS',
+    LISTED_FOR_SALE = 'LISTED_FOR_SALE',
+    WAITING_FOR_KAS = 'WAITING_FOR_KAS',
+    CHECKOUT = 'CHECKOUT',
+    WAITING_FOR_LOW_FEE = 'WAITING_FOR_LOW_FEE',
+    COMPLETED = 'COMPLETED',
+    CANCELED = 'CANCELED',
+    SWAP_ERROR = 'SWAP_ERROR',
+    CHECKING_EXPIRED = 'CHECKING_EXPIRED',
+    UNKNOWN_MONEY_ERROR = 'UNKNOWN_MONEY_ERROR',
+    OFF_MARKETPLACE = 'OFF_MARKETPLACE',
+    DELISTING = 'DELISTING',
+    DELIST_ERROR = 'DELIST_ERROR',
+    COMPLETED_DELISTING = 'COMPLETED_DELISTING',
+}
+export type FilterSellOrderStatus =
+    | SellOrderStatus.LISTED_FOR_SALE
+    | SellOrderStatus.COMPLETED
+    | SellOrderStatus.OFF_MARKETPLACE
+    | SellOrderStatus.COMPLETED_DELISTING;
+
+export const filterSellOrderStatuses: FilterSellOrderStatus[] = [
+    SellOrderStatus.LISTED_FOR_SALE,
+    SellOrderStatus.COMPLETED,
+    SellOrderStatus.OFF_MARKETPLACE,
+    SellOrderStatus.COMPLETED_DELISTING,
+];
+
+export type UserReferral = {
+    code: string;
+    referredBy?: string;
+    isNew?: boolean;
+};

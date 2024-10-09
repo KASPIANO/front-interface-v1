@@ -1,22 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Box, IconButton, InputAdornment, Typography } from '@mui/material';
+import { Box, IconButton, InputAdornment, Tooltip, Typography } from '@mui/material';
 import { BackendTokenResponse, TransferObj } from '../../../../../types/Types';
 import { StyledButton, StyledSellPanel, StyledTextField } from './SellPanel.s';
 import { fetchWalletKRC20Balance } from '../../../../../DAL/Krc20DAL';
 import { SwapHoriz } from '@mui/icons-material'; // MUI icon for swap
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
-import { transferKRC20Token } from '../../../../../utils/KaswareUtils';
+import { MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION, transferKRC20Token } from '../../../../../utils/KaswareUtils';
+import { confirmSellOrder, createSellOrder } from '../../../../../DAL/BackendP2PDAL';
+import { doPolling } from '../../../../../utils/Utils';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface SellPanelProps {
     tokenInfo: BackendTokenResponse;
     kasPrice: number;
     walletAddress: string | null;
     walletConnected;
+    walletBalance: number;
 }
 
+const KASPA_TO_SOMPI = 100000000;
+
 const SellPanel: React.FC<SellPanelProps> = (props) => {
-    const { tokenInfo, kasPrice, walletAddress, walletConnected } = props;
+    const { tokenInfo, kasPrice, walletAddress, walletConnected, walletBalance } = props;
     const [tokenAmount, setTokenAmount] = useState<string>(''); // Changed to string
     const [totalPrice, setTotalPrice] = useState<string>(''); // Changed to string
     const [pricePerToken, setPricePerToken] = useState<string>(''); // Changed to string
@@ -25,15 +31,28 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [priceCurrency, setPriceCurrency] = useState<'KAS' | 'USD'>('KAS');
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false); // Dialog state
     const [walletConfirmation, setWalletConfirmation] = useState<boolean>(false);
+    const [orderId, setOrderId] = useState<string>('');
+    const [tempWalletAddress, setTempWalletAddress] = useState<string>('');
+    const [creatingSellOrder, setCreatingSellOrder] = useState<boolean>(false);
+    const [disableSellButton, setDisableSellButton] = useState<boolean>(false);
+    const [finishedSellOrder, setFinishedSellOrder] = useState<boolean>(false);
+    const [amountError, setAmountError] = useState<string>('');
+    const [pricePerTokenError, setPricePerTokenError] = useState<string>('');
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         fetchWalletKRC20Balance(walletAddress, tokenInfo.ticker).then((balance) => {
             setWalletTickerBalance(balance);
         });
-    }, [walletAddress, tokenInfo.ticker]);
+    }, [walletAddress, tokenInfo.ticker, finishedSellOrder]);
 
     const handleTokenAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const amountStr = e.target.value;
+        if (amountStr.includes('.')) {
+            setAmountError('Please enter a rounded number without decimals.');
+            return;
+        }
+        setAmountError('');
         setTokenAmount(amountStr);
 
         const amount = parseInt(amountStr);
@@ -46,9 +65,11 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 setPricePerToken(newPricePerToken.toString());
             } else if (!isNaN(pricePerTokenValue)) {
                 const newTotalPrice = pricePerTokenValue * amount;
-                setTotalPrice(newTotalPrice.toString());
+                const fixedTotalPrice = handleTotalPriceDecimals(newTotalPrice.toString());
+                setTotalPrice(fixedTotalPrice);
             }
         } else {
+            setTokenAmount('');
             setPricePerToken('');
             setTotalPrice('');
         }
@@ -57,9 +78,18 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     // Handle changes in total price
     const handleTotalPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const priceStr = e.target.value;
-        setTotalPrice(priceStr);
+        let totalRounded;
+        if (priceStr.includes('.')) {
+            setTotalPrice(parseFloat(priceStr).toFixed(0));
+            totalRounded = parseFloat(priceStr).toFixed(0);
+            setPricePerTokenError('Please enter a rounded number without decimals.');
+        } else {
+            totalRounded = priceStr;
+            setTotalPrice(priceStr);
+            setPricePerTokenError('');
+        }
 
-        const total = parseFloat(priceStr);
+        const total = parseFloat(totalRounded);
         const amount = parseInt(tokenAmount);
 
         if (!isNaN(total)) {
@@ -68,6 +98,14 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             }
         } else {
             setPricePerToken('');
+        }
+    };
+    const handleTotalPriceDecimals = (totalPrice) => {
+        if (totalPrice.includes('.')) {
+            setTotalPrice(parseFloat(totalPrice).toFixed(0));
+            return parseFloat(totalPrice).toFixed(0);
+        } else {
+            return totalPrice;
         }
     };
 
@@ -81,7 +119,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         if (!isNaN(pricePerTokenValue)) {
             if (!isNaN(amount) && amount > 0) {
                 const newTotalPrice = pricePerTokenValue * amount;
-                setTotalPrice(newTotalPrice.toString());
+                const fixedTotalPrice = handleTotalPriceDecimals(newTotalPrice.toString());
+                setTotalPrice(fixedTotalPrice);
             }
         } else {
             setTotalPrice('');
@@ -99,6 +138,14 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     }, [pricePerToken, tokenInfo.price]);
 
     const handleSetPricePerToken = (multiplier: number) => {
+        if (!tokenInfo.price) {
+            showGlobalSnackbar({ message: 'No Token Floor Price Exists', severity: 'error' });
+            return;
+        }
+        if (tokenAmount === '') {
+            showGlobalSnackbar({ message: 'Please enter a valid token amount.', severity: 'error' });
+            return;
+        }
         const newPricePerTokenValue = tokenInfo.price * multiplier;
         const roundedPricePerToken = roundUp(newPricePerTokenValue, 8);
         setPricePerToken(roundedPricePerToken.toString());
@@ -106,8 +153,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         const amount = parseInt(tokenAmount);
         if (!isNaN(amount) && amount > 0) {
             const newTotalPrice = newPricePerTokenValue * amount;
-            const roundedTotalPrice = roundUp(newTotalPrice, 8);
-            setTotalPrice(roundedTotalPrice.toString());
+            const roundedTotalPrice = handleTotalPriceDecimals(newTotalPrice.toString());
+            setTotalPrice(roundedTotalPrice);
         }
     };
 
@@ -147,19 +194,78 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             }
         }
     };
+    const cleanFields = () => {
+        setTokenAmount('');
+        setTotalPrice('');
+        setPricePerToken('');
+    };
 
-    const handleCreateSellOrder = () => {
+    const handleCreateSellOrder = async () => {
+        setDisableSellButton(true);
+        if (priceCurrency === 'USD') {
+            setPriceCurrency('KAS');
+            if (totalPrice !== '') {
+                const totalPriceValue = parseFloat(totalPrice);
+                const totalInKAS = totalPriceValue / kasPrice;
+                const roundedTotalInKAS = roundUp(totalInKAS, 8);
+                setTotalPrice(roundedTotalInKAS.toString());
+            }
+            if (pricePerToken !== '') {
+                const pricePerTokenValue = parseFloat(pricePerToken);
+                const priceInKAS = pricePerTokenValue / kasPrice;
+                const roundedPriceInKAS = roundUp(priceInKAS, 8);
+                setPricePerToken(roundedPriceInKAS.toString());
+            }
+        }
+
         const amount = parseInt(tokenAmount);
         if (isNaN(amount) || amount <= 0) {
             showGlobalSnackbar({ message: 'Please enter a valid token amount.', severity: 'error' });
+            setDisableSellButton(false);
             return;
         }
         if (amount > walletTickerBalance) {
             showGlobalSnackbar({ message: 'Insufficient Token balance.', severity: 'error' });
+            setDisableSellButton(false);
             return;
         }
-        // Retrieve wallet temp wallert address and order id and set it
-        setIsDialogOpen(true);
+
+        if (walletBalance <= MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION) {
+            showGlobalSnackbar({
+                message: `Minimum wallet balance need to be ${MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION} KAS in order to transfer the tokens.`,
+                severity: 'error',
+            });
+            setDisableSellButton(false);
+            return;
+        }
+
+        if (parseInt(totalPrice) < 25) {
+            showGlobalSnackbar({
+                message: 'Please enter a valid total price has to be more than 25 KAS',
+                severity: 'error',
+            });
+            setDisableSellButton(false);
+            return;
+        }
+        try {
+            // Retrieve wallet temp wallert address and order id and set it
+            const { id, temporaryWalletAddress } = await createSellOrder(
+                tokenInfo.ticker,
+                amount,
+                parseInt(totalPrice),
+                parseFloat(pricePerToken),
+                walletAddress,
+            );
+            setIsDialogOpen(true);
+            setOrderId(id);
+            setTempWalletAddress(temporaryWalletAddress);
+        } catch (error) {
+            console.error(error);
+            showGlobalSnackbar({
+                message: 'Failed to create sell order for the token. Please try again later.',
+                severity: 'error',
+            });
+        }
     };
 
     const handleTransfer = async () => {
@@ -167,8 +273,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             p: 'KRC-20',
             op: 'transfer',
             tick: tokenInfo.ticker,
-            amt: (parseInt(tokenAmount) * 100000000).toString(),
-            to: '0x',
+            amt: (parseInt(tokenAmount) * KASPA_TO_SOMPI).toString(),
+            to: tempWalletAddress,
         };
         const jsonStringified = JSON.stringify(inscribeJsonString);
 
@@ -176,17 +282,40 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             setWalletConfirmation(true);
             const result = await transferKRC20Token(jsonStringified);
             setWalletConfirmation(false);
+            setCreatingSellOrder(true);
             if (result) {
-                const { commit, reveal } = JSON.parse(result);
-
+                const { commitId, revealId } = JSON.parse(result);
                 showGlobalSnackbar({
                     message: 'Token transferred successfully',
                     severity: 'success',
-                    commit,
-                    reveal,
+                    commitId,
+                    revealId,
                 });
             }
-            return true;
+            const confirmation = await doPolling(
+                () => confirmSellOrder(orderId),
+                (result) => result.confirmed,
+            );
+
+            if (confirmation) {
+                setDisableSellButton(false);
+                showGlobalSnackbar({
+                    message: 'Sell order confirmed successfully',
+                    severity: 'success',
+                });
+                setIsDialogOpen(false);
+                setCreatingSellOrder(false);
+                cleanFields();
+                queryClient.invalidateQueries({ queryKey: ['orders'] });
+                setFinishedSellOrder((prev) => !prev);
+                return true;
+            } else {
+                showGlobalSnackbar({
+                    message: 'Failed to confirm sell order',
+                    severity: 'error',
+                });
+                return false;
+            }
         } catch (error) {
             setWalletConfirmation(false);
             showGlobalSnackbar({
@@ -198,18 +327,9 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         }
     };
 
-    const handleConfirmSellOrder = async () => {
-        // Close the dialog
-        setIsDialogOpen(false);
-        const status = await handleTransfer();
-        // Backend sell order confirmation created
-        if (status) {
-            showGlobalSnackbar({ message: 'Sell order created successfully.', severity: 'success' });
-        }
-    };
-
     const handleCloseDialog = () => {
         setIsDialogOpen(false);
+        setDisableSellButton(false);
     };
 
     const currencyAdornment = (
@@ -240,17 +360,33 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     );
 
     const buttons = (
-        <Box sx={{ display: 'flex', gap: '0.3rem', mb: '0.5rem' }}>
-            <StyledButton onClick={() => handleSetPricePerToken(1)} variant="contained">
+        <Box sx={{ display: 'flex', gap: '0.3rem', mb: '0.5rem', justifyContent: 'center' }}>
+            <StyledButton
+                disabled={!tokenInfo.price}
+                onClick={() => handleSetPricePerToken(1)}
+                variant="contained"
+            >
                 Floor
             </StyledButton>
-            <StyledButton onClick={() => handleSetPricePerToken(1.01)} variant="contained">
+            <StyledButton
+                disabled={!tokenInfo.price}
+                onClick={() => handleSetPricePerToken(1.01)}
+                variant="contained"
+            >
                 +1%
             </StyledButton>
-            <StyledButton onClick={() => handleSetPricePerToken(1.05)} variant="contained">
+            <StyledButton
+                disabled={!tokenInfo.price}
+                onClick={() => handleSetPricePerToken(1.05)}
+                variant="contained"
+            >
                 +5%
             </StyledButton>
-            <StyledButton onClick={() => handleSetPricePerToken(1.1)} variant="contained">
+            <StyledButton
+                disabled={!tokenInfo.price}
+                onClick={() => handleSetPricePerToken(1.1)}
+                variant="contained"
+            >
                 +10%
             </StyledButton>
         </Box>
@@ -264,6 +400,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     value={tokenAmount}
                     onChange={handleTokenAmountChange}
                     fullWidth
+                    error={!!amountError}
+                    helperText={amountError}
                 />
 
                 <StyledTextField
@@ -274,6 +412,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     InputProps={{
                         endAdornment: currencyAdornment,
                     }}
+                    error={!!pricePerTokenError}
+                    helperText={pricePerTokenError}
                 />
                 <StyledTextField
                     label={`Price per Token (${priceCurrency})`}
@@ -284,11 +424,20 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                         endAdornment: currencyAdornment,
                     }}
                 />
-                {pricePerToken !== '' && (
-                    <Typography variant="body2" sx={{ fontWeigh: 300, ml: '0.15rem' }}>
-                        {`Price per token is ${
-                            priceDifference > 0 ? '+' : ''
-                        }${priceDifference.toFixed(2)}% compared to the floor price.`}
+                {pricePerToken !== '' && tokenInfo.price !== 0 && (
+                    <Typography variant="body2" sx={{ ml: '0.15rem' }}>
+                        {'Price per token is '}
+                        <Typography
+                            component="span"
+                            sx={{
+                                fontWeight: 'bold',
+                                color: priceDifference > 0 ? '#4caf50' : '#f44336',
+                            }}
+                        >
+                            {priceDifference > 0 ? '+' : '-'}
+                            {priceDifference.toFixed(2)}%
+                        </Typography>
+                        {' compared to the floor price.'}
                     </Typography>
                 )}
                 <Box
@@ -309,21 +458,37 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     >{`${walletTickerBalance} ${tokenInfo.ticker}`}</Typography>
                 </Box>
 
-                <StyledButton
-                    sx={{ marginTop: 'auto' }}
-                    variant="contained"
-                    onClick={handleCreateSellOrder}
-                    fullWidth
-                    disabled={!walletConnected}
+                <Tooltip
+                    title={
+                        !walletConnected
+                            ? 'Connect your wallet to create a sell order'
+                            : walletTickerBalance === 0
+                              ? 'You do not have enough tokens to create a sell order'
+                              : disableSellButton
+                                ? 'Creating Your Sell Order...'
+                                : ''
+                    }
                 >
-                    Create Sell Order
-                </StyledButton>
+                    <span style={{ marginTop: 'auto' }}>
+                        {/* Wrapping in a <span> to avoid Tooltip being disabled when the button is disabled */}
+                        <StyledButton
+                            sx={{ marginTop: 'auto' }}
+                            variant="contained"
+                            onClick={handleCreateSellOrder}
+                            fullWidth
+                            disabled={!walletConnected || walletTickerBalance === 0 || disableSellButton}
+                        >
+                            {disableSellButton ? 'Creating Your Sell Order...' : 'Create Sell Order'}
+                        </StyledButton>
+                    </span>
+                </Tooltip>
             </StyledSellPanel>
             <ConfirmSellDialog
+                creatingSellOrder={creatingSellOrder}
                 waitingForWalletConfirmation={walletConfirmation}
                 open={isDialogOpen}
                 onClose={handleCloseDialog}
-                onConfirm={handleConfirmSellOrder}
+                onConfirm={handleTransfer}
                 ticker={tokenInfo.ticker}
                 tokenAmount={tokenAmount}
                 totalPrice={totalPrice}

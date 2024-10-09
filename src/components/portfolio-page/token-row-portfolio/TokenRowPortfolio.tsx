@@ -90,13 +90,13 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
             const result = await transferKRC20Token(jsonStringified);
             setWalletConfirmation(false);
             if (result) {
-                const { commit, reveal } = JSON.parse(result);
+                const { commitId, revealId } = JSON.parse(result);
 
                 showGlobalSnackbar({
                     message: 'Token transferred successfully',
                     severity: 'success',
-                    commit,
-                    reveal,
+                    commitId,
+                    revealId,
                 });
                 handleChange();
                 handleTransferDialogClose();
@@ -135,12 +135,12 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
         try {
             const mint = await mintKRC20Token(inscribeJsonString);
             if (mint) {
-                const { commit, reveal } = JSON.parse(mint);
+                const { commitId, revealId } = JSON.parse(mint);
                 showGlobalSnackbar({
                     message: 'Token Mint successfully',
                     severity: 'success',
-                    commit,
-                    reveal,
+                    commitId,
+                    revealId,
                 });
             }
             handleChange();
@@ -207,7 +207,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                         }}
                         primary={
                             <Tooltip title={token.ticker}>
-                                <Typography variant="body1" sx={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
+                                <Typography variant="body1" sx={{ fontSize: '0.75rem', fontWeight: 'bold' }}>
                                     {capitalizeFirstLetter(token.ticker)}
                                 </Typography>
                             </Tooltip>
@@ -215,18 +215,18 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                     />
 
                     <ListItemText
-                        sx={{ width: '12vw' }}
+                        sx={{ width: '13vw' }}
                         primary={
                             <Typography
                                 variant="body1"
                                 style={{
-                                    fontSize: '0.8rem',
+                                    fontSize: '0.75rem',
                                     fontWeight: 'bold',
                                     display: 'flex',
                                     justifyContent: 'center',
                                 }}
                             >
-                                {token.price.toFixed(6)} KAS
+                                {token.price ? token.price.toFixed(6) : 0} KAS
                             </Typography>
                         }
                     />
@@ -236,7 +236,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                             <Typography
                                 variant="body1"
                                 style={{
-                                    fontSize: '0.8rem',
+                                    fontSize: '0.75rem',
                                     fontWeight: 'bold',
                                     display: 'flex',
                                     justifyContent: 'center',
@@ -252,7 +252,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                             <Typography
                                 variant="body1"
                                 style={{
-                                    fontSize: '0.8rem',
+                                    fontSize: '0.75rem',
                                     fontWeight: 'bold',
                                     display: 'flex',
                                     justifyContent: 'center',
@@ -267,10 +267,10 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '2vw',
-                            width: '27.5vw',
+                            gap: '1rem',
+                            width: '26vw',
                             justifyContent: 'center',
-                            paddingRight: '14vw',
+                            paddingRight: '6rem',
                         }}
                     >
                         <Button

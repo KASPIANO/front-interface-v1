@@ -43,8 +43,14 @@ const ReviewListTokenDialog: React.FC<ReviewListTokenDialogProps> = (props) => {
             return value;
         }
     };
+    const handleClose = () => {
+        if (isSavingData) {
+            return; // Prevent closing if deploying or waiting for confirmation
+        }
+        onClose();
+    };
     return (
-        <Dialog open={open} onClose={onClose}>
+        <Dialog open={open} onClose={handleClose}>
             <DialogTitle sx={{ fontWeight: 'bold' }}>Review Token Listing</DialogTitle>
             <DialogContent>
                 {isSavingData ? (
@@ -71,23 +77,25 @@ const ReviewListTokenDialog: React.FC<ReviewListTokenDialogProps> = (props) => {
                     </>
                 )}
             </DialogContent>
-            <DialogActions>
-                <Box sx={{ flexGrow: 1 }}>
-                    <Button onClick={onClose}>Cancel</Button>
-                </Box>
-                <Tooltip title={!walletConnected ? 'Please connect your wallet to List' : ''}>
-                    <span>
-                        <Button
-                            disabled={disableList || !walletConnected}
-                            onClick={handleList}
-                            variant="contained"
-                            color="primary"
-                        >
-                            {isSavingData ? 'Listing Token...' : 'List Token & Pay'}
-                        </Button>
-                    </span>
-                </Tooltip>
-            </DialogActions>
+            {isSavingData ? null : (
+                <DialogActions>
+                    <Box sx={{ flexGrow: 1 }}>
+                        <Button onClick={onClose}>Cancel</Button>
+                    </Box>
+                    <Tooltip title={!walletConnected ? 'Please connect your wallet to List' : ''}>
+                        <span>
+                            <Button
+                                disabled={disableList || !walletConnected || isSavingData}
+                                onClick={handleList}
+                                variant="contained"
+                                color="primary"
+                            >
+                                {isSavingData ? 'Listing Token...' : 'List Token & Pay'}
+                            </Button>
+                        </span>
+                    </Tooltip>
+                </DialogActions>
+            )}
         </Dialog>
     );
 };

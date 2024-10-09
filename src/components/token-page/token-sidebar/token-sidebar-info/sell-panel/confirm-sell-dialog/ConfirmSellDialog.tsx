@@ -1,5 +1,5 @@
 // ConfirmSellDialog.tsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -8,8 +8,11 @@ import {
     Button,
     Typography,
     Box,
-    CircularProgress,
+    Divider,
 } from '@mui/material';
+import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
+import { HighGasWarning } from '../../../../../common/HighGasWarning';
+import { highGasWarning } from '../../../../../../DAL/KaspaApiDal';
 
 interface ConfirmSellDialogProps {
     open: boolean;
@@ -21,8 +24,10 @@ interface ConfirmSellDialogProps {
     pricePerToken: string;
     priceCurrency: 'KAS' | 'USD';
     waitingForWalletConfirmation: boolean;
+    creatingSellOrder: boolean;
 }
-
+const MINIMUM_FEE_AMOUNT = 1;
+const MARKETLACE_FEE_PERCENTAGE = 0.025;
 const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
     const {
         waitingForWalletConfirmation,
@@ -34,26 +39,47 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
         totalPrice,
         pricePerToken,
         priceCurrency,
+        creatingSellOrder,
     } = props;
+    const [showHighGasWarning, setShowHighGasWarning] = useState(false);
+    useEffect(() => {
+        const checkGasLimits = async () => {
+            const isHighGasWarning = await highGasWarning('TRANSFER');
+
+            setShowHighGasWarning(isHighGasWarning);
+        };
+
+        checkGasLimits();
+    }, []);
+
     const handleClose = () => {
-        if (waitingForWalletConfirmation) {
+        if (waitingForWalletConfirmation || creatingSellOrder) {
             return; // Prevent closing if waiting
         }
         onClose();
     };
+    const marketplaceFeeString = `${MARKETLACE_FEE_PERCENTAGE * 100}%`;
+    const calculateAmountReceived = () => {
+        const total = parseFloat(totalPrice);
+        if (total * MARKETLACE_FEE_PERCENTAGE < MINIMUM_FEE_AMOUNT) {
+            return total - MINIMUM_FEE_AMOUNT;
+        } else {
+            return (total - total * MARKETLACE_FEE_PERCENTAGE).toFixed(2);
+        }
+    };
     return (
         <Dialog open={open} onClose={handleClose}>
-            <DialogTitle sx={{ fontWeight: 'bold' }}>Confirm Sell Order</DialogTitle>
+            <DialogTitle sx={{ fontWeight: 'bold' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {waitingForWalletConfirmation || creatingSellOrder ? '' : 'Confirm Sell Order'}
+                    {showHighGasWarning && <HighGasWarning />}
+                </Box>
+            </DialogTitle>
             <DialogContent>
                 {waitingForWalletConfirmation ? (
-                    <>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                            <CircularProgress size={24} sx={{ mr: 2 }} />
-                            <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                                Processing transaction...
-                            </Typography>
-                        </Box>
-                    </>
+                    <LoadingSpinner title="Waiting for wallet confirmation..." size={60} />
+                ) : creatingSellOrder ? (
+                    <LoadingSpinner title="Creating sell order..." size={60} />
                 ) : (
                     <>
                         <Box sx={{ mt: 1 }}>
@@ -70,18 +96,39 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                                 <strong>Price per Token ({priceCurrency}):</strong> {pricePerToken}
                             </Typography>
                         </Box>
-                        <Typography variant="body2" sx={{ mt: 2 }}>
-                            Please confirm that you want to create this sell order.
-                        </Typography>
+                        <Divider sx={{ my: 2 }} />
+                        <Box sx={{ bgcolor: 'info.light', p: 2, borderRadius: 1 }}>
+                            <Typography variant="body1" gutterBottom>
+                                By confirming this sell order:
+                            </Typography>
+                            <Typography variant="body2" paragraph>
+                                • You will receive{' '}
+                                <strong>
+                                    {calculateAmountReceived()} {priceCurrency}
+                                </strong>{' '}
+                                when the token is sold.
+                            </Typography>
+                            <Typography variant="body2">
+                                • Kaspiano will apply a {marketplaceFeeString} marketplace fee or a minimum fee of{' '}
+                                {MINIMUM_FEE_AMOUNT} KAS.{' '}
+                            </Typography>
+                        </Box>
                     </>
                 )}
             </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={onConfirm} variant="contained" color="primary">
-                    Confirm
-                </Button>
-            </DialogActions>
+            {waitingForWalletConfirmation || creatingSellOrder ? null : (
+                <DialogActions>
+                    <Button onClick={onClose}>Cancel</Button>
+                    <Button
+                        onClick={onConfirm}
+                        variant="contained"
+                        color="primary"
+                        disabled={waitingForWalletConfirmation || creatingSellOrder}
+                    >
+                        Confirm
+                    </Button>
+                </DialogActions>
+            )}
         </Dialog>
     );
 };

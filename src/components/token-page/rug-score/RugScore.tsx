@@ -10,7 +10,6 @@ interface RugScoreProps {
     score: number | null;
     xHandle: boolean;
     onRecalculate: () => void;
-    setWalletBalance: (balance: number) => void;
     walletBalance: number;
     ticker: string;
     walletConnected: boolean;
@@ -24,7 +23,6 @@ const RugScore: FC<RugScoreProps> = (props) => {
         score,
         xHandle,
         onRecalculate,
-        setWalletBalance,
         walletBalance,
         ticker,
         walletConnected,
@@ -56,11 +54,20 @@ const RugScore: FC<RugScoreProps> = (props) => {
         >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold', mr: 1 }}>
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ fontWeight: 'bold', mr: 1, fontSize: '0.75rem' }}
+                    >
                         RUG SCORE
                     </Typography>
                     <Tooltip title="The Rug Score is an algorithm based on token collection metrics and social media footprints. The score ranges from 1 to 100, with 100 being the best. It represents the collection's transparency and trustworthiness. If you find the score unsatisfactory, you can send a request to review it with the 'Send Request' button near the token header.">
-                        <InfoOutlinedIcon fontSize="small" />
+                        <InfoOutlinedIcon
+                            sx={{
+                                fontSize: '0.9rem',
+                            }}
+                            fontSize="small"
+                        />
                     </Tooltip>
                 </Box>
                 {xHandle && (
@@ -81,7 +88,11 @@ const RugScore: FC<RugScoreProps> = (props) => {
                                     padding: 0,
                                 }}
                             >
-                                <RefreshIcon />
+                                <RefreshIcon
+                                    sx={{
+                                        fontSize: '1rem',
+                                    }}
+                                />
                             </IconButton>
                         )}
                     </Tooltip>
@@ -101,6 +112,7 @@ const RugScore: FC<RugScoreProps> = (props) => {
                         display: 'flex',
                         justifyContent: 'center',
                         mt: '3vh',
+                        fontSize: '0.8rem',
                     }}
                 >
                     NO SCORE - Send New Request
@@ -113,7 +125,6 @@ const RugScore: FC<RugScoreProps> = (props) => {
                 onClose={() => setShowInfoForm(false)}
                 walletConnected={walletConnected}
                 setTokenInfo={setTokenInfo}
-                setWalletBalance={setWalletBalance}
                 walletBalance={walletBalance}
                 walletAddress={walletAddress}
                 ticker={ticker}

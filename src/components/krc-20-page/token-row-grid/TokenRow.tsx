@@ -62,12 +62,12 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
         try {
             const mint = await mintKRC20Token(inscribeJsonString);
             if (mint) {
-                const { commit, reveal } = JSON.parse(mint);
+                const { commitId, revealId } = JSON.parse(mint);
                 showGlobalSnackbar({
                     message: 'Token minted successfully',
                     severity: 'success',
-                    commit,
-                    reveal,
+                    commitId,
+                    revealId,
                 });
             }
         } catch (error) {

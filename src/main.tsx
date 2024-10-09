@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import { ThemeModes } from './utils/Utils.ts';
+import { LOCAL_STORAGE_KEYS } from './utils/Constants.ts';
 
 const queryClient = new QueryClient();
 // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -21,6 +22,13 @@ if (!(container as any).__root) {
     (container as any).__root = root;
 } else {
     root = (container as any).__root;
+}
+
+// Set referal code on local storage
+const urlParams = new URLSearchParams(window.location.search);
+const referralCode = urlParams.get('ref');
+if (referralCode && referralCode.trim().length > 0) {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.REFFERAL_CODE, referralCode);
 }
 
 // Render the App component

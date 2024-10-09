@@ -5,15 +5,13 @@ import { TransferObj } from '../../types/Types';
 import { parse } from 'papaparse'; // For CSV parsing
 import { showGlobalSnackbar } from '../alert-context/AlertContext';
 import FileDownloadIconRounded from '@mui/icons-material/FileDownloadRounded';
-import { setWalletBalanceUtil, verifyPaymentTransaction } from '../../utils/Utils';
-import { fetchWalletBalance } from '../../DAL/KaspaApiDal';
+import { verifyPaymentTransaction } from '../../utils/Utils';
 import { UploadButton } from '../../pages/deploy-page/DeployPage.s';
 import { fetchWalletKRC20Balance } from '../../DAL/Krc20DAL';
 
 export interface BatchTransferProps {
     walletConnected: boolean;
     walletAddress: string | null;
-    setWalletBalance: (balance: number) => void;
     walletBalance: number;
 }
 
@@ -21,7 +19,7 @@ const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
 const VERIFICATION_FEE_KAS = 500;
 const VERIFICATION_FEE_SOMPI = VERIFICATION_FEE_KAS * KASPA_TO_SOMPI;
 const BatchTransfer: FC<BatchTransferProps> = (props) => {
-    const { walletAddress, setWalletBalance, walletConnected, walletBalance } = props;
+    const { walletAddress, walletConnected, walletBalance } = props;
     const [ticker, setTicker] = useState<string>('');
     const [amount, setAmount] = useState<string>('');
     const [recipientAddresses, setRecipientAddresses] = useState('');
@@ -54,9 +52,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     };
 
     const handleTokenBalanceVerification = async (addresses: string[]) => {
-        console.log(amount);
         const balance = await fetchWalletKRC20Balance(walletAddress, ticker);
-        console.log('Balance:', balance);
         if (balance >= parseInt(amount) * addresses.length) {
             return true;
         } else {
@@ -116,8 +112,6 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         const jsonStr = JSON.stringify(transferObj);
 
         try {
-            console.log('Signing batch transfer:', jsonStr, addresses);
-
             const txid = await signKRC20BatchTransfer(jsonStr, addresses);
             setTxid(txid);
             clearFields();
@@ -152,7 +146,6 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         }
         const paymentTxn = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
 
-        console.log('Payment txn:', paymentTxn);
         const paymentTxnId = paymentTxn.id;
 
         if (!paymentTxnId) {
@@ -165,13 +158,11 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             showGlobalSnackbar({
                 message: 'Payment successful',
                 severity: 'success',
+                txIds: [paymentTxnId],
             });
             setPaymentTxnId(paymentTxnId);
             setPaymentMade(true);
         }
-
-        const balance = await fetchWalletBalance(walletAddress);
-        setWalletBalance(setWalletBalanceUtil(balance));
     };
 
     const validateNumbersOnly = (value: string) => {
@@ -217,7 +208,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 </Box>
             </Typography>
 
-            <Button variant="contained" onClick={handlePayment} sx={{ marginBottom: '2vh' }}>
+            <Button variant="contained" onClick={handlePayment} sx={{ marginBottom: '2vh' }} disabled={true}>
                 Pay 500 KAS
             </Button>
             <Box sx={{ marginBottom: '1.3vh' }}>

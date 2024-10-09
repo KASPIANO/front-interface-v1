@@ -54,7 +54,7 @@ const Footer: React.FC = () => (
 
                 {/* Links Section */}
                 <Grid item container xs={8} md={8} sm={8} lg={8}>
-                    <Grid item xs={4} md={4} sm={4} lg={4}>
+                    <Grid item xs={3} md={3} sm={3} lg={3}>
                         <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             App
                         </Typography>
@@ -71,20 +71,20 @@ const Footer: React.FC = () => (
                         </FooterList>
                     </Grid>
 
-                    {/* <Grid item xs={4}>
+                    <Grid item xs={3} md={3} sm={3} lg={3}>
                         <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
-                            Company
+                            About us
                         </Typography>
                         <FooterList>
                             <li>
                                 <FooterLink href="/team">Team</FooterLink>
                             </li>
                             <li>
-                                <FooterLink>Whitepaper</FooterLink>
+                                <FooterLink href="/faqs">FAQs</FooterLink>
                             </li>
                         </FooterList>
-                    </Grid> */}
-                    <Grid item xs={4} md={4} sm={4} lg={4}>
+                    </Grid>
+                    <Grid item xs={3} md={3} sm={3} lg={3}>
                         <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             Need Help?
                         </Typography>
@@ -94,7 +94,7 @@ const Footer: React.FC = () => (
                             </li>
                         </FooterList>
                     </Grid>
-                    <Grid item xs={4} md={4} sm={4} lg={4}>
+                    <Grid item xs={3} md={3} sm={3} lg={3}>
                         <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             Resources
                         </Typography>
@@ -104,6 +104,9 @@ const Footer: React.FC = () => (
                             </li>
                             <li>
                                 <FooterLink href="/privacy-policy">Privacy Policy</FooterLink>
+                            </li>
+                            <li>
+                                <FooterLink href="/trade-terms">Terms of Trade</FooterLink>
                             </li>
                             {/* <li>
                                 <FooterLink href="/trust-safety">Trust Safety</FooterLink>

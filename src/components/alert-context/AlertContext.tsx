@@ -13,9 +13,10 @@ interface AlertOptions {
     message: string;
     severity: AlertSeverity;
     details?: string;
-    commit?: string;
-    reveal?: string;
+    commitId?: string;
+    revealId?: string;
     kasware?: boolean;
+    txIds?: string[];
 }
 
 const alertColors = {
@@ -35,10 +36,10 @@ const alertIconColors = {
 };
 
 const autoHideDuration = {
-    error: 6000,
-    success: 4000,
+    error: 8000,
+    success: 8000,
     warning: 8000,
-    info: 4000,
+    info: 8000,
     loading: null,
 };
 
@@ -47,8 +48,11 @@ let showSnackbar: (options: AlertOptions) => void;
 // eslint-disable-next-line react-refresh/only-export-components
 const SnackbarComponent: React.FC = () => {
     const [alert, setAlert] = React.useState<(AlertOptions & { open: boolean }) | null>(null);
-    const [copied, setCopied] = React.useState(false);
+    const [, setCopied] = React.useState(false);
 
+    const currentEnv = import.meta.env.VITE_ENV === 'prod' ? 'kaspa_mainnet' : 'kaspa_testnet_10';
+    const txnLink =
+        currentEnv === 'kaspa_mainnet' ? 'https://kas.fyi/transaction/' : 'https://explorer-tn10.kaspa.org/txs/';
     showSnackbar = (options: AlertOptions) => {
         setAlert({ ...options, open: true });
     };
@@ -61,6 +65,10 @@ const SnackbarComponent: React.FC = () => {
             .writeText(text)
             .then(() => {
                 setCopied(true);
+                showGlobalSnackbar({
+                    message: 'Copied to clipboard',
+                    severity: 'success',
+                });
                 setTimeout(() => setCopied(false), 2000);
             })
             .catch((err) => {
@@ -128,7 +136,7 @@ const SnackbarComponent: React.FC = () => {
                         {alert.kasware && (
                             <Typography
                                 sx={{
-                                    fontSize: '1.5rem',
+                                    fontSize: '1rem',
                                     color: alertIconColors[alert.severity],
                                     opacity: 0.8,
                                     fontWeight: 'bold',
@@ -145,7 +153,7 @@ const SnackbarComponent: React.FC = () => {
                             </Typography>
                         )}
 
-                        {alert.commit && (
+                        {alert.commitId && (
                             <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
                                 <Typography
                                     sx={{
@@ -156,14 +164,22 @@ const SnackbarComponent: React.FC = () => {
                                         overflowWrap: 'break-word',
                                     }}
                                 >
-                                    Commit Txn: {alert.commit.slice(0, 10)}...
+                                    Commit Txn:{' '}
+                                    <a
+                                        href={`${txnLink}${alert.commitId}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ textDecoration: 'none', color: alertIconColors[alert.severity] }}
+                                    >
+                                        {alert.commitId.slice(0, 10)}...
+                                    </a>
                                 </Typography>
-                                <IconButton size="small" onClick={() => copyToClipboard(alert.commit)}>
+                                <IconButton size="small" onClick={() => copyToClipboard(alert.commitId)}>
                                     <ContentCopyRoundedIcon fontSize="small" />
                                 </IconButton>
                             </Box>
                         )}
-                        {alert.reveal && (
+                        {alert.revealId && (
                             <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
                                 <Typography
                                     sx={{
@@ -174,27 +190,49 @@ const SnackbarComponent: React.FC = () => {
                                         overflowWrap: 'break-word',
                                     }}
                                 >
-                                    Reveal Txn: {alert.reveal.slice(0, 10)}...
+                                    Reveal Txn:{' '}
+                                    <a
+                                        href={`${txnLink}${alert.revealId}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ textDecoration: 'none', color: alertIconColors[alert.severity] }}
+                                    >
+                                        {alert.revealId.slice(0, 10)}...
+                                    </a>
                                 </Typography>
-                                <IconButton size="small" onClick={() => copyToClipboard(alert.reveal)}>
+                                <IconButton size="small" onClick={() => copyToClipboard(alert.revealId)}>
                                     <ContentCopyRoundedIcon fontSize="small" />
                                 </IconButton>
                             </Box>
                         )}
+                        {alert.txIds?.map((txId) => (
+                            <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }} key={txId}>
+                                <Typography
+                                    sx={{
+                                        fontSize: '0.875rem',
+                                        color: alertIconColors[alert.severity],
+                                        opacity: 0.8,
+                                        wordBreak: 'break-all',
+                                        overflowWrap: 'break-word',
+                                    }}
+                                >
+                                    Txn:{' '}
+                                    <a
+                                        href={`${txnLink}${txId}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ textDecoration: 'none', color: alertIconColors[alert.severity] }}
+                                    >
+                                        {txId.slice(0, 10)}...
+                                    </a>
+                                </Typography>
+                                <IconButton size="small" onClick={() => copyToClipboard(txId)}>
+                                    <ContentCopyRoundedIcon fontSize="small" />
+                                </IconButton>
+                            </Box>
+                        ))}
                     </Box>
                 </Snackbar>
-            )}
-            {copied && (
-                <Snackbar
-                    sx={{
-                        backgroundColor: '#EDF7ED',
-                    }}
-                    open={copied}
-                    autoHideDuration={2000}
-                    onClose={() => setCopied(false)}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                    message="Copied to clipboard!"
-                />
             )}
         </>
     );

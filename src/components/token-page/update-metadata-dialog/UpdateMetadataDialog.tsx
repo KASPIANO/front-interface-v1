@@ -4,14 +4,12 @@ import ReviewListTokenDialog from '../../dialogs/token-info/review-list-token/Re
 import TokenInfoDialog from '../../dialogs/token-info/TokenInfoDialog';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { sendKaspaToKaspiano } from '../../../utils/KaswareUtils';
-import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
-import { isEmptyStringOrArray, setWalletBalanceUtil } from '../../../utils/Utils';
+import { isEmptyStringOrArray } from '../../../utils/Utils';
 import { sendServerRequestAndSetErrorsIfNeeded, updateTokenMetadata } from '../../../DAL/BackendDAL';
 import SuccessModal from '../../modals/sent-token-info-success/SuccessModal';
 
 interface UpdateMetadataDialogProps {
     open: boolean;
-    setWalletBalance: (balance: number) => void;
     walletBalance: number;
     ticker: string;
     walletConnected: boolean;
@@ -25,7 +23,7 @@ const VERIFICATION_FEE_KAS = 1250;
 const VERIFICATION_FEE_SOMPI = VERIFICATION_FEE_KAS * KASPA_TO_SOMPI;
 
 export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
-    const { setWalletBalance, walletBalance, ticker, walletConnected, walletAddress, setTokenInfo } = props;
+    const { walletBalance, ticker, walletConnected, walletAddress, setTokenInfo } = props;
 
     const [showInfoForm, setShowInfoForm] = useState(false);
     const [showReviewListTokenDialog, setShowReviewListTokenDialog] = useState(false);
@@ -56,8 +54,6 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
 
     const handleTokenListing = async (): Promise<boolean> => {
         if (!tokenMetadataDetails) return;
-        console.log('Token metadata:', tokenMetadataDetails);
-        console.log('VERIFICATION_FEE_KAS', VERIFICATION_FEE_KAS);
 
         let currentMetadataPaymentTransactionId = updateMetadataPaymentTransactionId;
 
@@ -82,6 +78,7 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
             showGlobalSnackbar({
                 message: 'Payment successful',
                 severity: 'success',
+                txIds: [metadataUpdateFeeTransactionId],
             });
         } catch (error) {
             console.log(error);
@@ -92,11 +89,6 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
 
             return false;
         }
-
-        console.log('metadataUpdateFeeTransactionId', metadataUpdateFeeTransactionId);
-
-        const balance = await fetchWalletBalance(walletAddress);
-        setWalletBalance(setWalletBalanceUtil(balance));
 
         if (currentMetadataPaymentTransactionId) {
             setIsUpdateMetadataLoading(true);

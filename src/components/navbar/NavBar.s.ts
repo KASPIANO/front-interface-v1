@@ -1,30 +1,33 @@
 import { Button, MenuItem, Select, styled } from '@mui/material';
 
-export const NavbarContainer = styled('div')({
+// Navbar container styling with responsive adjustments
+export const NavbarContainer = styled('div')(({ theme }) => ({
     display: 'flex',
     justifyContent: 'space-between',
     borderBottom: '0.5px solid #2b2b3b',
     width: '100%',
-
     padding: '8px 8px',
-});
+    [theme.breakpoints.down('sm')]: {
+        padding: '8px 4px',
+    },
+}));
 
+// Responsive NavButton with active state
 export const NavButton = styled(Button, {
     shouldForwardProp: (prop) => prop !== 'isActive',
 })<{ isActive: boolean }>(({ isActive }) => ({
-    fontWeight: 500,
+    fontWeight: 600,
     cursor: 'pointer',
     fontSize: '0.8rem',
     position: 'relative',
     maxWidth: '7vw',
-
     '&:hover': {
         color: '#39ddbe',
     },
     ...(isActive && {
         '&:after': {
-            height: '0.3vh',
             content: '""',
+            height: '0.3vh',
             width: '70%',
             background: '#2b2b3b',
             position: 'absolute',
@@ -33,6 +36,7 @@ export const NavButton = styled(Button, {
     }),
 }));
 
+// Logo styling
 export const Logo = styled(Button)({
     fontWeight: 'bold',
     cursor: 'pointer',
@@ -43,23 +47,24 @@ export const Logo = styled(Button)({
     },
 });
 
+// Center navigation container
 export const NavCenter = styled('div')({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1,
-    position: 'relative',
     width: 'auto',
 });
 
+// Wallet balance display
 export const WalletBalance = styled('div')({
     display: 'flex',
     alignItems: 'center',
 });
 
+// Connect button styling
 export const ConnectButton = styled(Button)({
     backgroundColor: '#70C7BA',
-
     border: 'none',
     cursor: 'pointer',
     fontSize: '0.6rem',
@@ -71,17 +76,14 @@ export const ConnectButton = styled(Button)({
     },
 });
 
+// Network select styling
 export const NetworkSelect = styled(Select)({
     backgroundColor: '#2b2b3b',
     fontSize: '0.6vw',
-
     marginRight: '3vw',
-    alignItems: 'center',
-
     '& .MuiSelect-icon': {
         display: 'none',
     },
-
     '& .MuiOutlinedInput-notchedOutline': {
         borderColor: '#888',
     },
@@ -90,11 +92,11 @@ export const NetworkSelect = styled(Select)({
     },
 });
 
+// Network select item styling
 export const NetworkSelectItem = styled(MenuItem)({
     backgroundColor: '#2b2b3b',
     fontSize: '0.6vw',
     padding: '0.5vh 0.5vw',
-
     '&:hover': {
         backgroundColor: '#70C7BA',
     },

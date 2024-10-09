@@ -5,12 +5,15 @@ import {
     TokenListItemResponse,
     TokenSearchItems,
     TokenSentiment,
+    UserReferral,
     VerifiedUser,
 } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
+const P2PCONTROLLER = 'p2p';
 const KRC20METADATA_CONTROLLER = 'krc20metadata';
+const USER_REFERRALS_CONTROLLER = 'referrals';
 const AUTH_CONTROLLER = 'auth';
 
 export type BackendValidationErrorsType = {
@@ -228,4 +231,22 @@ export const getTokenPriceHistory = async (ticker: string): Promise<{ price: num
         console.error(`Error fetching price for ${ticker}:`, error.response ? error.response.data : error.message);
         return []; // Return empty array in case of an error
     }
+};
+
+export const getGasEstimator = async (orderId: string): Promise<any> => {
+    try {
+        const response = await backendService.get<any>(`/${P2PCONTROLLER}/feeRate`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error deleting order ${orderId}:`, error.response ? error.response.data : error.message);
+        return { confirmed: false }; // Return empty array in case of an error
+    }
+};
+
+export const getUserReferral = async (walletAddress: string, referredBy?: string): Promise<UserReferral> => {
+    const response = await backendService.post<UserReferral>(`/${USER_REFERRALS_CONTROLLER}/user-referral`, {
+        walletAddress,
+        referredBy,
+    });
+    return response.data;
 };
