@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Tooltip, Typography, CircularProgress, Icon, IconButton } from '@mui/material';
+import { Box, Tooltip, Typography, CircularProgress, IconButton } from '@mui/material';
 import { StyledButton } from './BuyHeader.s';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useQueryClient } from '@tanstack/react-query';
