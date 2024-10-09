@@ -139,11 +139,9 @@ const ReferralDialog: React.FC<ReferralDialogProps> = ({
                         </Box>
                         <Box marginTop={1} display="flex" flexDirection="column" alignItems="center">
                             {/* Input field to add a referral code */}
-                            <Typography variant="h6" align="center" gutterBottom>
-                                Add Referral Code given to you by the user or community, if you have one!
-                            </Typography>
+
                             <TextField
-                                label="Referral Code"
+                                label="Add the Referral Code given to you Here"
                                 variant="outlined"
                                 fullWidth
                                 margin="normal"
