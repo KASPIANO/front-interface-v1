@@ -223,7 +223,12 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         <>
             <GlobalStyle />
             <Box sx={{ width: '100%' }}>
-                <BuyHeader sortBy={sortBy} onSortChange={handleSortChange} ticker={tokenInfo.ticker} />
+                <BuyHeader
+                    sortBy={sortBy}
+                    onSortChange={handleSortChange}
+                    ticker={tokenInfo.ticker}
+                    isLoading={isLoading}
+                />
                 <div id="scrollableList" style={{ overflow: 'auto', height: '64vh' }}>
                     <InfiniteScroll
                         dataLength={orders.length} // Length of the current data
