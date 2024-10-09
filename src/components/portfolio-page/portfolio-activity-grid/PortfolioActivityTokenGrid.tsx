@@ -150,11 +150,13 @@ const PortfolioActivityTokenGrid: FC<PortfolioActivityTokenGridProps> = (props) 
                     ))}
                 </List>
             )}
-            {portfolioAssetsActivity?.length === 0 && walletConnected && (
-                <p style={{ textAlign: 'center', fontSize: '0.8rem' }}>
-                    <b>End of list</b>
-                </p>
-            )}
+            {!isLoadingActivity &&
+                portfolioAssetsActivity?.length === 0 &&
+                (!isEmptyString(currentWalletToCheck) || walletConnected) && (
+                    <p style={{ textAlign: 'center', fontSize: '0.8rem' }}>
+                        <b>End of list</b>
+                    </p>
+                )}
         </StyledPortfolioGridContainer>
     );
 };

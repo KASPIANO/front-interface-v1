@@ -235,7 +235,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                           [...Array(5)].map((_, index) => <Skeleton key={index} width={'100%'} height={'12vh'} />)}
                 </List>
             )}
-            {orders.length === 0 && walletConnected && (
+            {orders.length === 0 && walletConnected && !isLoading && (
                 <p style={{ textAlign: 'center', fontSize: '0.8rem' }}>
                     <b>End of list</b>
                 </p>
