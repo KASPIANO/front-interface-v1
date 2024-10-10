@@ -32,14 +32,14 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 1],
     );
 
-    const { data: stats, isLoading: loading } = useFetchStats(tokenInfo.ticker, tradingDataTimeFrame)
+    const { data: stats, isLoading: loading } = useFetchStats(tokenInfo.ticker, tradingDataTimeFrame);
 
     const updateTradingDataTimeFrame = (value: string) => {
         setTradingDataTimeFrame(value);
     };
 
-    const StatsDisplay = ({ label, value, change, fontStyle=null }) => (
-        <Box sx={{ textAlign: 'center'}}>
+    const StatsDisplay = ({ label, value, change, fontStyle = null }) => (
+        <Box sx={{ textAlign: 'center' }}>
             <Typography sx={{ fontSize: '0.9rem' }} align="center">
                 {label}
             </Typography>
@@ -51,7 +51,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     align="center"
                     fontStyle={fontStyle}
                     sx={{
-                        fontSize: '0.6rem'
+                        fontSize: '0.6rem',
                     }}
                 >
                     {change}
@@ -80,37 +80,61 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     onChange={updateTradingDataTimeFrame}
                 />
             </Box>
-            {loading ? <Skeleton key={1} width={'100%'} height={'11vh'} /> :
-                stats && <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        marginTop: '2vh',
-                        columnGap: '1.5vw',
-                        justifyContent: 'center',
-                    }}
-                >
-                   <StatsDisplay label={`VOLUME (${tradingDataTimeFrame})`} value={stats.volume ? `$${stats.volume}` : '---'} change={'---'} />
+            {loading ? (
+                <Skeleton key={1} width={'100%'} height={'11vh'} />
+            ) : (
+                stats && (
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            marginTop: '2vh',
+                            columnGap: '1.5vw',
+                            justifyContent: 'center',
+                        }}
+                    >
+                        <StatsDisplay
+                            label={`VOLUME (${tradingDataTimeFrame})`}
+                            value={stats.volume ? `$${stats.volume}` : '---'}
+                            change={'---'}
+                        />
 
-                    <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
 
-                    <StatsDisplay label={`PRICE PER TOKEN (${tradingDataTimeFrame})`}
-                        value={stats.historicalPrice !== undefined ? `${stats.historicalPrice.toFixed(7)} / KAS` : '---'}
-                        change={stats.changes?.priceChange ? `${stats.changes.priceChange.toFixed(7)} / KAS` : '---'}
-                        fontStyle={{color: stats.changes.priceChange < 0 ? 'red' : 'green'}} />
+                        <StatsDisplay
+                            label={`PRICE PER TOKEN (${tradingDataTimeFrame})`}
+                            value={
+                                stats.historicalPrice !== undefined
+                                    ? `${stats.historicalPrice.toFixed(7)} / KAS`
+                                    : '---'
+                            }
+                            change={
+                                stats.changes?.priceChange
+                                    ? `${stats.changes.priceChange.toFixed(7)} / KAS`
+                                    : '---'
+                            }
+                            fontStyle={{ color: stats.changes.priceChange < 0 ? 'red' : 'green' }}
+                        />
 
-                    <Divider orientation="vertical" flexItem />
+                        <Divider orientation="vertical" flexItem />
 
-                    <StatsDisplay label="TOTAL MINTED" value={stats.historicalTotalMints || "---"} change={stats.changes.mintsChange || "---"} />
-                    
-                    <Divider orientation="vertical" flexItem />
-                    
-                    <StatsDisplay label="HOLDERS"
-                                  value={stats.historicalTotalHolders} 
-                                  change={stats.changes.holdersChange} 
-                                  fontStyle={{color: stats.changes.holdersChange < 0 ? 'red' : 'green'}} />
-                </Box>}
+                        <StatsDisplay
+                            label="TOTAL MINTED"
+                            value={stats.historicalTotalMints || '---'}
+                            change={stats.changes.mintsChange || '---'}
+                        />
 
+                        <Divider orientation="vertical" flexItem />
+
+                        <StatsDisplay
+                            label="HOLDERS"
+                            value={stats.historicalTotalHolders}
+                            change={stats.changes.holdersChange}
+                            fontStyle={{ color: stats.changes.holdersChange < 0 ? 'red' : 'green' }}
+                        />
+                    </Box>
+                )
+            )}
         </Card>
     );
 };
