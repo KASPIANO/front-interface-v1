@@ -178,7 +178,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         if (!isNaN(total)) {
             if (total >= 25) {
                 // Minimum total price check
-                setPricePerToken((total / amount).toFixed(2)); // Calculate price per token
+                setPricePerToken((total / amount).toFixed(8)); // Calculate price per token
                 setEditError(''); // Clear error if any
             } else {
                 setEditError('Total price must be at least 25 KAS.');
