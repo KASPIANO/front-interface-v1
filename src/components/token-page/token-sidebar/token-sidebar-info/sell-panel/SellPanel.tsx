@@ -297,7 +297,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             if (result) {
                 const { commitId, revealId } = JSON.parse(result);
                 showGlobalSnackbar({
-                    message: 'Token transferred successfully',
+                    message: 'Token transferred successfully, Finished step 1 of 2',
                     severity: 'success',
                     commitId,
                     revealId,
@@ -311,7 +311,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             if (confirmation) {
                 setDisableSellButton(false);
                 showGlobalSnackbar({
-                    message: 'Sell order confirmed successfully',
+                    message: 'Sell order confirmed successfully Finished step 2 of 2',
                     severity: 'success',
                 });
                 setIsDialogOpen(false);
