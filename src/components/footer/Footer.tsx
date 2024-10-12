@@ -47,7 +47,7 @@ const Footer: React.FC = () => (
                     </Grid>
                     <Grid item xs={12} md={12} sm={12} lg={12}>
                         <RightsReserved gutterBottom sx={{ fontSize: '0.8rem' }}>
-                            © 2021 Kaspiano. All rights reserved.
+                            © 2024 Kaspiano. All rights reserved.
                         </RightsReserved>
                     </Grid>
                 </Grid>

@@ -5,6 +5,7 @@ import App from './App.tsx';
 import './index.css';
 import { ThemeModes } from './utils/Utils.ts';
 import { LOCAL_STORAGE_KEYS } from './utils/Constants.ts';
+import { HelmetProvider } from 'react-helmet-async';
 
 const queryClient = new QueryClient();
 // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -35,7 +36,9 @@ if (referralCode && referralCode.trim().length > 0) {
 root.render(
     <React.StrictMode>
         <QueryClientProvider client={queryClient}>
-            <App />
+            <HelmetProvider>
+                <App />
+            </HelmetProvider>
         </QueryClientProvider>
     </React.StrictMode>,
 );
