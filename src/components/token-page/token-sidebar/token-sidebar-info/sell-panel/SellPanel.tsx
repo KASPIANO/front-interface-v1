@@ -411,6 +411,13 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             </Box>
         </Tooltip>
     );
+    const formatPrice = (value) => {
+        const num = parseFloat(value);
+
+        // Fix the number to 10 decimal places, then remove unnecessary trailing zeros
+        return num.toFixed(10).replace(/\.?0+$/, '');
+    };
+
     return (
         <>
             <StyledSellPanel>
@@ -450,7 +457,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 </Tooltip>
                 <StyledTextField
                     label={`Price per Token (${priceCurrency})`}
-                    value={pricePerToken}
+                    value={pricePerToken ? formatPrice(pricePerToken) : ''}
                     // onChange={handlePricePerTokenChange}
                     disabled={true}
                     fullWidth
