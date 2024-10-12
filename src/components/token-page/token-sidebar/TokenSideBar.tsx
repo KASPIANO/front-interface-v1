@@ -22,8 +22,14 @@ interface TokenSideBarProps {
 const TokenSideBar: FC<TokenSideBarProps> = (props) => {
     const { setTokenInfo, tokenInfo, walletAddress, walletConnected, walletBalance, kasPrice } = props;
     const [selectedSideActionTab, setSelectedSideActionTab] = useState('1');
+    const [buyPanelRef, setBuyPanelRef] = useState<{ handleDrawerClose: () => void } | null>(null);
 
-    const handleTabChage = (_event: SyntheticEvent, newValue: string) => {
+    const handleTabChange = (_event: SyntheticEvent, newValue: string) => {
+        // Check if we're switching away from the "Buy" tab (value="2")
+        if (selectedSideActionTab === '2' && newValue !== '2') {
+            // Release the order in BuyPanel
+            buyPanelRef?.handleDrawerClose();
+        }
         setSelectedSideActionTab(newValue);
     };
 
@@ -34,7 +40,7 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                 <TabContext value={selectedSideActionTab}>
                     <Tabs
                         value={selectedSideActionTab}
-                        onChange={handleTabChage}
+                        onChange={handleTabChange}
                         sx={{
                             minWidth: 0, // Optional: Removes default min-width
                             '& .MuiTabs-flexContainer': {
@@ -79,6 +85,7 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                         value="2"
                     >
                         <BuyPanel
+                            setBuyPanelRef={setBuyPanelRef}
                             walletAddress={walletAddress}
                             walletConnected={walletConnected}
                             tokenInfo={tokenInfo}
