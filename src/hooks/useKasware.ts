@@ -163,7 +163,8 @@ export const useKasware = () => {
         localStorage.removeItem('walletAddress');
         showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
         cookies.remove('user');
-    }, [cookies, handleAccountsChanged]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         if (isKasWareInstalled()) {
