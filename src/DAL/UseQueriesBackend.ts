@@ -122,7 +122,7 @@ export const useUserListings = (walletAddress, offset = 0) =>
 
 export const useFetchStats = (ticker: string, timeInterval: string) =>
     useQuery({
-        queryKey: [ticker, timeInterval],
+        queryKey: ['stats', ticker, timeInterval],
         queryFn: () => fetchTickerStats(ticker, timeInterval),
         staleTime: 25000, // Data stays fresh for 25 seconds
         refetchOnWindowFocus: false,
@@ -130,7 +130,7 @@ export const useFetchStats = (ticker: string, timeInterval: string) =>
 
 export const useFetchTradeStats = (ticker: string, timeInterval: string) =>
     useQuery({
-        queryKey: [ticker, timeInterval],
+        queryKey: ['tarde-stats', ticker, timeInterval],
         queryFn: () => fetchTickerTradeStats(ticker, timeInterval),
         staleTime: 25000, // Data stays fresh for 25 seconds
         refetchOnWindowFocus: false,
