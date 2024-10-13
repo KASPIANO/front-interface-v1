@@ -151,7 +151,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             alt={tokenInfo.ticker}
                             src={tokenInfo.metadata?.bannerUrl}
                             sx={{
-                                height: '19vh',
+                                height: '9rem',
                                 width: '100%',
                             }}
                         />

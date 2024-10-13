@@ -3,7 +3,7 @@ import TabPanel from '@mui/lab/TabPanel';
 import TabContext from '@mui/lab/TabContext';
 import { FC, useState, SyntheticEvent } from 'react';
 import { BackendTokenResponse } from '../../../types/Types';
-import { SideBarContainer } from './TokenSideBar.s';
+import { SideBarContainer, TabStyled } from './TokenSideBar.s';
 import TokenSideBarInfo from './token-sidebar-info/TokenSideBarInfo';
 import { GlobalStyleTokenSideBar } from '../../../utils/GlobalStyleScrollBar';
 import BuyPanel from './token-sidebar-info/buy-panel/BuyPanel';
@@ -42,18 +42,19 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                         value={selectedSideActionTab}
                         onChange={handleTabChange}
                         sx={{
-                            minWidth: 0, // Optional: Removes default min-width
+                            '&.MuiTabs-root': {
+                                height: '2rem',
+                                minHeight: '5px',
+                            },
                             '& .MuiTabs-flexContainer': {
-                                justifyContent: {
-                                    xs: 'flex-start', // Default on mobile
-                                    md: 'center', // Center on medium and up
-                                },
+                                height: '2rem',
+                                justifyContent: 'center',
                             },
                         }}
                     >
-                        <Tab label="Info" value="1" />
-                        <Tab label="Buy" value="2" />
-                        <Tab label="Sell" value="3" />
+                        <TabStyled label="Info" value="1" />
+                        <TabStyled label="Buy" value="2" />
+                        <TabStyled label="Sell" value="3" />
                     </Tabs>
                     <TabPanel
                         sx={{
