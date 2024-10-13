@@ -1,5 +1,5 @@
 // import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { fetchAllTokens, fetchTickerStats,countTokens } from './BackendDAL';
+import { fetchAllTokens, fetchTickerStats, countTokens, fetchTickerTradeStats } from './BackendDAL';
 import { useQuery } from '@tanstack/react-query';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { getOrders, getOrdersHistory, getUSerListings } from './BackendP2PDAL'; // Adjust the
@@ -120,13 +120,18 @@ export const useUserListings = (walletAddress, offset = 0) =>
         }),
     });
 
-    export const useFetchStats = (
-        ticker: string,
-        timeInterval: string,
-    ) =>
-        useQuery({
-            queryKey: [ticker, timeInterval],
-            queryFn: () => fetchTickerStats(ticker, timeInterval),
-            staleTime: 25000, // Data stays fresh for 25 seconds
-            refetchOnWindowFocus: false,
-        });
+export const useFetchStats = (ticker: string, timeInterval: string) =>
+    useQuery({
+        queryKey: [ticker, timeInterval],
+        queryFn: () => fetchTickerStats(ticker, timeInterval),
+        staleTime: 25000, // Data stays fresh for 25 seconds
+        refetchOnWindowFocus: false,
+    });
+
+export const useFetchTradeStats = (ticker: string, timeInterval: string) =>
+    useQuery({
+        queryKey: [ticker, timeInterval],
+        queryFn: () => fetchTickerTradeStats(ticker, timeInterval),
+        staleTime: 25000, // Data stays fresh for 25 seconds
+        refetchOnWindowFocus: false,
+    });

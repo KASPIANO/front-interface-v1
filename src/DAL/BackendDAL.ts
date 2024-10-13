@@ -12,6 +12,7 @@ import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
 const P2PCONTROLLER = 'p2p';
+const P2PCONTROLLERDATA = 'p2p-data';
 const KRC20METADATA_CONTROLLER = 'krc20metadata';
 const USER_REFERRALS_CONTROLLER = 'referrals';
 const AUTH_CONTROLLER = 'auth';
@@ -245,15 +246,24 @@ export const getUserReferral = async (walletAddress: string, referredBy?: string
     });
     return response.data;
 };
-export const fetchTickerStats = async (ticker: string, timeInterval:string): Promise<any> => {
+export const fetchTickerStats = async (ticker: string, timeInterval: string): Promise<any> => {
     try {
         const capitalTicker = ticker.toUpperCase();
         const response = await backendService.get<{ data: { volume: number; date: string } }>(
             `/${KRC20CONTROLLER}/stats/?ticker=${capitalTicker}&timeInterval=${timeInterval}`,
         );
-        return response.data? response.data[0]: undefined;
+        return response.data ? response.data[0] : undefined;
     } catch (error) {
         console.error(`Error fetching price for ${ticker}:`, error.response ? error.response.data : error.message);
         return undefined; // Return empty array in case of an error
     }
+};
+export const fetchTickerTradeStats = async (ticker: string, timeInterval?: string): Promise<any> => {
+    const timeFrame = timeInterval === 'All' ? '' : timeInterval;
+    const timeQueryStr = timeFrame ? `&timeInterval=${timeFrame}` : '';
+    const capitalTicker = ticker.toUpperCase();
+    const response = await backendService.get<{ data: { volume: number; date: string } }>(
+        `/${P2PCONTROLLERDATA}/trade-stats/?ticker=${capitalTicker}${timeQueryStr}`,
+    );
+    return response.data;
 };

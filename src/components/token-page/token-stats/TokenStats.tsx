@@ -2,7 +2,7 @@ import { FC, useState } from 'react';
 import { Box, Card, Divider, Skeleton, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
 import { BackendTokenResponse } from '../../../types/Types';
-import { useFetchStats } from '../../../DAL/UseQueriesBackend';
+import { useFetchStats, useFetchTradeStats } from '../../../DAL/UseQueriesBackend';
 
 interface TokenStatsProps {
     tokenInfo: BackendTokenResponse;
@@ -27,26 +27,30 @@ interface TokenStatsProps {
 
 const TokenStats: FC<TokenStatsProps> = (props) => {
     const { tokenInfo } = props;
-    const tradingDataTimeFramesToSelect = ['All', '1m', '1w', '1d'];
+    const tradingDataTimeFramesToSelect = ['All', '1m', '1w', '1d', '6h', '1h', '15m'];
     const [tradingDataTimeFrame, setTradingDataTimeFrame] = useState(
         tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 1],
     );
 
     const { data: stats, isLoading: loading } = useFetchStats(tokenInfo.ticker, tradingDataTimeFrame);
+    const { data: tradeStats, isLoading: tradeloading } = useFetchTradeStats(
+        tokenInfo.ticker,
+        tradingDataTimeFrame,
+    );
 
     const updateTradingDataTimeFrame = (value: string) => {
         setTradingDataTimeFrame(value);
     };
 
-    const StatsDisplay = ({ label, value, change, fontStyle = null }) => (
+    const StatsDisplay = ({ label, value }) => (
         <Box sx={{ textAlign: 'center' }}>
-            <Typography sx={{ fontSize: '0.9rem' }} align="center">
+            <Typography sx={{ fontSize: '0.7rem' }} align="center">
                 {label}
             </Typography>
             <Typography align="center" sx={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
                 {value}
             </Typography>
-            {change !== undefined && (
+            {/* {change !== undefined && (
                 <Typography
                     align="center"
                     fontStyle={fontStyle}
@@ -55,8 +59,8 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     }}
                 >
                     {change}
-                </Typography>
-            )}
+                </Typography> */}
+            {/* )} */}
         </Box>
     );
 
@@ -96,11 +100,19 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                         <StatsDisplay
                             label={`VOLUME (${tradingDataTimeFrame})`}
                             value={stats.volume ? `$${stats.volume}` : '---'}
-                            change={'---'}
                         />
 
                         <Divider orientation="vertical" flexItem />
 
+                        <StatsDisplay
+                            label={`TRADES (${tradingDataTimeFrame})`}
+                            value={stats.historicalTotalMints || '---'}
+                        />
+
+                        <Divider orientation="vertical" flexItem />
+                        <StatsDisplay label="TOTAL MINTED" value={stats.historicalTotalMints || '---'} />
+
+                        <Divider orientation="vertical" flexItem />
                         <StatsDisplay
                             label={`PRICE PER TOKEN (${tradingDataTimeFrame})`}
                             value={
@@ -108,20 +120,12 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                                     ? `${stats.historicalPrice.toFixed(7)} / KAS`
                                     : '---'
                             }
-                            change={
-                                stats.changes?.priceChange
-                                    ? `${stats.changes.priceChange.toFixed(7)} / KAS`
-                                    : '---'
-                            }
-                            fontStyle={{ color: stats.changes.priceChange < 0 ? 'red' : 'green' }}
-                        />
-
-                        <Divider orientation="vertical" flexItem />
-
-                        <StatsDisplay
-                            label="TOTAL MINTED"
-                            value={stats.historicalTotalMints || '---'}
-                            change={stats.changes.mintsChange || '---'}
+                            // change={
+                            //     stats.changes?.priceChange
+                            //         ? `${stats.changes.priceChange.toFixed(7)} / KAS`
+                            //         : '---'
+                            // }
+                            // fontStyle={{ color: stats.changes.priceChange < 0 ? 'red' : 'green' }}
                         />
 
                         <Divider orientation="vertical" flexItem />
@@ -129,8 +133,8 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                         <StatsDisplay
                             label="HOLDERS"
                             value={stats.historicalTotalHolders}
-                            change={stats.changes.holdersChange}
-                            fontStyle={{ color: stats.changes.holdersChange < 0 ? 'red' : 'green' }}
+                            // change={stats.changes.holdersChange}
+                            // fontStyle={{ color: stats.changes.holdersChange < 0 ? 'red' : 'green' }}
                         />
                     </Box>
                 )
