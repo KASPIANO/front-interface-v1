@@ -243,6 +243,7 @@ export function mapSellOrderStatusToDisplayText(status: SellOrderStatus): string
         [SellOrderStatus.COMPLETED]: 'Completed',
         [SellOrderStatus.CANCELED]: 'Canceled',
         [SellOrderStatus.SWAP_ERROR]: 'Swap Error',
+        [SellOrderStatus.TOKENS_NOT_SENT]: 'No KRC20 Tokens Sent',
         [SellOrderStatus.CHECKING_EXPIRED]: 'Checking Expiration',
         [SellOrderStatus.UNKNOWN_MONEY_ERROR]: 'Unknown Money Error',
         [SellOrderStatus.OFF_MARKETPLACE]: 'Off Marketplace',
