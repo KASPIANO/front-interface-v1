@@ -43,10 +43,13 @@ export const useKasware = () => {
 
     const setNewBalance = useCallback(() => {
         const { kasware } = window;
-        kasware.getBalance().then((balance) => {
-            const kasAmount = balance.total / 1e8;
-            setBalance(kasAmount);
-        });
+        if (connected) {
+            kasware.getBalance().then((balance) => {
+                const kasAmount = balance.total / 1e8;
+                setBalance(kasAmount);
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const selfRef = useRef<{ accounts: string[] }>({
