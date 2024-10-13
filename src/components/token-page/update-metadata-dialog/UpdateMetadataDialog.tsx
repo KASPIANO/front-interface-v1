@@ -19,7 +19,7 @@ interface UpdateMetadataDialogProps {
 }
 
 const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
-const VERIFICATION_FEE_KAS = 1250;
+const VERIFICATION_FEE_KAS = 650;
 const VERIFICATION_FEE_SOMPI = VERIFICATION_FEE_KAS * KASPA_TO_SOMPI;
 
 export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
