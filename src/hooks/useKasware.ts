@@ -126,6 +126,7 @@ export const useKasware = () => {
                     handleUserVerification(_accounts[0]);
                 }
             } else {
+                console.log('No accounts found');
                 setConnected(false);
                 setAccounts([]);
                 setAddress('');
@@ -139,16 +140,14 @@ export const useKasware = () => {
 
     const handleNetworkChange = useCallback(async (newNetwork) => {
         if (network !== newNetwork) {
-            try {
-                await handleNetworkByEnvironment();
+            const isValid = await handleNetworkByEnvironment();
+            if (isValid) {
                 showGlobalSnackbar({ message: `Switched to ${newNetwork}`, severity: 'success' });
                 getBasicInfo();
-            } catch (error) {
-                console.error('Error switching network:', error);
+            } else {
                 showGlobalSnackbar({
                     message: 'Failed to switch network',
                     severity: 'error',
-                    details: error.message,
                 });
             }
         }
@@ -163,7 +162,7 @@ export const useKasware = () => {
         localStorage.removeItem('walletAddress');
         showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
         cookies.remove('user');
-    }, [cookies, handleAccountsChanged]);
+    }, []);
 
     useEffect(() => {
         if (isKasWareInstalled()) {
@@ -288,10 +287,9 @@ export const useKasware = () => {
             const reject = await handleSwitchNetwork(currentEnv);
             if (!reject) {
                 await disconnectWallet();
-                showGlobalSnackbar({
-                    message: 'Failed to switch network',
-                    severity: 'error',
-                });
+                return false;
+            } else {
+                return true;
             }
         }
     };
