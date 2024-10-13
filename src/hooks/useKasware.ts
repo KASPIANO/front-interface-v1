@@ -67,16 +67,21 @@ export const useKasware = () => {
             const userVerification = await signMessage(userVerificationMessage);
             const publicKeyCookies = await window.kasware.getPublicKey();
             if (userVerification) {
-                cookies.remove('user');
+                cookies.remove('user', { path: '/' });
                 cookies.set(
                     'user',
                     {
                         message: userVerificationMessage,
                         publicKey: publicKeyCookies,
                         signature: userVerification,
-                        expiresAt: Date.now() + 4 * 60 * 60 * 1000,
                     },
-                    { secure: true, sameSite: 'none', path: '/', domain },
+                    {
+                        secure: true,
+                        sameSite: 'none',
+                        path: '/',
+                        domain,
+                        expires: new Date(Date.now() + 4 * 60 * 60 * 1000),
+                    },
                 );
                 const verifiedUser = {
                     userWalletAddress: account,
@@ -164,7 +169,7 @@ export const useKasware = () => {
         setUserReferral(null);
         localStorage.removeItem('walletAddress');
         showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
-        cookies.remove('user');
+        cookies.remove('user', { path: '/' });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -194,12 +199,12 @@ export const useKasware = () => {
                         await handleNetworkByEnvironment();
                     } else {
                         localStorage.removeItem('walletAddress');
-                        cookies.remove('user');
+                        cookies.remove('user', { path: '/' });
                     }
                 } catch (error) {
                     console.error('Error checking existing connection:', error);
                     localStorage.removeItem('walletAddress');
-                    cookies.remove('user');
+                    cookies.remove('user', { path: '/' });
                 }
             }
         };
