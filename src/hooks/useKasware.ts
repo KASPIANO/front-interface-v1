@@ -10,6 +10,9 @@ import { LOCAL_STORAGE_KEYS } from '../utils/Constants';
 import { getUserReferral } from '../DAL/BackendDAL';
 import { useQueryClient } from '@tanstack/react-query';
 
+const COOKIE_TTL = 4 * 60 * 60 * 1000;
+let cookieExperationTimeout = null;
+
 export const useKasware = () => {
     const [connected, setConnected] = useState(false);
     const [accounts, setAccounts] = useState<string[]>([]);
@@ -57,32 +60,51 @@ export const useKasware = () => {
     });
     const self = selfRef.current;
 
+    const setCookie = useCallback(async (cookieData) => {
+        const cookieExperation = new Date(Date.now() + COOKIE_TTL);
+        const domain = import.meta.env.VITE_ENV === 'local' ? '' : '.kaspiano.com';
+
+        cookies.remove('user', { path: '/' });
+        cookies.set('user', cookieData, {
+            secure: true,
+            sameSite: 'none',
+            path: '/',
+            domain,
+            expires: cookieExperation,
+        });
+
+        if (cookieExperationTimeout) {
+            clearTimeout(cookieExperationTimeout);
+            cookieExperationTimeout = null;
+        }
+
+        cookieExperationTimeout = setTimeout(() => disconnectWallet(), COOKIE_TTL);
+    }, []);
+
+    const refreshCookieOnLoadOrClearData = useCallback(async () => {
+        const userCookie = cookies.get('user');
+        if (userCookie) {
+            await setCookie(userCookie);
+        } else {
+            await disconnectWallet(true);
+        }
+    }, []);
+
     const handleUserVerification = useCallback(async (account) => {
         try {
             const nonce = generateNonce();
             const requestId = generateRequestId();
             const requestDate = new Date().toISOString();
             const userVerificationMessage = generateVerificationMessage(account, nonce, requestDate, requestId);
-            const domain = import.meta.env.VITE_ENV === 'local' ? '' : '.kaspiano.com';
             const userVerification = await signMessage(userVerificationMessage);
-            const publicKeyCookies = await window.kasware.getPublicKey();
             if (userVerification) {
-                cookies.remove('user', { path: '/' });
-                cookies.set(
-                    'user',
-                    {
-                        message: userVerificationMessage,
-                        publicKey: publicKeyCookies,
-                        signature: userVerification,
-                    },
-                    {
-                        secure: true,
-                        sameSite: 'none',
-                        path: '/',
-                        domain,
-                        expires: new Date(Date.now() + 4 * 60 * 60 * 1000),
-                    },
-                );
+                const publicKeyCookies = await window.kasware.getPublicKey();
+
+                await setCookie({
+                    message: userVerificationMessage,
+                    publicKey: publicKeyCookies,
+                    signature: userVerification,
+                });
                 const verifiedUser = {
                     userWalletAddress: account,
                     userSignedMessageTxId: userVerification,
@@ -95,6 +117,8 @@ export const useKasware = () => {
                     message: 'User verified successfully',
                     severity: 'success',
                 });
+
+                setNewBalance();
 
                 // Show a success message with part of the wallet address
 
@@ -162,14 +186,23 @@ export const useKasware = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const disconnectWallet = useCallback(async () => {
+    const disconnectWallet = useCallback(async (ignoreMessage = false) => {
         const { origin } = window.location;
         await window.kasware.disconnect(origin);
         handleAccountsChanged([]);
         setUserReferral(null);
         localStorage.removeItem('walletAddress');
-        showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
+
+        if (!ignoreMessage) {
+            showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
+        }
+
         cookies.remove('user', { path: '/' });
+        if (cookieExperationTimeout) {
+            clearTimeout(cookieExperationTimeout);
+            cookieExperationTimeout = null;
+        }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -189,6 +222,7 @@ export const useKasware = () => {
 
     useEffect(() => {
         const checkExistingConnection = async () => {
+            await refreshCookieOnLoadOrClearData();
             const storedAddress = localStorage.getItem('walletAddress');
             if (storedAddress && isKasWareInstalled()) {
                 try {
