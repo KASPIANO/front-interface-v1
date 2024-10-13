@@ -223,6 +223,7 @@ export const useKasware = () => {
     useEffect(() => {
         const checkExistingConnection = async () => {
             await refreshCookieOnLoadOrClearData();
+
             const storedAddress = localStorage.getItem('walletAddress');
             if (storedAddress && isKasWareInstalled()) {
                 try {
@@ -232,13 +233,11 @@ export const useKasware = () => {
                         handleAccountsChanged(accounts, true);
                         await handleNetworkByEnvironment();
                     } else {
-                        localStorage.removeItem('walletAddress');
-                        cookies.remove('user', { path: '/' });
+                        await disconnectWallet(true);
                     }
                 } catch (error) {
                     console.error('Error checking existing connection:', error);
-                    localStorage.removeItem('walletAddress');
-                    cookies.remove('user', { path: '/' });
+                    await disconnectWallet(true);
                 }
             }
         };
