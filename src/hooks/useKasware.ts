@@ -211,11 +211,7 @@ export const useKasware = () => {
             setNetwork(network);
             return true;
         } catch (error) {
-            if (error.code === 4001) {
-                return false;
-            }
-            console.error(error);
-            throw error;
+            return false;
         }
     };
 
@@ -290,9 +286,12 @@ export const useKasware = () => {
                 severity: 'error',
             });
             const reject = await handleSwitchNetwork(currentEnv);
-
             if (!reject) {
                 await disconnectWallet();
+                showGlobalSnackbar({
+                    message: 'Failed to switch network',
+                    severity: 'error',
+                });
             }
         }
     };
