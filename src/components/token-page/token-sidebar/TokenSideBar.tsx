@@ -1,4 +1,4 @@
-import { Tab, Tabs } from '@mui/material';
+import { Tabs } from '@mui/material';
 import TabPanel from '@mui/lab/TabPanel';
 import TabContext from '@mui/lab/TabContext';
 import { FC, useState, SyntheticEvent } from 'react';
