@@ -35,25 +35,26 @@ const App = () => {
         setThemeMode(newMode);
     };
 
-    const checkCookie = async () => {
-        const cookies = new Cookies(); // Create an instance of cookies-universal
-        const cookieValue = cookies.get('user'); // Replace 'myCookie' with your cookie name
-        if (cookieValue && cookieValue && Date.now() > cookieValue.expiresAt) {
-            await disconnectWallet();
-        }
-    };
+    // const checkCookie = async () => {
+    //     const cookies = new Cookies(); // Create an instance of cookies-universal
+    //     const cookieValue = cookies.get('user'); // Replace 'myCookie' with your cookie name
+    //     if (cookieValue && Date.now() > cookieValue.expiresAt) {
+    //         await disconnectWallet();
+    //         cookies.remove('user');
+    //     }
+    // };
 
     // Set up an interval to check the cookie every 1 minute
     useEffect(() => {
-        const interval = setInterval(async () => {
-            await checkCookie();
-        }, 1000); // Check every 60,000 milliseconds (1 minute)
+        // const interval = setInterval(async () => {
+        //     await checkCookie();
+        // }, 1000); // Check every 60,000 milliseconds (1 minute)
 
         const updateTokensInterval = setInterval(setNewBalance, 10 * 1000);
 
         // Cleanup function to clear the interval when component unmounts
         return () => {
-            clearInterval(interval);
+            // clearInterval(interval);
             clearInterval(updateTokensInterval);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
