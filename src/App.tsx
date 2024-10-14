@@ -37,7 +37,6 @@ const App = () => {
 
     // Set up an interval to check the cookie every 1 minute
     useEffect(() => {
-
         const updateTokensInterval = setInterval(setNewBalance, 10 * 1000);
 
         // Cleanup function to clear the interval when component unmounts

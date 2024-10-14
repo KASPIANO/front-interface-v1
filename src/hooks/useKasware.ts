@@ -79,6 +79,7 @@ export const useKasware = () => {
         }
 
         cookieExperationTimeout = setTimeout(() => disconnectWallet(), COOKIE_TTL);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const refreshCookieOnLoadOrClearData = useCallback(async () => {
@@ -88,6 +89,7 @@ export const useKasware = () => {
         } else {
             await disconnectWallet(true);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleUserVerification = useCallback(async (account) => {
