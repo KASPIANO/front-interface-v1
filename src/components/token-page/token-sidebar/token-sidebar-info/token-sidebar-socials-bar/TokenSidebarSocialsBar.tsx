@@ -36,12 +36,14 @@ const TokenSidebarSocialsBar: FC<TokenSidebarSocialsBarProps> = (props) => {
 
     return (
         <TokenSidebarSocialsBarGroup>
-            {Object.keys(options).map((key) => (
-                <TokenSidebarSocialsBarButton key={key} onClick={() => openLink(options[key])}>
-                    {socialIcons[key]}
-                    {capitalizeFirstLetter(key) === 'X' ? '' : capitalizeFirstLetter(key)}
-                </TokenSidebarSocialsBarButton>
-            ))}
+            {Object.keys(options)
+                .filter((key) => options[key]?.trim())
+                .map((key) => (
+                    <TokenSidebarSocialsBarButton key={key} onClick={() => openLink(options[key])}>
+                        {socialIcons[key]}
+                        {capitalizeFirstLetter(key) === 'X' ? '' : capitalizeFirstLetter(key)}
+                    </TokenSidebarSocialsBarButton>
+                ))}
         </TokenSidebarSocialsBarGroup>
     );
 };

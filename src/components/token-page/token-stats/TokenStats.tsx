@@ -2,7 +2,8 @@ import { FC, useState } from 'react';
 import { Box, Card, Divider, Skeleton, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
 import { BackendTokenResponse } from '../../../types/Types';
-import { useFetchFloorPrice, useFetchStats, useFetchTradeStats } from '../../../DAL/UseQueriesBackend';
+import { useFetchFloorPrice, useFetchHolderChange, useFetchTradeStats } from '../../../DAL/UseQueriesBackend';
+import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material'; // Import arrow icons
 
 interface TokenStatsProps {
     tokenInfo: BackendTokenResponse;
@@ -32,7 +33,10 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 1],
     );
 
-    const { data: stats, isLoading: loading } = useFetchStats(tokenInfo.ticker, tradingDataTimeFrame);
+    const { data: holdersChange, isLoading: loading } = useFetchHolderChange(
+        tokenInfo.ticker,
+        tradingDataTimeFrame,
+    );
     const { data: floorPrice, isLoading: floorPriceLoading } = useFetchFloorPrice(tokenInfo.ticker);
     const { data: tradeStats, isLoading: tradeloading } = useFetchTradeStats(
         tokenInfo.ticker,
@@ -43,7 +47,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         setTradingDataTimeFrame(value);
     };
 
-    const StatsDisplay = ({ label, value, secondary = null }) => (
+    const StatsDisplay = ({ label, value, secondary = null, arrow = null }) => (
         <Box>
             <Typography sx={{ fontSize: '0.7rem' }} align="center">
                 {label}
@@ -51,16 +55,33 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
             <Typography align="center" sx={{ fontSize: '0.65rem', fontWeight: 'bold' }}>
                 {value}
             </Typography>
-            {secondary && (
-                <Typography
-                    align="center"
-                    sx={{
-                        fontSize: '0.65rem',
-                    }}
-                >
-                    {secondary}
-                </Typography>
-            )}
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                {secondary && (
+                    <Typography
+                        align="center"
+                        sx={{
+                            fontSize: '0.65rem',
+                        }}
+                    >
+                        {secondary}
+                    </Typography>
+                )}
+                {arrow && (
+                    <Box
+                        sx={{
+                            color: arrow === 'positive' ? '#4CAF50' : '#F44336',
+                            display: 'flex',
+                            alignItems: 'center',
+                        }}
+                    >
+                        {arrow === 'positive' ? (
+                            <ArrowDropUp sx={{ fontSize: '1rem' }} />
+                        ) : (
+                            <ArrowDropDown sx={{ fontSize: '1rem' }} />
+                        )}
+                    </Box>
+                )}
+            </Box>
         </Box>
     );
 
@@ -70,9 +91,10 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         // Fix the number to 10 decimal places, then remove unnecessary trailing zeros
         return num.toFixed(10).replace(/\.?0+$/, '');
     };
-
-    //  const totalMintedDataToShow =
-    //      tokenInfo.state === 'finished' ? '100%' : `${(tokenInfo.totalMintedPercent * 100).toFixed(8)}%`;
+    const holderChangeValue = tokenInfo.totalHolders - holdersChange?.totalHolders || 0;
+    const holderChangeArrow = holderChangeValue > 0 ? 'positive' : 'negative';
+    const totalMintedDataToShow =
+        tokenInfo.state === 'finished' ? '100%' : `${(tokenInfo.totalMintedPercent * 100).toFixed(8)}%`;
     return (
         <Card sx={{ height: '20vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -91,57 +113,55 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     onChange={updateTradingDataTimeFrame}
                 />
             </Box>
-            {loading || tradeloading || floorPriceLoading ? (
+            {loading || tradeloading ? (
                 <Skeleton key={1} width={'100%'} height={'11vh'} />
             ) : (
-                stats && (
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            marginTop: '2vh',
-                            columnGap: '0.8rem',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <StatsDisplay
-                            label={`VOLUME (${tradingDataTimeFrame})`}
-                            value={
-                                tradeStats.totalVolumeKasKaspiano
-                                    ? `${parseFloat(tradeStats.totalVolumeKasKaspiano).toFixed(0)} KAS`
-                                    : null
-                            }
-                            secondary={
-                                tradeStats.totalVolumeUsdKaspiano
-                                    ? `${parseFloat(tradeStats.totalVolumeUsdKaspiano).toFixed(0)}$`
-                                    : null
-                            }
-                        />
+                <Box
+                    sx={{
+                        display: 'flex',
+                        mt: '1rem',
+                        columnGap: '0.8rem',
+                        justifyContent: 'center',
+                    }}
+                >
+                    <StatsDisplay
+                        label={`VOLUME (${tradingDataTimeFrame})`}
+                        value={
+                            tradeStats.totalVolumeKasKaspiano
+                                ? `${parseFloat(tradeStats.totalVolumeKasKaspiano).toFixed(0)} KAS`
+                                : null
+                        }
+                        secondary={
+                            tradeStats.totalVolumeUsdKaspiano
+                                ? `${parseFloat(tradeStats.totalVolumeUsdKaspiano).toFixed(0)}$`
+                                : null
+                        }
+                    />
 
-                        <Divider orientation="vertical" flexItem />
+                    <Divider orientation="vertical" flexItem />
 
-                        <StatsDisplay
-                            label={`TRADES (${tradingDataTimeFrame})`}
-                            value={tradeStats.totalTradesKaspiano ? tradeStats.totalTradesKaspiano : null}
-                        />
-                        <Divider orientation="vertical" flexItem />
-                        <StatsDisplay
-                            label={'FLOOR PRICE KAS'}
-                            value={floorPrice?.floor_price ? formatPrice(floorPrice.floor_price) : '---'}
-                        />
+                    <StatsDisplay
+                        label={`TRADES (${tradingDataTimeFrame})`}
+                        value={tradeStats.totalTradesKaspiano ? tradeStats.totalTradesKaspiano : 0}
+                    />
+                    <Divider orientation="vertical" flexItem />
+                    <StatsDisplay
+                        label={'FLOOR PRICE(KAS)'}
+                        value={floorPrice?.floor_price ? formatPrice(floorPrice.floor_price) : tokenInfo.price}
+                    />
 
-                        <Divider orientation="vertical" flexItem />
-                        <StatsDisplay label="TOTAL MINTED" value={stats.historicalTotalMints || '---'} />
+                    <Divider orientation="vertical" flexItem />
+                    <StatsDisplay label="TOTAL MINTED" value={totalMintedDataToShow} />
 
-                        <Divider orientation="vertical" flexItem />
+                    <Divider orientation="vertical" flexItem />
 
-                        <StatsDisplay
-                            label="HOLDERS"
-                            value={stats.currentTotalHolders}
-                            // change={stats.changes.holdersChange}
-                            // fontStyle={{ color: stats.changes.holdersChange < 0 ? 'red' : 'green' }}
-                        />
-                    </Box>
-                )
+                    <StatsDisplay
+                        label="HOLDERS"
+                        value={tokenInfo.totalHolders}
+                        secondary={tradingDataTimeFrame === 'All' ? '---' : holderChangeValue.toString()}
+                        arrow={holderChangeArrow}
+                    />
+                </Box>
             )}
         </Card>
     );

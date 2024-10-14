@@ -247,24 +247,13 @@ export const getUserReferral = async (walletAddress: string, referredBy?: string
     });
     return response.data;
 };
-export const fetchTickerStats = async (ticker: string, timeInterval: string): Promise<any> => {
-    try {
-        const capitalTicker = ticker.toUpperCase();
-        const response = await backendService.get<{ data: { volume: number; date: string } }>(
-            `/${KRC20CONTROLLER}/stats/?ticker=${capitalTicker}&timeInterval=${timeInterval}`,
-        );
-        return response.data ? response.data[0] : undefined;
-    } catch (error) {
-        console.error(`Error fetching price for ${ticker}:`, error.response ? error.response.data : error.message);
-        return undefined; // Return empty array in case of an error
-    }
-};
+
 export const fetchTickerTradeStats = async (ticker: string, timeInterval?: string): Promise<TradeStats> => {
     const timeFrame = timeInterval === 'All' ? '' : timeInterval;
-    const timeQueryStr = timeFrame ? `&timeInterval=${timeFrame}` : '';
+    const timeQueryStr = timeFrame ? `&timeFrame=${timeFrame}` : '';
     const capitalTicker = ticker.toUpperCase();
     const response = await backendService.get<TradeStats>(
-        `/${P2PCONTROLLERDATA}/trade-stats/?ticker=${capitalTicker}${timeQueryStr}`,
+        `/${P2PCONTROLLERDATA}/trade-stats?ticker=${capitalTicker}${timeQueryStr}`,
     );
     return response.data;
 };
@@ -276,14 +265,11 @@ export const fetchTickerFloorPrice = async (ticker: string): Promise<{ ticker: s
     return response.data[0];
 };
 
-export const getHolderChange = async (
-    ticker: string,
-    timeInterval?: string,
-): Promise<{ ticker: string; floor_price: number }> => {
+export const getHolderChange = async (ticker: string, timeInterval?: string): Promise<any> => {
     const capitalTicker = ticker.toUpperCase();
     const timeFrame = timeInterval === 'All' ? '' : timeInterval;
     const timeQueryStr = timeFrame ? `&timeInterval=${timeFrame}` : '';
-    const response = await backendService.get<{ ticker: string; floor_price: number }>(
+    const response = await backendService.get<any>(
         `/${KRC20CONTROLLER}/holder-change?ticker=${capitalTicker}${timeQueryStr}`,
     );
     return response.data;

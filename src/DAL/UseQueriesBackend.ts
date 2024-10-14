@@ -1,10 +1,10 @@
 // import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import {
     fetchAllTokens,
-    fetchTickerStats,
     countTokens,
     fetchTickerTradeStats,
     fetchTickerFloorPrice,
+    getHolderChange,
 } from './BackendDAL';
 import { useQuery } from '@tanstack/react-query';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -126,10 +126,10 @@ export const useUserListings = (walletAddress, offset = 0) =>
         }),
     });
 
-export const useFetchStats = (ticker: string, timeInterval: string) =>
+export const useFetchHolderChange = (ticker: string, timeInterval: string) =>
     useQuery({
-        queryKey: ['stats', ticker, timeInterval],
-        queryFn: () => fetchTickerStats(ticker, timeInterval),
+        queryKey: ['holder_change', ticker, timeInterval],
+        queryFn: () => getHolderChange(ticker, timeInterval),
         staleTime: 20000, // Data stays fresh for 25 seconds
         refetchOnWindowFocus: false,
     });

@@ -11,12 +11,12 @@ interface OrderItemProps {
     kasPrice: number;
     onSelect: (order: Order) => void;
     selectedOrder: Order | null;
-
     setSelectedOrder;
+    walletConnected: boolean;
 }
 
 const OrderItem: React.FC<OrderItemProps> = (props) => {
-    const { order, onSelect, kasPrice, selectedOrder, setSelectedOrder } = props;
+    const { order, onSelect, kasPrice, selectedOrder, setSelectedOrder, walletConnected } = props;
 
     // const floorPriceDifference = ((order.pricePerToken - floorPrice) / floorPrice) * 100;
 
@@ -76,22 +76,26 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                     {selectedOrder && selectedOrder.orderId === order.orderId ? (
                         <LoadingSpinner size={15} boxStyle={{ height: '5vh' }} />
                     ) : (
-                        <StyledButton
-                            variant="contained"
-                            onClick={() => handleSelect(order)}
-                            disabled={selectedOrder !== null}
-                            size="small"
-                            sx={{
-                                fontSize: '0.5rem',
+                        <Tooltip title={!walletConnected ? 'Connect to buy order' : ''}>
+                            <span>
+                                <StyledButton
+                                    variant="contained"
+                                    onClick={() => handleSelect(order)}
+                                    disabled={selectedOrder !== null || !walletConnected}
+                                    size="small"
+                                    sx={{
+                                        fontSize: '0.5rem',
 
-                                '&.MuiButton-root': {
-                                    padding: '0.4rem',
-                                    minWidth: '0.5rem',
-                                },
-                            }}
-                        >
-                            Buy
-                        </StyledButton>
+                                        '&.MuiButton-root': {
+                                            padding: '0.4rem',
+                                            minWidth: '0.5rem',
+                                        },
+                                    }}
+                                >
+                                    Buy
+                                </StyledButton>
+                            </span>
+                        </Tooltip>
                     )}
                 </Box>
             </Box>

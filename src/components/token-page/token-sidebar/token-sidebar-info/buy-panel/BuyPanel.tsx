@@ -255,18 +255,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                         scrollableTarget="scrollableList"
                         scrollThreshold={0.6}
                         endMessage={
-                            !walletConnected ? (
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        padding: '20px',
-                                        fontWeight: 'bold',
-                                    }}
-                                >
-                                    <p style={{ textAlign: 'center' }}>Connect wallet to interact</p>
-                                </Box>
-                            ) : isLoading ? (
+                            isLoading ? (
                                 <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
                                     <CircularProgress />
                                 </Box>

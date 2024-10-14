@@ -20,6 +20,7 @@ import { formatNumberWithCommas, simplifyNumber } from '../../../../utils/Utils'
 import { updateWalletSentiment } from '../../../../DAL/BackendDAL';
 import { UpdateMetadataDialog } from '../../update-metadata-dialog/UpdateMetadataDialog';
 import { fetchBurntRC20Balance } from '../../../../DAL/Krc20DAL';
+import { useFetchFloorPrice } from '../../../../DAL/UseQueriesBackend';
 
 export type SentimentButtonsConfig = {
     key: keyof TokenSentiment;
@@ -55,7 +56,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         { key: 'negative', icon: <TrendingDownRounded sx={{ fontSize: '1.1rem' }} color="error" /> },
         { key: 'warning', icon: <WarningAmberRoundedIcon sx={{ fontSize: '1.1rem' }} color="warning" /> },
     ];
-
+    const { data: floorPrice, isLoading: floorPriceLoading } = useFetchFloorPrice(tokenInfo.ticker);
     useEffect(() => {
         const fetchAndSetSupplyAfterBurn = async () => {
             const { totalSupply, ticker } = tokenInfo;
@@ -128,10 +129,10 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         setShowTokenInfoDialog(true);
     };
 
-    const tokenPriceDollars = tokenInfo.price ? (tokenInfo.price * kasPrice).toFixed(7) : null;
+    const tokenPriceDollars = floorPrice?.floor_price ? (floorPrice.floor_price * kasPrice).toFixed(7) : null;
 
     const preMintedSupplyPercentage = (tokenInfo.preMintedSupply / tokenInfo.totalSupply) * 100;
-    const tokenPrice = tokenInfo.price ? `${tokenInfo.price.toFixed(7)} KAS` : '---';
+    const tokenPrice = floorPrice?.floor_price ? `${floorPrice.floor_price.toFixed(7)} KAS` : '---';
 
     return (
         <Box
@@ -199,12 +200,16 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                         </Typography>
                     </StatCard>
                     <StatCard>
-                        <Typography variant="body2" align="center" color="text.secondary">
-                            PRICE
-                        </Typography>
-                        <Typography variant="body2" align="center">
-                            {tokenPrice}
-                        </Typography>
+                        <Tooltip title={'Kaspiano FP'}>
+                            <span>
+                                <Typography variant="body2" align="center" color="text.secondary">
+                                    PRICE
+                                </Typography>
+                                <Typography variant="body2" align="center">
+                                    {tokenPrice}
+                                </Typography>
+                            </span>
+                        </Tooltip>
                     </StatCard>
                 </Stack>
                 <Stack marginTop={8} direction={'row'} justify={'center'}>
