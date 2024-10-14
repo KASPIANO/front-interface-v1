@@ -14,6 +14,7 @@ import { fetchTokenByTicker, getTokenPriceHistory, recalculateRugScore } from '.
 import { AxiosError } from 'axios';
 import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
 import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
+import { useQuery } from '@tanstack/react-query';
 
 interface TokenPageProps {
     walletAddress: string | null;
@@ -23,7 +24,7 @@ interface TokenPageProps {
     walletBalance: number;
     walletConnected: boolean;
 }
-
+const tradingDataTimeFramesToSelect = ['All', '1m', '1w', '1d', '6h', '1h', '15m'];
 const TokenPage: FC<TokenPageProps> = (props) => {
     const { walletConnected, walletBalance, walletAddress, backgroundBlur } = props;
     const { ticker } = useParams();
@@ -31,8 +32,9 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const [tokenXHandle, setTokenXHandle] = useState(false);
     const [recalculateRugScoreLoading, setRecalculateRugScoreLoading] = useState(false);
     const [kasPrice, setkasPrice] = useState(0);
-    const [priceHistory, setPriceHistory] = useState(undefined);
-    const [currentTicker] = useState<string>(ticker);
+    const [tradingDataTimeFrame, setTradingDataTimeFrame] = useState(
+        tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 5],
+    );
 
     useEffect(() => {
         const fetchPrice = async () => {
@@ -79,19 +81,30 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         return () => clearInterval(interval);
     }, [fetchAndUpdateTokenInfo, ticker]);
 
-    useEffect(() => {
-        const fetchPriceHistory = async () => {
-            if (ticker !== currentTicker) {
-                setPriceHistory([]);
-            }
-            const result = await getTokenPriceHistory(ticker);
-            setPriceHistory(result);
-        };
-        fetchPriceHistory();
+    // useEffect(() => {
+    //     const fetchPriceHistory = async () => {
+    //         if (ticker !== currentTicker) {
+    //             setPriceHistory([]);
+    //         }
+    //         const result = await getTokenPriceHistory(ticker);
+    //         setPriceHistory(result);
+    //     };
+    //     fetchPriceHistory();
 
-        const interval = setInterval(fetchPriceHistory, 900000);
-        return () => clearInterval(interval);
-    }, [ticker, currentTicker]);
+    //     const interval = setInterval(fetchPriceHistory, 900000);
+    //     return () => clearInterval(interval);
+    // }, [ticker, currentTicker]);
+
+    const { data: priceHistoryData, isLoading } = useQuery({
+        queryKey: ['tokenPriceHistory', ticker, tradingDataTimeFrame], // The query key
+        queryFn: async () => {
+            const result = await getTokenPriceHistory(ticker, tradingDataTimeFrame);
+            return result;
+        },
+        enabled: !!ticker, // Only fetch if the ticker exists
+        staleTime: Infinity, // The cache never expires
+        refetchInterval: 900000, // 15 minutes
+    });
 
     const tokenData = useMemo(() => tokenInfo, [tokenInfo]);
 
@@ -99,7 +112,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         tokenData ? component : <Skeleton variant="rectangular" height={height} width={width} />;
 
     const getComponentGraphToShow = (component: JSX.Element, height?: string, width?: string) =>
-        priceHistory ? component : <Skeleton variant="rectangular" height={height} width={width} />;
+        !isLoading ? component : <Skeleton variant="rectangular" height={height} width={width} />;
 
     const rugScoreParse = tokenInfo?.metadata?.rugScore === 0 ? null : tokenInfo?.metadata?.rugScore;
 
@@ -134,10 +147,17 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         <TokenPageLayout backgroundBlur={backgroundBlur}>
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '11.5vh')}
             {getComponentGraphToShow(
-                <TokenGraph priceHistory={priceHistory} ticker={tokenInfo?.ticker} />,
+                <TokenGraph priceHistory={priceHistoryData} ticker={tokenInfo?.ticker} />,
                 '35vh',
             )}
-            {getComponentToShow(<TokenStats tokenInfo={tokenInfo} />)}
+            {getComponentToShow(
+                <TokenStats
+                    tokenInfo={tokenInfo}
+                    setTradingDataTimeFrame={setTradingDataTimeFrame}
+                    tradingDataTimeFrame={tradingDataTimeFrame}
+                    tradingDataTimeFramesToSelect={tradingDataTimeFramesToSelect}
+                />,
+            )}
             {getComponentToShow(
                 <MintingComponent
                     tokenInfo={tokenInfo}

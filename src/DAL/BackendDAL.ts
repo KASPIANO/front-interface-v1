@@ -217,11 +217,16 @@ export const fetchTokenPrice = async (ticker: string): Promise<number> => {
         return 0; // Return 0 in case of an error
     }
 };
-export const getTokenPriceHistory = async (ticker: string): Promise<{ price: number; date: string }[]> => {
+export const getTokenPriceHistory = async (
+    ticker: string,
+    timeInterval: string,
+): Promise<{ price: number; date: string }[]> => {
     try {
+        const timeFrame = timeInterval === 'All' ? '' : timeInterval;
+        const timeQueryStr = timeFrame ? `?timeFrame=${timeFrame}` : '';
         const capitalTicker = ticker.toUpperCase();
         const response = await backendService.get<{ data: { price: number; date: string }[] }>(
-            `/${KRC20CONTROLLER}/price-history/${capitalTicker}`,
+            `/${KRC20CONTROLLER}/price-history/${capitalTicker}${timeQueryStr}`,
         );
         return response.data.data;
     } catch (error) {

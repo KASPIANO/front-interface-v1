@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { Box, Card, Divider, Skeleton, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
 import { BackendTokenResponse } from '../../../types/Types';
@@ -7,6 +7,9 @@ import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material'; // Import arro
 
 interface TokenStatsProps {
     tokenInfo: BackendTokenResponse;
+    tradingDataTimeFrame: string;
+    setTradingDataTimeFrame: (value: string) => void;
+    tradingDataTimeFramesToSelect;
 }
 
 // function calculateAgeInDays(timestamp) {
@@ -27,17 +30,13 @@ interface TokenStatsProps {
 // }
 
 const TokenStats: FC<TokenStatsProps> = (props) => {
-    const { tokenInfo } = props;
-    const tradingDataTimeFramesToSelect = ['All', '1m', '1w', '1d', '6h', '1h', '15m'];
-    const [tradingDataTimeFrame, setTradingDataTimeFrame] = useState(
-        tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 1],
-    );
+    const { tokenInfo, setTradingDataTimeFrame, tradingDataTimeFrame, tradingDataTimeFramesToSelect } = props;
 
     const { data: holdersChange, isLoading: loading } = useFetchHolderChange(
         tokenInfo.ticker,
         tradingDataTimeFrame,
     );
-    const { data: floorPrice, isLoading: floorPriceLoading } = useFetchFloorPrice(tokenInfo.ticker);
+    const { data: floorPrice } = useFetchFloorPrice(tokenInfo.ticker);
     const { data: tradeStats, isLoading: tradeloading } = useFetchTradeStats(
         tokenInfo.ticker,
         tradingDataTimeFrame,
@@ -159,7 +158,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                         label="HOLDERS"
                         value={tokenInfo.totalHolders}
                         secondary={tradingDataTimeFrame === 'All' ? '---' : holderChangeValue.toString()}
-                        arrow={holderChangeArrow}
+                        arrow={tradingDataTimeFrame === 'All' ? null : holderChangeArrow}
                     />
                 </Box>
             )}

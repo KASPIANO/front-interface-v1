@@ -56,7 +56,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         { key: 'negative', icon: <TrendingDownRounded sx={{ fontSize: '1.1rem' }} color="error" /> },
         { key: 'warning', icon: <WarningAmberRoundedIcon sx={{ fontSize: '1.1rem' }} color="warning" /> },
     ];
-    const { data: floorPrice, isLoading: floorPriceLoading } = useFetchFloorPrice(tokenInfo.ticker);
+    const { data: floorPrice } = useFetchFloorPrice(tokenInfo.ticker);
     useEffect(() => {
         const fetchAndSetSupplyAfterBurn = async () => {
             const { totalSupply, ticker } = tokenInfo;
@@ -129,10 +129,13 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
         setShowTokenInfoDialog(true);
     };
 
-    const tokenPriceDollars = floorPrice?.floor_price ? (floorPrice.floor_price * kasPrice).toFixed(7) : null;
-
     const preMintedSupplyPercentage = (tokenInfo.preMintedSupply / tokenInfo.totalSupply) * 100;
-    const tokenPrice = floorPrice?.floor_price ? `${floorPrice.floor_price.toFixed(7)} KAS` : '---';
+    const tokenPrice = floorPrice?.floor_price
+        ? `${floorPrice.floor_price.toFixed(7)} KAS`
+        : `${tokenInfo.price.toFixed(7)} KAS`;
+    const tokenPriceDollars = floorPrice?.floor_price
+        ? (floorPrice.floor_price * kasPrice).toFixed(7)
+        : (tokenInfo.price * kasPrice).toFixed(7);
 
     return (
         <Box
