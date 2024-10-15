@@ -42,6 +42,7 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
         creatingSellOrder,
     } = props;
     const [showHighGasWarning, setShowHighGasWarning] = useState(false);
+    const [onClickConfirm, setOnClickConfirm] = useState(false);
     useEffect(() => {
         const checkGasLimits = async () => {
             const isHighGasWarning = await highGasWarning('TRANSFER');
@@ -66,6 +67,12 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
         } else {
             return (total - total * MARKETLACE_FEE_PERCENTAGE).toFixed(2);
         }
+    };
+
+    const handleConfirm = async () => {
+        setOnClickConfirm(true);
+        await onConfirm();
+        setOnClickConfirm(false);
     };
     return (
         <Dialog open={open} onClose={handleClose}>
@@ -128,12 +135,12 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                 <DialogActions>
                     <Button onClick={onClose}>Cancel</Button>
                     <Button
-                        onClick={onConfirm}
+                        onClick={handleConfirm}
                         variant="contained"
                         color="primary"
-                        disabled={waitingForWalletConfirmation || creatingSellOrder}
+                        disabled={waitingForWalletConfirmation || creatingSellOrder || onClickConfirm}
                     >
-                        Confirm
+                        {onClickConfirm ? 'Creating...' : 'Confirm'}
                     </Button>
                 </DialogActions>
             )}
