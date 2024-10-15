@@ -1,10 +1,15 @@
-import { FC, useState } from 'react';
-import { Box, Card, Divider, Typography } from '@mui/material';
+import { FC } from 'react';
+import { Box, Card, Divider, Skeleton, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
 import { BackendTokenResponse } from '../../../types/Types';
+import { useFetchFloorPrice, useFetchHolderChange, useFetchTradeStats } from '../../../DAL/UseQueriesBackend';
+import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material'; // Import arrow icons
 
 interface TokenStatsProps {
     tokenInfo: BackendTokenResponse;
+    tradingDataTimeFrame: string;
+    setTradingDataTimeFrame: (value: string) => void;
+    tradingDataTimeFramesToSelect;
 }
 
 // function calculateAgeInDays(timestamp) {
@@ -25,20 +30,70 @@ interface TokenStatsProps {
 // }
 
 const TokenStats: FC<TokenStatsProps> = (props) => {
-    const { tokenInfo } = props;
-    const tradingDataTimeFramesToSelect = ['All', '1m', '1w', '1d'];
-    const [tradingDataTimeFrame, setTradingDataTimeFrame] = useState(
-        tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 1],
+    const { tokenInfo, setTradingDataTimeFrame, tradingDataTimeFrame, tradingDataTimeFramesToSelect } = props;
+
+    const { data: holdersChange, isLoading: loading } = useFetchHolderChange(
+        tokenInfo.ticker,
+        tradingDataTimeFrame,
+    );
+    const { data: floorPrice } = useFetchFloorPrice(tokenInfo.ticker);
+    const { data: tradeStats, isLoading: tradeloading } = useFetchTradeStats(
+        tokenInfo.ticker,
+        tradingDataTimeFrame,
     );
 
     const updateTradingDataTimeFrame = (value: string) => {
         setTradingDataTimeFrame(value);
     };
 
-    const tokenKasPrice = tokenInfo.price ? `${tokenInfo.price.toFixed(7)} / KAS` : '---';
+    const StatsDisplay = ({ label, value, secondary = null, arrow = null }) => (
+        <Box>
+            <Typography sx={{ fontSize: '0.7rem' }} align="center">
+                {label}
+            </Typography>
+            <Typography align="center" sx={{ fontSize: '0.65rem', fontWeight: 'bold' }}>
+                {value}
+            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                {secondary && (
+                    <Typography
+                        align="center"
+                        sx={{
+                            fontSize: '0.65rem',
+                        }}
+                    >
+                        {secondary}
+                    </Typography>
+                )}
+                {arrow && (
+                    <Box
+                        sx={{
+                            color: arrow === 'positive' ? '#4CAF50' : '#F44336',
+                            display: 'flex',
+                            alignItems: 'center',
+                        }}
+                    >
+                        {arrow === 'positive' ? (
+                            <ArrowDropUp sx={{ fontSize: '1rem' }} />
+                        ) : (
+                            <ArrowDropDown sx={{ fontSize: '1rem' }} />
+                        )}
+                    </Box>
+                )}
+            </Box>
+        </Box>
+    );
 
+    const formatPrice = (value) => {
+        const num = parseFloat(value);
+
+        // Fix the number to 10 decimal places, then remove unnecessary trailing zeros
+        return num.toFixed(10).replace(/\.?0+$/, '');
+    };
+    const holderChangeValue = tokenInfo.totalHolders - holdersChange?.totalHolders || 0;
+    const holderChangeArrow = holderChangeValue > 0 ? 'positive' : 'negative';
     const totalMintedDataToShow =
-        tokenInfo.state === 'finished' ? '100%' : `${(tokenInfo.totalMintedPercent * 100).toFixed(3)}%`;
+        tokenInfo.state === 'finished' ? '100%' : `${(tokenInfo.totalMintedPercent * 100).toFixed(8)}%`;
     return (
         <Card sx={{ height: '20vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -57,52 +112,56 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     onChange={updateTradingDataTimeFrame}
                 />
             </Box>
-            <Box
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    marginTop: '3vh',
-                    columnGap: '2vw',
-                    justifyContent: 'center',
-                }}
-            >
-                <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '0.7rem' }} align="center">
-                        VOLUME ({tradingDataTimeFrame})
-                    </Typography>
-                    <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
-                        {tokenInfo.volume ? `$${tokenInfo.volume}` : '---'}
-                    </Typography>
-                </Box>
+            {loading || tradeloading ? (
+                <Skeleton key={1} width={'100%'} height={'11vh'} />
+            ) : (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        mt: '1rem',
+                        columnGap: '0.8rem',
+                        justifyContent: 'center',
+                    }}
+                >
+                    <StatsDisplay
+                        label={`VOLUME (${tradingDataTimeFrame})`}
+                        value={
+                            tradeStats.totalVolumeKasKaspiano
+                                ? `${parseFloat(tradeStats.totalVolumeKasKaspiano).toFixed(0)} KAS`
+                                : null
+                        }
+                        secondary={
+                            tradeStats.totalVolumeUsdKaspiano
+                                ? `${parseFloat(tradeStats.totalVolumeUsdKaspiano).toFixed(0)}$`
+                                : null
+                        }
+                    />
 
-                <Divider orientation="vertical" flexItem />
-                <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '0.7rem' }} align="center">
-                        PRICE PER TOKEN ({tradingDataTimeFrame})
-                    </Typography>
-                    <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
-                        {tokenKasPrice}
-                    </Typography>
+                    <Divider orientation="vertical" flexItem />
+
+                    <StatsDisplay
+                        label={`TRADES (${tradingDataTimeFrame})`}
+                        value={tradeStats.totalTradesKaspiano ? tradeStats.totalTradesKaspiano : 0}
+                    />
+                    <Divider orientation="vertical" flexItem />
+                    <StatsDisplay
+                        label={'FLOOR PRICE(KAS)'}
+                        value={floorPrice?.floor_price ? formatPrice(floorPrice.floor_price) : tokenInfo.price}
+                    />
+
+                    <Divider orientation="vertical" flexItem />
+                    <StatsDisplay label="TOTAL MINTED" value={totalMintedDataToShow} />
+
+                    <Divider orientation="vertical" flexItem />
+
+                    <StatsDisplay
+                        label="HOLDERS"
+                        value={tokenInfo.totalHolders}
+                        secondary={tradingDataTimeFrame === 'All' ? '---' : holderChangeValue.toString()}
+                        arrow={tradingDataTimeFrame === 'All' ? null : holderChangeArrow}
+                    />
                 </Box>
-                <Divider orientation="vertical" flexItem />
-                <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '0.7rem' }} align="center">
-                        TOTAL MINTED
-                    </Typography>
-                    <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
-                        {totalMintedDataToShow}
-                    </Typography>
-                </Box>
-                <Divider orientation="vertical" flexItem />
-                <Box sx={{ textAlign: 'center' }}>
-                    <Typography sx={{ fontSize: '0.7rem' }} align="center">
-                        HOLDERS
-                    </Typography>
-                    <Typography align="center" sx={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
-                        {tokenInfo.totalHolders}
-                    </Typography>
-                </Box>
-            </Box>
+            )}
         </Card>
     );
 };

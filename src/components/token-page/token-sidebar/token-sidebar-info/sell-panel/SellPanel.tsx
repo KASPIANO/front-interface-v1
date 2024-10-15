@@ -31,8 +31,6 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [priceCurrency, setPriceCurrency] = useState<'KAS' | 'USD'>('KAS');
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false); // Dialog state
     const [walletConfirmation, setWalletConfirmation] = useState<boolean>(false);
-    const [orderId, setOrderId] = useState<string>('');
-    const [tempWalletAddress, setTempWalletAddress] = useState<string>('');
     const [creatingSellOrder, setCreatingSellOrder] = useState<boolean>(false);
     const [disableSellButton, setDisableSellButton] = useState<boolean>(false);
     const [finishedSellOrder, setFinishedSellOrder] = useState<boolean>(false);
@@ -260,16 +258,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         }
         try {
             // Retrieve wallet temp wallert address and order id and set it
-            const { id, temporaryWalletAddress } = await createSellOrder(
-                tokenInfo.ticker,
-                amount,
-                parseInt(totalPrice),
-                parseFloat(pricePerToken),
-                walletAddress,
-            );
+
             setIsDialogOpen(true);
-            setOrderId(id);
-            setTempWalletAddress(temporaryWalletAddress);
         } catch (error) {
             console.error(error);
             showGlobalSnackbar({
@@ -280,20 +270,27 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     };
 
     const handleTransfer = async () => {
+        const { id, temporaryWalletAddress } = await createSellOrder(
+            tokenInfo.ticker,
+            parseInt(tokenAmount),
+            parseInt(totalPrice),
+            parseFloat(pricePerToken),
+            walletAddress,
+        );
+        setWalletConfirmation(true);
         const inscribeJsonString: TransferObj = {
             p: 'KRC-20',
             op: 'transfer',
             tick: tokenInfo.ticker,
             amt: (parseInt(tokenAmount) * KASPA_TO_SOMPI).toString(),
-            to: tempWalletAddress,
+            to: temporaryWalletAddress,
         };
         const jsonStringified = JSON.stringify(inscribeJsonString);
 
         try {
-            setWalletConfirmation(true);
             const result = await transferKRC20Token(jsonStringified);
-            setWalletConfirmation(false);
             setCreatingSellOrder(true);
+            setWalletConfirmation(false);
             if (result) {
                 const { commitId, revealId } = JSON.parse(result);
                 showGlobalSnackbar({
@@ -304,14 +301,14 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 });
             }
             const confirmation = await doPolling(
-                () => confirmSellOrder(orderId),
+                () => confirmSellOrder(id),
                 (result) => result.confirmed,
             );
 
             if (confirmation) {
                 setDisableSellButton(false);
                 showGlobalSnackbar({
-                    message: 'Sell order confirmed successfully',
+                    message: 'Sell order created successfully',
                     severity: 'success',
                 });
                 setIsDialogOpen(false);
@@ -322,7 +319,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 return true;
             } else {
                 showGlobalSnackbar({
-                    message: 'Failed to confirm sell order',
+                    message: 'Failed to create sell order',
                     severity: 'error',
                 });
                 return false;
@@ -411,6 +408,13 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             </Box>
         </Tooltip>
     );
+    const formatPrice = (value) => {
+        const num = parseFloat(value);
+
+        // Fix the number to 10 decimal places, then remove unnecessary trailing zeros
+        return num.toFixed(10).replace(/\.?0+$/, '');
+    };
+
     return (
         <>
             <StyledSellPanel>
@@ -450,7 +454,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 </Tooltip>
                 <StyledTextField
                     label={`Price per Token (${priceCurrency})`}
-                    value={pricePerToken}
+                    value={pricePerToken ? formatPrice(pricePerToken) : ''}
                     // onChange={handlePricePerTokenChange}
                     disabled={true}
                     fullWidth

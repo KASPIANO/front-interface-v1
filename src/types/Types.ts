@@ -314,6 +314,7 @@ export enum SellOrderStatus {
     SWAP_ERROR = 'SWAP_ERROR',
     CHECKING_EXPIRED = 'CHECKING_EXPIRED',
     UNKNOWN_MONEY_ERROR = 'UNKNOWN_MONEY_ERROR',
+    TOKENS_NOT_SENT = 'TOKENS_NOT_SENT',
     OFF_MARKETPLACE = 'OFF_MARKETPLACE',
     DELISTING = 'DELISTING',
     DELIST_ERROR = 'DELIST_ERROR',
@@ -336,4 +337,18 @@ export type UserReferral = {
     code: string;
     referredBy?: string;
     isNew?: boolean;
+};
+
+export type TradeStats = {
+    totalTradesKaspiano: number;
+    totalVolumeKasKaspiano: string;
+    totalVolumeUsdKaspiano: string;
+    tokens: [
+        {
+            totalTrades: number;
+            totalVolumeKAS: number;
+            ticker: string;
+            totalVolumeUsd: string;
+        },
+    ];
 };

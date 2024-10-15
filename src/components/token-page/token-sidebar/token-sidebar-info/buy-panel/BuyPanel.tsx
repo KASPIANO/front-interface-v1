@@ -21,12 +21,13 @@ interface BuyPanelProps {
     walletBalance: number;
     walletConnected: boolean;
     walletAddress: string | null;
+    setBuyPanelRef: (ref: { handleDrawerClose: () => void }) => void;
 }
 
 const KASPA_TO_SOMPI = 100000000;
 
 const BuyPanel: React.FC<BuyPanelProps> = (props) => {
-    const { tokenInfo, walletBalance, walletConnected, kasPrice, walletAddress } = props;
+    const { tokenInfo, walletBalance, walletConnected, kasPrice, walletAddress, setBuyPanelRef } = props;
     const [sortBy, setSortBy] = useState('pricePerToken');
     const [sortOrder] = useState<'asc' | 'desc'>('asc');
     const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -42,6 +43,20 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         sortBy,
         sortOrder,
     );
+
+    useEffect(() => {
+        if (setBuyPanelRef) {
+            setBuyPanelRef({
+                handleDrawerClose: () => {
+                    if (selectedOrder) {
+                        releaseBuyLock(selectedOrder.orderId);
+                        setIsPanelOpen(false);
+                        setSelectedOrder(null);
+                    }
+                },
+            });
+        }
+    }, [selectedOrder, setBuyPanelRef]);
 
     useEffect(() => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -240,18 +255,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                         scrollableTarget="scrollableList"
                         scrollThreshold={0.6}
                         endMessage={
-                            !walletConnected ? (
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        padding: '20px',
-                                        fontWeight: 'bold',
-                                    }}
-                                >
-                                    <p style={{ textAlign: 'center' }}>Connect wallet to interact</p>
-                                </Box>
-                            ) : isLoading ? (
+                            isLoading ? (
                                 <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
                                     <CircularProgress />
                                 </Box>

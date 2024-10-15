@@ -11,6 +11,7 @@ import { ThemeContext } from './main';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
 import { getLocalThemeMode, ThemeModes } from './utils/Utils';
+import Seo from './components/helmet-seo/Seo';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -52,6 +53,7 @@ const App = () => {
             <ThemeProvider theme={themeMode === ThemeModes.DARK ? darkTheme : lightTheme}>
                 <CssBaseline />
                 <BrowserRouter>
+                    <Seo />
                     <Navbar
                         walletConnected={walletConnected}
                         walletAddress={walletAddress}

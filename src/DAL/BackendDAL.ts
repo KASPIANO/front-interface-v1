@@ -5,6 +5,7 @@ import {
     TokenListItemResponse,
     TokenSearchItems,
     TokenSentiment,
+    TradeStats,
     UserReferral,
     VerifiedUser,
 } from '../types/Types';
@@ -12,6 +13,7 @@ import { backendService } from './AxiosInstaces';
 
 const KRC20CONTROLLER = 'krc20';
 const P2PCONTROLLER = 'p2p';
+const P2PCONTROLLERDATA = 'p2p-data';
 const KRC20METADATA_CONTROLLER = 'krc20metadata';
 const USER_REFERRALS_CONTROLLER = 'referrals';
 const AUTH_CONTROLLER = 'auth';
@@ -215,11 +217,16 @@ export const fetchTokenPrice = async (ticker: string): Promise<number> => {
         return 0; // Return 0 in case of an error
     }
 };
-export const getTokenPriceHistory = async (ticker: string): Promise<{ price: number; date: string }[]> => {
+export const getTokenPriceHistory = async (
+    ticker: string,
+    timeInterval?: string,
+): Promise<{ price: number; date: string }[]> => {
     try {
+        const timeFrame = timeInterval === 'All' ? '' : timeInterval;
+        const timeQueryStr = timeFrame ? `?timeFrame=${timeFrame}` : '';
         const capitalTicker = ticker.toUpperCase();
         const response = await backendService.get<{ data: { price: number; date: string }[] }>(
-            `/${KRC20CONTROLLER}/price-history/${capitalTicker}`,
+            `/${KRC20CONTROLLER}/price-history/${capitalTicker}${timeQueryStr}`,
         );
         return response.data.data;
     } catch (error) {
@@ -243,5 +250,32 @@ export const getUserReferral = async (walletAddress: string, referredBy?: string
         walletAddress,
         referredBy,
     });
+    return response.data;
+};
+
+export const fetchTickerTradeStats = async (ticker: string, timeInterval?: string): Promise<TradeStats> => {
+    const timeFrame = timeInterval === 'All' ? '' : timeInterval;
+    const timeQueryStr = timeFrame ? `&timeFrame=${timeFrame}` : '';
+    const capitalTicker = ticker.toUpperCase();
+    const response = await backendService.get<TradeStats>(
+        `/${P2PCONTROLLERDATA}/trade-stats?ticker=${capitalTicker}${timeQueryStr}`,
+    );
+    return response.data;
+};
+export const fetchTickerFloorPrice = async (ticker: string): Promise<{ ticker: string; floor_price: number }> => {
+    const capitalTicker = ticker.toUpperCase();
+    const response = await backendService.get<{ ticker: string; floor_price: number }>(
+        `/${P2PCONTROLLERDATA}/floor-price?ticker=${capitalTicker}`,
+    );
+    return response.data[0];
+};
+
+export const getHolderChange = async (ticker: string, timeInterval?: string): Promise<any> => {
+    const capitalTicker = ticker.toUpperCase();
+    const timeFrame = timeInterval === 'All' ? '' : timeInterval;
+    const timeQueryStr = timeFrame ? `&timeInterval=${timeFrame}` : '';
+    const response = await backendService.get<any>(
+        `/${KRC20CONTROLLER}/holder-change?ticker=${capitalTicker}${timeQueryStr}`,
+    );
     return response.data;
 };

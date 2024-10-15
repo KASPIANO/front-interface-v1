@@ -71,15 +71,23 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle sx={{ fontWeight: 'bold' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    {waitingForWalletConfirmation || creatingSellOrder ? '' : 'Confirm Sell Order'}
+                    {waitingForWalletConfirmation
+                        ? 'Step 1/2' // Show Step 1/2 when waiting for wallet confirmation
+                        : creatingSellOrder
+                          ? 'Step 2/2' // Show Step 2/2 when creating a sell order
+                          : 'Confirm Sell Order'}
                     {showHighGasWarning && <HighGasWarning />}
                 </Box>
             </DialogTitle>
             <DialogContent>
                 {waitingForWalletConfirmation ? (
-                    <LoadingSpinner title="Waiting for wallet confirmation..." size={60} />
+                    <LoadingSpinner
+                        title="Waiting for wallet confirmation..."
+                        size={60}
+                        boxStyle={{ marginBottom: '1rem' }}
+                    />
                 ) : creatingSellOrder ? (
-                    <LoadingSpinner title="Creating sell order..." size={60} />
+                    <LoadingSpinner title="Creating sell order..." size={60} boxStyle={{ marginBottom: '1rem' }} />
                 ) : (
                     <>
                         <Box sx={{ mt: 1 }}>

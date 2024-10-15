@@ -19,7 +19,7 @@ const OrderList: React.FC<OrderListProps> = ({
     floorPrice,
     kasPrice,
     selectedOrder,
-
+    walletConnected,
     setSelectedOrder,
 }) => (
     <div style={{ width: '100%' }}>
@@ -35,6 +35,7 @@ const OrderList: React.FC<OrderListProps> = ({
                 order={order}
                 floorPrice={floorPrice}
                 kasPrice={kasPrice}
+                walletConnected={walletConnected}
             />
         ))}
     </div>
