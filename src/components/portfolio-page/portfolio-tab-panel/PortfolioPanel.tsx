@@ -7,6 +7,7 @@ import { TokenRowPortfolioItem } from '../../../types/Types';
 import PortfolioActivityTokenGrid from '../portfolio-activity-grid/PortfolioActivityTokenGrid';
 import PortfolioOrdersGrid from '../user-orders/PortfolioOrdersGrid';
 import PortfolioOrdersHistoryGrid from '../user-orders-history/PortfolioOrdersHistoryGrid';
+import UserPanel from '../profile/UserPanel';
 
 interface PortfolioPanelProps {
     kasPrice: number;
@@ -63,6 +64,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                     <TabStyled label="Activity" value="2" />
                     <TabStyled label="Listings" value="3" />
                     <TabStyled label="Order HIstory" value="4" />
+                    <TabStyled label="Profile" value="5" />
                 </Tabs>
                 <TabPanelStyled value="1">
                     <PortfolioTokenGrid
@@ -101,6 +103,9 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                         walletConnected={walletConnected}
                         walletAddress={walletAddress}
                     />
+                </TabPanelStyled>
+                <TabPanelStyled value="5">
+                    <UserPanel />
                 </TabPanelStyled>
             </TabContext>
         </TabPanelContainer>
