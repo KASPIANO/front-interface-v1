@@ -10,6 +10,7 @@ export const darkTheme = createTheme({
         secondary: {
             main: '#49EACB', // Secondary color
         },
+        
         info: {
             main: '#767676',
         },
