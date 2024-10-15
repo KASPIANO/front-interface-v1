@@ -88,7 +88,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         const num = parseFloat(value);
 
         // Fix the number to 10 decimal places, then remove unnecessary trailing zeros
-        return num.toFixed(10).replace(/\.?0+$/, '');
+        return num.toFixed(7).replace(/\.?0+$/, '');
     };
     const holderChangeValue = tokenInfo.totalHolders - holdersChange?.totalHolders || 0;
     const holderChangeArrow = holderChangeValue > 0 ? 'positive' : 'negative';
@@ -146,7 +146,11 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     <Divider orientation="vertical" flexItem />
                     <StatsDisplay
                         label={'FLOOR PRICE(KAS)'}
-                        value={floorPrice?.floor_price ? formatPrice(floorPrice.floor_price) : tokenInfo.price}
+                        value={
+                            floorPrice?.floor_price
+                                ? formatPrice(floorPrice.floor_price)
+                                : tokenInfo.price.toFixed(7)
+                        }
                     />
 
                     <Divider orientation="vertical" flexItem />
