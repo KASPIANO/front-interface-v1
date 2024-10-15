@@ -289,12 +289,12 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
 
         try {
             const result = await transferKRC20Token(jsonStringified);
-            setWalletConfirmation(false);
             setCreatingSellOrder(true);
+            setWalletConfirmation(false);
             if (result) {
                 const { commitId, revealId } = JSON.parse(result);
                 showGlobalSnackbar({
-                    message: 'Token transferred successfully, Finished step 1/2',
+                    message: 'Token transferred successfully',
                     severity: 'success',
                     commitId,
                     revealId,
@@ -308,7 +308,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             if (confirmation) {
                 setDisableSellButton(false);
                 showGlobalSnackbar({
-                    message: 'Sell order confirmed successfully Finished step 2/2',
+                    message: 'Sell order created successfully',
                     severity: 'success',
                 });
                 setIsDialogOpen(false);
@@ -319,7 +319,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 return true;
             } else {
                 showGlobalSnackbar({
-                    message: 'Failed to confirm sell order',
+                    message: 'Failed to create sell order',
                     severity: 'error',
                 });
                 return false;
