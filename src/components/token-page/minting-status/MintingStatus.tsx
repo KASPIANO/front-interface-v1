@@ -26,10 +26,10 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
     useEffect(() => {
         if (mintSuccessful) {
             const timer = setTimeout(async () => {
+                setMintSuccessful(false);
                 try {
                     const updatedTokenData = await fetchTokenByTicker(tokenInfo.ticker, walletAddress, true);
                     setTokenInfo(updatedTokenData);
-                    setMintSuccessful(false);
                 } catch (error) {
                     console.error('Error updating data after mint:', error);
                 }

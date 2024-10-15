@@ -76,7 +76,7 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                     {selectedOrder && selectedOrder.orderId === order.orderId ? (
                         <LoadingSpinner size={15} boxStyle={{ height: '5vh' }} />
                     ) : (
-                        <Tooltip title={!walletConnected ? 'Connect to buy order' : ''}>
+                        <Tooltip title={!walletConnected ? 'Connect Wallet to buy order' : ''}>
                             <span>
                                 <StyledButton
                                     variant="contained"
