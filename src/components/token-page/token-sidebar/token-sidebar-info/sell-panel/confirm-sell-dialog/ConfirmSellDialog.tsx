@@ -137,7 +137,7 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                         Cancel
                     </Button>
                     <Button
-                        onClick={handleConfirm}
+                        onClick={() => handleConfirm()}
                         variant="contained"
                         color="primary"
                         disabled={waitingForWalletConfirmation || creatingSellOrder || onClickConfirm}

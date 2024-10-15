@@ -340,6 +340,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 return false;
             }
         } catch (error) {
+            setCreatingSellOrder(false);
             setWalletConfirmation(false);
             showGlobalSnackbar({
                 message: 'Failed to Transfer Token',
