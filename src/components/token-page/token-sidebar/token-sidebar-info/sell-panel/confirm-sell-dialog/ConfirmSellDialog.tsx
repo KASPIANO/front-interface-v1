@@ -140,7 +140,7 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                         color="primary"
                         disabled={waitingForWalletConfirmation || creatingSellOrder || onClickConfirm}
                     >
-                        Confirm
+                        {onClickConfirm ? 'Creating...' : 'Confirm'}
                     </Button>
                 </DialogActions>
             )}
