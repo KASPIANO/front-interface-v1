@@ -219,7 +219,7 @@ export const fetchTokenPrice = async (ticker: string): Promise<number> => {
 };
 export const getTokenPriceHistory = async (
     ticker: string,
-    timeInterval: string,
+    timeInterval?: string,
 ): Promise<{ price: number; date: string }[]> => {
     try {
         const timeFrame = timeInterval === 'All' ? '' : timeInterval;
