@@ -318,16 +318,19 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             );
 
             if (confirmation) {
+                setIsDialogOpen(false);
                 setDisableSellButton(false);
                 showGlobalSnackbar({
                     message: 'Sell order created successfully',
                     severity: 'success',
                 });
-                setIsDialogOpen(false);
-                setCreatingSellOrder(false);
                 cleanFields();
                 queryClient.invalidateQueries({ queryKey: ['orders'] });
                 setFinishedSellOrder((prev) => !prev);
+                setTimeout(() => {
+                    setCreatingSellOrder(false); // Ensures it closes after a slight delay
+                }, 500);
+
                 return true;
             } else {
                 showGlobalSnackbar({
