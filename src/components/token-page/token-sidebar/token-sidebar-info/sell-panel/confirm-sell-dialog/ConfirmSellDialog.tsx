@@ -54,7 +54,7 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
     }, []);
 
     const handleClose = () => {
-        if (waitingForWalletConfirmation || creatingSellOrder) {
+        if (waitingForWalletConfirmation || creatingSellOrder || onClickConfirm) {
             return; // Prevent closing if waiting
         }
         onClose();
@@ -133,7 +133,9 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
             </DialogContent>
             {waitingForWalletConfirmation || creatingSellOrder ? null : (
                 <DialogActions>
-                    <Button onClick={onClose}>Cancel</Button>
+                    <Button onClick={onClose} disabled={onClickConfirm}>
+                        Cancel
+                    </Button>
                     <Button
                         onClick={handleConfirm}
                         variant="contained"

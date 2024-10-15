@@ -270,20 +270,32 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     };
 
     const handleTransfer = async () => {
-        const { id, temporaryWalletAddress } = await createSellOrder(
-            tokenInfo.ticker,
-            parseInt(tokenAmount),
-            parseInt(totalPrice),
-            parseFloat(pricePerToken),
-            walletAddress,
-        );
+        let idResponse = '';
+        let temporaryWalletAddressResponse = '';
+        try {
+            const { id, temporaryWalletAddress } = await createSellOrder(
+                tokenInfo.ticker,
+                parseInt(tokenAmount),
+                parseInt(totalPrice),
+                parseFloat(pricePerToken),
+                walletAddress,
+            );
+            idResponse = id;
+            temporaryWalletAddressResponse = temporaryWalletAddress;
+        } catch (error) {
+            showGlobalSnackbar({
+                message: 'Failed to create sell order for the token. Please try again later.',
+                severity: 'error',
+            });
+            return;
+        }
         setWalletConfirmation(true);
         const inscribeJsonString: TransferObj = {
             p: 'KRC-20',
             op: 'transfer',
             tick: tokenInfo.ticker,
             amt: (parseInt(tokenAmount) * KASPA_TO_SOMPI).toString(),
-            to: temporaryWalletAddress,
+            to: temporaryWalletAddressResponse,
         };
         const jsonStringified = JSON.stringify(inscribeJsonString);
 
@@ -301,7 +313,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 });
             }
             const confirmation = await doPolling(
-                () => confirmSellOrder(id),
+                () => confirmSellOrder(idResponse),
                 (result) => result.confirmed,
             );
 
