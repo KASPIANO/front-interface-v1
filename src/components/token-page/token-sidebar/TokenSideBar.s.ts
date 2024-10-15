@@ -1,4 +1,4 @@
-import { styled, Card } from '@mui/material';
+import { styled, Card, Tab } from '@mui/material';
 
 export const SideBarContainer = styled(Card)({
     borderRadius: '8px',
@@ -10,4 +10,11 @@ export const SideBarContainer = styled(Card)({
     scroll: 'auto',
     overflow: 'hidden',
     top: '0',
+});
+
+export const TabStyled = styled(Tab)({
+    paddingBottom: 0,
+    paddingTop: 0,
+    height: '2rem',
+    minHeight: '5px',
 });

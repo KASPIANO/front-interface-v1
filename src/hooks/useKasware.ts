@@ -10,6 +10,9 @@ import { LOCAL_STORAGE_KEYS } from '../utils/Constants';
 import { getUserReferral } from '../DAL/BackendDAL';
 import { useQueryClient } from '@tanstack/react-query';
 
+const COOKIE_TTL = 4 * 60 * 60 * 1000;
+let cookieExperationTimeout = null;
+
 export const useKasware = () => {
     const [connected, setConnected] = useState(false);
     const [accounts, setAccounts] = useState<string[]>([]);
@@ -43,10 +46,13 @@ export const useKasware = () => {
 
     const setNewBalance = useCallback(() => {
         const { kasware } = window;
-        kasware.getBalance().then((balance) => {
-            const kasAmount = balance.total / 1e8;
-            setBalance(kasAmount);
-        });
+        if (connected) {
+            kasware.getBalance().then((balance) => {
+                const kasAmount = balance.total / 1e8;
+                setBalance(kasAmount);
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const selfRef = useRef<{ accounts: string[] }>({
@@ -54,27 +60,53 @@ export const useKasware = () => {
     });
     const self = selfRef.current;
 
+    const setCookie = useCallback(async (cookieData) => {
+        const cookieExperation = new Date(Date.now() + COOKIE_TTL);
+        const domain = import.meta.env.VITE_ENV === 'local' ? '' : '.kaspiano.com';
+
+        cookies.remove('user', { path: '/' });
+        cookies.set('user', cookieData, {
+            secure: true,
+            sameSite: 'none',
+            path: '/',
+            domain,
+            expires: cookieExperation,
+        });
+
+        if (cookieExperationTimeout) {
+            clearTimeout(cookieExperationTimeout);
+            cookieExperationTimeout = null;
+        }
+
+        cookieExperationTimeout = setTimeout(() => disconnectWallet(), COOKIE_TTL);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const refreshCookieOnLoadOrClearData = useCallback(async () => {
+        const userCookie = cookies.get('user');
+        if (userCookie) {
+            await setCookie(userCookie);
+        } else {
+            await disconnectWallet(true);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const handleUserVerification = useCallback(async (account) => {
         try {
             const nonce = generateNonce();
             const requestId = generateRequestId();
             const requestDate = new Date().toISOString();
             const userVerificationMessage = generateVerificationMessage(account, nonce, requestDate, requestId);
-            const domain = import.meta.env.VITE_ENV === 'local' ? '' : '.kaspiano.com';
             const userVerification = await signMessage(userVerificationMessage);
-            const publicKeyCookies = await window.kasware.getPublicKey();
             if (userVerification) {
-                cookies.remove('user');
-                cookies.set(
-                    'user',
-                    {
-                        message: userVerificationMessage,
-                        publicKey: publicKeyCookies,
-                        signature: userVerification,
-                        expiresAt: Date.now() + 4 * 60 * 60 * 1000,
-                    },
-                    { secure: true, sameSite: 'none', path: '/', domain },
-                );
+                const publicKeyCookies = await window.kasware.getPublicKey();
+
+                await setCookie({
+                    message: userVerificationMessage,
+                    publicKey: publicKeyCookies,
+                    signature: userVerification,
+                });
                 const verifiedUser = {
                     userWalletAddress: account,
                     userSignedMessageTxId: userVerification,
@@ -87,6 +119,8 @@ export const useKasware = () => {
                     message: 'User verified successfully',
                     severity: 'success',
                 });
+
+                setNewBalance();
 
                 // Show a success message with part of the wallet address
 
@@ -126,6 +160,7 @@ export const useKasware = () => {
                     handleUserVerification(_accounts[0]);
                 }
             } else {
+                console.log('No accounts found');
                 setConnected(false);
                 setAccounts([]);
                 setAddress('');
@@ -139,31 +174,39 @@ export const useKasware = () => {
 
     const handleNetworkChange = useCallback(async (newNetwork) => {
         if (network !== newNetwork) {
-            try {
-                await handleNetworkByEnvironment();
+            const isValid = await handleNetworkByEnvironment();
+            if (isValid) {
                 showGlobalSnackbar({ message: `Switched to ${newNetwork}`, severity: 'success' });
                 getBasicInfo();
-            } catch (error) {
-                console.error('Error switching network:', error);
+            } else {
                 showGlobalSnackbar({
                     message: 'Failed to switch network',
                     severity: 'error',
-                    details: error.message,
                 });
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const disconnectWallet = useCallback(async () => {
+    const disconnectWallet = useCallback(async (ignoreMessage = false) => {
         const { origin } = window.location;
         await window.kasware.disconnect(origin);
         handleAccountsChanged([]);
         setUserReferral(null);
         localStorage.removeItem('walletAddress');
-        showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
-        cookies.remove('user');
-    }, [cookies, handleAccountsChanged]);
+
+        if (!ignoreMessage) {
+            showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
+        }
+
+        cookies.remove('user', { path: '/' });
+        if (cookieExperationTimeout) {
+            clearTimeout(cookieExperationTimeout);
+            cookieExperationTimeout = null;
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         if (isKasWareInstalled()) {
@@ -181,6 +224,8 @@ export const useKasware = () => {
 
     useEffect(() => {
         const checkExistingConnection = async () => {
+            await refreshCookieOnLoadOrClearData();
+
             const storedAddress = localStorage.getItem('walletAddress');
             if (storedAddress && isKasWareInstalled()) {
                 try {
@@ -190,13 +235,11 @@ export const useKasware = () => {
                         handleAccountsChanged(accounts, true);
                         await handleNetworkByEnvironment();
                     } else {
-                        localStorage.removeItem('walletAddress');
-                        cookies.remove('user');
+                        await disconnectWallet(true);
                     }
                 } catch (error) {
                     console.error('Error checking existing connection:', error);
-                    localStorage.removeItem('walletAddress');
-                    cookies.remove('user');
+                    await disconnectWallet(true);
                 }
             }
         };
@@ -211,11 +254,7 @@ export const useKasware = () => {
             setNetwork(network);
             return true;
         } catch (error) {
-            if (error.code === 4001) {
-                return false;
-            }
-            console.error(error);
-            throw error;
+            return false;
         }
     };
 
@@ -290,9 +329,11 @@ export const useKasware = () => {
                 severity: 'error',
             });
             const reject = await handleSwitchNetwork(currentEnv);
-
             if (!reject) {
                 await disconnectWallet();
+                return false;
+            } else {
+                return true;
             }
         }
     };

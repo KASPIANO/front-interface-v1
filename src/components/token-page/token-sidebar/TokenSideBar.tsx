@@ -1,9 +1,9 @@
-import { Tab, Tabs } from '@mui/material';
+import { Tabs } from '@mui/material';
 import TabPanel from '@mui/lab/TabPanel';
 import TabContext from '@mui/lab/TabContext';
 import { FC, useState, SyntheticEvent } from 'react';
 import { BackendTokenResponse } from '../../../types/Types';
-import { SideBarContainer } from './TokenSideBar.s';
+import { SideBarContainer, TabStyled } from './TokenSideBar.s';
 import TokenSideBarInfo from './token-sidebar-info/TokenSideBarInfo';
 import { GlobalStyleTokenSideBar } from '../../../utils/GlobalStyleScrollBar';
 import BuyPanel from './token-sidebar-info/buy-panel/BuyPanel';
@@ -22,8 +22,14 @@ interface TokenSideBarProps {
 const TokenSideBar: FC<TokenSideBarProps> = (props) => {
     const { setTokenInfo, tokenInfo, walletAddress, walletConnected, walletBalance, kasPrice } = props;
     const [selectedSideActionTab, setSelectedSideActionTab] = useState('1');
+    const [buyPanelRef, setBuyPanelRef] = useState<{ handleDrawerClose: () => void } | null>(null);
 
-    const handleTabChage = (_event: SyntheticEvent, newValue: string) => {
+    const handleTabChange = (_event: SyntheticEvent, newValue: string) => {
+        // Check if we're switching away from the "Buy" tab (value="2")
+        if (selectedSideActionTab === '2' && newValue !== '2') {
+            // Release the order in BuyPanel
+            buyPanelRef?.handleDrawerClose();
+        }
         setSelectedSideActionTab(newValue);
     };
 
@@ -34,20 +40,21 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                 <TabContext value={selectedSideActionTab}>
                     <Tabs
                         value={selectedSideActionTab}
-                        onChange={handleTabChage}
+                        onChange={handleTabChange}
                         sx={{
-                            minWidth: 0, // Optional: Removes default min-width
+                            '&.MuiTabs-root': {
+                                height: '2rem',
+                                minHeight: '5px',
+                            },
                             '& .MuiTabs-flexContainer': {
-                                justifyContent: {
-                                    xs: 'flex-start', // Default on mobile
-                                    md: 'center', // Center on medium and up
-                                },
+                                height: '2rem',
+                                justifyContent: 'center',
                             },
                         }}
                     >
-                        <Tab label="Info" value="1" />
-                        <Tab label="Buy" value="2" />
-                        <Tab label="Sell" value="3" />
+                        <TabStyled label="Info" value="1" />
+                        <TabStyled label="Buy" value="2" />
+                        <TabStyled label="Sell" value="3" />
                     </Tabs>
                     <TabPanel
                         sx={{
@@ -79,6 +86,7 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                         value="2"
                     >
                         <BuyPanel
+                            setBuyPanelRef={setBuyPanelRef}
                             walletAddress={walletAddress}
                             walletConnected={walletConnected}
                             tokenInfo={tokenInfo}

@@ -56,7 +56,7 @@ const FAQ: React.FC = () => (
         <Typography variant="body1" paragraph>
             <strong>4. Are there any restricted tokens on Kaspiano?</strong>
             <br />
-            Tokens flagged for security reasons, such as those with a high "Rug Score," may be restricted or
+            Tokens flagged for security reasons, such as those with a low "Rug Score," may be restricted or
             delisted from the platform.
         </Typography>
 
@@ -153,8 +153,8 @@ const FAQ: React.FC = () => (
         <Typography variant="body1" paragraph>
             <strong>1. Are there trading fees?</strong>
             <br />
-            Yes, Kaspiano charges a 2.5% fee per trade, with 2% for platform maintenance and 0.5% for community and
-            marketing initiatives.
+            Kaspiano offers the lowest trading fees in the market—just 2.5%! Even better, 20% of that fee (0.5%
+            from the total) goes directly back to the communities and users through our referral program.
         </Typography>
         <Typography variant="body1" paragraph>
             <strong>2. What other fees should I be aware of?</strong>
@@ -210,12 +210,6 @@ const FAQ: React.FC = () => (
             <strong>2. Who can join Kaspiano?</strong>
             <br />
             Anyone interested in the Kaspa ecosystem can join, whether they are beginners or experienced traders.
-        </Typography>
-        <Typography variant="body1" paragraph>
-            <strong>3. How does Kaspiano generate revenue?</strong>
-            <br />
-            Kaspiano generates revenue through trading fees (2.5% per transaction) and fees for premium services
-            like token listings and advanced tools.
         </Typography>
     </Container>
 );

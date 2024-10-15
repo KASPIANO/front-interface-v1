@@ -23,7 +23,7 @@ interface TokenPageProps {
     walletBalance: number;
     walletConnected: boolean;
 }
-
+const tradingDataTimeFramesToSelect = ['All', '1m', '1w', '1d', '6h', '1h', '15m'];
 const TokenPage: FC<TokenPageProps> = (props) => {
     const { walletConnected, walletBalance, walletAddress, backgroundBlur } = props;
     const { ticker } = useParams();
@@ -31,8 +31,11 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const [tokenXHandle, setTokenXHandle] = useState(false);
     const [recalculateRugScoreLoading, setRecalculateRugScoreLoading] = useState(false);
     const [kasPrice, setkasPrice] = useState(0);
-    const [priceHistory, setPriceHistory] = useState(undefined);
-    const [currentTicker] = useState<string>(ticker);
+    const [currentTicker] = useState(ticker);
+    const [tradingDataTimeFrame, setTradingDataTimeFrame] = useState(
+        tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 5],
+    );
+    const [priceHistory, setPriceHistory] = useState([]);
 
     useEffect(() => {
         const fetchPrice = async () => {
@@ -72,8 +75,8 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         // Fetch the token info immediately on component mount
         fetchAndUpdateTokenInfo(false);
 
-        // Set up the interval to update token info every 30 seconds
-        const interval = setInterval(() => fetchAndUpdateTokenInfo(true), 30000);
+        // Set up the interval to update token info every 5 minutes
+        const interval = setInterval(() => fetchAndUpdateTokenInfo(false), 300000);
 
         // Clean up the interval when the component unmounts
         return () => clearInterval(interval);
@@ -93,13 +96,24 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         return () => clearInterval(interval);
     }, [ticker, currentTicker]);
 
+    // const { data: priceHistoryData, isLoading } = useQuery({
+    //     queryKey: ['tokenPriceHistory', ticker, tradingDataTimeFrame], // The query key
+    //     queryFn: async () => {
+    //         const result = await getTokenPriceHistory(ticker, tradingDataTimeFrame);
+    //         return result;
+    //     },
+    //     enabled: !!ticker, // Only fetch if the ticker exists
+    //     staleTime: Infinity, // The cache never expires
+    //     refetchInterval: 900000, // 15 minutes
+    // });
+
     const tokenData = useMemo(() => tokenInfo, [tokenInfo]);
 
     const getComponentToShow = (component: JSX.Element, height?: string, width?: string) =>
         tokenData ? component : <Skeleton variant="rectangular" height={height} width={width} />;
 
     const getComponentGraphToShow = (component: JSX.Element, height?: string, width?: string) =>
-        priceHistory ? component : <Skeleton variant="rectangular" height={height} width={width} />;
+        priceHistory.length > 0 ? component : <Skeleton variant="rectangular" height={height} width={width} />;
 
     const rugScoreParse = tokenInfo?.metadata?.rugScore === 0 ? null : tokenInfo?.metadata?.rugScore;
 
@@ -137,7 +151,14 @@ const TokenPage: FC<TokenPageProps> = (props) => {
                 <TokenGraph priceHistory={priceHistory} ticker={tokenInfo?.ticker} />,
                 '35vh',
             )}
-            {getComponentToShow(<TokenStats tokenInfo={tokenInfo} />)}
+            {getComponentToShow(
+                <TokenStats
+                    tokenInfo={tokenInfo}
+                    setTradingDataTimeFrame={setTradingDataTimeFrame}
+                    tradingDataTimeFrame={tradingDataTimeFrame}
+                    tradingDataTimeFramesToSelect={tradingDataTimeFramesToSelect}
+                />,
+            )}
             {getComponentToShow(
                 <MintingComponent
                     tokenInfo={tokenInfo}

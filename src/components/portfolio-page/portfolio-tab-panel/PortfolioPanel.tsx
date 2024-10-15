@@ -52,7 +52,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                     value={value}
                     onChange={handleValueChange}
                     sx={{
-                        '& .MuiTabs-flexContainer': {
+                        '&.MuiTabs-flexContainer': {
                             marginLeft: '2vw',
                             gap: '2vw',
                         },

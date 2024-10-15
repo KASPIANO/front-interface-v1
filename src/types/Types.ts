@@ -338,3 +338,17 @@ export type UserReferral = {
     referredBy?: string;
     isNew?: boolean;
 };
+
+export type TradeStats = {
+    totalTradesKaspiano: number;
+    totalVolumeKasKaspiano: string;
+    totalVolumeUsdKaspiano: string;
+    tokens: [
+        {
+            totalTrades: number;
+            totalVolumeKAS: number;
+            ticker: string;
+            totalVolumeUsd: string;
+        },
+    ];
+};

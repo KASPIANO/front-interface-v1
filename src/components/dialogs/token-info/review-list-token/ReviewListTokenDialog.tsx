@@ -61,8 +61,8 @@ const ReviewListTokenDialog: React.FC<ReviewListTokenDialogProps> = (props) => {
                 ) : (
                     <>
                         <Typography sx={{ marginBottom: '2vh', fontWeight: 500 }}>
-                            Listing requires a payment of 1250 KAS. These funds are used to maintain and enhance
-                            our platform, support the development of tools and services provided for your benefit,
+                            Listing requires a payment of 650 KAS. These funds are used to maintain and enhance our
+                            platform, support the development of tools and services provided for your benefit,
                             sustain the Rug Score algorithm for increased transparency and analytics, and help
                             prevent spam and fraudulent activity.
                         </Typography>

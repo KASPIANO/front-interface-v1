@@ -2,7 +2,7 @@ import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import Cookies from 'universal-cookie';
+// import Cookies from 'universal-cookie';
 import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
 import { useKasware } from './hooks/useKasware';
@@ -11,6 +11,7 @@ import { ThemeContext } from './main';
 import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
 import { getLocalThemeMode, ThemeModes } from './utils/Utils';
+import Seo from './components/helmet-seo/Seo';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -35,25 +36,13 @@ const App = () => {
         setThemeMode(newMode);
     };
 
-    const checkCookie = async () => {
-        const cookies = new Cookies(); // Create an instance of cookies-universal
-        const cookieValue = cookies.get('user'); // Replace 'myCookie' with your cookie name
-        if (cookieValue && cookieValue && Date.now() > cookieValue.expiresAt) {
-            await disconnectWallet();
-        }
-    };
-
     // Set up an interval to check the cookie every 1 minute
     useEffect(() => {
-        const interval = setInterval(async () => {
-            await checkCookie();
-        }, 1000); // Check every 60,000 milliseconds (1 minute)
-
         const updateTokensInterval = setInterval(setNewBalance, 10 * 1000);
 
         // Cleanup function to clear the interval when component unmounts
         return () => {
-            clearInterval(interval);
+            // clearInterval(interval);
             clearInterval(updateTokensInterval);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -64,6 +53,7 @@ const App = () => {
             <ThemeProvider theme={themeMode === ThemeModes.DARK ? darkTheme : lightTheme}>
                 <CssBaseline />
                 <BrowserRouter>
+                    <Seo />
                     <Navbar
                         walletConnected={walletConnected}
                         walletAddress={walletAddress}
