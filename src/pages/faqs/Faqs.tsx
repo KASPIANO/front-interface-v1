@@ -5,48 +5,105 @@ const FAQ: React.FC = () => (
     <Container maxWidth="md" sx={{ marginTop: '2rem', marginBottom: '2rem' }}>
         <Box sx={{ marginBottom: '2rem' }}>
             <Typography variant="h5" gutterBottom>
-                FAQ Navigation
+                Navigate the FAQ
             </Typography>
-            <Link href="#trade-process" underline="hover" sx={{ display: 'block', margin: '0.5rem 0' }}>
-                Trade Process
-            </Link>
-            <Link href="#trading-platform-rules" underline="hover" sx={{ display: 'block', margin: '0.5rem 0' }}>
-                Trading & Platform Rules
-            </Link>
-            <Link href="#security-reliability" underline="hover" sx={{ display: 'block', margin: '0.5rem 0' }}>
-                Security & Reliability
-            </Link>
-            <Link href="#user-verification" underline="hover" sx={{ display: 'block', margin: '0.5rem 0' }}>
-                User Verification
-            </Link>
-            <Link href="#resources-programs" underline="hover" sx={{ display: 'block', margin: '0.5rem 0' }}>
-                Resources & Programs
-            </Link>
-            <Link href="#getting-started" underline="hover" sx={{ display: 'block', margin: '0.5rem 0' }}>
-                Getting Started
-            </Link>
-            <Link href="#fees" underline="hover" sx={{ display: 'block', margin: '0.5rem 0' }}>
-                Fees
-            </Link>
-            <Link href="#referral-program" underline="hover" sx={{ display: 'block', margin: '0.5rem 0' }}>
-                Referral Program
-            </Link>
-            <Link href="#kaspiano-airdrop" underline="hover" sx={{ display: 'block', margin: '0.5rem 0' }}>
-                Kaspiano Airdrop
-            </Link>
-            <Link href="#features" underline="hover" sx={{ display: 'block', margin: '0.5rem 0' }}>
-                Features
-            </Link>
-            <Link href="#mainnet-testnet" underline="hover" sx={{ display: 'block', margin: '0.5rem 0' }}>
-                Mainnet & Testnet
-            </Link>
-            <Link href="#about-kaspiano" underline="hover" sx={{ display: 'block', margin: '0.5rem 0' }}>
-                About Kaspiano
-            </Link>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                }}
+            >
+                <Box sx={{ width: '23%' }}>
+                    <Link
+                        href="#trade-process"
+                        underline="hover"
+                        sx={{ display: 'block', marginBottom: '0.5rem' }}
+                    >
+                        Trade Process
+                    </Link>
+                    <Link
+                        href="#trading-platform-rules"
+                        underline="hover"
+                        sx={{ display: 'block', marginBottom: '0.5rem' }}
+                    >
+                        Trading & Platform Rules
+                    </Link>
+                    <Link
+                        href="#security-reliability"
+                        underline="hover"
+                        sx={{ display: 'block', marginBottom: '0.5rem' }}
+                    >
+                        Security & Reliability
+                    </Link>
+                </Box>
+                <Box sx={{ width: '23%' }}>
+                    <Link
+                        href="#user-verification"
+                        underline="hover"
+                        sx={{ display: 'block', marginBottom: '0.5rem' }}
+                    >
+                        User Verification
+                    </Link>
+                    <Link
+                        href="#resources-programs"
+                        underline="hover"
+                        sx={{ display: 'block', marginBottom: '0.5rem' }}
+                    >
+                        Resources & Programs
+                    </Link>
+                    <Link
+                        href="#getting-started"
+                        underline="hover"
+                        sx={{ display: 'block', marginBottom: '0.5rem' }}
+                    >
+                        Getting Started
+                    </Link>
+                </Box>
+                <Box sx={{ width: '23%' }}>
+                    <Link href="#fees" underline="hover" sx={{ display: 'block', marginBottom: '0.5rem' }}>
+                        Fees
+                    </Link>
+                    <Link
+                        href="#referral-program"
+                        underline="hover"
+                        sx={{ display: 'block', marginBottom: '0.5rem' }}
+                    >
+                        Referral Program
+                    </Link>
+                    <Link
+                        href="#kaspiano-airdrop"
+                        underline="hover"
+                        sx={{ display: 'block', marginBottom: '0.5rem' }}
+                    >
+                        Kaspiano Airdrop
+                    </Link>
+                </Box>
+                <Box sx={{ width: '23%' }}>
+                    <Link href="#features" underline="hover" sx={{ display: 'block', marginBottom: '0.5rem' }}>
+                        Features
+                    </Link>
+                    <Link
+                        href="#mainnet-testnet"
+                        underline="hover"
+                        sx={{ display: 'block', marginBottom: '0.5rem' }}
+                    >
+                        Mainnet & Testnet
+                    </Link>
+                    <Link
+                        href="#about-kaspiano"
+                        underline="hover"
+                        sx={{ display: 'block', marginBottom: '0.5rem' }}
+                    >
+                        About Kaspiano
+                    </Link>
+                </Box>
+            </Box>
             <Divider />
         </Box>
 
-        <Typography variant="h6" gutterBottom sx={{ textDecoration: 'underline' }}>
+        <Typography variant="h6" id="trade-process" gutterBottom sx={{ textDecoration: 'underline' }}>
             Trade Process
         </Typography>
         <Typography variant="body1" paragraph>
@@ -71,7 +128,7 @@ const FAQ: React.FC = () => (
             further investigation.
         </Typography>
 
-        <Typography variant="h6" gutterBottom sx={{ textDecoration: 'underline' }}>
+        <Typography variant="h6" id="trading-platform-rules" gutterBottom sx={{ textDecoration: 'underline' }}>
             Trading & Platform Rules
         </Typography>
         <Typography variant="body1" paragraph>
@@ -99,7 +156,7 @@ const FAQ: React.FC = () => (
             delisted from the platform.
         </Typography>
 
-        <Typography variant="h6" gutterBottom sx={{ textDecoration: 'underline' }}>
+        <Typography variant="h6" id="security-reliability" gutterBottom sx={{ textDecoration: 'underline' }}>
             Security & Reliability
         </Typography>
         <Typography variant="body1" paragraph>
@@ -115,7 +172,7 @@ const FAQ: React.FC = () => (
             automatically when possible. Kaspiano’s Rug Score system helps assess token legitimacy.
         </Typography>
 
-        <Typography variant="h6" gutterBottom sx={{ textDecoration: 'underline' }}>
+        <Typography variant="h6" id="user-verification" gutterBottom sx={{ textDecoration: 'underline' }}>
             User Verification
         </Typography>
         <Typography variant="body1" paragraph>
@@ -131,7 +188,7 @@ const FAQ: React.FC = () => (
             verification purposes on decentralized platforms like Kaspiano.
         </Typography>
 
-        <Typography variant="h6" gutterBottom sx={{ textDecoration: 'underline' }}>
+        <Typography variant="h6" id="resources-programs" gutterBottom sx={{ textDecoration: 'underline' }}>
             Resources & Programs
         </Typography>
         <Typography variant="body1" paragraph>
@@ -164,7 +221,7 @@ const FAQ: React.FC = () => (
             blockchain protocols.
         </Typography>
 
-        <Typography variant="h6" gutterBottom sx={{ textDecoration: 'underline' }}>
+        <Typography variant="h6" id="getting-started" gutterBottom sx={{ textDecoration: 'underline' }}>
             Getting Started
         </Typography>
         <Typography variant="body1" paragraph>
@@ -186,7 +243,7 @@ const FAQ: React.FC = () => (
             portfolio tracking, batch transfers, and token safety features.
         </Typography>
 
-        <Typography variant="h6" gutterBottom sx={{ textDecoration: 'underline' }}>
+        <Typography variant="h6" id="fees" gutterBottom sx={{ textDecoration: 'underline' }}>
             Fees
         </Typography>
         <Typography variant="body1" paragraph>
@@ -200,7 +257,7 @@ const FAQ: React.FC = () => (
             <br />A 500 KAS fee applies to batch airdrops, and additional fees may apply for premium services like
             token listings.
         </Typography>
-        <Typography variant="h6" gutterBottom sx={{ textDecoration: 'underline' }}>
+        <Typography variant="h6" id="referral-program" gutterBottom sx={{ textDecoration: 'underline' }}>
             Referral Program
         </Typography>
         <Typography variant="body1" paragraph>
@@ -225,7 +282,7 @@ const FAQ: React.FC = () => (
             Withdrawals will be available bi-weekly, allowing you to regularly claim your rewards.
         </Typography>
 
-        <Typography variant="h6" gutterBottom sx={{ textDecoration: 'underline' }}>
+        <Typography variant="h6" id="kaspiano-airdrop" gutterBottom sx={{ textDecoration: 'underline' }}>
             Kaspiano Airdrop
         </Typography>
 
@@ -262,13 +319,25 @@ const FAQ: React.FC = () => (
             The token's utility is still under development and will be disclosed at a later date.
         </Typography>
 
-        <Typography variant="h6" gutterBottom sx={{ textDecoration: 'underline' }}>
+        <Typography variant="h6" id="features" gutterBottom sx={{ textDecoration: 'underline' }}>
             Features
         </Typography>
         <Typography variant="body1" paragraph>
             <strong>1. How do I mint tokens on Kaspiano?</strong>
             <br />
-            Connect your wallet, go to the KRC-20 token dashboard, and select the Mint option to create new tokens.
+            Connect your wallet, go to the KRC-20 token dashboard or the Page of the token, and select the Mint
+            option to create new tokens.
+        </Typography>
+        <Typography variant="body1" paragraph>
+            <strong>1. How do Deploy mint tokens on Kaspiano?</strong>
+            <br />
+            Connect your wallet, go to the Deploy page and fill out the fields needed for it, and it will cost
+            1000KAS which goes to the miners.
+        </Typography>
+        <Typography variant="body1" paragraph>
+            <strong>1. How do I Airdrop tokens on Kaspiano?</strong>
+            <br />
+            Connect your wallet, go to the Airdrop Page, and follow instrucions.
         </Typography>
         <Typography variant="body1" paragraph>
             <strong>2. How do I create a sell order?</strong>
@@ -282,7 +351,7 @@ const FAQ: React.FC = () => (
             Go to the Buy section on your dashboard, select a sell order, and confirm your purchase.
         </Typography>
 
-        <Typography variant="h6" gutterBottom sx={{ textDecoration: 'underline' }}>
+        <Typography variant="h6" id="mainnet-testnet" gutterBottom sx={{ textDecoration: 'underline' }}>
             Mainnet & Testnet
         </Typography>
         <Typography variant="body1" paragraph>
@@ -297,7 +366,7 @@ const FAQ: React.FC = () => (
             Switch your Kasware network to Testnet 10 and visit the Kaspa Testnet Faucet to obtain testnet tokens.
         </Typography>
 
-        <Typography variant="h6" gutterBottom sx={{ textDecoration: 'underline' }}>
+        <Typography variant="h6" id="about-kaspiano" gutterBottom sx={{ textDecoration: 'underline' }}>
             About Kaspiano
         </Typography>
         <Typography variant="body1" paragraph>
