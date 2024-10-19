@@ -339,6 +339,11 @@ export type UserReferral = {
     isNew?: boolean;
 };
 
+export type UserInfo = {
+    email: string;
+    x_url: string;
+};
+
 export type TradeStats = {
     totalTradesKaspiano: number;
     totalVolumeKasKaspiano: string;

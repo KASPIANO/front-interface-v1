@@ -270,61 +270,77 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     };
 
     const handleTransfer = async () => {
-        const { id, temporaryWalletAddress } = await createSellOrder(
-            tokenInfo.ticker,
-            parseInt(tokenAmount),
-            parseInt(totalPrice),
-            parseFloat(pricePerToken),
-            walletAddress,
-        );
+        let idResponse = '';
+        let temporaryWalletAddressResponse = '';
+        try {
+            const { id, temporaryWalletAddress } = await createSellOrder(
+                tokenInfo.ticker,
+                parseInt(tokenAmount),
+                parseInt(totalPrice),
+                parseFloat(pricePerToken),
+                walletAddress,
+            );
+            idResponse = id;
+            temporaryWalletAddressResponse = temporaryWalletAddress;
+        } catch (error) {
+            showGlobalSnackbar({
+                message: 'Failed to create sell order for the token. Please try again later.',
+                severity: 'error',
+            });
+            return;
+        }
         setWalletConfirmation(true);
         const inscribeJsonString: TransferObj = {
             p: 'KRC-20',
             op: 'transfer',
             tick: tokenInfo.ticker,
             amt: (parseInt(tokenAmount) * KASPA_TO_SOMPI).toString(),
-            to: temporaryWalletAddress,
+            to: temporaryWalletAddressResponse,
         };
         const jsonStringified = JSON.stringify(inscribeJsonString);
 
         try {
             const result = await transferKRC20Token(jsonStringified);
-            setWalletConfirmation(false);
             setCreatingSellOrder(true);
+            setWalletConfirmation(false);
             if (result) {
                 const { commitId, revealId } = JSON.parse(result);
                 showGlobalSnackbar({
-                    message: 'Token transferred successfully, Finished step 1/2',
+                    message: 'Token transferred successfully',
                     severity: 'success',
                     commitId,
                     revealId,
                 });
             }
             const confirmation = await doPolling(
-                () => confirmSellOrder(id),
+                () => confirmSellOrder(idResponse),
                 (result) => result.confirmed,
             );
 
             if (confirmation) {
+                setIsDialogOpen(false);
                 setDisableSellButton(false);
                 showGlobalSnackbar({
-                    message: 'Sell order confirmed successfully Finished step 2/2',
+                    message: 'Sell order created successfully',
                     severity: 'success',
                 });
-                setIsDialogOpen(false);
-                setCreatingSellOrder(false);
                 cleanFields();
                 queryClient.invalidateQueries({ queryKey: ['orders'] });
                 setFinishedSellOrder((prev) => !prev);
+                setTimeout(() => {
+                    setCreatingSellOrder(false); // Ensures it closes after a slight delay
+                }, 500);
+
                 return true;
             } else {
                 showGlobalSnackbar({
-                    message: 'Failed to confirm sell order',
+                    message: 'Failed to create sell order',
                     severity: 'error',
                 });
                 return false;
             }
         } catch (error) {
+            setCreatingSellOrder(false);
             setWalletConfirmation(false);
             showGlobalSnackbar({
                 message: 'Failed to Transfer Token',
