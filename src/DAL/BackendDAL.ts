@@ -6,6 +6,7 @@ import {
     TokenSearchItems,
     TokenSentiment,
     TradeStats,
+    UserInfo,
     UserReferral,
     VerifiedUser,
 } from '../types/Types';
@@ -252,6 +253,25 @@ export const getUserReferral = async (walletAddress: string, referredBy?: string
     });
     return response.data;
 };
+export const updateContactInfo = async (
+    walletAddress: string,
+    email?: string,
+    x_url?: string,
+): Promise<UserInfo> => {
+    const response = await backendService.post<UserInfo>(`/${USER_REFERRALS_CONTROLLER}/update-contact-info`, {
+        walletAddress,
+        email,
+        x_url,
+    });
+    return response.data;
+};
+
+export const getContactInfo = async (walletAddress: string): Promise<{ email: string; x_url: string }> => {
+    const response = await backendService.get<{ email: string; x_url: string }>(
+        `/${USER_REFERRALS_CONTROLLER}/contact-info/${walletAddress}`,
+    );
+    return response.data;
+};
 
 export const fetchTickerTradeStats = async (ticker: string, timeInterval?: string): Promise<TradeStats> => {
     const timeFrame = timeInterval === 'All' ? '' : timeInterval;
@@ -277,5 +297,13 @@ export const getHolderChange = async (ticker: string, timeInterval?: string): Pr
     const response = await backendService.get<any>(
         `/${KRC20CONTROLLER}/holder-change?ticker=${capitalTicker}${timeQueryStr}`,
     );
+    return response.data;
+};
+
+export const saveDeployData = async (ticker: string, walletAddress: string): Promise<any> => {
+    const response = await backendService.post<any>(`/${KRC20CONTROLLER}/deploy`, {
+        ticker,
+        walletAddress,
+    });
     return response.data;
 };
