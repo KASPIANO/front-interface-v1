@@ -31,7 +31,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const [tokenXHandle, setTokenXHandle] = useState(false);
     const [recalculateRugScoreLoading, setRecalculateRugScoreLoading] = useState(false);
     const [kasPrice, setkasPrice] = useState(0);
-    const [currentTicker] = useState(ticker);
+    const [currentTicker, setCurrentTicker] = useState('');
     const [tradingDataTimeFrame, setTradingDataTimeFrame] = useState(
         tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 5],
     );
@@ -74,6 +74,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     useEffect(() => {
         // Fetch the token info immediately on component mount
         fetchAndUpdateTokenInfo(false);
+        setCurrentTicker(ticker);
 
         // Set up the interval to update token info every 5 minutes
         const interval = setInterval(() => fetchAndUpdateTokenInfo(false), 300000);
