@@ -53,7 +53,7 @@ export const kaspaFeeEstimate = async (): Promise<number> => {
         }>('info/fee-estimate');
 
         // Extract the feerate from the priorityBucket
-        const feeRate = response.data.priorityBucket.feerate;
+        const feeRate = response.data.normalBuckets[0].feerate;
 
         return feeRate;
     } catch (error) {

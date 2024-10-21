@@ -98,17 +98,23 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
 
             <SortButtonGroup variant="contained" sx={{ marginLeft: '1vw' }}>
                 <SortFirstButton
-                    selected={timeInterval === '10m'}
+                    selected={timeInterval === '1m'}
                     sx={{
                         '&.MuiButtonGroup-firstButton': {
                             backgroundColor:
-                                timeInterval === '10m' ? 'rgba(111, 199, 186, 0.8)' : 'rgba(111, 199, 186, 0.25)',
+                                timeInterval === '1m' ? 'rgba(111, 199, 186, 0.8)' : 'rgba(111, 199, 186, 0.25)',
                         },
                     }}
-                    onClick={() => handleSortChange('10m')}
+                    onClick={() => handleSortChange('1m')}
                 >
-                    10m
+                    1m
                 </SortFirstButton>
+                <SortMiddleButton selected={timeInterval === '5m'} onClick={() => handleSortChange('5m')}>
+                    5m
+                </SortMiddleButton>
+                <SortMiddleButton selected={timeInterval === '10m'} onClick={() => handleSortChange('10m')}>
+                    10m
+                </SortMiddleButton>
                 <SortMiddleButton selected={timeInterval === '30m'} onClick={() => handleSortChange('30m')}>
                     30m
                 </SortMiddleButton>
