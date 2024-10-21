@@ -1,7 +1,6 @@
 import React, { useState, FC } from 'react';
 import { Box, Button, Input, Typography, Card } from '@mui/material';
 import { sendKaspaToKaspiano, signKRC20BatchTransfer } from '../../utils/KaswareUtils';
-import { TransferObj } from '../../types/Types';
 import { parse } from 'papaparse'; // For CSV parsing
 import { showGlobalSnackbar } from '../alert-context/AlertContext';
 import FileDownloadIconRounded from '@mui/icons-material/FileDownloadRounded';
@@ -21,12 +20,10 @@ const VERIFICATION_FEE_SOMPI = VERIFICATION_FEE_KAS * KASPA_TO_SOMPI;
 const BatchTransfer: FC<BatchTransferProps> = (props) => {
     const { walletAddress, walletConnected, walletBalance } = props;
     const [ticker, setTicker] = useState<string>('');
-    const [amount, setAmount] = useState<string>('');
-    const [recipientAddresses, setRecipientAddresses] = useState('');
+    const [recipientList, setRecipientList] = useState<any[]>([]);
     const [txid, setTxid] = useState('');
     const [paymentMade, setPaymentMade] = useState(false); // Track if payment is made
     const [paymentTxnId, setPaymentTxnId] = useState<string | null>(null);
-    const [errorAmount, setErrorAmount] = useState<boolean>(false);
 
     // Example CSV header: "address"
     const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,10 +37,28 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 parse(csvText, {
                     header: true,
                     complete: (results) => {
-                        const addresses = results.data
-                            .map((row: any) => row.address)
-                            .filter((addr: string) => addr);
-                        setRecipientAddresses(addresses.join(','));
+                        const list = results.data
+                            .map((row: any) => {
+                                const amount = parseFloat(row.amount);
+                                const isValidAmount = !isNaN(amount) && amount > 0;
+                                debugger;
+                                if (!isValidAmount) {
+                                    showGlobalSnackbar({
+                                        message: `Invalid amount in row with address ${row.address}`,
+                                        severity: 'error',
+                                    });
+                                    return null; // Skip this row
+                                }
+
+                                return {
+                                    tick: ticker,
+                                    to: row.address.trim(),
+                                    amount,
+                                };
+                            })
+                            .filter((item: any) => item !== null); // Filter out invalid entries
+
+                        setRecipientList(list); // Set the validated list for transfer
                     },
                 });
             }
@@ -51,9 +66,13 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         reader.readAsText(file);
     };
 
-    const handleTokenBalanceVerification = async (addresses: string[]) => {
+    const calculateTotalAmount = (): number => recipientList.reduce((total, item) => total + item.amount, 0);
+
+    const handleTokenBalanceVerification = async (): Promise<boolean> => {
+        const totalAmount = calculateTotalAmount();
         const balance = await fetchWalletKRC20Balance(walletAddress, ticker);
-        if (balance >= parseInt(amount) * addresses.length) {
+
+        if (balance >= totalAmount) {
             return true;
         } else {
             showGlobalSnackbar({
@@ -65,10 +84,9 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     };
 
     const handleBatchTransfer = async () => {
-        const addresses = recipientAddresses.split(',').map((addr) => addr.trim());
-        if (addresses.length === 0) {
+        if (!recipientList.length) {
             showGlobalSnackbar({
-                message: 'Missing destination addresses ',
+                message: 'Recipient list is empty',
                 severity: 'error',
             });
             return;
@@ -80,19 +98,18 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             });
             return;
         }
-        if (!amount) {
+
+        // Verify token balance before proceeding
+        const tokenAmountVerification = await handleTokenBalanceVerification();
+        if (!tokenAmountVerification) {
             showGlobalSnackbar({
-                message: 'Missing amount',
+                message: 'Token balance is insufficient',
                 severity: 'error',
             });
             return;
         }
-        const tokenAmountVerification = await handleTokenBalanceVerification(addresses);
-        if (!tokenAmountVerification) {
-            setErrorAmount(true);
-            setAmount('');
-            return;
-        }
+
+        // Verify payment transaction
         const verification = await verifyPaymentTransaction(paymentTxnId, walletAddress, VERIFICATION_FEE_SOMPI);
         if (!verification) {
             showGlobalSnackbar({
@@ -102,17 +119,10 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             return;
         }
 
-        const transferObj: TransferObj = {
-            p: 'KRC-20',
-            op: 'transfer',
-            tick: ticker,
-            amt: (parseInt(amount) * 100000000).toString(),
-        };
-
-        const jsonStr = JSON.stringify(transferObj);
-
         try {
-            const txid = await signKRC20BatchTransfer(jsonStr, addresses);
+            console.log('Recipient list:', recipientList);
+            // Perform batch transfer with the generated recipient list
+            const txid = await signKRC20BatchTransfer(recipientList);
             setTxid(txid);
             clearFields();
         } catch (e) {
@@ -122,11 +132,9 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     };
     const clearFields = () => {
         setTicker('');
-        setAmount('');
         setPaymentMade(false);
         setPaymentTxnId(null);
-        setErrorAmount(false);
-        setRecipientAddresses('');
+        setRecipientList([]);
     };
 
     const handlePayment = async () => {
@@ -165,17 +173,6 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         }
     };
 
-    const validateNumbersOnly = (value: string) => {
-        const regex = /^(?!0+\.?0*$)((\d+\.?\d*|\.\d+)|)$/;
-        return regex.test(value);
-    };
-
-    const handleAmountChange = (value: string) => {
-        if (validateNumbersOnly(value)) {
-            setAmount(value);
-        }
-    };
-
     const handleDownload = () => {
         const link = document.createElement('a');
         link.href = '/example_csv.csv';
@@ -208,32 +205,14 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 </Box>
             </Typography>
 
-            <Button variant="contained" onClick={handlePayment} sx={{ marginBottom: '2vh' }} disabled={true}>
+            <Button variant="contained" onClick={handlePayment} sx={{ marginBottom: '2vh' }}>
                 Pay 500 KAS
             </Button>
             <Box sx={{ marginBottom: '1.3vh' }}>
                 <Typography variant="body2">Ticker:</Typography>
                 <Input value={ticker} onChange={(e) => setTicker(e.target.value)} fullWidth />
             </Box>
-            <Box sx={{ marginBottom: '1.3vh' }}>
-                <Typography variant="body2">Amount per Address:</Typography>
-                <Input
-                    value={amount}
-                    onChange={(e) => handleAmountChange(e.target.value)}
-                    fullWidth
-                    error={errorAmount}
-                />
-            </Box>
-            <Box sx={{ marginBottom: '1.3vh' }}>
-                <Typography variant="body2">Recipient Addresses (comma-separated):</Typography>
-                <Input
-                    value={recipientAddresses}
-                    onChange={(e) => setRecipientAddresses(e.target.value)}
-                    fullWidth
-                    multiline
-                    placeholder="Enter recipient addresses"
-                />
-            </Box>
+
             <Box sx={{ marginBottom: '1.3vh' }}>
                 <Typography variant="body2">Or Upload a CSV File:</Typography>
                 <UploadButton>
@@ -244,16 +223,17 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                         onChange={handleCSVUpload}
                     />
                     <Button variant="contained" color="primary" component="span">
-                        Choose File or Drag
+                        Choose File
                     </Button>
                 </UploadButton>
                 <Typography variant="caption" sx={{ marginTop: '5px', display: 'block' }}>
-                    CSV format: One column header named "address" with wallet addresses in each row.
+                    CSV format: One column header named "address" with wallet addresses in each row and second
+                    column named "amount" with the tokens for each address.
                 </Typography>
             </Box>
             <Button
                 variant="contained"
-                disabled={!paymentMade}
+                disabled={!paymentMade || !recipientList.length || !ticker}
                 onClick={handleBatchTransfer}
                 sx={{ marginTop: '20px' }}
             >

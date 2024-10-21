@@ -105,7 +105,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                     />
                 </TabPanelStyled>
                 <TabPanelStyled value="5">
-                    <UserPanel />
+                    <UserPanel walletAddress={walletAddress} tabValue={value} />
                 </TabPanelStyled>
             </TabContext>
         </TabPanelContainer>

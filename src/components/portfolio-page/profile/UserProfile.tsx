@@ -1,36 +1,35 @@
 import { useState, useEffect } from 'react';
 import { TextField, IconButton, Tooltip, Box } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { getContactInfo, updateContactInfo } from '../../../DAL/BackendDAL';
 
 // Regex patterns for validation
 const twitterUrlPattern = /^(https?:\/\/)?(www\.)?x\.com\/[a-zA-Z0-9_]{1,15}$/;
 const emailPattern = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
 
-const UserProfile = () => {
+const UserProfile = ({ walletAddress }) => {
     const [email, setEmail] = useState('');
     const [xHandle, setXHandle] = useState('');
-    const [isEditingEmail, setIsEditingEmail] = useState(false); // Initially not editing
-    const [isEditingX, setIsEditingX] = useState(false); // Initially not editing
+    const [isEditingEmail, setIsEditingEmail] = useState(false);
+    const [isEditingX, setIsEditingX] = useState(false);
     const [formErrors, setFormErrors] = useState({ email: '', xHandle: '' });
 
     // Fetch initial data from backend
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch('/api/getUserData');
-                const data = await response.json();
+                const data = await getContactInfo(walletAddress);
                 setEmail(data.email || '');
-                setXHandle(data.xHandle || '');
+                setXHandle(data.x_url || '');
             } catch (error) {
                 console.error('Failed to fetch user data:', error);
             }
         };
 
         fetchUserData();
-    }, []);
+    }, [walletAddress]);
 
     // Function to handle form error state
     const setErrorToField = (fieldName, message) => {
@@ -47,9 +46,7 @@ const UserProfile = () => {
             return;
         }
         try {
-            // Send backend request to save email
-            console.log('Saving email:', email);
-            await fetch('/api/saveEmail', { method: 'POST', body: JSON.stringify({ email }) });
+            await updateContactInfo(walletAddress, email, xHandle);
             setIsEditingEmail(false); // Disable editing after save
         } catch (error) {
             console.error('Failed to save email:', error);
@@ -63,9 +60,7 @@ const UserProfile = () => {
             return;
         }
         try {
-            // Send backend request to save X handle
-            console.log('Saving X handle:', xHandle);
-            await fetch('/api/saveX', { method: 'POST', body: JSON.stringify({ xHandle }) });
+            await updateContactInfo(walletAddress, email, xHandle);
             setIsEditingX(false); // Disable editing after save
         } catch (error) {
             console.error('Failed to save X handle:', error);
@@ -77,6 +72,7 @@ const UserProfile = () => {
             {/* Email Section */}
             <Box display="flex" alignItems="center">
                 <TextField
+                    sx={{ width: '100%' }}
                     label="Email"
                     variant="outlined"
                     fullWidth
@@ -88,33 +84,36 @@ const UserProfile = () => {
                     disabled={!isEditingEmail}
                     placeholder="Enter your email"
                     error={!!formErrors.email}
-                    helperText={formErrors.email || 'Email is required for confirmations'}
+                    helperText={formErrors.email || 'Email is  required for notifications on your listings'}
                     InputProps={{
                         endAdornment: (
-                            <IconButton
-                                onClick={() => {
-                                    if (isEditingEmail) {
-                                        handleEmailSave();
-                                    } else {
-                                        setIsEditingEmail(true);
-                                    }
-                                }}
+                            <Tooltip
+                                placement="left"
+                                title="Your email will be used for live notifications of your sales on the platform (not mandatory)."
                             >
-                                {isEditingEmail ? <SaveIcon /> : <EditIcon />}
-                            </IconButton>
+                                <InfoOutlinedIcon fontSize="small" />
+                            </Tooltip>
                         ),
                     }}
                 />
-                <Tooltip title="This email will be used to send live notifications of your sales on the platform.">
-                    <IconButton>
-                        <InfoOutlinedIcon />
-                    </IconButton>
-                </Tooltip>
+                <IconButton
+                    sx={{ marginBottom: '1.5rem' }}
+                    onClick={() => {
+                        if (isEditingEmail) {
+                            handleEmailSave();
+                        } else {
+                            setIsEditingEmail(true);
+                        }
+                    }}
+                >
+                    {isEditingEmail ? <SaveIcon /> : <EditIcon />}
+                </IconButton>
             </Box>
 
             {/* X (Twitter) Section */}
             <Box display="flex" alignItems="center">
                 <TextField
+                    sx={{ width: '100%' }}
                     label="X (Twitter) URL"
                     variant="outlined"
                     fullWidth
@@ -126,23 +125,30 @@ const UserProfile = () => {
                     disabled={!isEditingX}
                     placeholder="Enter your X handle or URL"
                     error={!!formErrors.xHandle}
-                    helperText={formErrors.xHandle || 'Enter your X/Twitter handle or URL'}
+                    helperText={formErrors.xHandle || 'X handle is optional but useful for giveaways '}
                     InputProps={{
                         endAdornment: (
-                            <IconButton
-                                onClick={() => {
-                                    if (isEditingX) {
-                                        handleXSave();
-                                    } else {
-                                        setIsEditingX(true);
-                                    }
-                                }}
+                            <Tooltip
+                                placement="left"
+                                title="Your X (Twitter) handle is optional but will be used for giveaways."
                             >
-                                {isEditingX ? <SaveIcon /> : <EditIcon />}
-                            </IconButton>
+                                <InfoOutlinedIcon fontSize="small" />
+                            </Tooltip>
                         ),
                     }}
                 />
+                <IconButton
+                    sx={{ marginBottom: '1.5rem' }}
+                    onClick={() => {
+                        if (isEditingX) {
+                            handleXSave();
+                        } else {
+                            setIsEditingX(true);
+                        }
+                    }}
+                >
+                    {isEditingX ? <SaveIcon /> : <EditIcon />}
+                </IconButton>
             </Box>
         </Box>
     );

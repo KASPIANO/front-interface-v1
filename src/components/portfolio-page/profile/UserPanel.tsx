@@ -1,12 +1,17 @@
 import { Grid, Divider, Box } from '@mui/material';
 import UserProfile from './UserProfile';
+import { FC } from 'react';
 
-const UserPanel = () => (
+interface UserPanelProps {
+    walletAddress: string;
+    tabValue: string;
+}
+const UserPanel: FC<UserPanelProps> = ({ walletAddress }) => (
     <div style={{ display: 'flex' }}>
         <Grid container spacing={2} padding={2}>
             {/* Left Side - UserProfile */}
             <Grid item xs={4.9} sm={4.9} md={4.9} lg={4.9}>
-                <UserProfile />
+                <UserProfile walletAddress={walletAddress} />
             </Grid>
 
             {/* Divider */}
