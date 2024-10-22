@@ -6,6 +6,7 @@ import ReviewListTokenDialog from '../../components/dialogs/token-info/review-li
 import {
     BackendValidationErrorsType,
     fetchTokenByTicker,
+    saveDeployData,
     sendServerRequestAndSetErrorsIfNeeded,
     updateTokenMetadata,
 } from '../../DAL/BackendDAL';
@@ -479,6 +480,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             const txid = await deployKRC20Token(inscribeJsonString);
 
             if (txid) {
+                saveDeployData(tokenKRC20Details.ticker, walletAddress);
                 setIsDeploying(false);
                 setWaitingForTokenConfirmation(true);
                 await delay(17000);
@@ -964,7 +966,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                             </Button>
                         </UploadButton>
                         <Typography variant="caption" color="text.secondary">
-                            Recommended size: 1500x500 pixels. Max file size: 50MB.
+                            Recommended size: 350x150 pixels. Max file size: 50MB.
                         </Typography>
                         <Button
                             sx={{ width: '1vw', height: '2vw' }}

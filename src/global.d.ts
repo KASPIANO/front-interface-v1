@@ -17,9 +17,7 @@ interface Kasware {
         priorityFee?: number,
     ) => Promise<string>;
     signKRC20BatchTransferTransaction: (
-        inscribeJsonString: string,
-        type: number,
-        destAddr?: string[],
+        list: { ticker: string; to: string; amount: number }[],
         priorityFee?: number,
     ) => Promise<string>;
     on: (event: 'accountsChanged' | 'networkChanged' | 'disconnect', handler: (data: any) => void) => void;

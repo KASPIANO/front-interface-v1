@@ -1,8 +1,7 @@
 // Ensure the WebSocket is available globally
 
 import Cookies from 'js-cookie';
-import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
-import { gasEstimator, getPriorityFee, kaspaFeeEstimate } from '../DAL/KaspaApiDal';
+import { getPriorityFee } from '../DAL/KaspaApiDal';
 import { KaswareSendKaspaResult } from '../types/Types';
 
 export const USER_REJECTED_TRANSACTION_ERROR_CODE = 4001;
@@ -243,30 +242,16 @@ export const removeNetworkChangedListener = (handler: (network: string) => void)
 };
 
 // Utility function to sign a KRC20 batch transfer transaction
-export const signKRC20BatchTransfer = async (inscribeJsonString: string, addresses: string[]): Promise<string> => {
+export const signKRC20BatchTransfer = async (
+    addressedList: { ticker: string; to: string; amount: number }[],
+): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
 
     try {
-        if (true) {
-            showGlobalSnackbar({
-                message: 'Airdrop disabled',
-                severity: 'error',
-            });
-            return;
-        }
-        let txid;
-        let priorityFee = await kaspaFeeEstimate();
-        if (priorityFee === 1) {
-            txid = await window.kasware.signKRC20BatchTransferTransaction(inscribeJsonString, 4, addresses);
-        } else {
-            priorityFee = await gasEstimator('TRANSFER');
-            txid = await window.kasware.signKRC20BatchTransferTransaction(
-                inscribeJsonString,
-                4,
-                addresses,
-                priorityFee,
-            );
-        }
+        const priorityFee = await getPriorityFee('TRANSFER');
+        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
+        const txid = await window.kasware.signKRC20BatchTransferTransaction(addressedList, kasPriorityFee);
+
         return txid;
     } catch (error) {
         console.error('Failed to execute batch KRC20 token transfer:', error);

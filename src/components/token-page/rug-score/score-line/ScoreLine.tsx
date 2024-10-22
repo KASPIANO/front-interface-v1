@@ -23,18 +23,15 @@ const ScoreLine: FC<ScoreLineProps> = (props) => {
         let gradientString = '';
         const keys = Object.keys(colorRanges);
 
-        for (let i = 0; i < keys.length; i++) {
-            const color = keys[i];
+        keys.forEach((color) => {
             const { start, end } = colorRanges[color];
+            gradientString += `${color} ${start}%, ${color} ${end}%, `;
+        });
 
-            gradientString += `${color} ${start}%, `;
-            gradientString += `${color} ${end}%, `;
-        }
-
-        gradientString = gradientString.slice(0, -2); // Remove trailing comma and space
-        return `linear-gradient(90deg, ${gradientString})`;
+        return `linear-gradient(90deg, ${gradientString.slice(0, -2)})`; // Remove last comma and space
     };
 
+    // Determines the color for the given value
     const getColorByValue = (value, colorRanges) => {
         const keys = Object.keys(colorRanges);
 
@@ -42,21 +39,21 @@ const ScoreLine: FC<ScoreLineProps> = (props) => {
             const color = keys[i];
             const { start, end } = colorRanges[color];
 
-            if (value >= start && value < end) {
+            if (value >= start && value <= end) {
+                // Updated to <= for boundary conditions
                 return color;
             }
         }
 
-        // If no range matches, return the color of the last range
-        const lastColor = keys[keys.length - 1];
-        return value >= colorRanges[lastColor].end ? lastColor : keys[0];
+        // Fallback to the last color if value exceeds all ranges
+        return keys[keys.length - 1];
     };
 
     useEffect(() => {
         const color = getColorByValue(value, config);
         setThumbColor(color);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [value]);
+    }, [value, config]);
 
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '1.2vh' }}>

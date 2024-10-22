@@ -34,9 +34,9 @@ const RugScore: FC<RugScoreProps> = (props) => {
     const [showInfoForm, setShowInfoForm] = useState(false);
 
     const scoreLineRanges: ScoreLineConfig = {
-        [theme.palette.error.main]: { start: 0, end: 30 },
+        [theme.palette.error.main]: { start: 0, end: 34 },
         [theme.palette.warning.main]: { start: 35, end: 69 },
-        [theme.palette.success.main]: { start: 72, end: 100 },
+        [theme.palette.success.main]: { start: 70, end: 100 },
     };
 
     const handleOpenDialog = () => {
