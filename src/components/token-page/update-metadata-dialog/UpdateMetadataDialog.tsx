@@ -57,28 +57,28 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
 
         let currentMetadataPaymentTransactionId = updateMetadataPaymentTransactionId;
 
-        if (walletBalance < VERIFICATION_FEE_KAS) {
-            showGlobalSnackbar({
-                message: 'Insufficient funds to list token',
-                severity: 'error',
-            });
-            return false;
-        }
+        // if (walletBalance < VERIFICATION_FEE_KAS) {
+        //     showGlobalSnackbar({
+        //         message: 'Insufficient funds to list token',
+        //         severity: 'error',
+        //     });
+        //     return false;
+        // }
 
-        let metadataUpdateFeeTransactionId = null;
+        // let metadataUpdateFeeTransactionId = null;
 
         try {
-            const metadataFeeTransaction = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
+            // const metadataFeeTransaction = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
 
-            // TODO: GET REAL TRANSACTION ID FROM RESPONSE
-            metadataUpdateFeeTransactionId = metadataFeeTransaction.id;
-            setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId);
-            currentMetadataPaymentTransactionId = metadataUpdateFeeTransactionId;
+            // // TODO: GET REAL TRANSACTION ID FROM RESPONSE
+            // metadataUpdateFeeTransactionId = metadataFeeTransaction.id;
+            // setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId);
+            // currentMetadataPaymentTransactionId = metadataUpdateFeeTransactionId;
 
             showGlobalSnackbar({
                 message: 'Payment successful',
                 severity: 'success',
-                txIds: [metadataUpdateFeeTransactionId],
+                txIds: ['asd'],
             });
         } catch (error) {
             console.log(error);
@@ -90,7 +90,7 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
             return false;
         }
 
-        if (currentMetadataPaymentTransactionId) {
+        if (true) {
             setIsUpdateMetadataLoading(true);
 
             // Token listing request to backend
@@ -98,7 +98,7 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
 
             tokenDetailsForm.append('ticker', ticker.toUpperCase());
             tokenDetailsForm.append('walletAddress', walletAddress);
-            tokenDetailsForm.append('transactionHash', currentMetadataPaymentTransactionId);
+            tokenDetailsForm.append('transactionHash', 'asd');
 
             for (const [key, value] of Object.entries(tokenMetadataDetails)) {
                 if (value instanceof File || !isEmptyStringOrArray(value as any)) {
