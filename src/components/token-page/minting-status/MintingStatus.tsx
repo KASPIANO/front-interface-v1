@@ -33,7 +33,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                 } catch (error) {
                     console.error('Error updating data after mint:', error);
                 }
-            }, 10000); // 10000 milliseconds = 10 seconds
+            }, 12000); // 12000 milliseconds = 12 seconds
 
             // Cleanup function to clear the timeout if the component unmounts
             return () => clearTimeout(timer);

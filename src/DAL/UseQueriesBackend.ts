@@ -35,7 +35,7 @@ export const useFetchTokens = (
     useQuery({
         queryKey: ['tokens', order || 'noOrder', direction || 'noDir', timeInterval, page],
         queryFn: () => fetchAllTokens(limit, page * 50, order, direction, timeInterval),
-        staleTime: 25000, // Data stays fresh for 25 seconds
+        staleTime: 10000, // Data stays fresh for 25 seconds
         retry: 2, // Retry 2 times on failure
         refetchOnWindowFocus: false,
     });

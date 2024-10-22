@@ -327,7 +327,7 @@ const TokenInfoDialog: React.FC<TokenInfoDialogProps> = (props) => {
                             </Button>
                         </UploadButton>
                         <Typography variant="caption" color="text.secondary">
-                            Recommended size: 1500x500 pixels. Max file size: 50MB.
+                            Recommended size: 350x150 pixels. Max file size: 50MB.
                         </Typography>
                         <Button
                             sx={{ width: '1vw', height: '2vw' }}
