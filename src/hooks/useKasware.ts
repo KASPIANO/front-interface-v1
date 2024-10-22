@@ -1,59 +1,51 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import Cookies from 'universal-cookie';
 import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
-import { UserReferral, UserVerfication } from '../types/Types';
-import { generateNonce, generateRequestId, generateVerificationMessage, isEmptyString } from '../utils/Utils';
+import { UserReferral } from '../types/Types';
+import { generateRequestId, generateVerificationMessage, isEmptyString } from '../utils/Utils';
 // import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 import { getNetwork, isKasWareInstalled } from '../utils/KaswareUtils';
 import { LOCAL_STORAGE_KEYS } from '../utils/Constants';
-import { geConnectedWalletInfo, getUserReferral } from '../DAL/BackendDAL';
+import {
+    doWalletSignIn,
+    geConnectedWalletInfo,
+    getOtpForWallet,
+    getUserReferral,
+    removeCookieOnBackend,
+    setAxiosInterceptorToDisconnect,
+} from '../DAL/BackendDAL';
 import { useQueryClient } from '@tanstack/react-query';
 
 const COOKIE_TTL = 4 * 60 * 60 * 1000;
-let cookieExperationTimeout = null;
-let walletAddress = null;
+let walletAddressBeforeVerification = null;
 
 export const useKasware = () => {
     const [connected, setConnected] = useState(false);
     const [accounts, setAccounts] = useState<string[]>([]);
-    const [publicKey, setPublicKey] = useState('');
     const [address, setAddress] = useState('');
     const [balance, setBalance] = useState(0);
     const [network, setNetwork] = useState('mainnet');
     const [signature, setSignature] = useState('');
-    const [userVerified, setUserVerified] = useState<UserVerfication>(null);
     const [userReferral, setUserReferral] = useState<UserReferral | null>(null);
     const [isUserReferralFinishedLoading, setIsUserReferralFinishedLoading] = useState(false);
+    const [isConnecting, setIsConnecting] = useState(false);
     const queryClient = useQueryClient();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const cookies = new Cookies();
-
-    const getBasicInfo = async () => {
-        const { kasware } = window;
-        const [address] = await kasware.getAccounts();
-        setAddress(address);
-
-        const publicKey = await kasware.getPublicKey();
-        setPublicKey(publicKey);
-
-        const balance = await kasware.getBalance();
-        const kasAmount = balance.total / 1e8;
-        setBalance(kasAmount);
-
-        const network = await kasware.getNetwork();
-        setNetwork(network);
-    };
 
     const setNewBalance = useCallback(() => {
-        const { kasware } = window;
         if (connected) {
-            kasware.getBalance().then((balance) => {
-                const kasAmount = balance.total / 1e8;
-                setBalance(kasAmount);
-            });
+            updateBalance();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const updateBalance = useCallback(() => {
+        const { kasware } = window;
+
+        kasware.getBalance().then((balance) => {
+            const kasAmount = balance.total / 1e8;
+            setBalance(kasAmount);
+        });
     }, []);
 
     const selfRef = useRef<{ accounts: string[] }>({
@@ -61,125 +53,128 @@ export const useKasware = () => {
     });
     const self = selfRef.current;
 
-    const setCookie = useCallback(async (cookieData) => {
-        const cookieExperation = new Date(Date.now() + COOKIE_TTL);
-        const domain = import.meta.env.VITE_ENV === 'local' ? '' : '.kaspiano.com';
-
-        cookies.remove('user', { path: '/' });
-        cookies.set('user', cookieData, {
-            secure: true,
-            sameSite: 'none',
-            path: '/',
-            domain,
-            expires: cookieExperation,
-        });
-
-        if (cookieExperationTimeout) {
-            clearTimeout(cookieExperationTimeout);
-            cookieExperationTimeout = null;
-        }
-
-        cookieExperationTimeout = setTimeout(() => disconnectWallet(), COOKIE_TTL);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const refreshCookieOnLoadOrClearData = useCallback(async () => {
-        const userCookie = cookies.get('user');
-        if (userCookie) {
-            await setCookie(userCookie);
-        } else {
-            await disconnectWallet(true);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     const handleUserVerification = useCallback(async (account) => {
+        setIsConnecting(true);
+
         try {
-            const nonce = generateNonce();
+            const otpRequest = await getOtpForWallet(account);
+
+            if (!otpRequest.success) {
+                console.error(otpRequest);
+                throw new Error('Error getting code from server');
+            }
+
+            const nonce = otpRequest.code;
             const requestId = generateRequestId();
             const requestDate = new Date().toISOString();
             const userVerificationMessage = generateVerificationMessage(account, nonce, requestDate, requestId);
             const userVerification = await signMessage(userVerificationMessage);
             if (userVerification) {
-                const publicKeyCookies = await window.kasware.getPublicKey();
+                const walletPublicKey = await window.kasware.getPublicKey();
 
-                await setCookie({
-                    message: userVerificationMessage,
-                    publicKey: publicKeyCookies,
+                const signInRequest = await doWalletSignIn({
+                    date: requestDate,
+                    publicKey: walletPublicKey,
+                    requestId,
+                    walletAddress: account,
                     signature: userVerification,
                 });
-                const verifiedUser = {
-                    userWalletAddress: account,
-                    userSignedMessageTxId: userVerification,
-                    requestId,
-                    requestNonce: nonce,
-                    requestTimestamp: requestDate,
-                };
-                setUserVerified(verifiedUser);
+
+                if (!signInRequest.success) {
+                    console.error(signInRequest);
+                    throw new Error('Error signing in');
+                }
+
                 localStorage.setItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN, Date.now().toString());
+                setConnectedWalletInfo(account);
                 showGlobalSnackbar({
                     message: 'User verified successfully',
                     severity: 'success',
                 });
 
-                setNewBalance();
-
                 // Show a success message with part of the wallet address
-
-                return verifiedUser;
             }
         } catch (error) {
             console.error('Error verifying user:', error);
             showGlobalSnackbar({
-                message: 'Failed to verify user - Connect Again',
+                message:
+                    'Failed to verify user - Please try again. If the problem persists, please contact support.',
                 severity: 'error',
-                details: error.message,
+                // details: error.message,
             });
-            await disconnectWallet();
+            await disconnectWallet(true);
+            setIsConnecting(false);
             return null;
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const setConnectedWalletInfo = useCallback(
+        (walletAddress) => {
+            setAddress(walletAddress);
+            setIsConnecting(false);
+            setConnected(true);
+            updateBalance();
+        },
+        [updateBalance],
+    );
+
     const handleAccountsChanged = useCallback(
-        (_accounts: string[], verified = false) => {
+        (_accounts: string[], isFirstLoad = false) => {
             if (self.accounts[0] === _accounts[0]) {
                 return;
             }
+
+            setIsConnecting(true);
 
             self.accounts = _accounts;
             if (_accounts.length > 0) {
                 queryClient.invalidateQueries({ queryKey: ['userListings'] });
                 queryClient.invalidateQueries({ queryKey: ['ordersHistory'] });
-                getBasicInfo();
-                setAccounts(_accounts);
-                setConnected(true);
 
-                setAddress(_accounts[0]);
-                [walletAddress] = _accounts;
-                if (!verified) {
+                // setConnected(true);
+
+                [walletAddressBeforeVerification] = _accounts;
+                if (isFirstLoad) {
+                    setAccounts(_accounts);
+                    setConnectedWalletInfo(_accounts[0]);
+                } else {
+                    if (localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN)) {
+                        clearConnectionData();
+                    }
+
                     handleUserVerification(_accounts[0]);
                 }
             } else {
                 console.log('No accounts found');
-                setConnected(false);
-                setAccounts([]);
-                setAddress('');
-                setPublicKey('');
-                setBalance(0);
+                clearConnectionData();
             }
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [handleUserVerification, self],
+        [],
     );
+
+    const clearConnectionData = useCallback(() => {
+        setConnected(false);
+        setAccounts([]);
+        setAddress('');
+        setBalance(0);
+        setIsConnecting(false);
+        setUserReferral(null);
+
+        if (localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN)) {
+            localStorage.removeItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN);
+            removeCookieOnBackend().catch((error) => console.error(error));
+        }
+    }, []);
 
     const handleNetworkChange = useCallback(async (newNetwork) => {
         if (network !== newNetwork) {
             const isValid = await handleNetworkByEnvironment();
             if (isValid) {
                 showGlobalSnackbar({ message: `Switched to ${newNetwork}`, severity: 'success' });
-                getBasicInfo();
+                setNetwork(newNetwork);
             } else {
                 showGlobalSnackbar({
                     message: 'Failed to switch network',
@@ -191,24 +186,14 @@ export const useKasware = () => {
     }, []);
 
     const disconnectWallet = useCallback(async (ignoreMessage = false) => {
-        walletAddress = null;
+        walletAddressBeforeVerification = null;
         const { origin } = window.location;
         await window.kasware.disconnect(origin);
-        handleAccountsChanged([]);
-        setUserReferral(null);
+        clearConnectionData();
 
         if (!ignoreMessage) {
             showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
         }
-
-        cookies.remove('user', { path: '/' });
-        if (cookieExperationTimeout) {
-            clearTimeout(cookieExperationTimeout);
-            cookieExperationTimeout = null;
-        }
-
-        localStorage.removeItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN);
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -228,13 +213,18 @@ export const useKasware = () => {
 
     useEffect(() => {
         const checkExistingConnection = async () => {
-            await refreshCookieOnLoadOrClearData();
+            let isLoggedIn = false;
+            const lastLoggedInAt = localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN);
 
-            if (localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN) === 'true') {
+            if (lastLoggedInAt && Date.now() < parseInt(lastLoggedInAt) + COOKIE_TTL) {
+                isLoggedIn = true;
+            }
+
+            if (isLoggedIn) {
                 try {
                     const result = await geConnectedWalletInfo();
                     // eslint-disable-next-line prefer-destructuring
-                    walletAddress = result.walletAddress;
+                    walletAddressBeforeVerification = result.walletAddress;
                 } catch (error) {
                     console.error('error checking existing connection:', error);
 
@@ -245,11 +235,15 @@ export const useKasware = () => {
                 }
             }
 
-            if (walletAddress && isKasWareInstalled()) {
+            if (walletAddressBeforeVerification && isKasWareInstalled()) {
                 try {
                     const accounts = await window.kasware.requestAccounts();
-                    if (accounts.length > 0 && accounts[0].toLowerCase() === walletAddress.toLowerCase()) {
-                        await getBasicInfo();
+                    if (
+                        accounts.length > 0 &&
+                        accounts[0].toLowerCase() === walletAddressBeforeVerification.toLowerCase()
+                    ) {
+                        const network = await window.kasware.getNetwork();
+                        setNetwork(network);
                         handleAccountsChanged(accounts, true);
                         await handleNetworkByEnvironment();
                     } else {
@@ -261,6 +255,13 @@ export const useKasware = () => {
                 }
             }
         };
+
+        setAxiosInterceptorToDisconnect(async () => {
+            if (connected) {
+                localStorage.removeItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN);
+                disconnectWallet(false);
+            }
+        });
 
         checkExistingConnection();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -316,12 +317,19 @@ export const useKasware = () => {
     const connectWallet = async () => {
         if (isKasWareInstalled()) {
             await handleNetworkByEnvironment();
-            const result = await window.kasware.requestAccounts();
-            showGlobalSnackbar({
-                message: 'Wallet connected successfully',
-                severity: 'success',
-            });
-            handleAccountsChanged(result);
+            setIsConnecting(true);
+
+            try {
+                const result = await window.kasware.requestAccounts();
+                showGlobalSnackbar({
+                    message: 'Wallet connected successfully, Please sign the message to complete your login.',
+                    severity: 'success',
+                });
+                handleAccountsChanged(result);
+            } catch (error) {
+                console.error(error);
+                setIsConnecting(false);
+            }
         } else {
             showGlobalSnackbar({
                 message: 'KasWare not installed',
@@ -357,7 +365,6 @@ export const useKasware = () => {
     };
 
     return {
-        publicKey,
         walletAddress: address,
         network,
         walletBalance: balance,
@@ -365,7 +372,6 @@ export const useKasware = () => {
         accounts,
         kaswareInstance: window.kasware,
         signature,
-        userVerified,
         disconnectWallet,
         connectWallet,
         signMessage,
@@ -374,5 +380,6 @@ export const useKasware = () => {
         userReferral,
         updateAndGetUserReferral,
         isUserReferralFinishedLoading,
+        isConnecting,
     };
 };

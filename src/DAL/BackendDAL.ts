@@ -1,7 +1,9 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
 import {
     AuthWalletInfo,
+    AuthWalletOtp,
     BackendTokenResponse,
+    SignInWithWalletRequestDto,
     TickerPortfolioBackend,
     TokenListItemResponse,
     TokenSearchItems,
@@ -9,7 +11,6 @@ import {
     TradeStats,
     UserInfo,
     UserReferral,
-    VerifiedUser,
 } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
@@ -19,9 +20,23 @@ const P2PCONTROLLERDATA = 'p2p-data';
 const KRC20METADATA_CONTROLLER = 'krc20metadata';
 const USER_REFERRALS_CONTROLLER = 'referrals';
 const AUTH_CONTROLLER = 'auth';
+const DISCONNECT_ROUTE = `/${AUTH_CONTROLLER}/disconnect`;
 
 export type BackendValidationErrorsType = {
     [key: string]: string[];
+};
+
+export const setAxiosInterceptorToDisconnect = (disconnectFunction: () => Promise<any>) => {
+    backendService.interceptors.response.use(
+        (response) => response, // Pass through all successful responses
+        async (error) => {
+            if (error.response && error.response.status === 401) {
+                await disconnectFunction();
+            }
+
+            return Promise.reject(error); // Reject the error to handle it in other catch blocks
+        },
+    );
 };
 
 export const fetchAllTokens = async (
@@ -298,4 +313,22 @@ export const saveDeployData = async (ticker: string, walletAddress: string): Pro
 export const geConnectedWalletInfo = async () => {
     const response = await backendService.get<AuthWalletInfo>(`/${AUTH_CONTROLLER}/info`);
     return response.data;
-}
+};
+
+export const getOtpForWallet = async (walletAddress: string) => {
+    const response = await backendService.post<AuthWalletOtp>(`/${AUTH_CONTROLLER}/otp`, { walletAddress });
+    return response.data;
+};
+
+export const doWalletSignIn = async (signInData: SignInWithWalletRequestDto) => {
+    const response = await backendService.post<{ success: string }>(
+        `/${AUTH_CONTROLLER}/wallet-sign-in`,
+        signInData,
+    );
+    return response.data;
+};
+
+export const removeCookieOnBackend = async () => {
+    const response = await backendService.post<{ success: string }>(DISCONNECT_ROUTE, {});
+    return response.data;
+};

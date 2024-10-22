@@ -211,14 +211,6 @@ export interface TokenRowActivityItem {
     oneDayChange?: string;
 }
 
-export interface UserVerfication {
-    userWalletAddress: string;
-    userSignedMessageTxId: string;
-    requestId: string;
-    requestNonce: string;
-    requestTimestamp: string;
-}
-
 export interface TransferObj {
     p: string;
     op: string;
@@ -238,14 +230,6 @@ export interface FetchWalletActivityResponse {
     activityItems: TokenRowActivityItem[];
     next: string | null;
     prev: string | null;
-}
-
-export interface VerifiedUser {
-    userWalletAddress: string;
-    userSignedMessageTxId: string;
-    requestId: string;
-    requestNonce: string;
-    requestTimestamp: string;
 }
 
 export interface FetchWalletPortfolioResponse {
@@ -361,4 +345,22 @@ export type TradeStats = {
 export interface AuthWalletInfo {
     walletAddress: string;
     authType: AuthType;
+}
+
+export enum AuthType {
+    USER = 'user',
+    WALLET = 'wallet',
+}
+
+export interface AuthWalletOtp {
+    success: boolean;
+    code: string;
+}
+
+export interface SignInWithWalletRequestDto {
+    walletAddress: string;
+    signature: string;
+    date: string;
+    requestId: string;
+    publicKey: string;
 }
