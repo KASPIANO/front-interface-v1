@@ -18,13 +18,16 @@ import { useQueryClient } from '@tanstack/react-query';
 
 const COOKIE_TTL = 4 * 60 * 60 * 1000;
 let walletAddressBeforeVerification = null;
+let isConnected = false;
 
 export const useKasware = () => {
     const [connected, setConnected] = useState(false);
     const [accounts, setAccounts] = useState<string[]>([]);
     const [address, setAddress] = useState('');
     const [balance, setBalance] = useState(0);
-    const [network, setNetwork] = useState('mainnet');
+    const [network, setNetwork] = useState(
+        import.meta.env.VITE_ENV === 'prod' ? 'kaspa_mainnet' : 'kaspa_testnet_10',
+    );
     const [signature, setSignature] = useState('');
     const [userReferral, setUserReferral] = useState<UserReferral | null>(null);
     const [isUserReferralFinishedLoading, setIsUserReferralFinishedLoading] = useState(false);
@@ -115,6 +118,7 @@ export const useKasware = () => {
             setAddress(walletAddress);
             setIsConnecting(false);
             setConnected(true);
+            isConnected = true;
             updateBalance();
         },
         [updateBalance],
@@ -157,6 +161,7 @@ export const useKasware = () => {
 
     const clearConnectionData = useCallback(() => {
         setConnected(false);
+        isConnected = false;
         setAccounts([]);
         setAddress('');
         setBalance(0);
@@ -257,7 +262,7 @@ export const useKasware = () => {
         };
 
         setAxiosInterceptorToDisconnect(async () => {
-            if (connected) {
+            if (isConnected) {
                 localStorage.removeItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN);
                 disconnectWallet(false);
             }
@@ -369,7 +374,6 @@ export const useKasware = () => {
         network,
         walletBalance: balance,
         walletConnected: connected,
-        accounts,
         kaswareInstance: window.kasware,
         signature,
         disconnectWallet,

@@ -27,6 +27,7 @@ export type BackendValidationErrorsType = {
 };
 
 export const setAxiosInterceptorToDisconnect = (disconnectFunction: () => Promise<any>) => {
+    backendService.interceptors.response.clear();
     backendService.interceptors.response.use(
         (response) => response, // Pass through all successful responses
         async (error) => {
