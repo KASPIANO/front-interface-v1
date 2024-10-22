@@ -357,3 +357,8 @@ export type TradeStats = {
         },
     ];
 };
+
+export interface AuthWalletInfo {
+    walletAddress: string;
+    authType: AuthType;
+}

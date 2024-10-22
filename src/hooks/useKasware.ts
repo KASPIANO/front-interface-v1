@@ -7,11 +7,12 @@ import { generateNonce, generateRequestId, generateVerificationMessage, isEmptyS
 import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 import { getNetwork, isKasWareInstalled } from '../utils/KaswareUtils';
 import { LOCAL_STORAGE_KEYS } from '../utils/Constants';
-import { getUserReferral } from '../DAL/BackendDAL';
+import { geConnectedWalletInfo, getUserReferral } from '../DAL/BackendDAL';
 import { useQueryClient } from '@tanstack/react-query';
 
 const COOKIE_TTL = 4 * 60 * 60 * 1000;
 let cookieExperationTimeout = null;
+let walletAddress = null;
 
 export const useKasware = () => {
     const [connected, setConnected] = useState(false);
@@ -115,6 +116,7 @@ export const useKasware = () => {
                     requestTimestamp: requestDate,
                 };
                 setUserVerified(verifiedUser);
+                localStorage.setItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN, Date.now().toString());
                 showGlobalSnackbar({
                     message: 'User verified successfully',
                     severity: 'success',
@@ -155,7 +157,7 @@ export const useKasware = () => {
                 setConnected(true);
 
                 setAddress(_accounts[0]);
-                localStorage.setItem('walletAddress', _accounts[0]);
+                [walletAddress] = _accounts;
                 if (!verified) {
                     handleUserVerification(_accounts[0]);
                 }
@@ -189,11 +191,11 @@ export const useKasware = () => {
     }, []);
 
     const disconnectWallet = useCallback(async (ignoreMessage = false) => {
+        walletAddress = null;
         const { origin } = window.location;
         await window.kasware.disconnect(origin);
         handleAccountsChanged([]);
         setUserReferral(null);
-        localStorage.removeItem('walletAddress');
 
         if (!ignoreMessage) {
             showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
@@ -204,6 +206,8 @@ export const useKasware = () => {
             clearTimeout(cookieExperationTimeout);
             cookieExperationTimeout = null;
         }
+
+        localStorage.removeItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -226,11 +230,25 @@ export const useKasware = () => {
         const checkExistingConnection = async () => {
             await refreshCookieOnLoadOrClearData();
 
-            const storedAddress = localStorage.getItem('walletAddress');
-            if (storedAddress && isKasWareInstalled()) {
+            if (localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN) === 'true') {
+                try {
+                    const result = await geConnectedWalletInfo();
+                    // eslint-disable-next-line prefer-destructuring
+                    walletAddress = result.walletAddress;
+                } catch (error) {
+                    console.error('error checking existing connection:', error);
+
+                    if (isKasWareInstalled()) {
+                        await disconnectWallet(true);
+                        return;
+                    }
+                }
+            }
+
+            if (walletAddress && isKasWareInstalled()) {
                 try {
                     const accounts = await window.kasware.requestAccounts();
-                    if (accounts.length > 0 && accounts[0].toLowerCase() === storedAddress.toLowerCase()) {
+                    if (accounts.length > 0 && accounts[0].toLowerCase() === walletAddress.toLowerCase()) {
                         await getBasicInfo();
                         handleAccountsChanged(accounts, true);
                         await handleNetworkByEnvironment();

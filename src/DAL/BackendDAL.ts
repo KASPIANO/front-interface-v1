@@ -1,5 +1,6 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
 import {
+    AuthWalletInfo,
     BackendTokenResponse,
     TickerPortfolioBackend,
     TokenListItemResponse,
@@ -195,20 +196,6 @@ export async function fetchTokenPortfolio(tickers: string[]): Promise<TickerPort
     }
 }
 
-export async function signUser(verifiedUser: VerifiedUser): Promise<{ message: string }> {
-    try {
-        const response = await backendService.post<{ message: string }>(`/${AUTH_CONTROLLER}/sign`, {
-            verifiedUser,
-        });
-
-        // Assuming response.data contains the actual array of logo URLs
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching token logo URL:', error);
-        return;
-    }
-}
-
 export const fetchTokenPrice = async (ticker: string): Promise<number> => {
     try {
         const response = await backendService.get<{ price: number }>(`/${KRC20CONTROLLER}/token-price/${ticker}`);
@@ -307,3 +294,8 @@ export const saveDeployData = async (ticker: string, walletAddress: string): Pro
     });
     return response.data;
 };
+
+export const geConnectedWalletInfo = async () => {
+    const response = await backendService.get<AuthWalletInfo>(`/${AUTH_CONTROLLER}/info`);
+    return response.data;
+}
