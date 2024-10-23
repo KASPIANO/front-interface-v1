@@ -376,6 +376,7 @@ export const useKasware = () => {
         walletConnected: connected,
         kaswareInstance: window.kasware,
         signature,
+        accounts,
         disconnectWallet,
         connectWallet,
         signMessage,
