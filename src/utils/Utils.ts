@@ -68,6 +68,7 @@ export function generateNonce() {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
+// If you change here, must be changed in the front too, MUST BE SIMILAR 1:1
 export const generateVerificationMessage = (account: string, nonce: string, date: string, requestId: string) => `
     kaspiano.com wants you to sign in with your Kaspa account:
     
@@ -83,8 +84,7 @@ export const generateVerificationMessage = (account: string, nonce: string, date
     
     Issued At: ${date}
     
-    Request ID: ${requestId}
-            `;
+    Request ID: ${requestId}`;
 
 // Function to generate a unique request ID
 export function generateRequestId() {
