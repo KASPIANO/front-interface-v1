@@ -60,7 +60,7 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
         const urlParams = new URLSearchParams(window.location.search);
 
         // Get the value of the 'isAdmin' parameter
-        const isAdmin = urlParams.get('admin');
+        const isAdmin = !!urlParams.get('admin');
 
         if (isAdmin) {
             currentMetadataPaymentTransactionId = 'ADMIN';

@@ -127,22 +127,14 @@ export async function updateWalletSentiment(
 
 export async function updateTokenMetadata(
     tokenDetails: FormData, // TokenDeploy
-    isAdmin: boolean = false,
+    isAdmin = false,
 ): Promise<AxiosResponse<any> | null> {
     // eslint-disable-next-line no-return-await
-    return await makeUpdateTokenMetadataRequest(tokenDetails, false, isAdmin);
-}
-
-export async function validateFormDetailsForUpdateTokenMetadata(
-    tokenDetails: FormData, // TokenDeploy
-): Promise<AxiosResponse<any> | null> {
-    // eslint-disable-next-line no-return-await
-    return await makeUpdateTokenMetadataRequest(tokenDetails, true);
+    return await makeUpdateTokenMetadataRequest(tokenDetails, isAdmin);
 }
 
 export async function makeUpdateTokenMetadataRequest(
     tokenDetails: FormData, // TokenDeploy
-    validateOnly = false,
     isAdmin = false,
 ): Promise<AxiosResponse<any> | null> {
     try {
@@ -150,8 +142,6 @@ export async function makeUpdateTokenMetadataRequest(
 
         if (isAdmin) {
             url += '-admin';
-        } else if (validateOnly) {
-            url += '-validate';
         }
 
         const response = await backendService.post<any>(url, tokenDetails);
