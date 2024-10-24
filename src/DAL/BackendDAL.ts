@@ -3,6 +3,7 @@ import {
     AuthWalletInfo,
     AuthWalletOtp,
     BackendTokenResponse,
+    SignInResponse,
     SignInWithWalletRequestDto,
     TickerPortfolioBackend,
     TokenListItemResponse,
@@ -126,27 +127,21 @@ export async function updateWalletSentiment(
 
 export async function updateTokenMetadata(
     tokenDetails: FormData, // TokenDeploy
+    isAdmin = false,
 ): Promise<AxiosResponse<any> | null> {
     // eslint-disable-next-line no-return-await
-    return await makeUpdateTokenMetadataRequest(tokenDetails, false);
-}
-
-export async function validateFormDetailsForUpdateTokenMetadata(
-    tokenDetails: FormData, // TokenDeploy
-): Promise<AxiosResponse<any> | null> {
-    // eslint-disable-next-line no-return-await
-    return await makeUpdateTokenMetadataRequest(tokenDetails, true);
+    return await makeUpdateTokenMetadataRequest(tokenDetails, isAdmin);
 }
 
 export async function makeUpdateTokenMetadataRequest(
     tokenDetails: FormData, // TokenDeploy
-    validateOnly = false,
+    isAdmin = false,
 ): Promise<AxiosResponse<any> | null> {
     try {
         let url = `/${KRC20METADATA_CONTROLLER}/update`;
 
-        if (validateOnly) {
-            url += '-validate';
+        if (isAdmin) {
+            url += '-admin';
         }
 
         const response = await backendService.post<any>(url, tokenDetails);
@@ -249,9 +244,8 @@ export const getGasEstimator = async (orderId: string): Promise<any> => {
     }
 };
 
-export const getUserReferral = async (walletAddress: string, referredBy?: string): Promise<UserReferral> => {
+export const getUserReferral = async (referredBy?: string): Promise<UserReferral> => {
     const response = await backendService.post<UserReferral>(`/${USER_REFERRALS_CONTROLLER}/user-referral`, {
-        walletAddress,
         referredBy,
     });
     return response.data;
@@ -311,7 +305,7 @@ export const saveDeployData = async (ticker: string, walletAddress: string): Pro
     return response.data;
 };
 
-export const geConnectedWalletInfo = async () => {
+export const geConnectedWalletInfo = async (): Promise<AuthWalletInfo> => {
     const response = await backendService.get<AuthWalletInfo>(`/${AUTH_CONTROLLER}/info`);
     return response.data;
 };
@@ -321,11 +315,8 @@ export const getOtpForWallet = async (walletAddress: string) => {
     return response.data;
 };
 
-export const doWalletSignIn = async (signInData: SignInWithWalletRequestDto) => {
-    const response = await backendService.post<{ success: string }>(
-        `/${AUTH_CONTROLLER}/wallet-sign-in`,
-        signInData,
-    );
+export const doWalletSignIn = async (signInData: SignInWithWalletRequestDto): Promise<SignInResponse> => {
+    const response = await backendService.post<SignInResponse>(`/${AUTH_CONTROLLER}/wallet-sign-in`, signInData);
     return response.data;
 };
 

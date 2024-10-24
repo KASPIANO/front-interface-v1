@@ -75,7 +75,7 @@ export const useKasware = () => {
             if (userVerification) {
                 const walletPublicKey = await window.kasware.getPublicKey();
 
-                const signInRequest = await doWalletSignIn({
+                const signInResponse = await doWalletSignIn({
                     date: requestDate,
                     publicKey: walletPublicKey,
                     requestId,
@@ -83,8 +83,8 @@ export const useKasware = () => {
                     signature: userVerification,
                 });
 
-                if (!signInRequest.success) {
-                    console.error(signInRequest);
+                if (!(signInResponse.success && signInResponse.walletAddress === account)) {
+                    console.error(signInResponse);
                     throw new Error('Error signing in');
                 }
 
@@ -283,7 +283,7 @@ export const useKasware = () => {
     };
 
     const updateAndGetUserReferral = async (referredBy?: string): Promise<UserReferral> => {
-        const result = await getUserReferral(address, referredBy);
+        const result = await getUserReferral(referredBy);
         setUserReferral(result);
 
         return result;

@@ -364,3 +364,18 @@ export interface SignInWithWalletRequestDto {
     requestId: string;
     publicKey: string;
 }
+
+export interface AuthWalletInfo {
+    walletAddress: string;
+    authType: AuthType;
+    userRoles?: UserRoleEnum[];
+}
+
+export interface SignInResponse extends AuthWalletInfo {
+    success: boolean;
+}
+
+export enum UserRoleEnum {
+    SYS_ADMIN = -1,
+    LISTING_MANAGER = 1,
+}
