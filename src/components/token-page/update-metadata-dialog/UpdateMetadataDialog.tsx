@@ -57,37 +57,46 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
 
         let currentMetadataPaymentTransactionId = updateMetadataPaymentTransactionId;
 
-        if (walletBalance < VERIFICATION_FEE_KAS) {
-            showGlobalSnackbar({
-                message: 'Insufficient funds to list token',
-                severity: 'error',
-            });
-            return false;
-        }
+        const urlParams = new URLSearchParams(window.location.search);
 
-        let metadataUpdateFeeTransactionId = null;
+        // Get the value of the 'isAdmin' parameter
+        const isAdmin = urlParams.get('admin');
 
-        try {
-            const metadataFeeTransaction = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
+        if (isAdmin) {
+            currentMetadataPaymentTransactionId = 'ADMIN';
+        } else {
+            if (walletBalance < VERIFICATION_FEE_KAS) {
+                showGlobalSnackbar({
+                    message: 'Insufficient funds to list token',
+                    severity: 'error',
+                });
+                return false;
+            }
 
-            // TODO: GET REAL TRANSACTION ID FROM RESPONSE
-            metadataUpdateFeeTransactionId = metadataFeeTransaction.id;
-            setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId);
-            currentMetadataPaymentTransactionId = metadataUpdateFeeTransactionId;
+            let metadataUpdateFeeTransactionId = null;
 
-            showGlobalSnackbar({
-                message: 'Payment successful',
-                severity: 'success',
-                txIds: [metadataUpdateFeeTransactionId],
-            });
-        } catch (error) {
-            console.log(error);
-            showGlobalSnackbar({
-                message: 'Payment failed',
-                severity: 'error',
-            });
+            try {
+                const metadataFeeTransaction = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
 
-            return false;
+                // TODO: GET REAL TRANSACTION ID FROM RESPONSE
+                metadataUpdateFeeTransactionId = metadataFeeTransaction.id;
+                setUpdateMetadataPaymentTransactionId(metadataUpdateFeeTransactionId);
+                currentMetadataPaymentTransactionId = metadataUpdateFeeTransactionId;
+
+                showGlobalSnackbar({
+                    message: 'Payment successful',
+                    severity: 'success',
+                    txIds: [metadataUpdateFeeTransactionId],
+                });
+            } catch (error) {
+                console.log(error);
+                showGlobalSnackbar({
+                    message: 'Payment failed',
+                    severity: 'error',
+                });
+
+                return false;
+            }
         }
 
         if (currentMetadataPaymentTransactionId) {
@@ -109,7 +118,7 @@ export const UpdateMetadataDialog: FC<UpdateMetadataDialogProps> = (props) => {
             try {
                 const result: BackendTokenMetadata | null =
                     (await sendServerRequestAndSetErrorsIfNeeded<BackendTokenMetadata>(
-                        async () => updateTokenMetadata(tokenDetailsForm),
+                        async () => updateTokenMetadata(tokenDetailsForm, isAdmin),
                         (errors) => console.error(errors),
                     )) as BackendTokenMetadata | null;
 
