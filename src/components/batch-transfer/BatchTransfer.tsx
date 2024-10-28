@@ -56,6 +56,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     const [openDialog, setOpenDialog] = useState(false);
     const [startedPayment, setStartedPayment] = useState(false);
     const [userCredits, setUserCredits] = useState(0);
+    const [usingCredits, setUsingCredits] = useState(false);
     useEffect(() => {
         const fetchUserCredits = async () => {
             try {
@@ -68,7 +69,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         };
 
         fetchUserCredits();
-    }, [userCredits, paymentMade, paymentTxnId, walletAddress]);
+    }, [userCredits, paymentMade, paymentTxnId, walletAddress, walletConnected]);
 
     // Calculate the airdrop summary
     const totalTokens = recipientList.reduce((sum, item) => sum + item.amount, 0);
@@ -76,7 +77,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
 
     const handleOpenDialog = () => setOpenDialog(true);
     const handleCloseDialog = () => {
-        if (startedPayment) {
+        if (startedPayment || usingCredits) {
             return;
         }
 
@@ -350,6 +351,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
 
     const handleCreditReduction = async () => {
         try {
+            setUsingCredits(true);
             const tokenAmountVerification = await handleTokenBalanceVerification();
             if (!tokenAmountVerification) {
                 showGlobalSnackbar({
@@ -366,6 +368,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                     severity: 'success',
                 });
                 setPaymentMade(true);
+                setUsingCredits(false);
                 handleCloseDialog();
             } else {
                 showGlobalSnackbar({
@@ -472,7 +475,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 variant="contained"
                 onClick={handleOpenDialog}
                 sx={{ marginTop: '20px', marginRight: '10px' }}
-                disabled={!recipientList.length || !ticker || isTransferActive || isVerifying}
+                disabled={!recipientList.length || !ticker || isTransferActive || isVerifying || paymentMade}
             >
                 Review Airdrop
             </Button>
@@ -505,9 +508,9 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                             onClick={handleCreditReduction}
                             color="primary"
                             variant="contained"
-                            disabled={startedPayment}
+                            disabled={startedPayment || usingCredits}
                         >
-                            Use Credit
+                            {usingCredits ? 'Loading...' : 'Use Credit'}
                         </Button>
                     ) : (
                         <Button
