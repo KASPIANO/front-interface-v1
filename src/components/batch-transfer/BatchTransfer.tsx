@@ -1,10 +1,21 @@
-import React, { useState, FC } from 'react';
-import { Box, Button, Input, Typography, Card } from '@mui/material';
+import React, { useState, FC, useEffect } from 'react';
+import {
+    Box,
+    Button,
+    Input,
+    Typography,
+    Card,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Tooltip,
+} from '@mui/material';
 import { sendKaspaToKaspiano, signKRC20BatchTransfer, versionCheck } from '../../utils/KaswareUtils';
 import { parse } from 'papaparse'; // For CSV parsing
 import { showGlobalSnackbar } from '../alert-context/AlertContext';
 import FileDownloadIconRounded from '@mui/icons-material/FileDownloadRounded';
-import { verifyPaymentTransaction } from '../../utils/Utils';
+
 import { UploadButton } from '../../pages/deploy-page/DeployPage.s';
 import { fetchWalletKRC20Balance } from '../../DAL/Krc20DAL';
 import { BatchTransferItem } from '../../types/Types';
@@ -12,6 +23,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CircularProgress from '@mui/material/CircularProgress';
+import { checkAirdropCredits, decreaseAirdropCredits, saveAirdropData } from '../../DAL/BackendDAL';
 
 export interface BatchTransferProps {
     walletConnected: boolean;
@@ -20,14 +32,14 @@ export interface BatchTransferProps {
 }
 
 const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
-const VERIFICATION_FEE_KAS = 500;
-const VERIFICATION_FEE_SOMPI = VERIFICATION_FEE_KAS * KASPA_TO_SOMPI;
+const AIRDROP_FEE_KAS = 500;
+const AIRDROP_FEE_SOMPI = AIRDROP_FEE_KAS * KASPA_TO_SOMPI;
 const BatchTransfer: FC<BatchTransferProps> = (props) => {
     const { walletAddress, walletConnected, walletBalance } = props;
     const [ticker, setTicker] = useState<string>('');
     const [recipientList, setRecipientList] = useState<BatchTransferItem[]>([]);
     const [paymentMade, setPaymentMade] = useState(false); // Track if payment is made
-    const [paymentTxnId, setPaymentTxnId] = useState<string | null>(null);
+    const [, setPaymentTxnId] = useState<string | null>(null);
     const [walletListProgress, setWalletListProgress] = useState<
         {
             to: string;
@@ -40,6 +52,36 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         }[]
     >([]);
     const [isTransferActive, setIsTransferActive] = useState(false);
+    const [isVerifying, setIsVerifying] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [startedPayment, setStartedPayment] = useState(false);
+    const [userCredits, setUserCredits] = useState(0);
+    useEffect(() => {
+        const fetchUserCredits = async () => {
+            try {
+                // Fetch user credits from the backend
+                const response = await checkAirdropCredits();
+                setUserCredits(response.credits);
+            } catch (error) {
+                console.error('Error fetching user credits:', error);
+            }
+        };
+
+        fetchUserCredits();
+    }, [userCredits, paymentMade]);
+
+    // Calculate the airdrop summary
+    const totalTokens = recipientList.reduce((sum, item) => sum + item.amount, 0);
+    const totalAddresses = recipientList.length;
+
+    const handleOpenDialog = () => setOpenDialog(true);
+    const handleCloseDialog = () => {
+        if (startedPayment) {
+            return;
+        }
+
+        setOpenDialog(false);
+    };
 
     // Example CSV header: "address"
     // const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -180,6 +222,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     };
 
     const handleBatchTransfer = async () => {
+        setIsVerifying(true);
         if (await versionCheck()) {
             window.kasware.on('krc20BatchTransferChanged', handleKRC20BatchTransferChangedChanged);
         } else {
@@ -187,6 +230,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 message: `Your kasware version is outdated. Please update to the latest version`,
                 severity: 'error',
             });
+            setIsVerifying(false);
             return;
         }
         if (!recipientList.length) {
@@ -194,6 +238,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 message: 'Recipient list is empty',
                 severity: 'error',
             });
+            setIsVerifying(false);
             return;
         }
         if (!ticker) {
@@ -201,6 +246,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 message: 'Missing ticker',
                 severity: 'error',
             });
+            setIsVerifying(false);
             return;
         }
 
@@ -215,17 +261,10 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         }
 
         // Verify payment transaction
-        const verification = await verifyPaymentTransaction(paymentTxnId, walletAddress, VERIFICATION_FEE_SOMPI);
-        if (!verification) {
-            showGlobalSnackbar({
-                message: 'Payment required',
-                severity: 'error',
-            });
-            return;
-        }
 
         try {
             setIsTransferActive(true); // Activate the transfer
+            setIsVerifying(false);
             // Perform batch transfer with the generated recipient list
             await signKRC20BatchTransfer(recipientList);
 
@@ -238,10 +277,17 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         }
     };
 
+    const handleTickerChange = (newTicker: string) => {
+        setTicker(newTicker);
+        setRecipientList((prevList) => prevList.map((item) => ({ ...item, tick: newTicker })));
+        setWalletListProgress((prevProgress) => prevProgress.map((item) => ({ ...item, tick: newTicker })));
+    };
+
     const clearFields = () => {
         setTicker('');
         setPaymentMade(false);
         setPaymentTxnId(null);
+        setIsVerifying(false);
     };
 
     const handleCancelTransfer = async () => {
@@ -255,6 +301,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     };
 
     const handlePayment = async () => {
+        setStartedPayment(true);
         if (!walletConnected) {
             showGlobalSnackbar({
                 message: 'Please connect your wallet',
@@ -262,31 +309,67 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             });
             return;
         }
-        if (walletBalance < VERIFICATION_FEE_KAS) {
+        if (walletBalance < AIRDROP_FEE_KAS) {
             showGlobalSnackbar({
                 message: 'Insufficient funds',
                 severity: 'error',
             });
             return;
         }
-        const paymentTxn = await sendKaspaToKaspiano(VERIFICATION_FEE_SOMPI);
+        try {
+            const paymentTxn = await sendKaspaToKaspiano(AIRDROP_FEE_SOMPI);
 
-        const paymentTxnId = paymentTxn.id;
+            const paymentTxnId = paymentTxn.id;
 
-        if (!paymentTxnId) {
-            showGlobalSnackbar({
-                message: 'Payment failed',
-                severity: 'error',
-            });
-            return;
-        } else {
+            if (!paymentTxnId) {
+                showGlobalSnackbar({
+                    message: 'Payment failed',
+                    severity: 'error',
+                });
+                return;
+            }
+            await saveAirdropData(ticker, paymentTxnId);
             showGlobalSnackbar({
                 message: 'Payment successful',
                 severity: 'success',
                 txIds: [paymentTxnId],
             });
+            setStartedPayment(false);
             setPaymentTxnId(paymentTxnId);
-            setPaymentMade(true);
+        } catch (error) {
+            console.error('Error in handlePayment:', error);
+            showGlobalSnackbar({
+                message: 'An error occurred while processing your payment. Please try again.',
+                severity: 'error',
+            });
+        } finally {
+            setStartedPayment(false);
+        }
+    };
+
+    const handleCreditReduction = async () => {
+        try {
+            const result = await decreaseAirdropCredits();
+            if (result.message === 'Credits successfully decreased.') {
+                setUserCredits(userCredits - 1);
+                showGlobalSnackbar({
+                    message: 'Airdrop credit used successfully',
+                    severity: 'success',
+                });
+                setPaymentMade(true);
+                handleCloseDialog();
+            } else {
+                showGlobalSnackbar({
+                    message: 'No credits available or wallet address not found.',
+                    severity: 'error',
+                });
+            }
+        } catch (error) {
+            console.error('Error in handleCreditReduction:', error);
+            showGlobalSnackbar({
+                message: 'An error occurred while using your credit. Please try again.',
+                severity: 'error',
+            });
         }
     };
 
@@ -312,9 +395,9 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             <Typography variant="body2" sx={{ marginBottom: '2vh' }}>
                 Enter the details below to perform a batch transfer of KRC20 tokens. You will be charged 500 KAS to
                 use this service. You can also upload a list of addresses through a CSV file. Follow the Example
-                Provided.
+                Provided. You will be able to use the Airdrop tool up to 3 times per payment 500 KAS.
                 <br />
-                <Box sx={{ mt: '3vh' }}>
+                <Box sx={{ mt: '3vh', display: 'flex', justifyContent: 'space-between' }}>
                     <Button
                         variant="outlined"
                         startIcon={<FileDownloadIconRounded />}
@@ -323,19 +406,23 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                     >
                         Download example CSV
                     </Button>
+                    <Tooltip title="You can use the Airdrop tool up to 3 times per payment 500 KAS.">
+                        <span>
+                            <Button onClick={handlePayment} variant="outlined" disabled={startedPayment}>
+                                {startedPayment ? 'Processing Payment...' : 'Get More Credits'}
+                            </Button>
+                        </span>
+                    </Tooltip>
                 </Box>
             </Typography>
 
-            <Button variant="contained" onClick={handlePayment} sx={{ marginBottom: '2vh' }}>
-                Pay 500 KAS
-            </Button>
             <Box sx={{ marginBottom: '1.3vh' }}>
                 <Typography variant="body2">Ticker:</Typography>
-                <Input value={ticker} onChange={(e) => setTicker(e.target.value)} fullWidth />
+                <Input value={ticker} onChange={(e) => handleTickerChange(e.target.value)} fullWidth />
             </Box>
 
             <Box sx={{ marginBottom: '1.3vh' }}>
-                <Typography variant="body2">Or Upload a CSV File:</Typography>
+                <Typography variant="body2">Upload a CSV File:</Typography>
                 <UploadButton>
                     <Input
                         sx={{ display: 'none' }}
@@ -369,11 +456,19 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             </Box>
             <Button
                 variant="contained"
-                disabled={!paymentMade || !recipientList.length || !ticker}
+                onClick={handleOpenDialog}
+                sx={{ marginTop: '20px', marginRight: '10px' }}
+                disabled={!recipientList.length || !ticker || isTransferActive || isVerifying}
+            >
+                Review Airdrop
+            </Button>
+            <Button
+                variant="contained"
+                disabled={!paymentMade || !recipientList.length || !ticker || isTransferActive || isVerifying}
                 onClick={handleBatchTransfer}
                 sx={{ marginTop: '20px', marginRight: '10px' }}
             >
-                Batch Transfer
+                {isVerifying ? 'Verifying...' : 'Start Airdrop'}
             </Button>
             <Button
                 sx={{ marginTop: '20px' }}
@@ -381,8 +476,40 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 disabled={!isTransferActive}
                 variant="contained"
             >
-                Cancel Batch Transfer
+                Cancel Airdrop
             </Button>
+            <Dialog open={openDialog} onClose={handleCloseDialog}>
+                <DialogTitle>Airdrop Summary</DialogTitle>
+                <DialogContent>
+                    <Typography>Ticker: {ticker}</Typography>
+                    <Typography>Total Amount of Tokens: {totalTokens}</Typography>
+                    <Typography>Total Addresses: {totalAddresses}</Typography>
+                </DialogContent>
+                <DialogActions>
+                    {userCredits > 0 ? (
+                        <Button
+                            onClick={handleCreditReduction}
+                            color="primary"
+                            variant="contained"
+                            disabled={startedPayment}
+                        >
+                            Use Credit
+                        </Button>
+                    ) : (
+                        <Button
+                            onClick={handlePayment}
+                            color="primary"
+                            variant="contained"
+                            disabled={startedPayment}
+                        >
+                            {startedPayment ? 'Verifiying payment' : 'Pay 500 KAS for 3 Credits'}
+                        </Button>
+                    )}
+                    <Button onClick={handleCloseDialog} color="secondary" disabled={startedPayment}>
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
             {recipientList.length > 0 && (
                 <Box mt={2}>
                     <Typography variant="h6">Wallet List and Progress</Typography>

@@ -65,7 +65,7 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                     <TabStyled label="Activity" value="2" />
                     <TabStyled label="Listings" value="3" />
                     <TabStyled label="Order HIstory" value="4" />
-                    {/* <TabStyled label="Profile" value="5" /> */}
+                    <TabStyled label="Profile" value="5" />
                 </Tabs>
                 <TabPanelStyled value="1">
                     <PortfolioTokenGrid

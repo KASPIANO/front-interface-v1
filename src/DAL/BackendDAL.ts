@@ -304,6 +304,28 @@ export const saveMintData = async (ticker: string): Promise<any> => {
     return response.data;
 };
 
+export const saveAirdropData = async (ticker: string, paymentTxId: string): Promise<{ message: string }> => {
+    const response = await backendService.post<{ message: string }>(`/${KRC20CONTROLLER}/airdrop`, {
+        ticker,
+        paymentTxId,
+    });
+    return response.data;
+};
+
+// Decrease credits for the authenticated wallet address
+export const decreaseAirdropCredits = async (): Promise<{ message: string }> => {
+    const response = await backendService.post<{ message: string }>(
+        `/${KRC20CONTROLLER}/airdrop/decrease-credits`,
+    );
+    return response.data;
+};
+
+// Check if credits are available for the authenticated wallet address
+export const checkAirdropCredits = async (): Promise<{ credits: number }> => {
+    const response = await backendService.get<{ credits: number }>(`/${KRC20CONTROLLER}/airdrop/check-credits`);
+    return response.data;
+};
+
 export const geConnectedWalletInfo = async (): Promise<AuthWalletInfo> => {
     const response = await backendService.get<AuthWalletInfo>(`/${AUTH_CONTROLLER}/info`);
     return response.data;
