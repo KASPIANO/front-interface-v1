@@ -68,7 +68,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         };
 
         fetchUserCredits();
-    }, [userCredits, paymentMade, paymentTxnId]);
+    }, [userCredits, paymentMade, paymentTxnId, walletAddress]);
 
     // Calculate the airdrop summary
     const totalTokens = recipientList.reduce((sum, item) => sum + item.amount, 0);
@@ -350,6 +350,14 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
 
     const handleCreditReduction = async () => {
         try {
+            const tokenAmountVerification = await handleTokenBalanceVerification();
+            if (!tokenAmountVerification) {
+                showGlobalSnackbar({
+                    message: 'Token balance is insufficient',
+                    severity: 'error',
+                });
+                return;
+            }
             const result = await decreaseAirdropCredits();
             if (result.message === 'Credits successfully decreased.') {
                 setUserCredits(userCredits - 1);
@@ -518,7 +526,9 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             </Dialog>
             {recipientList.length > 0 && (
                 <Box mt={2}>
-                    <Typography variant="h6">Wallet List and Progress</Typography>
+                    <Typography variant="h6">
+                        Wallet List and Progress {isTransferActive ? 'Please DO NOT REFRESH OR LEAVE PAGE' : ''}
+                    </Typography>
                     <ol>
                         {walletListProgress.map((item, index) => (
                             <li
