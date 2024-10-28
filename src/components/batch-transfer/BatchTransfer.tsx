@@ -326,16 +326,13 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 </Box>
             </Typography>
 
-            <Button variant="contained" onClick={handlePayment} sx={{ marginBottom: '2vh' }}>
-                Pay 500 KAS
-            </Button>
             <Box sx={{ marginBottom: '1.3vh' }}>
                 <Typography variant="body2">Ticker:</Typography>
                 <Input value={ticker} onChange={(e) => setTicker(e.target.value)} fullWidth />
             </Box>
 
             <Box sx={{ marginBottom: '1.3vh' }}>
-                <Typography variant="body2">Or Upload a CSV File:</Typography>
+                <Typography variant="body2">Upload a CSV File:</Typography>
                 <UploadButton>
                     <Input
                         sx={{ display: 'none' }}
@@ -367,6 +364,9 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                     column named "amount" with the tokens for each address.
                 </Typography>
             </Box>
+            <Button variant="contained" onClick={handlePayment} sx={{ marginBottom: '2vh' }}>
+                Pay 500 KAS
+            </Button>
             <Button
                 variant="contained"
                 disabled={!paymentMade || !recipientList.length || !ticker}
@@ -385,7 +385,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             </Button>
             {recipientList.length > 0 && (
                 <Box mt={2}>
-                    <Typography variant="h6">Wallet List and Progress</Typography>
+                    <Typography variant="h6">Airdrop Summary && Wallet List and Progress</Typography>
                     <ol>
                         {walletListProgress.map((item, index) => (
                             <li
