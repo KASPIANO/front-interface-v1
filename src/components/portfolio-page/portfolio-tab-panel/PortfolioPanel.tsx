@@ -7,6 +7,7 @@ import { TokenRowPortfolioItem } from '../../../types/Types';
 import PortfolioActivityTokenGrid from '../portfolio-activity-grid/PortfolioActivityTokenGrid';
 import PortfolioOrdersGrid from '../user-orders/PortfolioOrdersGrid';
 import PortfolioOrdersHistoryGrid from '../user-orders-history/PortfolioOrdersHistoryGrid';
+import UserPanel from '../profile/UserPanel';
 // import UserPanel from '../profile/UserPanel';
 
 interface PortfolioPanelProps {
@@ -104,9 +105,9 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
                         walletAddress={walletAddress}
                     />
                 </TabPanelStyled>
-                {/* <TabPanelStyled value="5">
+                <TabPanelStyled value="5">
                     <UserPanel walletAddress={walletAddress} tabValue={value} />
-                </TabPanelStyled> */}
+                </TabPanelStyled>
             </TabContext>
         </TabPanelContainer>
     );
