@@ -4,6 +4,7 @@ import { Order } from '../../../../../../types/Types';
 import { OrderItemPrimary, OrderItemSecondary } from './OrderItem.s';
 import { StyledButton } from '../../sell-panel/SellPanel.s';
 import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
+import { formatNumberWithCommas } from '../../../../../../utils/Utils';
 
 interface OrderItemProps {
     order: Order;
@@ -43,7 +44,7 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                 {/* Amount with Floor Difference */}
                 <Box sx={{ width: '17%' }}>
                     <OrderItemPrimary variant="body2">
-                        {order.quantity}
+                        {formatNumberWithCommas(order.quantity)}
                         {/* <Tooltip title="Difference from floor price"> */}
                         {/* <Typography
                                 variant="caption"

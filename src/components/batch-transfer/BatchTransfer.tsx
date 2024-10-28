@@ -7,6 +7,11 @@ import FileDownloadIconRounded from '@mui/icons-material/FileDownloadRounded';
 import { verifyPaymentTransaction } from '../../utils/Utils';
 import { UploadButton } from '../../pages/deploy-page/DeployPage.s';
 import { fetchWalletKRC20Balance } from '../../DAL/Krc20DAL';
+import { BatchTransferItem } from '../../types/Types';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import CancelIcon from '@mui/icons-material/Cancel';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export interface BatchTransferProps {
     walletConnected: boolean;
@@ -20,12 +25,55 @@ const VERIFICATION_FEE_SOMPI = VERIFICATION_FEE_KAS * KASPA_TO_SOMPI;
 const BatchTransfer: FC<BatchTransferProps> = (props) => {
     const { walletAddress, walletConnected, walletBalance } = props;
     const [ticker, setTicker] = useState<string>('');
-    const [recipientList, setRecipientList] = useState<any[]>([]);
+    const [recipientList, setRecipientList] = useState<BatchTransferItem[]>([]);
     const [txid, setTxid] = useState('');
     const [paymentMade, setPaymentMade] = useState(false); // Track if payment is made
     const [paymentTxnId, setPaymentTxnId] = useState<string | null>(null);
+    const [walletListProgress, setWalletListProgress] = useState<
+        { to: string; amount: number; tick: string; status: string }[]
+    >([]);
+    const [isTransferActive, setIsTransferActive] = useState(false);
 
     // Example CSV header: "address"
+    // const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const file = e.target.files?.[0];
+    //     if (!file) return;
+
+    //     const reader = new FileReader();
+    //     reader.onload = (event) => {
+    //         const csvText = event.target?.result?.toString();
+    //         if (csvText) {
+    //             parse(csvText, {
+    //                 header: true,
+    //                 complete: (results) => {
+    //                     const list = results.data
+    //                         .map((row: any) => {
+    //                             const amount = parseFloat(row.amount);
+    //                             const isValidAmount = !isNaN(amount) && amount > 0;
+    //                             if (!isValidAmount) {
+    //                                 showGlobalSnackbar({
+    //                                     message: `Invalid amount in row with address ${row.address}`,
+    //                                     severity: 'error',
+    //                                 });
+    //                                 return null; // Skip this row
+    //                             }
+
+    //                             return {
+    //                                 tick: ticker,
+    //                                 to: row.address.trim(),
+    //                                 amount,
+    //                             };
+    //                         })
+    //                         .filter((item: any) => item !== null); // Filter out invalid entries
+
+    //                     setRecipientList(list); // Set the validated list for transfer
+    //                 },
+    //             });
+    //         }
+    //     };
+    //     reader.readAsText(file);
+    // };
+
     const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -41,14 +89,27 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                             .map((row: any) => {
                                 const amount = parseFloat(row.amount);
                                 const isValidAmount = !isNaN(amount) && amount > 0;
-                                debugger;
+
                                 if (!isValidAmount) {
                                     showGlobalSnackbar({
                                         message: `Invalid amount in row with address ${row.address}`,
                                         severity: 'error',
                                     });
+
+                                    // Mark as skipped in walletListProgress
+                                    setWalletListProgress((prevProgress) => [
+                                        ...prevProgress,
+                                        { to: row.address.trim(), amount: 0, tick: ticker, status: 'skipped' },
+                                    ]);
+
                                     return null; // Skip this row
                                 }
+
+                                // Mark as pending in walletListProgress
+                                setWalletListProgress((prevProgress) => [
+                                    ...prevProgress,
+                                    { to: row.address.trim(), amount, tick: ticker, status: 'pending' },
+                                ]);
 
                                 return {
                                     tick: ticker,
@@ -121,20 +182,42 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
 
         try {
             console.log('Recipient list:', recipientList);
+            setIsTransferActive(true); // Activate the transfer
             // Perform batch transfer with the generated recipient list
             const txid = await signKRC20BatchTransfer(recipientList);
+
+            (window as any).kasware.on('handleKRC20BatchTransferChangedChanged', (progress) => {
+                setWalletListProgress((prevProgress) =>
+                    prevProgress.map((item) =>
+                        item.to === progress.to ? { ...item, status: progress.status } : item,
+                    ),
+                );
+            });
+
             setTxid(txid);
             clearFields();
         } catch (e) {
             console.error('Error in batch transfer:', e);
             setTxid('Error in transaction');
+        } finally {
+            setIsTransferActive(false);
         }
     };
+
     const clearFields = () => {
         setTicker('');
         setPaymentMade(false);
         setPaymentTxnId(null);
         setRecipientList([]);
+    };
+
+    const handleCancelTransfer = async () => {
+        await (window as any).kasware.cancelKRC20BatchTransfer();
+        setWalletListProgress((prevProgress) =>
+            prevProgress.map((item) => (item.status === 'pending' ? { ...item, status: 'cancelled' } : item)),
+        );
+        setIsTransferActive(false);
+        showGlobalSnackbar({ message: 'Batch transfer cancelled', severity: 'info' });
     };
 
     const handlePayment = async () => {
@@ -239,10 +322,29 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             >
                 Batch Transfer
             </Button>
-            {txid && (
-                <Typography variant="body2" sx={{ marginTop: '20px', wordWrap: 'break-word' }}>
-                    Transaction ID: {txid}
-                </Typography>
+            <Button style={{ marginTop: 10 }} onClick={handleCancelTransfer} disabled={!isTransferActive}>
+                Cancel Batch Transfer
+            </Button>
+            {recipientList.length > 0 && (
+                <Box mt={2}>
+                    <Typography variant="h6">Wallet List and Progress</Typography>
+                    <ol>
+                        {walletListProgress.map((item, index) => (
+                            <li key={index} style={{ display: 'flex', alignItems: 'center' }}>
+                                <Typography variant="body2" style={{ marginRight: 10 }}>
+                                    {item.to} - {item.amount} KAS
+                                </Typography>
+                                {item.status === 'success' && <CheckCircleIcon color="success" />}
+                                {item.status === 'failed' && <ErrorIcon color="error" />}
+                                {item.status === 'cancelled' && <CancelIcon color="disabled" />}
+                                {item.status === 'skipped' && (
+                                    <ErrorIcon color="error" titleAccess="Skipped due to invalid amount" />
+                                )}
+                                {item.status === 'pending' && <CircularProgress size={16} />}
+                            </li>
+                        ))}
+                    </ol>
+                </Box>
             )}
         </Card>
     );

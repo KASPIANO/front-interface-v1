@@ -243,14 +243,12 @@ export const removeNetworkChangedListener = (handler: (network: string) => void)
 
 // Utility function to sign a KRC20 batch transfer transaction
 export const signKRC20BatchTransfer = async (
-    addressedList: { ticker: string; to: string; amount: number }[],
+    addressedList: { tick: string; to: string; amount: number }[],
 ): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
 
     try {
-        const priorityFee = await getPriorityFee('TRANSFER');
-        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
-        const txid = await window.kasware.signKRC20BatchTransferTransaction(addressedList, kasPriorityFee);
+        const txid = await window.kasware.krc20BatchTransferTransaction(addressedList);
 
         return txid;
     } catch (error) {

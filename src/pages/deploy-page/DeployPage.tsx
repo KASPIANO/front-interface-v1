@@ -483,7 +483,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 saveDeployData(tokenKRC20Details.ticker, walletAddress);
                 setIsDeploying(false);
                 setWaitingForTokenConfirmation(true);
-                await delay(17000);
                 const token = await checkTokenDeployment(tokenKRC20Details.ticker);
 
                 if (token) {

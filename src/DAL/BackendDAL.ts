@@ -113,13 +113,11 @@ export async function recalculateRugScore(ticker: string): Promise<number> {
 
 export async function updateWalletSentiment(
     ticker: string,
-    wallet: string,
     sentiment: keyof TokenSentiment,
 ): Promise<TokenSentiment> {
     const result = await backendService.post<TokenSentiment>(`/${KRC20METADATA_CONTROLLER}/set-sentiment`, {
         sentiment,
         ticker,
-        wallet,
     });
 
     return result.data;
@@ -250,22 +248,17 @@ export const getUserReferral = async (referredBy?: string): Promise<UserReferral
     });
     return response.data;
 };
-export const updateContactInfo = async (
-    walletAddress: string,
-    email?: string,
-    x_url?: string,
-): Promise<UserInfo> => {
+export const updateContactInfo = async (email?: string, x_url?: string): Promise<UserInfo> => {
     const response = await backendService.post<UserInfo>(`/${USER_REFERRALS_CONTROLLER}/update-contact-info`, {
-        walletAddress,
         email,
         x_url,
     });
     return response.data;
 };
 
-export const getContactInfo = async (walletAddress: string): Promise<{ email: string; x_url: string }> => {
+export const getContactInfo = async (): Promise<{ email: string; x_url: string }> => {
     const response = await backendService.get<{ email: string; x_url: string }>(
-        `/${USER_REFERRALS_CONTROLLER}/contact-info/${walletAddress}`,
+        `/${USER_REFERRALS_CONTROLLER}/contact-info`,
     );
     return response.data;
 };

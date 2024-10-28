@@ -16,8 +16,8 @@ interface Kasware {
         destAdd?: string,
         priorityFee?: number,
     ) => Promise<string>;
-    signKRC20BatchTransferTransaction: (
-        list: { ticker: string; to: string; amount: number }[],
+    krc20BatchTransferTransaction: (
+        list: { tick: string; to: string; amount: number }[],
         priorityFee?: number,
     ) => Promise<string>;
     on: (event: 'accountsChanged' | 'networkChanged' | 'disconnect', handler: (data: any) => void) => void;
@@ -25,6 +25,7 @@ interface Kasware {
         event: 'accountsChanged' | 'networkChanged' | 'disconnect',
         handler: (data: any) => void,
     ) => void;
+    cancelKRC20BatchTransfer(): void;
 }
 
 interface Window {

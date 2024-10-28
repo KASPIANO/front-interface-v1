@@ -1,3 +1,5 @@
+import BatchTransfer from '../components/batch-transfer/BatchTransfer';
+
 export interface Krc20ApiTokenResponse {
     tick: string;
     max: string;
@@ -378,4 +380,10 @@ export interface SignInResponse extends AuthWalletInfo {
 export enum UserRoleEnum {
     SYS_ADMIN = -1,
     LISTING_MANAGER = 1,
+}
+
+export interface BatchTransferItem {
+    to: string;
+    amount: number;
+    tick: string;
 }
