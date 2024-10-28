@@ -297,6 +297,12 @@ export const saveDeployData = async (ticker: string, walletAddress: string): Pro
     });
     return response.data;
 };
+export const saveMintData = async (ticker: string): Promise<any> => {
+    const response = await backendService.post<any>(`/${KRC20CONTROLLER}/mint`, {
+        ticker,
+    });
+    return response.data;
+};
 
 export const geConnectedWalletInfo = async (): Promise<AuthWalletInfo> => {
     const response = await backendService.get<AuthWalletInfo>(`/${AUTH_CONTROLLER}/info`);
