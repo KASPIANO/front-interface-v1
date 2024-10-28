@@ -162,7 +162,7 @@ export const checkTokenExpiration = (token) => {
 };
 
 export const checkTokenDeployment = async (ticker: string): Promise<boolean> => {
-    const maxRetries = 5;
+    const maxRetries = 7;
     let retryCount = 0;
 
     while (retryCount < maxRetries) {

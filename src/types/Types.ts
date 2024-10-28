@@ -379,3 +379,9 @@ export enum UserRoleEnum {
     SYS_ADMIN = -1,
     LISTING_MANAGER = 1,
 }
+
+export interface BatchTransferItem {
+    to: string;
+    amount: number;
+    tick: string;
+}

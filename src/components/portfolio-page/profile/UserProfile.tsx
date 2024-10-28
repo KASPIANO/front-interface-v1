@@ -20,7 +20,7 @@ const UserProfile = ({ walletAddress }) => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const data = await getContactInfo(walletAddress);
+                const data = await getContactInfo();
                 setEmail(data.email || '');
                 setXHandle(data.x_url || '');
             } catch (error) {
@@ -46,7 +46,7 @@ const UserProfile = ({ walletAddress }) => {
             return;
         }
         try {
-            await updateContactInfo(walletAddress, email, xHandle);
+            await updateContactInfo(email, xHandle);
             setIsEditingEmail(false); // Disable editing after save
         } catch (error) {
             console.error('Failed to save email:', error);
@@ -60,7 +60,7 @@ const UserProfile = ({ walletAddress }) => {
             return;
         }
         try {
-            await updateContactInfo(walletAddress, email, xHandle);
+            await updateContactInfo(email, xHandle);
             setIsEditingX(false); // Disable editing after save
         } catch (error) {
             console.error('Failed to save X handle:', error);

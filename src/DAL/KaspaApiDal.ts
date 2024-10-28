@@ -35,7 +35,7 @@ export const kaspaLivePrice = async (): Promise<number> => {
         return 0;
     }
 };
-export const kaspaFeeEstimate = async (): Promise<number> => {
+export const kaspaTradeFeeEstimate = async (): Promise<number> => {
     try {
         const response = await kasInfoMainnetService.get<{
             priorityBucket: {
@@ -61,10 +61,41 @@ export const kaspaFeeEstimate = async (): Promise<number> => {
         return 0;
     }
 };
+export const kaspaFeeEstimate = async (): Promise<number> => {
+    try {
+        const response = await kasInfoMainnetService.get<{
+            priorityBucket: {
+                feerate: number;
+                estimatedSeconds: number;
+            };
+            normalBuckets: Array<{
+                feerate: number;
+                estimatedSeconds: number;
+            }>;
+            lowBuckets: Array<{
+                feerate: number;
+                estimatedSeconds: number;
+            }>;
+        }>('info/fee-estimate');
+
+        // Extract the feerate from the priorityBucket
+        const feeRate = response.data.lowBuckets[0].feerate;
+
+        return feeRate;
+    } catch (error) {
+        console.error('Error fetching kaspa fee estimate:', error);
+        return 0;
+    }
+};
 
 export const gasEstimator = async (txType: 'KASPA' | 'TRANSFER' | 'TRADE'): Promise<number> => {
     try {
-        const fee = await kaspaFeeEstimate();
+        let fee;
+        if (txType === 'TRADE') {
+            fee = await kaspaTradeFeeEstimate();
+        } else {
+            fee = await kaspaFeeEstimate();
+        }
         if (txType === 'KASPA') {
             return KASPA_TRANSACTION_MASS * fee;
         } else if (txType === 'TRANSFER') {
@@ -141,7 +172,8 @@ export const highGasLimitExceeded = async () => {
 };
 
 export const highGasWarning = async (type: 'TRANSFER' | '' = '') => {
-    const priorityFeeSompi = await getPriorityFee('TRADE');
+    const typeCheck = type === 'TRANSFER' ? 'TRANSFER' : 'TRADE';
+    const priorityFeeSompi = await getPriorityFee(typeCheck);
     if (!priorityFeeSompi) return false;
 
     const kaspaPriorityFee = priorityFeeSompi / 1e8;

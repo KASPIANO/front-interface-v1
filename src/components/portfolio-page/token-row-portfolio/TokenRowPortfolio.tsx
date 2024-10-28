@@ -134,7 +134,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
             tick: ticker,
         });
         try {
-            const mint = await mintKRC20Token(inscribeJsonString);
+            const mint = await mintKRC20Token(inscribeJsonString, ticker);
             if (mint) {
                 const { commitId, revealId } = JSON.parse(mint);
                 showGlobalSnackbar({
