@@ -39,7 +39,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     const [ticker, setTicker] = useState<string>('');
     const [recipientList, setRecipientList] = useState<BatchTransferItem[]>([]);
     const [paymentMade, setPaymentMade] = useState(false); // Track if payment is made
-    const [, setPaymentTxnId] = useState<string | null>(null);
+    const [paymentTxnId, setPaymentTxnId] = useState<string | null>(null);
     const [walletListProgress, setWalletListProgress] = useState<
         {
             to: string;
@@ -68,7 +68,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         };
 
         fetchUserCredits();
-    }, [userCredits, paymentMade]);
+    }, [userCredits, paymentMade, paymentTxnId]);
 
     // Calculate the airdrop summary
     const totalTokens = recipientList.reduce((sum, item) => sum + item.amount, 0);
@@ -270,6 +270,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
 
             window.kasware.removeListener('krc20BatchTransferChanged', handleKRC20BatchTransferChangedChanged);
             clearFields();
+            showGlobalSnackbar({ message: 'Airdrop completed', severity: 'success' });
         } catch (e) {
             console.error('Error in batch transfer:', e);
         } finally {
@@ -389,13 +390,16 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     };
     return (
         <Card sx={{ padding: '20px', margin: '20px', width: '80%' }}>
-            <Typography variant="h5" sx={{ marginBottom: '2vh' }}>
-                Batch Transfer KRC20 Tokens
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="h5" sx={{ marginBottom: '2vh' }}>
+                    Airdrop KRC20 Tokens
+                </Typography>
+                <Typography sx={{ marginBottom: '2vh' }}>Credits: {userCredits}</Typography>
+            </Box>
             <Typography variant="body2" sx={{ marginBottom: '2vh' }}>
-                Enter the details below to perform a batch transfer of KRC20 tokens. You will be charged 500 KAS to
-                use this service. You can also upload a list of addresses through a CSV file. Follow the Example
-                Provided. You will be able to use the Airdrop tool up to 3 times per payment 500 KAS.
+                Please enter the required details below to initiate an airdrop of KRC20 tokens. Each payment incurs
+                a fee of 500 KAS, granting you up to 3 uses of the airdrop tool. You may also upload a CSV file
+                with a list of recipient addresses—simply follow the provided example format.
                 <br />
                 <Box sx={{ mt: '3vh', display: 'flex', justifyContent: 'space-between' }}>
                     <Button
@@ -406,6 +410,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                     >
                         Download example CSV
                     </Button>
+
                     <Tooltip title="You can use the Airdrop tool up to 3 times per payment 500 KAS.">
                         <span>
                             <Button onClick={handlePayment} variant="outlined" disabled={startedPayment}>
@@ -425,6 +430,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 <Typography variant="body2">Upload a CSV File:</Typography>
                 <UploadButton>
                     <Input
+                        disabled={recipientList.length > 0 || !ticker}
                         sx={{ display: 'none' }}
                         inputProps={{ accept: '.csv' }}
                         type="file"
