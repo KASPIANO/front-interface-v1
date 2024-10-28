@@ -12,7 +12,6 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CircularProgress from '@mui/material/CircularProgress';
-import { version } from 'os';
 
 export interface BatchTransferProps {
     walletConnected: boolean;
