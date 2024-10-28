@@ -1,5 +1,3 @@
-import BatchTransfer from '../components/batch-transfer/BatchTransfer';
-
 export interface Krc20ApiTokenResponse {
     tick: string;
     max: string;

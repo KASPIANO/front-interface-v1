@@ -7,6 +7,7 @@ import { saveMintData } from '../DAL/BackendDAL';
 
 export const USER_REJECTED_TRANSACTION_ERROR_CODE = 4001;
 export const MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION = 21;
+export const LASTEST_VERSION = '0.7.5.4';
 
 // Utility to detect if KasWare Wallet is installed
 export const isKasWareInstalled = (): boolean => typeof window.kasware !== 'undefined';
@@ -256,5 +257,26 @@ export const signKRC20BatchTransfer = async (
     } catch (error) {
         console.error('Failed to execute batch KRC20 token transfer:', error);
         throw error;
+    }
+};
+
+const isVersionLatestOrGreater = (currentVersion) => {
+    const currentParts = currentVersion.split('.').map(Number);
+    const latestParts = LASTEST_VERSION.split('.').map(Number);
+
+    for (let i = 0; i < latestParts.length; i++) {
+        if (currentParts[i] > latestParts[i]) return true;
+        if (currentParts[i] < latestParts[i]) return false;
+    }
+    return true; // If all parts are equal, the version is up-to-date
+};
+export const versionCheck = async () => {
+    const currentVersion = await window.kasware.getVersion();
+    if (isVersionLatestOrGreater(currentVersion)) {
+        console.log('User has the latest version or a newer one:', currentVersion);
+        return true;
+    } else {
+        console.log("User's version is outdated:", currentVersion);
+        return false;
     }
 };

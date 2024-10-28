@@ -3,6 +3,7 @@ interface Kasware {
     _selectedAddress: string;
     getAccounts: () => Promise<string[]>;
     getNetwork: () => Promise<string>;
+    getVersion: () => Promise<string>;
     switchNetwork: (network: string) => Promise<string>;
     disconnect: (origin: string) => Promise<void>;
     getPublicKey: () => Promise<string>;
@@ -20,9 +21,12 @@ interface Kasware {
         list: { tick: string; to: string; amount: number }[],
         priorityFee?: number,
     ) => Promise<string>;
-    on: (event: 'accountsChanged' | 'networkChanged' | 'disconnect', handler: (data: any) => void) => void;
+    on: (
+        event: 'accountsChanged' | 'networkChanged' | 'disconnect' | 'krc20BatchTransferChanged',
+        handler: (data: any) => void,
+    ) => void;
     removeListener: (
-        event: 'accountsChanged' | 'networkChanged' | 'disconnect',
+        event: 'accountsChanged' | 'networkChanged' | 'disconnect' | 'krc20BatchTransferChanged',
         handler: (data: any) => void,
     ) => void;
     cancelKRC20BatchTransfer(): void;

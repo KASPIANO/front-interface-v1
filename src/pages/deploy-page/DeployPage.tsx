@@ -21,7 +21,6 @@ import {
 import {
     checkTokenDeployment,
     convertToProtocolFormat,
-    delay,
     isEmptyString,
     isEmptyStringOrArray,
 } from '../../utils/Utils';
