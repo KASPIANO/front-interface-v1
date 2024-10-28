@@ -15,7 +15,7 @@ import { sendKaspaToKaspiano, signKRC20BatchTransfer, versionCheck } from '../..
 import { parse } from 'papaparse'; // For CSV parsing
 import { showGlobalSnackbar } from '../alert-context/AlertContext';
 import FileDownloadIconRounded from '@mui/icons-material/FileDownloadRounded';
-import { verifyPaymentTransaction } from '../../utils/Utils';
+
 import { UploadButton } from '../../pages/deploy-page/DeployPage.s';
 import { fetchWalletKRC20Balance } from '../../DAL/Krc20DAL';
 import { BatchTransferItem } from '../../types/Types';
@@ -39,7 +39,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     const [ticker, setTicker] = useState<string>('');
     const [recipientList, setRecipientList] = useState<BatchTransferItem[]>([]);
     const [paymentMade, setPaymentMade] = useState(false); // Track if payment is made
-    const [paymentTxnId, setPaymentTxnId] = useState<string | null>(null);
+    const [, setPaymentTxnId] = useState<string | null>(null);
     const [walletListProgress, setWalletListProgress] = useState<
         {
             to: string;
