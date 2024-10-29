@@ -93,21 +93,11 @@ export const lightTheme = createTheme({
             styleOverrides: {
                 root: {
                     textTransform: 'none',
-                    color: '#70C7BA',
+                    color: 'black',
                 },
             },
         },
-        MuiTextField: {
-            defaultProps: {
-                variant: 'outlined',
-                size: 'small',
-            },
-            styleOverrides: {
-                root: {
-                    color: '#70C7BA',
-                },
-            },
-        },
+
         MuiLink: {
             styleOverrides: {
                 root: {
@@ -140,6 +130,71 @@ export const lightTheme = createTheme({
                 },
             },
         },
+        MuiAutocomplete: {
+            styleOverrides: {
+                root: {
+                    color: 'black',
+                    '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                            borderColor: '#70C7BA', // Border color for input
+                        },
+                        '&:hover fieldset': {
+                            borderColor: '#49EACB', // Hover border color
+                        },
+                        '&.Mui-focused fieldset': {
+                            borderColor: '#3c6ed4', // Focused border color
+                        },
+                    },
+                },
+                inputRoot: {
+                    color: 'black', // Text color for input
+                },
+                paper: {
+                    backgroundColor: 'white', // Background color for dropdown
+                    color: 'black', // Text color for dropdown items
+                },
+                option: {
+                    '&[aria-selected="true"]': {
+                        backgroundColor: '#70C7BA', // Selected item background
+                    },
+                    '&:hover': {
+                        backgroundColor: '#49EACB', // Hover background color
+                    },
+                },
+            },
+        },
+        MuiMenuItem: {
+            styleOverrides: {
+                root: {
+                    color: '#000000', // Default text color for light theme
+                    backgroundColor: '#FFFFFF', // Light theme background color
+                    '&:hover': {
+                        backgroundColor: '#F5F5F7', // Light background color for hover
+                    },
+                    '&.Mui-selected': {
+                        backgroundColor: '#70C7BA', // Primary color for selected background
+                        color: '#FFFFFF', // White color for text on selected item
+                        '&:hover': {
+                            backgroundColor: '#49EACB', // Secondary color for hover when selected
+                        },
+                    },
+                },
+            },
+        },
+        MuiTextField: {
+            defaultProps: {
+                variant: 'outlined',
+                size: 'small',
+            },
+            styleOverrides: {
+                root: {
+                    '& .MuiOutlinedInput-root': {
+                        color: '#000000', // Font color for light theme
+                    },
+                },
+            },
+        },
+
         // Customize other component configurations as needed
     },
     shadows: createTheme().shadows, // Customize shadow options
