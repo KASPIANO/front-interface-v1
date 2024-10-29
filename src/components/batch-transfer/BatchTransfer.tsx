@@ -372,8 +372,8 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                     severity: 'success',
                 });
                 setPaymentMade(true);
-                setUsingCredits(false);
                 handleCloseDialog();
+                setUsingCredits(false);
             } else {
                 showGlobalSnackbar({
                     message: 'No credits available or wallet address not found.',
@@ -483,13 +483,20 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 variant="contained"
                 onClick={handleOpenDialog}
                 sx={{ marginTop: '20px', marginRight: '10px' }}
-                disabled={!recipientList.length || !ticker || isTransferActive || isVerifying || paymentMade}
+                disabled={!recipientList.length || !ticker || isTransferActive || isVerifying || !walletConnected}
             >
                 Review Airdrop
             </Button>
             <Button
                 variant="contained"
-                disabled={!paymentMade || !recipientList.length || !ticker || isTransferActive || isVerifying}
+                disabled={
+                    !paymentMade ||
+                    !recipientList.length ||
+                    !ticker ||
+                    isTransferActive ||
+                    isVerifying ||
+                    !walletConnected
+                }
                 onClick={handleBatchTransfer}
                 sx={{ marginTop: '20px', marginRight: '10px' }}
             >
@@ -516,7 +523,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                             onClick={handleCreditReduction}
                             color="primary"
                             variant="contained"
-                            disabled={startedPayment || usingCredits}
+                            disabled={startedPayment || usingCredits || !walletConnected || paymentMade}
                         >
                             {usingCredits ? 'Loading...' : 'Use Credit'}
                         </Button>
@@ -538,9 +545,21 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             {recipientList.length > 0 && (
                 <Box mt={2}>
                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                        <Typography variant="h6">Airdrop Wallet List and Progress </Typography>
+                        <Typography variant="h6">Airdrop Wallet List and Progress</Typography>
                         {isTransferActive && (
-                            <Typography style={{ color: 'red' }}>- PLEASE DO NOT REFRESH OR LEAVE PAGE</Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Typography
+                                    sx={{
+                                        mr: 1,
+                                        color: 'error.light',
+                                        fontWeight: 'medium',
+                                        fontSize: '0.9rem',
+                                    }}
+                                >
+                                    - Please do not refresh or leave the page
+                                </Typography>
+                                <CircularProgress size={20} />
+                            </Box>
                         )}
                     </Box>
                     <ol>
