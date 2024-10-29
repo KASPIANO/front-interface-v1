@@ -67,7 +67,9 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                 </Box>
                 {/* Total Price */}
                 <Box sx={{ width: '15%' }}>
-                    <OrderItemPrimary variant="body2">{order.totalPrice.toFixed(2)}</OrderItemPrimary>
+                    <OrderItemPrimary variant="body2">
+                        {formatNumberWithCommas(order.totalPrice.toFixed(2))}
+                    </OrderItemPrimary>
                     <OrderItemSecondary variant="caption" color="textSecondary">
                         (${(order.totalPrice * kasPrice).toFixed(2)})
                     </OrderItemSecondary>

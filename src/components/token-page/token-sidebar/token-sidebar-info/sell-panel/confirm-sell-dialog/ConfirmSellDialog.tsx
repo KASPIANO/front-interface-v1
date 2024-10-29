@@ -13,6 +13,7 @@ import {
 import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
 import { HighGasWarning } from '../../../../../common/HighGasWarning';
 import { highGasWarning } from '../../../../../../DAL/KaspaApiDal';
+import { formatNumberWithCommas } from '../../../../../../utils/Utils';
 
 interface ConfirmSellDialogProps {
     open: boolean;
@@ -102,7 +103,7 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                                 <strong>Ticker:</strong> {ticker}
                             </Typography>
                             <Typography variant="body1">
-                                <strong>Token Amount:</strong> {tokenAmount}
+                                <strong>Token Amount:</strong> {formatNumberWithCommas(tokenAmount)}
                             </Typography>
                             <Typography variant="body1">
                                 <strong>Total Price ({priceCurrency}):</strong> {totalPrice}
