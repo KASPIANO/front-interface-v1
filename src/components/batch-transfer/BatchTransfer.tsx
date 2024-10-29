@@ -61,6 +61,9 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         const fetchUserCredits = async () => {
             try {
                 // Fetch user credits from the backend
+                if (!walletConnected) {
+                    setUserCredits(0);
+                }
                 const response = await checkAirdropCredits();
                 setUserCredits(response.credits);
             } catch (error) {
@@ -137,14 +140,14 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                     complete: (results) => {
                         const list = results.data
                             .filter((row: any) => row.address && row.amount)
-                            .map((row: any) => {
+                            .map((row: any, index: number) => {
                                 const amount = parseFloat(row.amount);
                                 const isValidAmount = !isNaN(amount) && amount > 0;
                                 console.log(ticker);
 
                                 if (!isValidAmount) {
                                     showGlobalSnackbar({
-                                        message: `Invalid amount in row with address ${row.address}`,
+                                        message: `Invalid amount in row ${index + 2}`,
                                         severity: 'error',
                                     });
 
@@ -188,10 +191,9 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
 
     const handleKRC20BatchTransferChangedChanged = (ress: any[]) => {
         ress.forEach((res) => {
-            console.log('result', res.status, res?.index, res?.txId?.revealId, res?.errorMsg);
             setWalletListProgress((prevProgress) =>
                 prevProgress.map((item) =>
-                    item.to === res.to && item.index === res.index
+                    item.to === res.to && item.amount === res.amount
                         ? {
                               ...item,
                               status: res.status,
@@ -270,8 +272,8 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             await signKRC20BatchTransfer(recipientList);
 
             window.kasware.removeListener('krc20BatchTransferChanged', handleKRC20BatchTransferChangedChanged);
-            clearFields();
             showGlobalSnackbar({ message: 'Airdrop completed', severity: 'success' });
+            clearFields();
         } catch (e) {
             console.error('Error in batch transfer:', e);
         } finally {
@@ -303,7 +305,6 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     };
 
     const handlePayment = async () => {
-        setStartedPayment(true);
         if (!walletConnected) {
             showGlobalSnackbar({
                 message: 'Please connect your wallet',
@@ -318,6 +319,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             });
             return;
         }
+        setStartedPayment(true);
         try {
             const paymentTxn = await sendKaspaToKaspiano(AIRDROP_FEE_SOMPI);
 
@@ -358,6 +360,8 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                     message: 'Token balance is insufficient',
                     severity: 'error',
                 });
+                setUsingCredits(false);
+                handleCloseDialog();
                 return;
             }
             const result = await decreaseAirdropCredits();
@@ -375,6 +379,8 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                     message: 'No credits available or wallet address not found.',
                     severity: 'error',
                 });
+                setUsingCredits(false);
+                handleCloseDialog();
             }
         } catch (error) {
             console.error('Error in handleCreditReduction:', error);
@@ -382,6 +388,8 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 message: 'An error occurred while using your credit. Please try again.',
                 severity: 'error',
             });
+            setUsingCredits(false);
+            handleCloseDialog();
         }
     };
 
@@ -529,9 +537,12 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             </Dialog>
             {recipientList.length > 0 && (
                 <Box mt={2}>
-                    <Typography variant="h6">
-                        Wallet List and Progress {isTransferActive ? 'Please DO NOT REFRESH OR LEAVE PAGE' : ''}
-                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                        <Typography variant="h6">Airdrop Wallet List and Progress </Typography>
+                        {isTransferActive && (
+                            <Typography style={{ color: 'red' }}>- PLEASE DO NOT REFRESH OR LEAVE PAGE</Typography>
+                        )}
+                    </Box>
                     <ol>
                         {walletListProgress.map((item, index) => (
                             <li
