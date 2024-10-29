@@ -102,6 +102,11 @@ export const lightTheme = createTheme({
                 variant: 'outlined',
                 size: 'small',
             },
+            styleOverrides: {
+                root: {
+                    color: 'black',
+                },
+            },
         },
         MuiLink: {
             styleOverrides: {
