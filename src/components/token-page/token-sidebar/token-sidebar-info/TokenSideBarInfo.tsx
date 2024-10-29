@@ -107,7 +107,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
 
         try {
             const sentimentToSet = tokenInfo.metadata?.selectedSentiment === key ? null : key;
-            const result = await updateWalletSentiment(tokenInfo.ticker, walletAddress, sentimentToSet);
+            const result = await updateWalletSentiment(tokenInfo.ticker, sentimentToSet);
 
             setTokenInfo({
                 ...tokenInfo,
@@ -130,12 +130,11 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
     };
 
     const preMintedSupplyPercentage = (tokenInfo.preMintedSupply / tokenInfo.totalSupply) * 100;
-    const tokenPrice = floorPrice?.floor_price
-        ? `${floorPrice.floor_price.toFixed(7)} KAS`
-        : `${tokenInfo.price.toFixed(7)} KAS`;
-    const tokenPriceDollars = floorPrice?.floor_price
-        ? (floorPrice.floor_price * kasPrice).toFixed(7)
-        : (tokenInfo.price * kasPrice).toFixed(7);
+    const tokenPriceKAS = floorPrice?.floor_price
+        ? Math.min(floorPrice.floor_price, tokenInfo.price)
+        : tokenInfo.price;
+    const tokenPrice = `${tokenPriceKAS.toFixed(7)} KAS`;
+    const tokenPriceDollars = (tokenPriceKAS * kasPrice).toFixed(7);
 
     return (
         <Box

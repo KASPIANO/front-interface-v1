@@ -19,6 +19,23 @@ export const StyledButton = styled(Button)(({ theme }) => ({
     },
 }));
 
-export const StyledTextField = styled(TextField)({
+export const StyledTextField = styled(TextField)(({ theme }) => ({
     marginBottom: '0.6rem',
-});
+    '& .MuiInputBase-root': {
+        color: theme.palette.text.primary, // text color
+    },
+    '& .MuiOutlinedInput-root': {
+        '& fieldset': {
+            borderColor: alpha(theme.palette.primary.main, 0.2), // border color
+        },
+        '&:hover fieldset': {
+            borderColor: alpha(theme.palette.primary.main, 0.2), // border color on hover
+        },
+        '&.Mui-disabled fieldset': {
+            borderColor: alpha(theme.palette.primary.main, 0.1), // border color when disabled
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: theme.palette.primary.main, // focused border color
+        },
+    },
+}));

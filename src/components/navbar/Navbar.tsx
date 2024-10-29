@@ -20,6 +20,7 @@ interface NavbarProps {
     walletConnected: boolean;
     setBackgroundBlur: (isFocused: boolean) => void;
     backgroundBlur: boolean;
+    isWalletConnecting: boolean;
 }
 
 const Navbar: React.FC<NavbarProps> = ({
@@ -29,6 +30,7 @@ const Navbar: React.FC<NavbarProps> = ({
     connectWallet,
     setBackgroundBlur,
     backgroundBlur,
+    isWalletConnecting,
 }) => {
     const [activePage, setActivePage] = useState('/KRC-20');
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -51,6 +53,10 @@ const Navbar: React.FC<NavbarProps> = ({
 
     const formatNumberWithCommas = (value: number) => Math.floor(value).toLocaleString();
     const handleConnectButton = () => {
+        if (isWalletConnecting) {
+            return;
+        }
+
         if (walletConnected) disconnectWallet();
         else connectWallet();
     };
@@ -73,6 +79,17 @@ const Navbar: React.FC<NavbarProps> = ({
         return () => clearInterval(intervalId);
     }, []);
 
+    const getConnectButton = (style) => (
+        <ConnectButton
+            onClick={handleConnectButton}
+            sx={style}
+            className={isWalletConnecting ? 'connecting' : ''}
+            disabled={isWalletConnecting}
+        >
+            {isWalletConnecting ? 'Connecting...' : walletConnected ? 'Disconnect' : 'Connect'}
+        </ConnectButton>
+    );
+
     return (
         <NavbarContainer sx={{ height: backgroundBlur ? '9vh' : '7vh', display: 'flex', alignItems: 'center' }}>
             {/* Responsive Hamburger Menu for Mobile */}
@@ -85,12 +102,8 @@ const Navbar: React.FC<NavbarProps> = ({
 
             {/* Logo and Connect Button on the left */}
             <div style={{ display: 'flex', alignItems: 'center' }}>
-                <ConnectButton
-                    onClick={handleConnectButton}
-                    sx={{ marginLeft: '1vw', display: { xs: 'flex', md: 'none' } }}
-                >
-                    {walletConnected ? 'Disconnect' : 'Connect'}
-                </ConnectButton>
+                {getConnectButton({ marginLeft: '1vw', display: { xs: 'flex', md: 'none' } })}
+
                 <Logo
                     onClick={() => handleNavButtonClick('/KRC-20')}
                     sx={{ display: 'flex', alignItems: 'center', marginRight: '1vw' }}
@@ -179,12 +192,7 @@ const Navbar: React.FC<NavbarProps> = ({
                     {isDarkMode ? <LightModeRoundedIcon /> : <NightlightRoundIcon />}
                 </IconButton>
             </Tooltip>
-            <ConnectButton
-                onClick={handleConnectButton}
-                sx={{ marginLeft: '0.2rem', display: { xs: 'none', md: 'flex' } }}
-            >
-                {walletConnected ? 'Disconnect' : 'Connect'}
-            </ConnectButton>
+            {getConnectButton({ marginLeft: '0.2rem', display: { xs: 'none', md: 'flex' } })}
         </NavbarContainer>
     );
 };

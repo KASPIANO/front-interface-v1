@@ -74,6 +74,9 @@ export const ConnectButton = styled(Button)({
     '&:hover': {
         backgroundColor: '#49EACB',
     },
+    '&.connecting': {
+        backgroundColor: 'rgba(111, 199, 186, 0.25)',
+    },
 });
 
 // Network select styling

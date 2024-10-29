@@ -68,23 +68,9 @@ export function generateNonce() {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
-export const generateVerificationMessage = (account: string, nonce: string, date: string, requestId: string) => `
-    kaspiano.com wants you to sign in with your Kaspa account:
-    
-    ${account}
-    
-    Welcome to Kaspiano. Signing is the only way we can truly know that you are the owner of the wallet you are connecting. Signing is a safe, gas-less transaction that does not in any way give Kaspiano permission to perform any transactions with your wallet.
-    
-    URI: https://kaspiano.com
-    
-    Version: 1
-    
-    Nonce: ${nonce}
-    
-    Issued At: ${date}
-    
-    Request ID: ${requestId}
-            `;
+// If you change here, must be changed in the front too, MUST BE SIMILAR 1:1
+export const generateVerificationMessage = (account: string, nonce: string, date: string, requestId: string) =>
+    `kaspiano.com wants you to sign in with your Kaspa account:\n\n${account}\n\nWelcome to Kaspiano!\n\nSigning is the only way we can truly know that you are the owner of the wallet you are connecting.\nSigning is a safe, gas-less transaction that does not in any way give Kaspiano permission to perform any transactions with your wallet.\n\nURI: https://kaspiano.com\n\nVersion: 1\n\nNonce: ${nonce}\n\nIssued At: ${date}\n\nRequest ID: ${requestId}`;
 
 // Function to generate a unique request ID
 export function generateRequestId() {
@@ -162,7 +148,7 @@ export const checkTokenExpiration = (token) => {
 };
 
 export const checkTokenDeployment = async (ticker: string): Promise<boolean> => {
-    const maxRetries = 5;
+    const maxRetries = 7;
     let retryCount = 0;
 
     while (retryCount < maxRetries) {

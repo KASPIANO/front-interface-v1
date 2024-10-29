@@ -1,6 +1,10 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
 import {
+    AuthWalletInfo,
+    AuthWalletOtp,
     BackendTokenResponse,
+    SignInResponse,
+    SignInWithWalletRequestDto,
     TickerPortfolioBackend,
     TokenListItemResponse,
     TokenSearchItems,
@@ -8,7 +12,6 @@ import {
     TradeStats,
     UserInfo,
     UserReferral,
-    VerifiedUser,
 } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
@@ -18,9 +21,24 @@ const P2PCONTROLLERDATA = 'p2p-data';
 const KRC20METADATA_CONTROLLER = 'krc20metadata';
 const USER_REFERRALS_CONTROLLER = 'referrals';
 const AUTH_CONTROLLER = 'auth';
+const DISCONNECT_ROUTE = `/${AUTH_CONTROLLER}/disconnect`;
 
 export type BackendValidationErrorsType = {
     [key: string]: string[];
+};
+
+export const setAxiosInterceptorToDisconnect = (disconnectFunction: () => Promise<any>) => {
+    backendService.interceptors.response.clear();
+    backendService.interceptors.response.use(
+        (response) => response, // Pass through all successful responses
+        async (error) => {
+            if (error.response && error.response.status === 401) {
+                await disconnectFunction();
+            }
+
+            return Promise.reject(error); // Reject the error to handle it in other catch blocks
+        },
+    );
 };
 
 export const fetchAllTokens = async (
@@ -95,13 +113,11 @@ export async function recalculateRugScore(ticker: string): Promise<number> {
 
 export async function updateWalletSentiment(
     ticker: string,
-    wallet: string,
     sentiment: keyof TokenSentiment,
 ): Promise<TokenSentiment> {
     const result = await backendService.post<TokenSentiment>(`/${KRC20METADATA_CONTROLLER}/set-sentiment`, {
         sentiment,
         ticker,
-        wallet,
     });
 
     return result.data;
@@ -109,27 +125,21 @@ export async function updateWalletSentiment(
 
 export async function updateTokenMetadata(
     tokenDetails: FormData, // TokenDeploy
+    isAdmin = false,
 ): Promise<AxiosResponse<any> | null> {
     // eslint-disable-next-line no-return-await
-    return await makeUpdateTokenMetadataRequest(tokenDetails, false);
-}
-
-export async function validateFormDetailsForUpdateTokenMetadata(
-    tokenDetails: FormData, // TokenDeploy
-): Promise<AxiosResponse<any> | null> {
-    // eslint-disable-next-line no-return-await
-    return await makeUpdateTokenMetadataRequest(tokenDetails, true);
+    return await makeUpdateTokenMetadataRequest(tokenDetails, isAdmin);
 }
 
 export async function makeUpdateTokenMetadataRequest(
     tokenDetails: FormData, // TokenDeploy
-    validateOnly = false,
+    isAdmin = false,
 ): Promise<AxiosResponse<any> | null> {
     try {
         let url = `/${KRC20METADATA_CONTROLLER}/update`;
 
-        if (validateOnly) {
-            url += '-validate';
+        if (isAdmin) {
+            url += '-admin';
         }
 
         const response = await backendService.post<any>(url, tokenDetails);
@@ -195,20 +205,6 @@ export async function fetchTokenPortfolio(tickers: string[]): Promise<TickerPort
     }
 }
 
-export async function signUser(verifiedUser: VerifiedUser): Promise<{ message: string }> {
-    try {
-        const response = await backendService.post<{ message: string }>(`/${AUTH_CONTROLLER}/sign`, {
-            verifiedUser,
-        });
-
-        // Assuming response.data contains the actual array of logo URLs
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching token logo URL:', error);
-        return;
-    }
-}
-
 export const fetchTokenPrice = async (ticker: string): Promise<number> => {
     try {
         const response = await backendService.get<{ price: number }>(`/${KRC20CONTROLLER}/token-price/${ticker}`);
@@ -246,29 +242,23 @@ export const getGasEstimator = async (orderId: string): Promise<any> => {
     }
 };
 
-export const getUserReferral = async (walletAddress: string, referredBy?: string): Promise<UserReferral> => {
+export const getUserReferral = async (referredBy?: string): Promise<UserReferral> => {
     const response = await backendService.post<UserReferral>(`/${USER_REFERRALS_CONTROLLER}/user-referral`, {
-        walletAddress,
         referredBy,
     });
     return response.data;
 };
-export const updateContactInfo = async (
-    walletAddress: string,
-    email?: string,
-    x_url?: string,
-): Promise<UserInfo> => {
+export const updateContactInfo = async (email?: string, x_url?: string): Promise<UserInfo> => {
     const response = await backendService.post<UserInfo>(`/${USER_REFERRALS_CONTROLLER}/update-contact-info`, {
-        walletAddress,
         email,
         x_url,
     });
     return response.data;
 };
 
-export const getContactInfo = async (walletAddress: string): Promise<{ email: string; x_url: string }> => {
+export const getContactInfo = async (): Promise<{ email: string; x_url: string }> => {
     const response = await backendService.get<{ email: string; x_url: string }>(
-        `/${USER_REFERRALS_CONTROLLER}/contact-info/${walletAddress}`,
+        `/${USER_REFERRALS_CONTROLLER}/contact-info`,
     );
     return response.data;
 };
@@ -305,5 +295,53 @@ export const saveDeployData = async (ticker: string, walletAddress: string): Pro
         ticker,
         walletAddress,
     });
+    return response.data;
+};
+export const saveMintData = async (ticker: string): Promise<any> => {
+    const response = await backendService.post<any>(`/${KRC20CONTROLLER}/mint`, {
+        ticker,
+    });
+    return response.data;
+};
+
+export const saveAirdropData = async (ticker: string, paymentTxId: string): Promise<{ message: string }> => {
+    const response = await backendService.post<{ message: string }>(`/${KRC20CONTROLLER}/airdrop`, {
+        ticker,
+        paymentTxId,
+    });
+    return response.data;
+};
+
+// Decrease credits for the authenticated wallet address
+export const decreaseAirdropCredits = async (): Promise<{ message: string }> => {
+    const response = await backendService.post<{ message: string }>(
+        `/${KRC20CONTROLLER}/airdrop/decrease-credits`,
+    );
+    return response.data;
+};
+
+// Check if credits are available for the authenticated wallet address
+export const checkAirdropCredits = async (): Promise<{ credits: number }> => {
+    const response = await backendService.get<{ credits: number }>(`/${KRC20CONTROLLER}/airdrop/check-credits`);
+    return response.data;
+};
+
+export const geConnectedWalletInfo = async (): Promise<AuthWalletInfo> => {
+    const response = await backendService.get<AuthWalletInfo>(`/${AUTH_CONTROLLER}/info`);
+    return response.data;
+};
+
+export const getOtpForWallet = async (walletAddress: string) => {
+    const response = await backendService.post<AuthWalletOtp>(`/${AUTH_CONTROLLER}/otp`, { walletAddress });
+    return response.data;
+};
+
+export const doWalletSignIn = async (signInData: SignInWithWalletRequestDto): Promise<SignInResponse> => {
+    const response = await backendService.post<SignInResponse>(`/${AUTH_CONTROLLER}/wallet-sign-in`, signInData);
+    return response.data;
+};
+
+export const removeCookieOnBackend = async () => {
+    const response = await backendService.post<{ success: string }>(DISCONNECT_ROUTE, {});
     return response.data;
 };

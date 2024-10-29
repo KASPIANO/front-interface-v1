@@ -4,6 +4,7 @@ import { Order } from '../../../../../../types/Types';
 import { OrderItemPrimary, OrderItemSecondary } from './OrderItem.s';
 import { StyledButton } from '../../sell-panel/SellPanel.s';
 import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
+import { formatNumberWithCommas } from '../../../../../../utils/Utils';
 
 interface OrderItemProps {
     order: Order;
@@ -43,7 +44,7 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                 {/* Amount with Floor Difference */}
                 <Box sx={{ width: '17%' }}>
                     <OrderItemPrimary variant="body2">
-                        {order.quantity}
+                        {formatNumberWithCommas(order.quantity)}
                         {/* <Tooltip title="Difference from floor price"> */}
                         {/* <Typography
                                 variant="caption"
@@ -66,9 +67,11 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                 </Box>
                 {/* Total Price */}
                 <Box sx={{ width: '15%' }}>
-                    <OrderItemPrimary variant="body2">{order.totalPrice.toFixed(2)}</OrderItemPrimary>
+                    <OrderItemPrimary variant="body2">
+                        {formatNumberWithCommas(order.totalPrice.toFixed(2))}
+                    </OrderItemPrimary>
                     <OrderItemSecondary variant="caption" color="textSecondary">
-                        (${(order.totalPrice * kasPrice).toFixed(2)})
+                        (${formatNumberWithCommas((order.totalPrice * kasPrice).toFixed(2))})
                     </OrderItemSecondary>
                 </Box>
                 {/* Buy/Close Button */}

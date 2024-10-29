@@ -2,7 +2,6 @@ import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
-// import Cookies from 'universal-cookie';
 import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
 import { useKasware } from './hooks/useKasware';
@@ -26,6 +25,7 @@ const App = () => {
         isUserReferralFinishedLoading,
         updateAndGetUserReferral,
         userReferral,
+        isConnecting: isWalletConnecting,
     } = useKasware();
 
     const [backgroundBlur, setBackgroundBlur] = useState(false);
@@ -36,13 +36,11 @@ const App = () => {
         setThemeMode(newMode);
     };
 
-    // Set up an interval to check the cookie every 1 minute
     useEffect(() => {
         const updateTokensInterval = setInterval(setNewBalance, 10 * 1000);
 
         // Cleanup function to clear the interval when component unmounts
         return () => {
-            // clearInterval(interval);
             clearInterval(updateTokensInterval);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -63,6 +61,7 @@ const App = () => {
                         disconnectWallet={disconnectWallet}
                         setBackgroundBlur={setBackgroundBlur}
                         backgroundBlur={backgroundBlur}
+                        isWalletConnecting={isWalletConnecting}
                     />
                     <KaspianoRouter
                         backgroundBlur={backgroundBlur}

@@ -93,7 +93,7 @@ export const lightTheme = createTheme({
             styleOverrides: {
                 root: {
                     textTransform: 'none',
-                    color: 'black',
+                    color: '#70C7BA',
                 },
             },
         },
@@ -101,6 +101,11 @@ export const lightTheme = createTheme({
             defaultProps: {
                 variant: 'outlined',
                 size: 'small',
+            },
+            styleOverrides: {
+                root: {
+                    color: '#70C7BA',
+                },
             },
         },
         MuiLink: {

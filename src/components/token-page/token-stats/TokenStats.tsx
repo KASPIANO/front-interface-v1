@@ -94,6 +94,11 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
     const holderChangeArrow = holderChangeValue > 0 ? 'positive' : 'negative';
     const totalMintedDataToShow =
         tokenInfo.state === 'finished' ? '100%' : `${(tokenInfo.totalMintedPercent * 100).toFixed(8)}%`;
+
+    const displayPrice = floorPrice?.floor_price
+        ? formatPrice(Math.min(floorPrice.floor_price, tokenInfo.price))
+        : formatPrice(tokenInfo.price);
+
     return (
         <Card sx={{ height: '20vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -144,14 +149,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                         value={tradeStats.totalTradesKaspiano ? tradeStats.totalTradesKaspiano : 0}
                     />
                     <Divider orientation="vertical" flexItem />
-                    <StatsDisplay
-                        label={'FLOOR PRICE(KAS)'}
-                        value={
-                            floorPrice?.floor_price
-                                ? formatPrice(floorPrice.floor_price)
-                                : tokenInfo.price.toFixed(7)
-                        }
-                    />
+                    <StatsDisplay label={'FLOOR PRICE(KAS)'} value={displayPrice} />
 
                     <Divider orientation="vertical" flexItem />
                     <StatsDisplay label="TOTAL MINTED" value={totalMintedDataToShow} />

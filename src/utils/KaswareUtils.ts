@@ -3,9 +3,11 @@
 import Cookies from 'js-cookie';
 import { getPriorityFee } from '../DAL/KaspaApiDal';
 import { KaswareSendKaspaResult } from '../types/Types';
+import { saveMintData } from '../DAL/BackendDAL';
 
 export const USER_REJECTED_TRANSACTION_ERROR_CODE = 4001;
 export const MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION = 21;
+export const LASTEST_VERSION = '0.7.5.4';
 
 // Utility to detect if KasWare Wallet is installed
 export const isKasWareInstalled = (): boolean => typeof window.kasware !== 'undefined';
@@ -195,12 +197,13 @@ export const deployKRC20Token = async (inscribeJsonString: string): Promise<stri
 
 // Method to mint KRC20 token
 // PRIORITY FEE KAS
-export const mintKRC20Token = async (inscribeJsonString: string): Promise<string> => {
+export const mintKRC20Token = async (inscribeJsonString: string, ticker: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
         const priorityFee = await getPriorityFee('TRANSFER');
         const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, '', kasPriorityFee);
+        saveMintData(ticker);
         return txid;
     } catch (error) {
         console.error('Failed to mint KRC20 token:', error);
@@ -243,18 +246,37 @@ export const removeNetworkChangedListener = (handler: (network: string) => void)
 
 // Utility function to sign a KRC20 batch transfer transaction
 export const signKRC20BatchTransfer = async (
-    addressedList: { ticker: string; to: string; amount: number }[],
+    addressedList: { tick: string; to: string; amount: number }[],
 ): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
 
     try {
-        const priorityFee = await getPriorityFee('TRANSFER');
-        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
-        const txid = await window.kasware.signKRC20BatchTransferTransaction(addressedList, kasPriorityFee);
+        const txid = await window.kasware.krc20BatchTransferTransaction(addressedList);
 
         return txid;
     } catch (error) {
         console.error('Failed to execute batch KRC20 token transfer:', error);
         throw error;
+    }
+};
+
+const isVersionLatestOrGreater = (currentVersion) => {
+    const currentParts = currentVersion.split('.').map(Number);
+    const latestParts = LASTEST_VERSION.split('.').map(Number);
+
+    for (let i = 0; i < latestParts.length; i++) {
+        if (currentParts[i] > latestParts[i]) return true;
+        if (currentParts[i] < latestParts[i]) return false;
+    }
+    return true; // If all parts are equal, the version is up-to-date
+};
+export const versionCheck = async () => {
+    const currentVersion = await window.kasware.getVersion();
+    if (isVersionLatestOrGreater(currentVersion)) {
+        console.log('User has the latest version or a newer one:', currentVersion);
+        return true;
+    } else {
+        console.log("User's version is outdated:", currentVersion);
+        return false;
     }
 };
