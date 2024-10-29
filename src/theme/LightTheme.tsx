@@ -93,7 +93,7 @@ export const lightTheme = createTheme({
             styleOverrides: {
                 root: {
                     textTransform: 'none',
-                    color: 'black',
+                    color: '#70C7BA',
                 },
             },
         },
@@ -104,7 +104,7 @@ export const lightTheme = createTheme({
             },
             styleOverrides: {
                 root: {
-                    color: 'black',
+                    color: '#70C7BA',
                 },
             },
         },
