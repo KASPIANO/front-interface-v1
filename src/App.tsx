@@ -36,13 +36,11 @@ const App = () => {
         setThemeMode(newMode);
     };
 
-    // Set up an interval to check the cookie every 1 minute
     useEffect(() => {
         const updateTokensInterval = setInterval(setNewBalance, 10 * 1000);
 
         // Cleanup function to clear the interval when component unmounts
         return () => {
-            // clearInterval(interval);
             clearInterval(updateTokensInterval);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps

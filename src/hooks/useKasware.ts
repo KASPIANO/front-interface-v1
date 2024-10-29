@@ -36,7 +36,7 @@ export const useKasware = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
 
     const setNewBalance = useCallback(() => {
-        if (connected) {
+        if (isConnected) {
             updateBalance();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
