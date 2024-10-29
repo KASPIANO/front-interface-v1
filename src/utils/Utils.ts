@@ -70,7 +70,7 @@ export function generateNonce() {
 
 // If you change here, must be changed in the front too, MUST BE SIMILAR 1:1
 export const generateVerificationMessage = (account: string, nonce: string, date: string, requestId: string) =>
-    `kaspiano.com wants you to sign in with your Kaspa account: ${account}\n\nWelcome to Kaspiano. Signing is the only way we can truly know that you are the owner of the wallet you are connecting.\nSigning is a safe, gas-less transaction that does not in any way give Kaspiano permission to perform any transactions with your wallet.\n\n URI: https://kaspiano.com\n\nVersion: 1\n\nNonce: ${nonce}\n\nIssued At:${date}\n\nRequest ID: ${requestId}`;
+    `kaspiano.com wants you to sign in with your Kaspa account:\n\n${account}\n\nWelcome to Kaspiano!\nSigning is the only way we can truly know that you are the owner of the wallet you are connecting.\nSigning is a safe, gas-less transaction that does not in any way give Kaspiano permission to perform any transactions with your wallet.\n\nURI: https://kaspiano.com\n\nVersion: 1\n\nNonce: ${nonce}\n\nIssued At:${date}\n\nRequest ID: ${requestId}`;
 
 // Function to generate a unique request ID
 export function generateRequestId() {
