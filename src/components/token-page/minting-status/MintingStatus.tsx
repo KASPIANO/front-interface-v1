@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { Box, Button, Card, Tooltip, Typography } from '@mui/material';
+import { Box, Card, Tooltip, Typography } from '@mui/material';
 import { BackendTokenResponse } from '../../../types/Types';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
