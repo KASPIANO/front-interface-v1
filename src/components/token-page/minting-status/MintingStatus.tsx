@@ -1,9 +1,10 @@
 import { FC, useEffect, useState } from 'react';
-import { Box, Button, Card, Tooltip, Typography } from '@mui/material';
+import { Box, Card, Tooltip, Typography } from '@mui/material';
 import { BackendTokenResponse } from '../../../types/Types';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { fetchTokenByTicker } from '../../../DAL/BackendDAL';
+import { StyledMintButton } from './MintingStatus.s';
 
 interface MintingComponentProps {
     tokenInfo: BackendTokenResponse;
@@ -150,7 +151,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                     }
                 >
                     <span>
-                        <Button
+                        <StyledMintButton
                             onClick={() => handleMint(tokenInfo.ticker)}
                             variant="contained"
                             color="primary"
@@ -162,7 +163,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                             disabled={isMintingDisabled || !walletConnected || walletBalance < 1 || isSoldOut}
                         >
                             {isMintingDisabled || isSoldOut ? 'Sold Out' : 'Mint'}
-                        </Button>
+                        </StyledMintButton>
                     </span>
                 </Tooltip>
             </Box>
