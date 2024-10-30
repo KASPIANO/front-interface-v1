@@ -15,8 +15,6 @@ import { sendKaspaToKaspiano, signKRC20BatchTransfer, versionCheck } from '../..
 import { parse } from 'papaparse'; // For CSV parsing
 import { showGlobalSnackbar } from '../alert-context/AlertContext';
 import FileDownloadIconRounded from '@mui/icons-material/FileDownloadRounded';
-
-import { UploadButton } from '../../pages/deploy-page/DeployPage.s';
 import { fetchWalletKRC20Balance } from '../../DAL/Krc20DAL';
 import { BatchTransferItem } from '../../types/Types';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -86,46 +84,6 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
 
         setOpenDialog(false);
     };
-
-    // Example CSV header: "address"
-    // const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     const file = e.target.files?.[0];
-    //     if (!file) return;
-
-    //     const reader = new FileReader();
-    //     reader.onload = (event) => {
-    //         const csvText = event.target?.result?.toString();
-    //         if (csvText) {
-    //             parse(csvText, {
-    //                 header: true,
-    //                 complete: (results) => {
-    //                     const list = results.data
-    //                         .map((row: any) => {
-    //                             const amount = parseFloat(row.amount);
-    //                             const isValidAmount = !isNaN(amount) && amount > 0;
-    //                             if (!isValidAmount) {
-    //                                 showGlobalSnackbar({
-    //                                     message: `Invalid amount in row with address ${row.address}`,
-    //                                     severity: 'error',
-    //                                 });
-    //                                 return null; // Skip this row
-    //                             }
-
-    //                             return {
-    //                                 tick: ticker,
-    //                                 to: row.address.trim(),
-    //                                 amount,
-    //                             };
-    //                         })
-    //                         .filter((item: any) => item !== null); // Filter out invalid entries
-
-    //                     setRecipientList(list); // Set the validated list for transfer
-    //                 },
-    //             });
-    //         }
-    //     };
-    //     reader.readAsText(file);
-    // };
 
     const handleCSVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -364,6 +322,15 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 handleCloseDialog();
                 return;
             }
+            if (walletBalance < 30) {
+                showGlobalSnackbar({
+                    message: 'You Need 30 KAS to use the Airdrop tool',
+                    severity: 'error',
+                });
+                setUsingCredits(false);
+                handleCloseDialog();
+                return;
+            }
             const result = await decreaseAirdropCredits();
             if (result.message === 'Credits successfully decreased.') {
                 setUserCredits(userCredits - 1);
@@ -371,8 +338,10 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                     message: 'Airdrop credit used successfully',
                     severity: 'success',
                 });
-                setPaymentMade(true);
                 handleCloseDialog();
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                setTimeout(() => {}, 700);
+                setPaymentMade(true);
                 setUsingCredits(false);
             } else {
                 showGlobalSnackbar({
@@ -447,24 +416,28 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
 
             <Box sx={{ marginBottom: '1.3vh' }}>
                 <Typography variant="body2">Upload a CSV File:</Typography>
-                <UploadButton>
-                    <Input
-                        disabled={recipientList.length > 0 || !ticker}
-                        sx={{ display: 'none' }}
-                        inputProps={{ accept: '.csv' }}
-                        type="file"
-                        onChange={handleCSVUpload}
-                    />
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        component="span"
-                        disabled={recipientList.length > 0 || !ticker}
-                        sx={{ marginRight: '10px' }}
-                    >
-                        Choose File
-                    </Button>
-                </UploadButton>
+                <label>
+                    <Tooltip title="Please Add Ticker First to start process">
+                        <span>
+                            <Input
+                                disabled={recipientList.length > 0 || !ticker}
+                                sx={{ display: 'none' }}
+                                inputProps={{ accept: '.csv' }}
+                                type="file"
+                                onChange={handleCSVUpload}
+                            />
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                component="span"
+                                disabled={recipientList.length > 0 || !ticker}
+                                sx={{ marginRight: '10px' }}
+                            >
+                                Choose File
+                            </Button>
+                        </span>
+                    </Tooltip>
+                </label>
                 <Button
                     variant="contained"
                     color="primary"
