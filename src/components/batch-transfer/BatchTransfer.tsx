@@ -96,6 +96,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 parse(csvText, {
                     header: true,
                     complete: (results) => {
+                        const uniqueEntries = new Map();
                         const list = results.data
                             .filter((row: any) => row.address && row.amount)
                             .map((row: any, index: number) => {
@@ -117,6 +118,23 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
 
                                     return null; // Skip this row
                                 }
+                                const addressKey = `${row.address.trim()}_${amount}`;
+                                if (uniqueEntries.has(addressKey)) {
+                                    showGlobalSnackbar({
+                                        message: `Duplicate entry found`,
+                                        severity: 'error',
+                                    });
+
+                                    // Mark as skipped in walletListProgress for duplicate
+                                    setWalletListProgress((prevProgress) => [
+                                        ...prevProgress,
+                                        { to: row.address.trim(), amount, tick: ticker, status: 'skipped' },
+                                    ]);
+
+                                    return null; // Skip duplicate entries
+                                }
+
+                                uniqueEntries.set(addressKey, true);
 
                                 // Mark as pending in walletListProgress
                                 setWalletListProgress((prevProgress) => [
