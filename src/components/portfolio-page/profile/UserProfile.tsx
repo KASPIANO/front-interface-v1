@@ -74,7 +74,7 @@ const UserProfile = ({ walletAddress }) => {
             // Update the UI based on the deleted field
             if (field === 'email') {
                 setEmail('');
-            } else if (field === 'xHandle') {
+            } else if (field === 'x_url') {
                 setXHandle('');
             }
 
@@ -177,7 +177,7 @@ const UserProfile = ({ walletAddress }) => {
                         <EditIcon sx={{ fontSize: '1.2rem' }} />
                     )}
                 </IconButton>
-                <IconButton sx={{ marginBottom: '1.5rem' }} onClick={() => handleDelete('xHandle')}>
+                <IconButton sx={{ marginBottom: '1.5rem' }} onClick={() => handleDelete('x_url')}>
                     <DeleteIcon sx={{ fontSize: '1.2rem' }} />
                 </IconButton>
             </Box>

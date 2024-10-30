@@ -113,7 +113,12 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                                     // Mark as skipped in walletListProgress
                                     setWalletListProgress((prevProgress) => [
                                         ...prevProgress,
-                                        { to: row.address.trim(), amount: 0, tick: ticker, status: 'skipped' },
+                                        {
+                                            to: row.address.trim(),
+                                            amount: 0,
+                                            tick: ticker,
+                                            status: 'Invalid Amount',
+                                        },
                                     ]);
 
                                     return null; // Skip this row
@@ -128,7 +133,12 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                                     // Mark as skipped in walletListProgress for duplicate
                                     setWalletListProgress((prevProgress) => [
                                         ...prevProgress,
-                                        { to: row.address.trim(), amount, tick: ticker, status: 'skipped' },
+                                        {
+                                            to: row.address.trim(),
+                                            amount,
+                                            tick: ticker,
+                                            status: 'Duplicate Wallet',
+                                        },
                                     ]);
 
                                     return null; // Skip duplicate entries
