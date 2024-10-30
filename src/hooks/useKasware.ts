@@ -19,6 +19,7 @@ import { useQueryClient } from '@tanstack/react-query';
 const COOKIE_TTL = 4 * 60 * 60 * 1000;
 let walletAddressBeforeVerification = null;
 let isConnected = false;
+let disconnectTimeout = null;
 
 export const useKasware = () => {
     const [connected, setConnected] = useState(false);
@@ -120,6 +121,13 @@ export const useKasware = () => {
             setConnected(true);
             isConnected = true;
             updateBalance();
+
+            const lastLoggedInAt = localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN);
+
+            if (lastLoggedInAt) {
+                const timeDiff = Date.now() - parseInt(lastLoggedInAt);
+                disconnectTimeout = setTimeout(() => disconnectWallet(), Math.max(COOKIE_TTL - timeDiff, 0));
+            }
         },
         [updateBalance],
     );
@@ -170,6 +178,11 @@ export const useKasware = () => {
 
         if (localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN)) {
             localStorage.removeItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN);
+            if (disconnectTimeout) {
+                clearTimeout(disconnectTimeout);
+                disconnectTimeout = null;
+            }
+
             removeCookieOnBackend().catch((error) => console.error(error));
         }
     }, []);
@@ -265,6 +278,10 @@ export const useKasware = () => {
         setAxiosInterceptorToDisconnect(async () => {
             if (isConnected) {
                 localStorage.removeItem(LOCAL_STORAGE_KEYS.LAST_LOGGED_IN);
+                if (disconnectTimeout) {
+                    clearTimeout(disconnectTimeout);
+                    disconnectTimeout = null;
+                }
                 disconnectWallet(false);
             }
         });
