@@ -6,6 +6,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
 import { SpinningIcon } from './CustomSnackBar.s';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 type AlertSeverity = 'error' | 'success' | 'warning' | 'info' | 'loading';
 
@@ -82,6 +83,8 @@ const SnackbarComponent: React.FC = () => {
                 return <SpinningIcon sx={{ color: alertIconColors[severity] }} />;
             case 'success':
                 return <CheckCircleOutlineIcon sx={{ color: alertIconColors[severity] }} />;
+            case 'warning':
+                return <WarningAmberIcon sx={{ color: alertIconColors[severity] }} />;
             case 'info':
                 return <PrivacyTipIcon sx={{ color: alertIconColors[severity] }} />;
             case 'error':

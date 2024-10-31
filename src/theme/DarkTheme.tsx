@@ -114,7 +114,15 @@ export const darkTheme = createTheme({
                 variant: 'outlined',
                 size: 'small',
             },
+            styleOverrides: {
+                root: {
+                    '& .MuiOutlinedInput-root': {
+                        color: '#FFFFFF', // Font color for dark theme
+                    },
+                },
+            },
         },
+
         MuiCard: {
             styleOverrides: {
                 root: {
@@ -146,6 +154,58 @@ export const darkTheme = createTheme({
                 paper: { backgroundColor: '#1e1e1e', backgroundImage: 'none' },
             },
         },
+        MuiAutocomplete: {
+            styleOverrides: {
+                root: {
+                    color: 'white',
+                    '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                            borderColor: '#70C7BA', // Border color for input
+                        },
+                        '&:hover fieldset': {
+                            borderColor: '#49EACB', // Hover border color
+                        },
+                        '&.Mui-focused fieldset': {
+                            borderColor: '#3c6ed4', // Focused border color
+                        },
+                    },
+                },
+                inputRoot: {
+                    color: 'white', // Text color for input
+                },
+                paper: {
+                    backgroundColor: '#1e1e1e', // Background color for dropdown
+                    color: 'white', // Text color for dropdown items
+                },
+                option: {
+                    '&[aria-selected="true"]': {
+                        backgroundColor: '#3c6ed4', // Selected item background
+                    },
+                    '&:hover': {
+                        backgroundColor: '#49EACB', // Hover background color
+                    },
+                },
+            },
+        },
+        MuiMenuItem: {
+            styleOverrides: {
+                root: {
+                    color: '#FFFFFF', // Default text color for dark theme
+                    backgroundColor: '#1e1e1e', // Background color from dark theme palette
+                    '&:hover': {
+                        backgroundColor: '#2b2b3b', // Slightly lighter for hover
+                    },
+                    '&.Mui-selected': {
+                        backgroundColor: '#70C7BA', // Primary color for selected background
+                        color: '#231F20', // Black color from the dark theme palette for selected text
+                        '&:hover': {
+                            backgroundColor: '#49EACB', // Secondary color for hover when selected
+                        },
+                    },
+                },
+            },
+        },
+
         // Customize other component configurations as needed
     },
     shadows: createTheme().shadows, // Customize shadow options
