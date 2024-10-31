@@ -164,7 +164,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                                         to: row.address.trim(),
                                         amount,
                                         tick: ticker,
-                                        status: 'Pending',
+                                        status: 'pending',
                                         index: prevProgress.length,
                                     },
                                 ]);
@@ -569,12 +569,16 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             {recipientList.length > 0 && (
                 <Box mt={2}>
                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                        <Typography variant="h6">Airdrop Wallet List and Progress</Typography>
+                        <Typography variant="h6" sx={{ fontSize: '1.3rem' }}>
+                            Airdrop Wallet List and Progress
+                        </Typography>
                         {totalErrors > 0 && (
                             <Tooltip title="Errors in the wallet list. These entries will be skipped during the airdrop.">
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <WarningAmberIcon sx={{ color: '#FBC02D', mr: '0.2rem' }} />
-                                    <Typography>{totalErrors}</Typography>
+                                    <WarningAmberIcon
+                                        sx={{ color: '#FBC02D', mr: '0.2rem', fontSize: '1.2rem' }}
+                                    />
+                                    <Typography sx={{ fontSize: '0.8rem' }}>{totalErrors}</Typography>
                                 </Box>
                             </Tooltip>
                         )}
@@ -587,15 +591,17 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                                     size="small"
                                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                                     disabled={currentPage === 1}
+                                    sx={{ fontSize: '0.6rem' }}
                                 >
                                     Previous
                                 </Button>
-                                <Typography variant="body2">
+                                <Typography variant="body2" sx={{ fontSize: '0.7rem' }}>
                                     Page {currentPage} of {Math.ceil(walletListProgress.length / itemsPerPage)}
                                 </Typography>
                                 <Button
                                     variant="outlined"
                                     size="small"
+                                    sx={{ fontSize: '0.6rem' }}
                                     onClick={() =>
                                         setCurrentPage((prev) =>
                                             Math.min(
@@ -618,10 +624,10 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                                         mr: 1,
                                         color: 'error.light',
                                         fontWeight: 'medium',
-                                        fontSize: '0.9rem',
+                                        fontSize: '0.7rem',
                                     }}
                                 >
-                                    Please do not refresh or leave the page
+                                    Please leave the page open
                                 </Typography>
                                 <CircularProgress size={20} />
                             </Box>
