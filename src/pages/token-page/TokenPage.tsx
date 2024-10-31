@@ -14,6 +14,7 @@ import { fetchTokenByTicker, getTokenPriceHistory, recalculateRugScore } from '.
 import { AxiosError } from 'axios';
 import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
 import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
+import { useQuery } from '@tanstack/react-query';
 
 interface TokenPageProps {
     walletAddress: string | null;
@@ -31,11 +32,9 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const [tokenXHandle, setTokenXHandle] = useState(false);
     const [recalculateRugScoreLoading, setRecalculateRugScoreLoading] = useState(false);
     const [kasPrice, setkasPrice] = useState(0);
-    const [currentTicker, setCurrentTicker] = useState('');
     const [tradingDataTimeFrame, setTradingDataTimeFrame] = useState(
         tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 5],
     );
-    const [priceHistory, setPriceHistory] = useState([]);
 
     useEffect(() => {
         const fetchPrice = async () => {
@@ -74,39 +73,25 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     useEffect(() => {
         // Fetch the token info immediately on component mount
         fetchAndUpdateTokenInfo(false);
-        setCurrentTicker(ticker);
 
         // Set up the interval to update token info every 5 minutes
         const interval = setInterval(() => fetchAndUpdateTokenInfo(false), 300000);
 
         // Clean up the interval when the component unmounts
         return () => clearInterval(interval);
-    }, [fetchAndUpdateTokenInfo, ticker]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ticker]);
 
-    useEffect(() => {
-        const fetchPriceHistory = async () => {
-            if (ticker !== currentTicker) {
-                setPriceHistory([]);
-            }
-            const result = await getTokenPriceHistory(ticker);
-            setPriceHistory(result);
-        };
-        fetchPriceHistory();
-
-        const interval = setInterval(fetchPriceHistory, 900000);
-        return () => clearInterval(interval);
-    }, [ticker, currentTicker]);
-
-    // const { data: priceHistoryData, isLoading } = useQuery({
-    //     queryKey: ['tokenPriceHistory', ticker, tradingDataTimeFrame], // The query key
-    //     queryFn: async () => {
-    //         const result = await getTokenPriceHistory(ticker, tradingDataTimeFrame);
-    //         return result;
-    //     },
-    //     enabled: !!ticker, // Only fetch if the ticker exists
-    //     staleTime: Infinity, // The cache never expires
-    //     refetchInterval: 900000, // 15 minutes
-    // });
+    const { data: priceHistoryData, isLoading } = useQuery({
+        queryKey: ['tokenPriceHistory', ticker, tradingDataTimeFrame], // The query key
+        queryFn: async () => {
+            const result = await getTokenPriceHistory(ticker, tradingDataTimeFrame);
+            return result;
+        },
+        enabled: !!ticker, // Only fetch if the ticker exists
+        staleTime: Infinity, // The cache never expires
+        refetchInterval: 900000, // 15 minutes
+    });
 
     const tokenData = useMemo(() => tokenInfo, [tokenInfo]);
 
@@ -114,8 +99,14 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         tokenData ? component : <Skeleton variant="rectangular" height={height} width={width} />;
 
     const getComponentGraphToShow = (component: JSX.Element, height?: string, width?: string) =>
-        priceHistory.length > 0 ? component : <Skeleton variant="rectangular" height={height} width={width} />;
-
+        !isLoading && priceHistoryData.length > 0 ? (
+            component
+        ) : (
+            <Skeleton variant="rectangular" height={height} width={width} />
+        );
+    useEffect(() => {
+        console.log('priceHistoryData changed:', priceHistoryData);
+    }, [priceHistoryData]);
     const rugScoreParse = tokenInfo?.metadata?.rugScore === 0 ? null : tokenInfo?.metadata?.rugScore;
 
     const recalculateRugScoreAndShow = async () => {
@@ -149,7 +140,12 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         <TokenPageLayout backgroundBlur={backgroundBlur}>
             {getComponentToShow(<TokenHeader tokenInfo={tokenInfo} />, '11.5vh')}
             {getComponentGraphToShow(
-                <TokenGraph priceHistory={priceHistory} ticker={tokenInfo?.ticker} />,
+                <TokenGraph
+                    key={tradingDataTimeFrame}
+                    priceHistory={priceHistoryData}
+                    ticker={tokenInfo?.ticker}
+                    timeframe={tradingDataTimeFrame}
+                />,
                 '35vh',
             )}
             {getComponentToShow(

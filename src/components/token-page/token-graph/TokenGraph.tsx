@@ -11,9 +11,10 @@ interface PriceHistoryItem {
 interface RealTimeGraphProps {
     priceHistory: PriceHistoryItem[];
     ticker: string;
+    timeframe: string;
 }
 
-const RealTimeGraph: React.FC<RealTimeGraphProps> = ({ priceHistory, ticker }) => {
+const RealTimeGraph: React.FC<RealTimeGraphProps> = ({ priceHistory, ticker, timeframe }) => {
     const theme = useTheme();
 
     const [data, setData] = useState<{ x: string[]; y: number[] }>({
@@ -63,7 +64,7 @@ const RealTimeGraph: React.FC<RealTimeGraphProps> = ({ priceHistory, ticker }) =
                     },
                 ]}
                 layout={{
-                    title: `${ticker} Price Chart`,
+                    title: `${ticker} Price Chart (${timeframe})`,
                     paper_bgcolor: theme.palette.background.paper,
                     plot_bgcolor: theme.palette.background.paper,
                     xaxis: {
