@@ -22,6 +22,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CircularProgress from '@mui/material/CircularProgress';
 import { checkAirdropCredits, decreaseAirdropCredits, saveAirdropData } from '../../DAL/BackendDAL';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 export interface BatchTransferProps {
     walletConnected: boolean;
@@ -55,6 +56,13 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     const [startedPayment, setStartedPayment] = useState(false);
     const [userCredits, setUserCredits] = useState(0);
     const [usingCredits, setUsingCredits] = useState(false);
+    const [csvLoading, setCsvLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalErrors, setTotalErrors] = useState(0);
+    const itemsPerPage = 500; //
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = walletListProgress.slice(indexOfFirstItem, indexOfLastItem);
     useEffect(() => {
         const fetchUserCredits = async () => {
             try {
@@ -90,25 +98,28 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
         if (!file) return;
 
         const reader = new FileReader();
+        setCsvLoading(true);
         reader.onload = (event) => {
             const csvText = event.target?.result?.toString();
             if (csvText) {
                 parse(csvText, {
                     header: true,
+                    transformHeader: (header) => header.trim(),
                     complete: (results) => {
                         const uniqueEntries = new Map();
+                        let errorCount = 0;
                         const list = results.data
                             .filter((row: any) => row.address && row.amount)
-                            .map((row: any, index: number) => {
+                            .map((row: any) => {
                                 const amount = parseFloat(row.amount);
                                 const isValidAmount = !isNaN(amount) && amount > 0;
-                                console.log(ticker);
 
                                 if (!isValidAmount) {
                                     showGlobalSnackbar({
-                                        message: `Invalid amount in row ${index + 2}`,
-                                        severity: 'error',
+                                        message: `Please Check the errors in the wallet list`,
+                                        severity: 'warning',
                                     });
+                                    errorCount += 1;
 
                                     // Mark as skipped in walletListProgress
                                     setWalletListProgress((prevProgress) => [
@@ -126,10 +137,10 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                                 const addressKey = `${row.address.trim()}_${amount}`;
                                 if (uniqueEntries.has(addressKey)) {
                                     showGlobalSnackbar({
-                                        message: `Duplicate entry found`,
-                                        severity: 'error',
+                                        message: `Please Check the errors in the wallet list`,
+                                        severity: 'warning',
                                     });
-
+                                    errorCount += 1;
                                     // Mark as skipped in walletListProgress for duplicate
                                     setWalletListProgress((prevProgress) => [
                                         ...prevProgress,
@@ -153,7 +164,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                                         to: row.address.trim(),
                                         amount,
                                         tick: ticker,
-                                        status: 'pending',
+                                        status: 'Pending',
                                         index: prevProgress.length,
                                     },
                                 ]);
@@ -165,9 +176,19 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                                 };
                             })
                             .filter((item: any) => item !== null); // Filter out invalid entries
-
+                        if (list.length === 0) {
+                            showGlobalSnackbar({
+                                message: 'Please review your CSV structure and try again',
+                                details: 'Check Headers Spacing and Column Names',
+                                severity: 'error',
+                            });
+                            setCsvLoading(false);
+                            return;
+                        }
+                        setTotalErrors(errorCount);
                         setRecipientList(list);
                         e.target.value = ''; // Set the validated list for transfer
+                        setCsvLoading(false);
                     },
                 });
             }
@@ -403,6 +424,8 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
     const handleCleanWalletList = () => {
         setRecipientList([]);
         setWalletListProgress([]);
+        setCurrentPage(1);
+        setTotalErrors(0);
     };
     return (
         <Card sx={{ padding: '20px', margin: '20px', width: '80%' }}>
@@ -445,10 +468,10 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
             <Box sx={{ marginBottom: '1.3vh' }}>
                 <Typography variant="body2">Upload a CSV File:</Typography>
                 <label>
-                    <Tooltip title="Please Add Ticker First to start process">
+                    <Tooltip title={recipientList.length > 0 ? '' : 'Please Add Ticker First to start process'}>
                         <span>
                             <Input
-                                disabled={recipientList.length > 0 || !ticker}
+                                disabled={csvLoading || recipientList.length > 0 || !ticker}
                                 sx={{ display: 'none' }}
                                 inputProps={{ accept: '.csv' }}
                                 type="file"
@@ -458,10 +481,10 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                                 variant="contained"
                                 color="primary"
                                 component="span"
-                                disabled={recipientList.length > 0 || !ticker}
+                                disabled={csvLoading || recipientList.length > 0 || !ticker}
                                 sx={{ marginRight: '10px' }}
                             >
-                                Choose File
+                                {csvLoading ? 'Processing Adresses...' : 'Choose File'}
                             </Button>
                         </span>
                     </Tooltip>
@@ -547,6 +570,47 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                 <Box mt={2}>
                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                         <Typography variant="h6">Airdrop Wallet List and Progress</Typography>
+                        {totalErrors > 0 && (
+                            <Tooltip title="Errors in the wallet list. These entries will be skipped during the airdrop.">
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <WarningAmberIcon sx={{ color: '#FBC02D', mr: '0.2rem' }} />
+                                    <Typography>{totalErrors}</Typography>
+                                </Box>
+                            </Tooltip>
+                        )}
+
+                        {/* Pagination Buttons */}
+                        {walletListProgress.length > 2000 && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                    disabled={currentPage === 1}
+                                >
+                                    Previous
+                                </Button>
+                                <Typography variant="body2">
+                                    Page {currentPage} of {Math.ceil(walletListProgress.length / itemsPerPage)}
+                                </Typography>
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={() =>
+                                        setCurrentPage((prev) =>
+                                            Math.min(
+                                                prev + 1,
+                                                Math.ceil(walletListProgress.length / itemsPerPage),
+                                            ),
+                                        )
+                                    }
+                                    disabled={currentPage === Math.ceil(walletListProgress.length / itemsPerPage)}
+                                >
+                                    Next
+                                </Button>
+                            </Box>
+                        )}
+
                         {isTransferActive && (
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                 <Typography
@@ -557,16 +621,16 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                                         fontSize: '0.9rem',
                                     }}
                                 >
-                                    - Please do not refresh or leave the page
+                                    Please do not refresh or leave the page
                                 </Typography>
                                 <CircularProgress size={20} />
                             </Box>
                         )}
                     </Box>
                     <ol>
-                        {walletListProgress.map((item, index) => (
+                        {currentItems.map((item, index) => (
                             <li
-                                key={index}
+                                key={indexOfFirstItem + index}
                                 style={{
                                     display: 'flex',
                                     flexDirection: 'column',
@@ -594,8 +658,10 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                                     {item.status === 'success' && <CheckCircleIcon color="success" />}
                                     {item.status === 'failed' && <ErrorIcon color="error" />}
                                     {item.status === 'cancelled' && <CancelIcon color="disabled" />}
-                                    {item.status === 'skipped' && (
-                                        <ErrorIcon color="error" titleAccess="Skipped due to invalid amount" />
+                                    {(item.status === 'skipped' ||
+                                        item.status === 'Invalid Amount' ||
+                                        item.status === 'Duplicate Wallet') && (
+                                        <ErrorIcon color="error" titleAccess={`Error: ${item.status}`} />
                                     )}
                                     {item.status === 'pending' && isTransferActive && (
                                         <CircularProgress size={16} />
