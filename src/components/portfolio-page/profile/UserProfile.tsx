@@ -3,8 +3,8 @@ import { TextField, IconButton, Tooltip, Box } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { getContactInfo, updateContactInfo } from '../../../DAL/BackendDAL';
-
+import { deleteUserInfoField, getContactInfo, updateContactInfo } from '../../../DAL/BackendDAL';
+import DeleteIcon from '@mui/icons-material/Delete';
 // Regex patterns for validation
 const twitterUrlPattern = /^(https?:\/\/)?(www\.)?x\.com\/[a-zA-Z0-9_]{1,15}$/;
 const emailPattern = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
@@ -66,6 +66,23 @@ const UserProfile = ({ walletAddress }) => {
             console.error('Failed to save X handle:', error);
         }
     };
+    const handleDelete = async (field) => {
+        try {
+            // Call the delete request for the specified field
+            await deleteUserInfoField(field);
+
+            // Update the UI based on the deleted field
+            if (field === 'email') {
+                setEmail('');
+            } else if (field === 'x_url') {
+                setXHandle('');
+            }
+
+            console.log(`Deleted ${field}`);
+        } catch (error) {
+            console.error(`Failed to delete ${field}:`, error);
+        }
+    };
 
     return (
         <Box display="flex" flexDirection="column" gap={3} sx={{ width: '100%' }}>
@@ -106,7 +123,14 @@ const UserProfile = ({ walletAddress }) => {
                         }
                     }}
                 >
-                    {isEditingEmail ? <SaveIcon /> : <EditIcon />}
+                    {isEditingEmail ? (
+                        <SaveIcon sx={{ fontSize: '1.2rem' }} />
+                    ) : (
+                        <EditIcon sx={{ fontSize: '1.2rem' }} />
+                    )}
+                </IconButton>
+                <IconButton sx={{ marginBottom: '1.5rem' }} onClick={() => handleDelete('email')}>
+                    <DeleteIcon sx={{ fontSize: '1.2rem' }} />
                 </IconButton>
             </Box>
 
@@ -147,7 +171,14 @@ const UserProfile = ({ walletAddress }) => {
                         }
                     }}
                 >
-                    {isEditingX ? <SaveIcon /> : <EditIcon />}
+                    {isEditingX ? (
+                        <SaveIcon sx={{ fontSize: '1.2rem' }} />
+                    ) : (
+                        <EditIcon sx={{ fontSize: '1.2rem' }} />
+                    )}
+                </IconButton>
+                <IconButton sx={{ marginBottom: '1.5rem' }} onClick={() => handleDelete('x_url')}>
+                    <DeleteIcon sx={{ fontSize: '1.2rem' }} />
                 </IconButton>
             </Box>
         </Box>

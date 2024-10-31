@@ -22,12 +22,11 @@ export const TokenSidebarSocialsBarButton = styled(Button)(({ theme }) => ({
     },
 }));
 
-export const AddText = styled(Typography)(({ theme }) => ({
+export const AddText = styled(Typography)({
     backgroundColor: 'transparent',
-    color: theme.palette.primary.contrastText,
     fontSize: '0.8rem',
-    fontWeight: 'bold',
-}));
+    fontWeight: 650,
+});
 
 export const AddBox = styled(Button)(({ theme }) => ({
     display: 'flex',

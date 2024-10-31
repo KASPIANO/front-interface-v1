@@ -6,7 +6,6 @@ export const StyledMintButton = styled(Button)(({ theme }) => ({
     fontSize: '0.7rem',
     width: '100%',
     backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
     '&:hover': {
         backgroundColor: alpha(theme.palette.primary.main, 0.8),
     },

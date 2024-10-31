@@ -248,6 +248,13 @@ export const getUserReferral = async (referredBy?: string): Promise<UserReferral
     });
     return response.data;
 };
+export const deleteUserInfoField = async (field: 'email' | 'x_url'): Promise<{ message: string }> => {
+    const response = await backendService.delete<{ message: string }>(`/${USER_REFERRALS_CONTROLLER}`, {
+        params: { field }, // Axios will automatically append ?field=email or ?field=x_url
+    });
+    return response.data;
+};
+
 export const updateContactInfo = async (email?: string, x_url?: string): Promise<UserInfo> => {
     const response = await backendService.post<UserInfo>(`/${USER_REFERRALS_CONTROLLER}/update-contact-info`, {
         email,
