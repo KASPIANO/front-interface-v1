@@ -142,7 +142,7 @@ export const lightTheme = createTheme({
                             borderColor: '#49EACB', // Hover border color
                         },
                         '&.Mui-focused fieldset': {
-                            borderColor: '#3c6ed4', // Focused border color
+                            borderColor: '#49EACB', // Focused border color
                         },
                     },
                 },
@@ -155,7 +155,7 @@ export const lightTheme = createTheme({
                 },
                 option: {
                     '&[aria-selected="true"]': {
-                        backgroundColor: '#70C7BA', // Selected item background
+                        backgroundColor: '#49EACB', // Selected item background
                     },
                     '&:hover': {
                         backgroundColor: '#49EACB', // Hover background color
