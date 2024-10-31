@@ -21,7 +21,6 @@ import {
 import {
     checkTokenDeployment,
     convertToProtocolFormat,
-    doPolling,
     isEmptyString,
     isEmptyStringOrArray,
 } from '../../utils/Utils';
@@ -483,10 +482,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 saveDeployData(tokenKRC20Details.ticker, walletAddress);
                 setIsDeploying(false);
                 setWaitingForTokenConfirmation(true);
-                const token = await doPolling(
-                    () => checkTokenDeployment(tokenKRC20Details.ticker),
-                    (result) => result,
-                );
+                const token = await checkTokenDeployment(tokenKRC20Details.ticker);
 
                 if (token) {
                     try {
