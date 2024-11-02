@@ -14,13 +14,14 @@ interface GridHeaderProps {
 }
 
 const marginMapperByHeader = {
-    Ticker: '15%',
-    Age: '12%',
-    Price: '10%',
+    Ticker: '13%',
+    Age: '9.5%',
+    Price: '11.5%',
     'Market Cap': '14.3%',
     Minted: '11.5%',
-    Holders: '12%',
-    'Fair Mint': '26%',
+    Holders: '9%',
+    'Fair Mint': '20%',
+    Volume: '10%',
 };
 
 const marginLeft = {
@@ -39,7 +40,8 @@ const disableSort = (name: string) =>
     name === 'Minted' ||
     name === 'Holders' ||
     name === 'Market Cap' ||
-    name === 'Price';
+    name === 'Price' ||
+    name === 'Volume';
 
 export const GridHeader: FC<GridHeaderProps> = (props) => {
     const { name, activeHeader, setActiveHeader, onSortBy, sortField, setChangeTotalMintsActive } = props;

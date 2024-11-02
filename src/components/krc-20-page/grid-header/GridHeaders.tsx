@@ -49,6 +49,14 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                         />
                         <GridHeader
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
+                            name="Volume"
+                            sortField="volumeUsd"
+                            onSortBy={onSortBy}
+                            activeHeader={activeHeader}
+                            setActiveHeader={setActiveHeader}
+                        />
+                        <GridHeader
+                            setChangeTotalMintsActive={setChangeTotalMintsActive}
                             name="Market Cap"
                             sortField="marketCap"
                             onSortBy={onSortBy}
