@@ -1,9 +1,10 @@
 import { FC } from 'react';
-import { Box, Card, Divider, Skeleton, Typography } from '@mui/material';
+import { Box, Card, Divider, Skeleton, Tooltip, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
 import { BackendTokenResponse } from '../../../types/Types';
 import { useFetchFloorPrice, useFetchHolderChange, useFetchTradeStats } from '../../../DAL/UseQueriesBackend';
 import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material'; // Import arrow icons
+import { formatNumberWithCommas } from '../../../utils/Utils';
 
 interface TokenStatsProps {
     tokenInfo: BackendTokenResponse;
@@ -41,6 +42,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         tokenInfo.ticker,
         tradingDataTimeFrame,
     );
+    const { data: tradeStats24, isLoading: tradeloading24 } = useFetchTradeStats(tokenInfo.ticker, '1d');
 
     const updateTradingDataTimeFrame = (value: string) => {
         setTradingDataTimeFrame(value);
@@ -99,6 +101,14 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         ? formatPrice(Math.min(floorPrice.floor_price, tokenInfo.price))
         : formatPrice(tokenInfo.price);
 
+    const totalVolumeUsd =
+        (Number.isFinite(tradeStats24?.totalVolumeUsdKaspiano)
+            ? parseFloat(tradeStats24?.totalVolumeUsdKaspiano)
+            : 0) + (Number.isFinite(tokenInfo?.volumeUsd) ? (tokenInfo?.volumeUsd as number) : 0);
+    // Format the total volume
+    const formattedTotalVolumeUsd =
+        totalVolumeUsd > 0 ? `${formatNumberWithCommas(totalVolumeUsd.toFixed(0))}$` : '0$';
+
     return (
         <Card sx={{ height: '20vh', padding: '8px 10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -117,7 +127,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     onChange={updateTradingDataTimeFrame}
                 />
             </Box>
-            {loading || tradeloading ? (
+            {loading || tradeloading || tradeloading24 ? (
                 <Skeleton key={1} width={'100%'} height={'11vh'} />
             ) : (
                 <Box
@@ -128,19 +138,19 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                         justifyContent: 'center',
                     }}
                 >
-                    <StatsDisplay
-                        label={`VOLUME (${tradingDataTimeFrame})`}
-                        value={
-                            tradeStats.totalVolumeKasKaspiano
-                                ? `${parseFloat(tradeStats.totalVolumeKasKaspiano).toFixed(0)} KAS`
-                                : null
-                        }
-                        secondary={
-                            tradeStats.totalVolumeUsdKaspiano
-                                ? `${parseFloat(tradeStats.totalVolumeUsdKaspiano).toFixed(0)}$`
-                                : null
-                        }
-                    />
+                    <Tooltip title="Total trading volume across all markets in the last 24 hours, displayed in USD">
+                        <span>
+                            <StatsDisplay
+                                label={`VOLUME (1d)`}
+                                // value={
+                                //     tradeStats24.totalVolumeKasKaspiano
+                                //         ? `${parseFloat(tradeStats24.totalVolumeKasKaspiano).toFixed(0)} KAS`
+                                //         : null
+                                // }
+                                value={formattedTotalVolumeUsd}
+                            />
+                        </span>
+                    </Tooltip>
 
                     <Divider orientation="vertical" flexItem />
 
@@ -155,13 +165,16 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                     <StatsDisplay label="TOTAL MINTED" value={totalMintedDataToShow} />
 
                     <Divider orientation="vertical" flexItem />
-
-                    <StatsDisplay
-                        label="HOLDERS"
-                        value={tokenInfo.totalHolders}
-                        secondary={tradingDataTimeFrame === 'All' ? '---' : holderChangeValue.toString()}
-                        arrow={tradingDataTimeFrame === 'All' ? null : holderChangeArrow}
-                    />
+                    <Tooltip title="Total number of unique addresses holding this token. The secondary number shows the change in holders during the selected timeframe.">
+                        <span>
+                            <StatsDisplay
+                                label="HOLDERS"
+                                value={tokenInfo.totalHolders}
+                                secondary={tradingDataTimeFrame === 'All' ? '---' : holderChangeValue.toString()}
+                                arrow={tradingDataTimeFrame === 'All' ? null : holderChangeArrow}
+                            />
+                        </span>
+                    </Tooltip>
                 </Box>
             )}
         </Card>
