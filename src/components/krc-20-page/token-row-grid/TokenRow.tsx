@@ -111,8 +111,8 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemAvatar>
                         <Avatar
                             sx={{
-                                width: '6vh',
-                                height: '6vh',
+                                width: '2.3rem',
+                                height: '2.3rem',
                                 marginRight: '1vw',
                             }}
                             style={{
@@ -127,7 +127,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
 
                     <ListItemText
                         sx={{
-                            maxWidth: '14%',
+                            width: '7vw',
                         }}
                         primary={
                             <Tooltip title="">
@@ -144,7 +144,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     />
 
                     <ListItemText
-                        sx={{ maxWidth: '12.5%' }}
+                        sx={{ width: '6vw', justifyContent: 'start' }}
                         primary={
                             <Typography
                                 component={'span'}
@@ -156,7 +156,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }
                     />
                     <ListItemText
-                        sx={{ maxWidth: '13%' }}
+                        sx={{ width: '9vw' }}
                         primary={
                             <Tooltip title={`${token.price} Kas`}>
                                 <Stat>
@@ -186,7 +186,40 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }
                     />
                     <ListItemText
-                        sx={{ maxWidth: '13.5%' }}
+                        sx={{ width: '8vw', justifyContent: 'start' }}
+                        primary={
+                            <Tooltip
+                                title={`${
+                                    Number.isFinite(token?.volumeUsd)
+                                        ? formatNumberWithCommas(token.volumeUsd.toFixed(0))
+                                        : '0'
+                                } USD`}
+                            >
+                                <Stat>
+                                    <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
+                                        {Number.isFinite(token?.volumeUsd)
+                                            ? formatNumberWithCommas(token.volumeUsd.toFixed(0))
+                                            : '0'}
+                                    </StatNumber>
+                                    {Number.isFinite(token?.changeVolumeUsd) && token.changeVolumeUsd !== 0 && (
+                                        <StatHelpText style={{ fontSize: '0.7rem' }} margin="0">
+                                            {token.changeVolumeUsd.toFixed(2)}%
+                                            <StatArrow
+                                                sx={{
+                                                    color: token.changeVolumeUsd >= 0 ? 'green' : 'red',
+                                                    marginLeft: '2px',
+                                                }}
+                                                type={token.changeVolumeUsd >= 0 ? 'increase' : 'decrease'}
+                                            />
+                                        </StatHelpText>
+                                    )}
+                                </Stat>
+                            </Tooltip>
+                        }
+                    />
+
+                    <ListItemText
+                        sx={{ width: '8vw', justifyContent: 'start' }}
                         primary={
                             <Tooltip title={formatNumberWithCommas(token.marketCap)}>
                                 <Stat>
@@ -216,7 +249,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }
                     />
                     <ListItemText
-                        sx={{ maxWidth: '14%' }}
+                        sx={{ width: '8vw' }}
                         primary={
                             <Tooltip title="This shows the percentage of tokens minted, along with the number of mints made in the selected time interval.">
                                 <Stat>
@@ -244,7 +277,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }
                     />
                     <ListItemText
-                        sx={{ maxWidth: '11%' }}
+                        sx={{ width: '6vw', justifyContent: 'start' }}
                         primary={
                             <Tooltip title="This displays the total number of token holders and the change in the holder amount during the selected time interval.">
                                 <Stat>
@@ -275,7 +308,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     />
 
                     <ListItemText
-                        sx={{ maxWidth: '5%' }}
+                        sx={{ width: '5vw', justifyContent: 'start' }}
                         primary={
                             <Typography component={'span'} variant="body2" style={{ fontSize: '0.8rem' }}>
                                 {preMintedIcons(token.preMintedSupply, token.totalSupply)}
@@ -284,16 +317,17 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     />
                     {token.state !== 'finished' ? (
                         <ListItemText
-                            sx={{ maxWidth: '10%', display: 'flex', justifyContent: 'center' }}
+                            sx={{ width: '1.1vw' }}
                             primary={
                                 <Button
                                     onClick={(event) => handleMint(event, token.ticker)}
                                     variant="contained"
                                     color="primary"
                                     style={{
-                                        minWidth: '2vw',
-                                        width: '3vw',
-                                        fontSize: '0.75rem',
+                                        minWidth: '1rem',
+                                        width: '1.5rem',
+                                        height: '1.5rem',
+                                        fontSize: '0.6rem',
                                     }}
                                 >
                                     Mint
@@ -301,7 +335,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             }
                         />
                     ) : (
-                        <div style={{ width: '10%' }} />
+                        <div style={{ width: '3vw' }} />
                     )}
                 </ListItemButton>
             </ListItem>

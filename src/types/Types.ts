@@ -40,6 +40,8 @@ export interface BackendTokenResponse {
     marketCap?: number;
     changeMarketCap?: number;
     changePrice?: number;
+    volumeUsd?: number;
+    changeVolumeUsd?: number;
 }
 
 export interface BackendTokenMetadata {
@@ -71,6 +73,8 @@ export interface TokenListItemResponse {
     marketCap?: number;
     changeMarketCap?: number;
     changePrice?: number;
+    volumeUsd?: number;
+    changeVolumeUsd?: number;
 }
 export interface TokenSearchItems {
     ticker: string;
