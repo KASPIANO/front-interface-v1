@@ -389,3 +389,8 @@ export interface BatchTransferItem {
     amount: number;
     tick: string;
 }
+
+export enum AdType {
+    BANNER = 'main_page',
+    SIDEBAR = 'token_page',
+}
