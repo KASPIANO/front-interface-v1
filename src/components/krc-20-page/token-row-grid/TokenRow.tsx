@@ -221,7 +221,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemText
                         sx={{ width: '8vw', justifyContent: 'start' }}
                         primary={
-                            <Tooltip title={formatNumberWithCommas(token.marketCap)}>
+                            <Tooltip title={`${formatNumberWithCommas(token.marketCap)} USD`}>
                                 <Stat>
                                     <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
                                         {simplifyNumber(token.marketCap)}
