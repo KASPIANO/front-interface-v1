@@ -110,6 +110,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                 id="scrollableList"
                 dense
                 sx={{
+                    paddingTop: 0,
                     width: '100%',
                     overflowX: 'hidden',
                     height: '70vh',

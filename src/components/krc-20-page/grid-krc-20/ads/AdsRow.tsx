@@ -73,7 +73,7 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
 
     return (
         <div>
-            <ListItem onClick={() => handleItemClick(adData)} disablePadding>
+            <ListItem onClick={() => handleItemClick(adData)} disablePadding sx={{ height: '12vh' }}>
                 <ListItemButton>
                     <ListItemAvatar>
                         <Avatar
@@ -143,27 +143,21 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                             </Tooltip>
                         }
                     />
+                    <ListItemText
+                        sx={{ width: '8vw' }}
+                        primary={
+                            <Tooltip title="This shows the percentage of tokens minted, along with the number of mints made in the selected time interval.">
+                                <Stat>
+                                    <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
+                                        {(adData.totalMintedPercent * 100).toFixed(2)}%
+                                    </StatNumber>
+                                </Stat>
+                            </Tooltip>
+                        }
+                    />
 
                     {/* Additional details if necessary, following similar structure */}
 
-                    <ListItemText
-                        sx={{ width: '6vw', justifyContent: 'start' }}
-                        primary={
-                            <Typography
-                                component="span"
-                                variant="body2"
-                                style={{
-                                    fontSize: '0.7rem',
-                                    color: 'gray',
-                                    fontWeight: 'bold',
-                                    textAlign: 'right',
-                                    width: '100%',
-                                }}
-                            >
-                                {SlotPurpose[adData.purpose as unknown as keyof typeof SlotPurpose] || 'Sponsored'}
-                            </Typography>
-                        }
-                    />
                     {adData.state !== 'finished' ? (
                         <ListItemText
                             sx={{ width: '1.1vw' }}
@@ -186,6 +180,24 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                     ) : (
                         <div style={{ width: '3vw' }} />
                     )}
+                    <ListItemText
+                        sx={{ width: '6vw', justifyContent: 'start' }}
+                        primary={
+                            <Typography
+                                component="span"
+                                variant="body2"
+                                style={{
+                                    fontSize: '0.7rem',
+                                    color: 'gray',
+                                    fontWeight: 'bold',
+                                    textAlign: 'right',
+                                    width: '100%',
+                                }}
+                            >
+                                {SlotPurpose[adData.purpose as unknown as keyof typeof SlotPurpose] || 'Sponsored'}
+                            </Typography>
+                        }
+                    />
                 </ListItemButton>
             </ListItem>
             <Divider />
