@@ -12,9 +12,11 @@ export const SideBarContainer = styled(Card)({
     top: '0',
 });
 
-export const TabStyled = styled(Tab)({
+export const TabStyled = styled(Tab)(({ theme }) => ({
     paddingBottom: 0,
     paddingTop: 0,
     height: '2rem',
     minHeight: '5px',
-});
+    fontWeight: 600,
+    color: theme.palette.primary.main,
+}));
