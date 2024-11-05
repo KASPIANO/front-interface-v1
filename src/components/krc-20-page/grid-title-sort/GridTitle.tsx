@@ -1,4 +1,4 @@
-import { Typography, IconButton, Box, Tooltip } from '@mui/material';
+import { Typography, IconButton, Box, Tooltip, Button } from '@mui/material';
 import { FC } from 'react';
 import {
     HeaderContainer,
@@ -22,6 +22,10 @@ interface TokenGridTitleProps {
     setActiveHeader: (value: string) => void;
     changeTotalMintsDisabled: boolean;
     setChangeTotalMintsActive: (value: boolean) => void;
+    setChangeMCActive: (value: boolean) => void;
+    changeMCDisabled: boolean;
+    setPriceChangeActive: (value: boolean) => void;
+    priceChangeDisabled: boolean;
 }
 
 const GridTitle: FC<TokenGridTitleProps> = (props) => {
@@ -35,6 +39,10 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
         setActiveHeader,
         changeTotalMintsDisabled,
         setChangeTotalMintsActive,
+        setChangeMCActive,
+        changeMCDisabled,
+        setPriceChangeActive,
+        priceChangeDisabled,
     } = props;
 
     const handleSortChange = (sortOption: string) => {
@@ -43,9 +51,26 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
 
     const handleMintingRateSort = () => {
         // Handle sorting by minting rate
-        const orderedBy = changeTotalMintsDisabled ? 'changeTotalMints' : 'ticker';
-        const orderedByAsc = orderedBy !== 'ticker';
+        const orderedBy = changeTotalMintsDisabled ? 'changeTotalMints' : 'marketCap';
+        const orderedByAsc = orderedBy !== 'marketCap';
         setChangeTotalMintsActive(!changeTotalMintsDisabled);
+        setActiveHeader('');
+        onSortBy(orderedBy, orderedByAsc);
+    };
+
+    const handleMCChange = () => {
+        // Handle sorting by minting rate
+        const orderedBy = changeMCDisabled ? 'changeMC' : 'marketCap';
+        const orderedByAsc = orderedBy !== 'marketCap';
+        setChangeMCActive(!changeMCDisabled);
+        setActiveHeader('');
+        onSortBy(orderedBy, orderedByAsc);
+    };
+    const handlePriceChange = () => {
+        // Handle sorting by minting rate
+        const orderedBy = priceChangeDisabled ? 'priceMC' : 'marketCap';
+        const orderedByAsc = orderedBy !== 'marketCap';
+        setPriceChangeActive(!priceChangeDisabled);
         setActiveHeader('');
         onSortBy(orderedBy, orderedByAsc);
     };
@@ -77,15 +102,39 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
             </Box>
 
             {/* Sort Time Period Buttons */}
-            <Tooltip title="Sort by the pace and change of minting activity. Mint heat-map.">
-                <IconButton
-                    onClick={handleMintingRateSort}
+            <Tooltip title="Sort by the market cap change within the selected timeframe.">
+                <Button
+                    variant="contained"
+                    onClick={handleMCChange}
                     sx={{
                         marginLeft: 'auto',
+                        fontSize: '0.65rem',
+                        padding: '2px 5px',
+                        marginRight: '0.4rem',
                     }}
-                    aria-label="sort by minting rate"
+                    aria-label="sort by MC Change"
                 >
-                    <FireIcon selected={!changeTotalMintsDisabled} />
+                    MC Change
+                    {/* <WhatshotRounded
+                        sx={{
+                            color: '#ff0000',
+                            borderRadius: '12px',
+                            backgroundColor: changeTotalMintsDisabled ? 'transparent' : 'rgba(255, 0, 0, 0.35)',
+                        }}
+                    /> */}
+                </Button>
+            </Tooltip>
+            <Tooltip title="Sort by the price change within the selected timeframe.">
+                <Button
+                    variant="contained"
+                    onClick={handlePriceChange}
+                    aria-label="sort by Price Change"
+                    sx={{
+                        padding: '2px 5px',
+                        fontSize: '0.65rem',
+                    }}
+                >
+                    Price Change
                     {/* <WhatshotRoundedIcon
                         sx={{
                             color: '#ff0000',
@@ -93,6 +142,24 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
                             backgroundColor: changeTotalMintsDisabled ? 'transparent' : 'rgba(255, 0, 0, 0.35)',
                         }}
                     /> */}
+                </Button>
+            </Tooltip>
+            <Tooltip title="Sort by the pace and change of minting activity. Mint heat-map.">
+                <IconButton
+                    onClick={handleMintingRateSort}
+                    sx={{
+                        marginLeft: '0.2rem',
+                    }}
+                    aria-label="sort by minting rate"
+                >
+                    <FireIcon selected={!changeTotalMintsDisabled} />{' '}
+                    {/* <WhatshotRoundedIcon
+                                sx={{
+                                    color: '#ff0000',
+                                    borderRadius: '12px',
+                                    backgroundColor: changeTotalMintsDisabled ? 'transparent' : 'rgba(255, 0, 0, 0.35)',
+                                }}
+                            /> */}
                 </IconButton>
             </Tooltip>
 

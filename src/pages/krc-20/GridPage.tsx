@@ -21,6 +21,8 @@ const GridPage: FC<GridPageProps> = (props) => {
     const [page, setPage] = useState(0);
     const [activeHeader, setActiveHeader] = useState<string>('');
     const [changeTotalMintsDisabled, setChangeTotalMintsActive] = useState(true);
+    const [priceChangeDisabled, setPriceChangeActive] = useState(true);
+    const [changeMCDisabled, setChangeMCActive] = useState(true);
     const {
         data: tokenList,
         isLoading: isTokenListLoading,
@@ -62,6 +64,10 @@ const GridPage: FC<GridPageProps> = (props) => {
                 onSortBy={onSortBy}
                 isLoading={isTokenListLoading && isTotalTokenLoading}
                 setActiveHeader={setActiveHeader}
+                setChangeMCActive={setChangeMCActive}
+                changeMCDisabled={changeMCDisabled}
+                setPriceChangeActive={setPriceChangeActive}
+                priceChangeDisabled={priceChangeDisabled}
             />
             <StyledDataGridContainer>
                 <TokenDataGrid

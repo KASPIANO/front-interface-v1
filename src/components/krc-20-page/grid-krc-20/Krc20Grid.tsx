@@ -42,6 +42,16 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     const handleItemClick = (token) => {
         navigate(`/token/${token.ticker}`);
     };
+    const handleItemClickAds = (link: string) => {
+        // Check if the link starts with http:// or https://
+        if (!link.startsWith('http://') && !link.startsWith('https://')) {
+            // If not, assume it's a domain and prepend https://
+            link = `https://${link}`;
+        }
+
+        // Open the link in a new tab
+        window.open(link, '_blank');
+    };
 
     const { data: adsData, isLoading: isAdsLoading } = useGetCurrentAds('main_page');
 
@@ -77,6 +87,10 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
             return <Skeleton key="ads-row" width={'100%'} height={'12vh'} />;
         }
 
+        if (!adsData || adsData.length === 0) {
+            return null;
+        }
+
         return (
             <Box
                 key="ads-row"
@@ -89,7 +103,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
             >
                 <AdsSlider
                     adsData={adsData}
-                    handleItemClick={handleItemClick}
+                    handleItemClick={handleItemClickAds}
                     walletBalance={walletBalance}
                     walletConnected={walletConnected}
                 />

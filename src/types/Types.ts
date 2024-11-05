@@ -90,6 +90,8 @@ export interface AdsListItemResponse {
     marketCap?: number;
     volumeUsd?: number;
     purpose: SlotPurpose;
+    telegram?: string;
+    website?: string;
 }
 export interface TokenSearchItems {
     ticker: string;
@@ -411,7 +413,15 @@ export enum AdType {
 }
 
 export enum SlotPurpose {
-    SPONSORED = 'Sponsored',
-    EVENT = 'Event',
-    TRADING = 'Trading Competition',
+    FEATURED = 'featured',
+    EVENT = 'event',
+    TRADING = 'trading',
+    MINT = 'mint_live',
 }
+
+export const slotPurposeDisplayMapper: { [key in SlotPurpose]: string } = {
+    [SlotPurpose.FEATURED]: 'Featured',
+    [SlotPurpose.EVENT]: 'Event',
+    [SlotPurpose.TRADING]: 'Trading Competition',
+    [SlotPurpose.MINT]: 'Mint Live',
+};

@@ -3,6 +3,7 @@ import { Stat, StatNumber } from '@chakra-ui/react';
 
 import {
     Avatar,
+    Box,
     Button,
     Divider,
     ListItem,
@@ -11,13 +12,13 @@ import {
     ListItemText,
     Tooltip,
     Typography,
+    useTheme,
 } from '@mui/material';
 
-import { AdsListItemResponse, SlotPurpose } from '../../../../types/Types';
+import { AdsListItemResponse, SlotPurpose, slotPurposeDisplayMapper } from '../../../../types/Types';
 import { DEFAULT_TOKEN_LOGO_URL } from '../../../../utils/Constants';
 import { capitalizeFirstLetter, formatPrice, formatNumberWithCommas, formatDate } from '../../../../utils/Utils';
-import { mintKRC20Token } from '../../../../utils/KaswareUtils';
-import { showGlobalSnackbar } from '../../../alert-context/AlertContext';
+import { useNavigate } from 'react-router-dom';
 
 interface AdsRowProps {
     adData: AdsListItemResponse;
@@ -27,53 +28,17 @@ interface AdsRowProps {
 }
 
 export const AdsRow: FC<AdsRowProps> = (props) => {
-    const { adData, handleItemClick, walletConnected, walletBalance } = props;
+    const { adData, handleItemClick } = props;
+    const navigate = useNavigate();
 
-    const handleMint = async (event, ticker: string) => {
+    const handleMint = (event, ticker) => {
         event.stopPropagation();
-        if (!walletConnected) {
-            showGlobalSnackbar({
-                message: 'Please connect your wallet to mint a token',
-                severity: 'error',
-            });
-
-            return;
-        }
-        if (walletBalance < 1) {
-            showGlobalSnackbar({
-                message: 'You need at least 1 KAS to mint a token',
-                severity: 'error',
-            });
-            return;
-        }
-        const inscribeJsonString = JSON.stringify({
-            p: 'KRC-20',
-            op: 'mint',
-            tick: ticker,
-        });
-        try {
-            const mint = await mintKRC20Token(inscribeJsonString, ticker);
-            if (mint) {
-                const { commitId, revealId } = JSON.parse(mint);
-                showGlobalSnackbar({
-                    message: 'Token minted successfully',
-                    severity: 'success',
-                    commitId,
-                    revealId,
-                });
-            }
-        } catch (error) {
-            showGlobalSnackbar({
-                message: 'Token minting failed',
-                severity: 'error',
-                details: error.message,
-            });
-        }
+        navigate(`/token/${ticker}`);
     };
 
     return (
         <div>
-            <ListItem onClick={() => handleItemClick(adData)} disablePadding sx={{ height: '12vh' }}>
+            <ListItem onClick={() => handleItemClick(adData.telegram)} disablePadding sx={{ height: '9vh' }}>
                 <ListItemButton>
                     <ListItemAvatar>
                         <Avatar
@@ -103,64 +68,13 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                                 </Typography>
                             </Tooltip>
                         }
-                        secondary={
-                            <Typography component={'span'} variant="body2" style={{ fontSize: '0.75rem' }}>
-                                {formatDate(adData.creationDate)}
-                            </Typography>
-                        }
-                    />
-
-                    <ListItemText
-                        sx={{ width: '9vw' }}
-                        primary={
-                            <Tooltip title={`${adData.price} Kas`}>
-                                <Stat>
-                                    <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
-                                        {formatPrice(adData.price)}
-                                    </StatNumber>
-                                </Stat>
-                            </Tooltip>
-                        }
-                    />
-
-                    <ListItemText
-                        sx={{ width: '8vw', justifyContent: 'start' }}
-                        primary={
-                            <Tooltip
-                                title={`${
-                                    Number.isFinite(adData?.volumeUsd)
-                                        ? formatNumberWithCommas(adData.volumeUsd.toFixed(0))
-                                        : '0'
-                                } USD`}
-                            >
-                                <Stat>
-                                    <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
-                                        {Number.isFinite(adData?.volumeUsd)
-                                            ? formatNumberWithCommas(adData.volumeUsd.toFixed(0))
-                                            : '0'}
-                                    </StatNumber>
-                                </Stat>
-                            </Tooltip>
-                        }
-                    />
-                    <ListItemText
-                        sx={{ width: '8vw' }}
-                        primary={
-                            <Tooltip title="This shows the percentage of tokens minted, along with the number of mints made in the selected time interval.">
-                                <Stat>
-                                    <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
-                                        {(adData.totalMintedPercent * 100).toFixed(2)}%
-                                    </StatNumber>
-                                </Stat>
-                            </Tooltip>
-                        }
                     />
 
                     {/* Additional details if necessary, following similar structure */}
 
-                    {adData.state !== 'finished' ? (
+                    {adData.state === 'finished' ? (
                         <ListItemText
-                            sx={{ width: '1.1vw' }}
+                            sx={{ width: '4rem' }}
                             primary={
                                 <Button
                                     onClick={(event) => handleMint(event, adData.ticker)}
@@ -168,12 +82,12 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                                     color="primary"
                                     style={{
                                         minWidth: '1rem',
-                                        width: '1.5rem',
-                                        height: '1.5rem',
+                                        width: '4rem',
+                                        height: '2rem',
                                         fontSize: '0.6rem',
                                     }}
                                 >
-                                    Mint
+                                    Mint Now
                                 </Button>
                             }
                         />
@@ -181,21 +95,36 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                         <div style={{ width: '3vw' }} />
                     )}
                     <ListItemText
-                        sx={{ width: '6vw', justifyContent: 'start' }}
+                        sx={{
+                            position: 'absolute',
+                            right: '5px', // Adjust this value as needed to position it precisely
+                            top: '70%', // Center vertically within the ListItem
+                            transform: 'translateY(-50%)', // Centering transformation
+                            width: '6vw',
+                            justifyContent: 'start',
+                        }}
                         primary={
-                            <Typography
-                                component="span"
-                                variant="body2"
-                                style={{
-                                    fontSize: '0.7rem',
-                                    color: 'gray',
-                                    fontWeight: 'bold',
-                                    textAlign: 'right',
-                                    width: '100%',
+                            <Box
+                                sx={{
+                                    display: 'inline-block',
+                                    padding: '1px 4px', // Padding inside the border box
+                                    border: `0.5px solid rgba(111, 199, 186, 0.3)`, // Border color
+                                    borderRadius: '4px', // Rounded corners
                                 }}
                             >
-                                {SlotPurpose[adData.purpose as unknown as keyof typeof SlotPurpose] || 'Sponsored'}
-                            </Typography>
+                                <Typography
+                                    variant="body2"
+                                    style={{
+                                        fontSize: '0.6rem',
+                                        color: 'gray',
+                                        fontWeight: 'bold',
+                                    }}
+                                >
+                                    {slotPurposeDisplayMapper[
+                                        adData.purpose as unknown as keyof typeof SlotPurpose
+                                    ] || 'Featured'}
+                                </Typography>
+                            </Box>
                         }
                     />
                 </ListItemButton>
