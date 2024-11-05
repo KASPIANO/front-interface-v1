@@ -38,17 +38,17 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
 
     return (
         <div>
-            <ListItem onClick={() => handleItemClick(adData.telegram)} disablePadding sx={{ height: '9vh' }}>
+            <ListItem onClick={() => handleItemClick(adData.telegram)} disablePadding sx={{ height: '7vh' }}>
                 <ListItemButton>
                     <ListItemAvatar>
                         <Avatar
                             sx={{
-                                width: '2.3rem',
-                                height: '2.3rem',
+                                width: '1.8rem',
+                                height: '1.8rem',
                                 marginRight: '1vw',
                             }}
                             style={{
-                                marginLeft: '0.1vw',
+                                marginLeft: '0.5rem',
                                 borderRadius: 7,
                             }}
                             variant="square"
@@ -63,7 +63,11 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                         }}
                         primary={
                             <Tooltip title="">
-                                <Typography component={'span'} variant="body1" style={{ fontSize: '0.8rem' }}>
+                                <Typography
+                                    component={'span'}
+                                    variant="body1"
+                                    style={{ fontSize: '0.8rem', fontWeight: 700 }}
+                                >
                                     {capitalizeFirstLetter(adData.ticker)}
                                 </Typography>
                             </Tooltip>
@@ -98,7 +102,7 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                         sx={{
                             position: 'absolute',
                             right: '5px', // Adjust this value as needed to position it precisely
-                            top: '70%', // Center vertically within the ListItem
+                            top: '55%', // Center vertically within the ListItem
                             transform: 'translateY(-50%)', // Centering transformation
                             width: '6vw',
                             justifyContent: 'start',
