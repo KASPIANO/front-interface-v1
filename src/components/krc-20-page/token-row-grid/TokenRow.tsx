@@ -30,14 +30,13 @@ import { DEFAULT_TOKEN_LOGO_URL } from '../../../utils/Constants';
 interface TokenRowProps {
     token: TokenListItemResponse;
     handleItemClick: (token: any) => void;
-    tokenKey: string;
     walletBalance: number;
     walletConnected: boolean;
     walletAddress: string | null;
 }
 
 export const TokenRow: FC<TokenRowProps> = (props) => {
-    const { token, handleItemClick, tokenKey, walletBalance, walletConnected } = props;
+    const { token, handleItemClick, walletBalance, walletConnected } = props;
 
     const handleMint = async (event, ticker: string) => {
         event.stopPropagation();
@@ -105,7 +104,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
     };
 
     return (
-        <div key={tokenKey}>
+        <div key={token.ticker}>
             <ListItem onClick={() => handleItemClick(token)} disablePadding sx={{ height: '12vh' }}>
                 <ListItemButton>
                     <ListItemAvatar>

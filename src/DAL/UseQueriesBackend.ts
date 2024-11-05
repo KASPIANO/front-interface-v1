@@ -5,6 +5,7 @@ import {
     fetchTickerTradeStats,
     fetchTickerFloorPrice,
     getHolderChange,
+    getCurrentAds,
 } from './BackendDAL';
 import { useQuery } from '@tanstack/react-query';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -146,5 +147,12 @@ export const useFetchTradeStats = (ticker: string, timeInterval: string) =>
         queryKey: ['tarde-stats', ticker, timeInterval],
         queryFn: () => fetchTickerTradeStats(ticker, timeInterval),
         staleTime: 10000, // Data stays fresh for 25 seconds
+        refetchOnWindowFocus: false,
+    });
+export const useGetCurrentAds = (type: string) =>
+    useQuery({
+        queryKey: ['main_page_ads', type],
+        queryFn: () => getCurrentAds(type),
+        staleTime: Infinity, // Data stays fresh for 25 seconds
         refetchOnWindowFocus: false,
     });

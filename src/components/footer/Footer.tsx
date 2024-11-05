@@ -54,7 +54,7 @@ const Footer: React.FC = () => (
 
                 {/* Links Section */}
                 <Grid item container xs={8} md={8} sm={8} lg={8}>
-                    <Grid item xs={3} md={3} sm={3} lg={3}>
+                    <Grid item xs={2.4} md={2.4} sm={2.4} lg={2.4}>
                         <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             App
                         </Typography>
@@ -71,7 +71,7 @@ const Footer: React.FC = () => (
                         </FooterList>
                     </Grid>
 
-                    <Grid item xs={3} md={3} sm={3} lg={3}>
+                    <Grid item xs={2.4} md={2.4} sm={2.4} lg={2.4}>
                         <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             About us
                         </Typography>
@@ -84,7 +84,17 @@ const Footer: React.FC = () => (
                             </li>
                         </FooterList>
                     </Grid>
-                    <Grid item xs={3} md={3} sm={3} lg={3}>
+                    <Grid item xs={2.4} md={2.4} sm={2.4} lg={2.4}>
+                        <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
+                            Advertise
+                        </Typography>
+                        <FooterList>
+                            <li>
+                                <FooterLink href="/ads">Advertise with Us</FooterLink>
+                            </li>
+                        </FooterList>
+                    </Grid>
+                    <Grid item xs={2.4} md={2.4} sm={2.4} lg={2.4}>
                         <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             Need Help?
                         </Typography>
@@ -94,7 +104,7 @@ const Footer: React.FC = () => (
                             </li>
                         </FooterList>
                     </Grid>
-                    <Grid item xs={3} md={3} sm={3} lg={3}>
+                    <Grid item xs={2.4} md={2.4} sm={2.4} lg={2.4}>
                         <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             Resources
                         </Typography>

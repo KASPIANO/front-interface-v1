@@ -7,6 +7,8 @@ import { TokenListItemResponse } from '../../../types/Types';
 import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 import { TokenRow } from '../token-row-grid/TokenRow';
 import { GridHeadersComponent } from '../grid-header/GridHeaders';
+import { useGetCurrentAds } from '../../../DAL/UseQueriesBackend';
+import { AdsSlider } from './ads/AdsSlider';
 
 interface TokenDataGridProps {
     tokensList: TokenListItemResponse[];
@@ -41,6 +43,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         navigate(`/token/${token.ticker}`);
     };
 
+    const { data: adsData, isLoading: isAdsLoading } = useGetCurrentAds('main_page');
     const renderContent = () => {
         if (isLoading) {
             return [...Array(10)].map((_, index) => <Skeleton key={index} width={'100%'} height={'12vh'} />);
@@ -56,17 +59,31 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
             return <Box sx={{ textAlign: 'center' }}>No tokens found.</Box>;
         }
 
-        return tokensList.map((token) => (
-            <TokenRow
-                walletConnected={walletConnected}
-                key={token.ticker}
-                walletBalance={walletBalance}
-                tokenKey={token.ticker}
-                handleItemClick={handleItemClick}
-                token={token}
-                walletAddress={walletAddress}
-            />
-        ));
+        const content = [];
+
+        // Render ad row if ad data is available
+        if (!isAdsLoading && adsData.length > 0) {
+            content.push(<AdsSlider key="ads-row" adsData={adsData} handleItemClick={handleItemClick} />);
+        }
+
+        if (tokensList.length === 0) {
+            content.push(<Box sx={{ textAlign: 'center' }}>No tokens found.</Box>);
+        } else {
+            content.push(
+                tokensList.map((token) => (
+                    <TokenRow
+                        key={token.ticker}
+                        token={token}
+                        handleItemClick={handleItemClick}
+                        walletConnected={walletConnected}
+                        walletBalance={walletBalance}
+                        walletAddress={walletAddress}
+                    />
+                )),
+            );
+        }
+
+        return content;
     };
 
     return (
