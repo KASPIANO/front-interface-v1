@@ -151,7 +151,7 @@ export const useFetchTradeStats = (ticker: string, timeInterval: string) =>
     });
 export const useGetCurrentAds = (type: string) =>
     useQuery({
-        queryKey: ['main_page_ads', type],
+        queryKey: ['ads', type],
         queryFn: () => getCurrentAds(type),
         staleTime: Infinity, // Data stays fresh for 25 seconds
         refetchOnWindowFocus: false,

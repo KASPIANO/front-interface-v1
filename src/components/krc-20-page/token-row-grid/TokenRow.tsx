@@ -12,7 +12,6 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
-import moment from 'moment';
 import { FC } from 'react';
 import { TokenListItemResponse } from '../../../types/Types';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
@@ -21,6 +20,7 @@ import {
     formatDate,
     formatNumberWithCommas,
     formatPrice,
+    getFormattedDateDifference,
     isEmptyString,
     simplifyNumber,
 } from '../../../utils/Utils';
@@ -150,7 +150,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                                 variant="body2"
                                 style={{ fontSize: '0.8rem', display: 'flex', justifyContent: 'flex-start' }}
                             >
-                                {`${moment().diff(Number(token.creationDate), 'days')} days`}
+                                {getFormattedDateDifference(token.creationDate)}
                             </Typography>
                         }
                     />

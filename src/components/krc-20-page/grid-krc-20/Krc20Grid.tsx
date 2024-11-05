@@ -44,6 +44,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     };
 
     const { data: adsData, isLoading: isAdsLoading } = useGetCurrentAds('main_page');
+
     const renderContent = () => {
         if (isLoading) {
             return [...Array(10)].map((_, index) => <Skeleton key={index} width={'100%'} height={'12vh'} />);
@@ -59,31 +60,41 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
             return <Box sx={{ textAlign: 'center' }}>No tokens found.</Box>;
         }
 
-        const content = [];
+        return tokensList.map((token) => (
+            <TokenRow
+                walletConnected={walletConnected}
+                key={token.ticker}
+                walletBalance={walletBalance}
+                handleItemClick={handleItemClick}
+                token={token}
+                walletAddress={walletAddress}
+            />
+        ));
+    };
 
-        // Render ad row if ad data is available
-        if (!isAdsLoading && adsData.length > 0) {
-            content.push(<AdsSlider key="ads-row" adsData={adsData} handleItemClick={handleItemClick} />);
+    const renderAds = () => {
+        if (isAdsLoading) {
+            return <Skeleton key="ads-row" width={'100%'} height={'12vh'} />;
         }
 
-        if (tokensList.length === 0) {
-            content.push(<Box sx={{ textAlign: 'center' }}>No tokens found.</Box>);
-        } else {
-            content.push(
-                tokensList.map((token) => (
-                    <TokenRow
-                        key={token.ticker}
-                        token={token}
-                        handleItemClick={handleItemClick}
-                        walletConnected={walletConnected}
-                        walletBalance={walletBalance}
-                        walletAddress={walletAddress}
-                    />
-                )),
-            );
-        }
-
-        return content;
+        return (
+            <Box
+                key="ads-row"
+                sx={{
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 1,
+                    backgroundColor: 'background.paper', // Adjust as necessary for your theme
+                }}
+            >
+                <AdsSlider
+                    adsData={adsData}
+                    handleItemClick={handleItemClick}
+                    walletBalance={walletBalance}
+                    walletConnected={walletConnected}
+                />
+            </Box>
+        );
     };
 
     return (
@@ -104,6 +115,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                     height: '70vh',
                 }}
             >
+                {renderAds()}
                 {renderContent()}
             </List>
         </>

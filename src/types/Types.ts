@@ -76,6 +76,21 @@ export interface TokenListItemResponse {
     volumeUsd?: number;
     changeVolumeUsd?: number;
 }
+export interface AdsListItemResponse {
+    ticker: string;
+    creationDate: number;
+    totalSupply: number;
+    totalMinted: number;
+    totalMintedPercent: number;
+    totalHolders: number;
+    preMintedSupply: number;
+    logo: string;
+    state: string;
+    price?: number;
+    marketCap?: number;
+    volumeUsd?: number;
+    purpose: SlotPurpose;
+}
 export interface TokenSearchItems {
     ticker: string;
     logo: string;
@@ -393,4 +408,10 @@ export interface BatchTransferItem {
 export enum AdType {
     BANNER = 'main_page',
     SIDEBAR = 'token_page',
+}
+
+export enum SlotPurpose {
+    SPONSORED = 'Sponsored',
+    EVENT = 'Event',
+    TRADING = 'Trading Competition',
 }

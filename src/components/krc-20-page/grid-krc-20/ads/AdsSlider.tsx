@@ -1,14 +1,16 @@
 import { FC, useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import { AdsRow } from './AdsRow';
-import { TokenListItemResponse } from '../../../../types/Types';
+import { AdsListItemResponse } from '../../../../types/Types';
 
 interface AdsSliderProps {
-    adsData: TokenListItemResponse[];
-    handleItemClick: (adData: TokenListItemResponse) => void;
+    adsData: AdsListItemResponse[];
+    handleItemClick: (adData: any) => void;
+    walletBalance: number;
+    walletConnected: boolean;
 }
 
-export const AdsSlider: FC<AdsSliderProps> = ({ adsData, handleItemClick }) => {
+export const AdsSlider: FC<AdsSliderProps> = ({ adsData, handleItemClick, walletBalance, walletConnected }) => {
     const [currentAdIndex, setCurrentAdIndex] = useState(0);
 
     useEffect(() => {
@@ -20,24 +22,26 @@ export const AdsSlider: FC<AdsSliderProps> = ({ adsData, handleItemClick }) => {
         return () => clearInterval(adChangeInterval);
     }, [adsData.length]);
 
+    const currentAd = adsData[currentAdIndex];
+
     return (
-        <Box sx={{ position: 'relative', width: '100%' }}>
-            {adsData.map((adData, index) => (
-                <Box
-                    key={adData.ticker}
-                    sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        transition: 'opacity 1s ease-in-out',
-                        opacity: index === currentAdIndex ? 1 : 0,
-                        pointerEvents: index === currentAdIndex ? 'auto' : 'none',
-                    }}
-                >
-                    <AdsRow adData={adData} handleItemClick={handleItemClick} />
-                </Box>
-            ))}
+        <Box sx={{ width: '100%', position: 'relative' }}>
+            <Box
+                key={currentAd.ticker}
+                sx={{
+                    width: '100%',
+                    transition: 'opacity 5s ease-in-out',
+                    opacity: 1,
+                    pointerEvents: 'auto',
+                }}
+            >
+                <AdsRow
+                    adData={currentAd}
+                    handleItemClick={handleItemClick}
+                    walletBalance={walletBalance}
+                    walletConnected={walletConnected}
+                />
+            </Box>
         </Box>
     );
 };
