@@ -3,7 +3,6 @@ import { FC, useState } from 'react';
 import { FilterState } from '../../../types/Types';
 import { DownButton } from '../filter-button/down-button/DownButton';
 import { UpButton } from '../filter-button/up-button/UpButton';
-import { set } from 'lodash';
 
 interface GridHeaderProps {
     name: string;
