@@ -22,6 +22,8 @@ interface TokenDataGridProps {
     setActiveHeader: (value: string) => void;
     activeHeader: string;
     setChangeTotalMintsActive: (value: boolean) => void;
+    setChangeMCActive: (value: boolean) => void;
+    setChangeTotalHoldersActive: (value: boolean) => void;
 }
 
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
@@ -36,6 +38,8 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         setActiveHeader,
         activeHeader,
         setChangeTotalMintsActive,
+        setChangeMCActive,
+        setChangeTotalHoldersActive,
     } = props;
     const navigate = useNavigate();
 
@@ -116,6 +120,8 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
             <GlobalStyle />
             <GridHeadersComponent
                 setChangeTotalMintsActive={setChangeTotalMintsActive}
+                setChangeMCActive={setChangeMCActive}
+                setChangeTotalHoldersActive={setChangeTotalHoldersActive}
                 onSortBy={sortBy}
                 setActiveHeader={setActiveHeader}
                 activeHeader={activeHeader}

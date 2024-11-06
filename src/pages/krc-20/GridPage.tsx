@@ -72,6 +72,8 @@ const GridPage: FC<GridPageProps> = (props) => {
             <StyledDataGridContainer>
                 <TokenDataGrid
                     setChangeTotalMintsActive={setChangeTotalMintsActive}
+                    setChangeMCActive={setChangeMCActive}
+                    setChangeTotalHoldersActive={setChangeTotalHoldersActive}
                     setActiveHeader={setActiveHeader}
                     activeHeader={activeHeader}
                     walletConnected={walletConnected}

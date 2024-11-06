@@ -7,10 +7,19 @@ interface GridHeadersComponentProps {
     activeHeader: string;
     setActiveHeader: (value: string) => void;
     setChangeTotalMintsActive: (value: boolean) => void;
+    setChangeMCActive: (value: boolean) => void;
+    setChangeTotalHoldersActive: (value: boolean) => void;
 }
 
 export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
-    const { onSortBy, activeHeader, setActiveHeader, setChangeTotalMintsActive } = props;
+    const {
+        onSortBy,
+        activeHeader,
+        setActiveHeader,
+        setChangeTotalMintsActive,
+        setChangeMCActive,
+        setChangeTotalHoldersActive,
+    } = props;
 
     return (
         <Box
@@ -25,6 +34,8 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                     <tr style={{ display: 'flex' }}>
                         <GridHeader
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
+                            setChangeTotalHoldersActive={setChangeTotalHoldersActive}
+                            setChangeMCActive={setChangeMCActive}
                             name="Ticker"
                             sortField="ticker"
                             onSortBy={onSortBy}
@@ -33,6 +44,8 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                         />
                         <GridHeader
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
+                            setChangeTotalHoldersActive={setChangeTotalHoldersActive}
+                            setChangeMCActive={setChangeMCActive}
                             name="Age"
                             sortField="creationDate"
                             onSortBy={onSortBy}
@@ -41,6 +54,8 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                         />
                         <GridHeader
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
+                            setChangeTotalHoldersActive={setChangeTotalHoldersActive}
+                            setChangeMCActive={setChangeMCActive}
                             name="Price"
                             sortField="price"
                             onSortBy={onSortBy}
@@ -49,6 +64,8 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                         />
                         <GridHeader
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
+                            setChangeTotalHoldersActive={setChangeTotalHoldersActive}
+                            setChangeMCActive={setChangeMCActive}
                             name="Volume"
                             sortField="volumeUsd"
                             onSortBy={onSortBy}
@@ -57,6 +74,8 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                         />
                         <GridHeader
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
+                            setChangeTotalHoldersActive={setChangeTotalHoldersActive}
+                            setChangeMCActive={setChangeMCActive}
                             name="Market Cap"
                             sortField="marketCap"
                             onSortBy={onSortBy}
@@ -65,6 +84,8 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                         />
                         <GridHeader
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
+                            setChangeTotalHoldersActive={setChangeTotalHoldersActive}
+                            setChangeMCActive={setChangeMCActive}
                             name="Minted"
                             sortField="totalMintedPercent"
                             onSortBy={onSortBy}
@@ -73,6 +94,8 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                         />
                         <GridHeader
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
+                            setChangeTotalHoldersActive={setChangeTotalHoldersActive}
+                            setChangeMCActive={setChangeMCActive}
                             name="Holders"
                             sortField="totalHolders"
                             onSortBy={onSortBy}
@@ -81,6 +104,8 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                         />
                         <GridHeader
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
+                            setChangeTotalHoldersActive={setChangeTotalHoldersActive}
+                            setChangeMCActive={setChangeMCActive}
                             name="Fair Mint"
                             sortField="fairMint"
                             onSortBy={onSortBy}

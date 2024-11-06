@@ -3,6 +3,7 @@ import { FC, useState } from 'react';
 import { FilterState } from '../../../types/Types';
 import { DownButton } from '../filter-button/down-button/DownButton';
 import { UpButton } from '../filter-button/up-button/UpButton';
+import { set } from 'lodash';
 
 interface GridHeaderProps {
     name: string;
@@ -11,6 +12,8 @@ interface GridHeaderProps {
     setActiveHeader: (value: string) => void;
     onSortBy: (field: string, asc: boolean) => void;
     setChangeTotalMintsActive: (value: boolean) => void;
+    setChangeMCActive: (value: boolean) => void;
+    setChangeTotalHoldersActive: (value: boolean) => void;
 }
 
 const marginMapperByHeader = {
@@ -44,13 +47,24 @@ const disableSort = (name: string) =>
     name === 'Volume';
 
 export const GridHeader: FC<GridHeaderProps> = (props) => {
-    const { name, activeHeader, setActiveHeader, onSortBy, sortField, setChangeTotalMintsActive } = props;
+    const {
+        name,
+        activeHeader,
+        setActiveHeader,
+        onSortBy,
+        sortField,
+        setChangeTotalMintsActive,
+        setChangeMCActive,
+        setChangeTotalHoldersActive,
+    } = props;
     const [currentFilterState, setCurrentFilterState] = useState<FilterState>(FilterState.NONE);
 
     const handleUpClick = () => {
         setActiveHeader(name);
         setCurrentFilterState(FilterState.UP);
         onSortBy(sortField, true);
+        setChangeMCActive(true);
+        setChangeTotalHoldersActive(true);
         setChangeTotalMintsActive(true);
     };
 
@@ -59,6 +73,8 @@ export const GridHeader: FC<GridHeaderProps> = (props) => {
         setCurrentFilterState(FilterState.DOWN);
         onSortBy(sortField, false);
         setChangeTotalMintsActive(true);
+        setChangeMCActive(true);
+        setChangeTotalHoldersActive(true);
     };
 
     return (
