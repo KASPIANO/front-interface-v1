@@ -21,7 +21,7 @@ const GridPage: FC<GridPageProps> = (props) => {
     const [page, setPage] = useState(0);
     const [activeHeader, setActiveHeader] = useState<string>('');
     const [changeTotalMintsDisabled, setChangeTotalMintsActive] = useState(true);
-    const [priceChangeDisabled, setPriceChangeActive] = useState(true);
+    const [changeTotalHoldersDisabled, setChangeTotalHoldersActive] = useState(true);
     const [changeMCDisabled, setChangeMCActive] = useState(true);
     const {
         data: tokenList,
@@ -66,8 +66,8 @@ const GridPage: FC<GridPageProps> = (props) => {
                 setActiveHeader={setActiveHeader}
                 setChangeMCActive={setChangeMCActive}
                 changeMCDisabled={changeMCDisabled}
-                setPriceChangeActive={setPriceChangeActive}
-                priceChangeDisabled={priceChangeDisabled}
+                setChangeTotalHoldersActive={setChangeTotalHoldersActive}
+                changeTotalHoldersDisabled={changeTotalHoldersDisabled}
             />
             <StyledDataGridContainer>
                 <TokenDataGrid

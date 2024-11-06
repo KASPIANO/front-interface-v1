@@ -40,7 +40,7 @@ export function simplifyNumber(value) {
     } else if (value >= 1e3) {
         return `${(value / 1e3).toFixed(0)}K`;
     } else {
-        return value?.toString().length <= 7 ? value : 'Value too BIG';
+        return `${value.toFixed(0)}`;
     }
 }
 
