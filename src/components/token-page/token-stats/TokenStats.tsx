@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Box, Card, Divider, Skeleton, Tooltip, Typography } from '@mui/material';
 import OptionSelection from '../option-selection/OptionSelection';
 import { BackendTokenResponse } from '../../../types/Types';
@@ -32,6 +32,7 @@ interface TokenStatsProps {
 
 const TokenStats: FC<TokenStatsProps> = (props) => {
     const { tokenInfo, setTradingDataTimeFrame, tradingDataTimeFrame, tradingDataTimeFramesToSelect } = props;
+    const [totalVolumeUsd, setTotalVolumeUsd] = useState(0);
 
     const { data: holdersChange, isLoading: loading } = useFetchHolderChange(
         tokenInfo.ticker,
@@ -101,11 +102,22 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
         ? formatPrice(Math.min(floorPrice.floor_price, tokenInfo.price))
         : formatPrice(tokenInfo.price);
 
-    const totalVolumeUsd =
-        (Number.isFinite(tradeStats24?.totalVolumeUsdKaspiano)
-            ? parseFloat(tradeStats24?.totalVolumeUsdKaspiano)
-            : 0) + (Number.isFinite(tokenInfo?.volumeUsd) ? (tokenInfo?.volumeUsd as number) : 0);
-    // Format the total volume
+    useEffect(() => {
+        if (!tradeloading24 && tradeStats24) {
+            // Parse and calculate totalVolumeUsd
+            const volumeUsdKaspiano = tradeStats24?.totalVolumeUsdKaspiano
+                ? parseFloat(tradeStats24.totalVolumeUsdKaspiano)
+                : 0;
+            const volumeUsdTokenInfo = Number.isFinite(tokenInfo?.volumeUsd) ? tokenInfo.volumeUsd : 0;
+
+            const calculatedVolumeUsd = volumeUsdKaspiano + volumeUsdTokenInfo;
+
+            // Update the state with the calculated value
+            setTotalVolumeUsd(calculatedVolumeUsd);
+        }
+    }, [tradeloading24, tradeStats24, tokenInfo?.volumeUsd, tokenInfo?.volumeKas]);
+
+    // Format the total volume for display
     const formattedTotalVolumeUsd =
         totalVolumeUsd > 0 ? `${formatNumberWithCommas(totalVolumeUsd.toFixed(0))}$` : '0$';
 
@@ -140,15 +152,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
                 >
                     <Tooltip title="Total trading volume across all markets in the last 24 hours, displayed in USD">
                         <span>
-                            <StatsDisplay
-                                label={`VOLUME (1d)`}
-                                // value={
-                                //     tradeStats24.totalVolumeKasKaspiano
-                                //         ? `${parseFloat(tradeStats24.totalVolumeKasKaspiano).toFixed(0)} KAS`
-                                //         : null
-                                // }
-                                value={formattedTotalVolumeUsd}
-                            />
+                            <StatsDisplay label={`VOLUME (1d)`} value={formattedTotalVolumeUsd} />
                         </span>
                     </Tooltip>
 

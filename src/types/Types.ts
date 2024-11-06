@@ -42,6 +42,7 @@ export interface BackendTokenResponse {
     changePrice?: number;
     volumeUsd?: number;
     changeVolumeUsd?: number;
+    volumeKas?: number;
 }
 
 export interface BackendTokenMetadata {
