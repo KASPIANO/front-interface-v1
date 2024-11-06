@@ -60,7 +60,7 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
 
     const handleMCChange = () => {
         // Handle sorting by minting rate
-        const orderedBy = changeMCDisabled ? 'changeMC' : 'marketCap';
+        const orderedBy = changeMCDisabled ? 'changeMarketCap' : 'marketCap';
         const orderedByAsc = orderedBy !== 'marketCap';
         setChangeMCActive(!changeMCDisabled);
         setActiveHeader('');
@@ -68,7 +68,7 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
     };
     const handlePriceChange = () => {
         // Handle sorting by minting rate
-        const orderedBy = priceChangeDisabled ? 'priceMC' : 'marketCap';
+        const orderedBy = priceChangeDisabled ? 'changePrice' : 'marketCap';
         const orderedByAsc = orderedBy !== 'marketCap';
         setPriceChangeActive(!priceChangeDisabled);
         setActiveHeader('');
@@ -111,6 +111,7 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
                         fontSize: '0.65rem',
                         padding: '2px 5px',
                         marginRight: '0.4rem',
+                        opacity: changeMCDisabled ? 0.5 : 1,
                     }}
                     aria-label="sort by MC Change"
                 >
@@ -132,6 +133,7 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
                     sx={{
                         padding: '2px 5px',
                         fontSize: '0.65rem',
+                        opacity: changeMCDisabled ? 0.5 : 1,
                     }}
                 >
                     Price Change
