@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { Stat, StatNumber } from '@chakra-ui/react';
 
 import {
     Avatar,
@@ -12,12 +11,11 @@ import {
     ListItemText,
     Tooltip,
     Typography,
-    useTheme,
 } from '@mui/material';
 
 import { AdsListItemResponse, SlotPurpose, slotPurposeDisplayMapper } from '../../../../types/Types';
 import { DEFAULT_TOKEN_LOGO_URL } from '../../../../utils/Constants';
-import { capitalizeFirstLetter, formatPrice, formatNumberWithCommas, formatDate } from '../../../../utils/Utils';
+import { capitalizeFirstLetter } from '../../../../utils/Utils';
 import { useNavigate } from 'react-router-dom';
 
 interface AdsRowProps {
@@ -78,15 +76,15 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
 
                     {adData.state === 'finished' ? (
                         <ListItemText
-                            sx={{ width: '4rem' }}
+                            sx={{ width: '2rem' }}
                             primary={
                                 <Button
                                     onClick={(event) => handleMint(event, adData.ticker)}
                                     variant="contained"
                                     color="primary"
                                     style={{
-                                        minWidth: '1rem',
-                                        width: '4rem',
+                                        minWidth: '5rem',
+                                        width: '2rem',
                                         height: '2rem',
                                         fontSize: '0.6rem',
                                     }}

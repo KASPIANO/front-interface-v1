@@ -5,7 +5,7 @@ import GoogleCalendarEmbed from './GoogleCalendar';
 
 const AdsPage: React.FC = () => {
     const [selectedAdType, setSelectedAdType] = useState<AdType | null>(null);
-    const [selectedSlot, setSelectedSlot] = useState(null);
+    const [selectedSlot] = useState(null);
 
     const handleAdTypeChange = (event: SelectChangeEvent<AdType>) => {
         setSelectedAdType(event.target.value as AdType);

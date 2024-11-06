@@ -84,7 +84,7 @@ const Footer: React.FC = () => (
                             </li>
                         </FooterList>
                     </Grid>
-                    <Grid item xs={2.4} md={2.4} sm={2.4} lg={2.4}>
+                    {/* <Grid item xs={2.4} md={2.4} sm={2.4} lg={2.4}>
                         <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             Advertise
                         </Typography>
@@ -93,7 +93,7 @@ const Footer: React.FC = () => (
                                 <FooterLink href="/ads">Advertise with Us</FooterLink>
                             </li>
                         </FooterList>
-                    </Grid>
+                    </Grid> */}
                     <Grid item xs={2.4} md={2.4} sm={2.4} lg={2.4}>
                         <Typography gutterBottom sx={{ fontSize: '0.85rem' }}>
                             Need Help?

@@ -15,7 +15,7 @@ import OrdersManagement from './pages/orders-management/OrdersManagement';
 import TeamPage from './pages/team-page/MeetTheTeam';
 import FAQ from './pages/faqs/Faqs';
 import { UserReferral } from './types/Types';
-import AdsPage from './pages/ads-page/AdsPage';
+// import AdsPage from './pages/ads-page/AdsPage';
 
 interface KaspianoRouterProps {
     backgroundBlur: boolean;
@@ -121,7 +121,7 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
         <Route path="/trade-terms" element={<TermsOfTrade />} />
         <Route path="/team" element={<TeamPage />} />
         <Route path="/faqs" element={<FAQ />} />
-        <Route path="/ads" element={<AdsPage />} />
+        {/* <Route path="/ads" element={<AdsPage />} /> */}
         <Route path="*" element={<div>404 - Not Found</div>} />
     </Routes>
 );

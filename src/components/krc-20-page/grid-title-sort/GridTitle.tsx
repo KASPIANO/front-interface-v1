@@ -52,27 +52,24 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
     const handleMintingRateSort = () => {
         // Handle sorting by minting rate
         const orderedBy = changeTotalMintsDisabled ? 'changeTotalMints' : 'marketCap';
-        const orderedByAsc = orderedBy !== 'marketCap';
         setChangeTotalMintsActive(!changeTotalMintsDisabled);
         setActiveHeader('');
-        onSortBy(orderedBy, orderedByAsc);
+        onSortBy(orderedBy, true);
     };
 
     const handleMCChange = () => {
         // Handle sorting by minting rate
         const orderedBy = changeMCDisabled ? 'changeMarketCap' : 'marketCap';
-        const orderedByAsc = orderedBy !== 'marketCap';
         setChangeMCActive(!changeMCDisabled);
         setActiveHeader('');
-        onSortBy(orderedBy, orderedByAsc);
+        onSortBy(orderedBy, true);
     };
     const handlePriceChange = () => {
         // Handle sorting by minting rate
         const orderedBy = priceChangeDisabled ? 'changePrice' : 'marketCap';
-        const orderedByAsc = orderedBy !== 'marketCap';
         setPriceChangeActive(!priceChangeDisabled);
         setActiveHeader('');
-        onSortBy(orderedBy, orderedByAsc);
+        onSortBy(orderedBy, true);
     };
 
     const handleNextPage = () => {
