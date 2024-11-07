@@ -12,7 +12,6 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
-import moment from 'moment';
 import { FC } from 'react';
 import { TokenListItemResponse } from '../../../types/Types';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
@@ -21,6 +20,7 @@ import {
     formatDate,
     formatNumberWithCommas,
     formatPrice,
+    getFormattedDateDifference,
     isEmptyString,
     simplifyNumber,
 } from '../../../utils/Utils';
@@ -30,14 +30,13 @@ import { DEFAULT_TOKEN_LOGO_URL } from '../../../utils/Constants';
 interface TokenRowProps {
     token: TokenListItemResponse;
     handleItemClick: (token: any) => void;
-    tokenKey: string;
     walletBalance: number;
     walletConnected: boolean;
     walletAddress: string | null;
 }
 
 export const TokenRow: FC<TokenRowProps> = (props) => {
-    const { token, handleItemClick, tokenKey, walletBalance, walletConnected } = props;
+    const { token, handleItemClick, walletBalance, walletConnected } = props;
 
     const handleMint = async (event, ticker: string) => {
         event.stopPropagation();
@@ -105,7 +104,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
     };
 
     return (
-        <div key={tokenKey}>
+        <div key={token.ticker}>
             <ListItem onClick={() => handleItemClick(token)} disablePadding sx={{ height: '12vh' }}>
                 <ListItemButton>
                     <ListItemAvatar>
@@ -151,7 +150,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                                 variant="body2"
                                 style={{ fontSize: '0.8rem', display: 'flex', justifyContent: 'flex-start' }}
                             >
-                                {`${moment().diff(Number(token.creationDate), 'days')} days`}
+                                {getFormattedDateDifference(token.creationDate)}
                             </Typography>
                         }
                     />
@@ -221,7 +220,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemText
                         sx={{ width: '8vw', justifyContent: 'start' }}
                         primary={
-                            <Tooltip title={formatNumberWithCommas(token.marketCap)}>
+                            <Tooltip title={`${formatNumberWithCommas(token.marketCap.toFixed(0))} USD`}>
                                 <Stat>
                                     <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
                                         {simplifyNumber(token.marketCap)}

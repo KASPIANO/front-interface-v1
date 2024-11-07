@@ -7,6 +7,8 @@ import { TokenListItemResponse } from '../../../types/Types';
 import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 import { TokenRow } from '../token-row-grid/TokenRow';
 import { GridHeadersComponent } from '../grid-header/GridHeaders';
+// import { useGetCurrentAds } from '../../../DAL/UseQueriesBackend';
+// import { AdsSlider } from './ads/AdsSlider';
 
 interface TokenDataGridProps {
     tokensList: TokenListItemResponse[];
@@ -20,6 +22,8 @@ interface TokenDataGridProps {
     setActiveHeader: (value: string) => void;
     activeHeader: string;
     setChangeTotalMintsActive: (value: boolean) => void;
+    setChangeMCActive: (value: boolean) => void;
+    setChangeTotalHoldersActive: (value: boolean) => void;
 }
 
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
@@ -34,12 +38,26 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         setActiveHeader,
         activeHeader,
         setChangeTotalMintsActive,
+        setChangeMCActive,
+        setChangeTotalHoldersActive,
     } = props;
     const navigate = useNavigate();
 
     const handleItemClick = (token) => {
         navigate(`/token/${token.ticker}`);
     };
+    // const handleItemClickAds = (link: string) => {
+    //     // Check if the link starts with http:// or https://
+    //     if (!link.startsWith('http://') && !link.startsWith('https://')) {
+    //         // If not, assume it's a domain and prepend https://
+    //         link = `https://${link}`;
+    //     }
+
+    //     // Open the link in a new tab
+    //     window.open(link, '_blank');
+    // };
+
+    // const { data: adsData, isLoading: isAdsLoading } = useGetCurrentAds('main_page');
 
     const renderContent = () => {
         if (isLoading) {
@@ -61,7 +79,6 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                 walletConnected={walletConnected}
                 key={token.ticker}
                 walletBalance={walletBalance}
-                tokenKey={token.ticker}
                 handleItemClick={handleItemClick}
                 token={token}
                 walletAddress={walletAddress}
@@ -69,11 +86,42 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         ));
     };
 
+    // const renderAds = () => {
+    //     if (isAdsLoading) {
+    //         return <Skeleton key="ads-row" width={'100%'} height={'12vh'} />;
+    //     }
+
+    //     if (!adsData || adsData.length === 0) {
+    //         return null;
+    //     }
+
+    //     return (
+    //         <Box
+    //             key="ads-row"
+    //             sx={{
+    //                 position: 'sticky',
+    //                 top: 0,
+    //                 zIndex: 1,
+    //                 backgroundColor: 'background.paper', // Adjust as necessary for your theme
+    //             }}
+    //         >
+    //             <AdsSlider
+    //                 adsData={adsData}
+    //                 handleItemClick={handleItemClickAds}
+    //                 walletBalance={walletBalance}
+    //                 walletConnected={walletConnected}
+    //             />
+    //         </Box>
+    //     );
+    // };
+
     return (
         <>
             <GlobalStyle />
             <GridHeadersComponent
                 setChangeTotalMintsActive={setChangeTotalMintsActive}
+                setChangeMCActive={setChangeMCActive}
+                setChangeTotalHoldersActive={setChangeTotalHoldersActive}
                 onSortBy={sortBy}
                 setActiveHeader={setActiveHeader}
                 activeHeader={activeHeader}
@@ -82,11 +130,13 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                 id="scrollableList"
                 dense
                 sx={{
+                    paddingTop: 0,
                     width: '100%',
                     overflowX: 'hidden',
                     height: '70vh',
                 }}
             >
+                {/* {renderAds()} */}
                 {renderContent()}
             </List>
         </>

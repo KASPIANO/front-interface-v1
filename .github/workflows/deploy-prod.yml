@@ -29,6 +29,8 @@ jobs:
         echo "VITE_KASPA_API=${{ secrets.VITE_KASPA_API }}" >> .env
         echo "VITE_WEBSERVER_API_KEY=${{ secrets.VITE_WEBSERVER_API_KEY }}" >> .env
         echo "VITE_ENV=${{ secrets.VITE_ENV }}" >> .env
+        echo "VITE_GOOGLE_CALENDAR_ID=${{ secrets.VITE_GOOGLE_CALENDAR_ID }}" >> .env
+        echo "VITE_GOOGLE_API_KEY=${{ secrets.VITE_GOOGLE_API_KEY }}" >> .env
 
     - name: Build React app
       run: npm run build

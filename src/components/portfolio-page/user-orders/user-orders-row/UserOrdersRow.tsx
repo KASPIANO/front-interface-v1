@@ -25,14 +25,13 @@ interface UserOrdersRowProps {
     walletConnected: boolean;
     handleDelist: (orderId: string) => void;
     handleRelist: (orderId: string) => void;
-    handleEditOrder: (orderId: string, pricePerToken: number, totalPrice: number) => void;
+    handleEditOrder: (orderId: string, pricePerToken: number, totalPrice: number) => Promise<boolean>;
     handleCancelOrder?: (orderId: string) => void;
     cancelOrderWaitingConfirmation: boolean;
     cancelOrderWaitingPayment: boolean;
     setCancelOrderWaitingConfirmation: (value: boolean) => void;
     loadingOrderId: string | null;
     setLoadingOrderId: (orderId: string | null) => void;
-    offset: number;
     walletAddress: string;
 }
 
@@ -49,7 +48,6 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         setCancelOrderWaitingConfirmation,
         setLoadingOrderId,
         loadingOrderId,
-        offset,
         walletAddress,
     } = props;
     const [openEditDialog, setOpenEditDialog] = useState(false);
@@ -86,63 +84,17 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
 
     const delistHandler = async (orderId: string) => {
         setLoadingOrderId(orderId);
+        await handleDelist(orderId);
 
-        // Optimistically update the order status
-
-        try {
-            await handleDelist(orderId);
-            queryClient.setQueryData(
-                ['userListings', walletAddress, offset],
-                (oldData: { orders: Order[] } | undefined) => {
-                    if (!oldData) return oldData;
-
-                    const newOrders = oldData.orders.map((order) => {
-                        if (order.orderId === orderId) {
-                            return { ...order, status: SellOrderStatus.OFF_MARKETPLACE };
-                        }
-                        return order;
-                    });
-
-                    return { ...oldData, orders: newOrders };
-                },
-            );
-        } catch (error) {
-            // Revert the optimistic update on error
-            queryClient.invalidateQueries({ queryKey: ['userListings', walletAddress, offset] });
-            // Optionally show an error message to the user
-        } finally {
-            setLoadingOrderId(null);
-        }
+        setLoadingOrderId(null);
     };
 
     const relistHandler = async (orderId: string) => {
         setIsRelistLoading(true);
         setLoadingOrderId(orderId);
-        try {
-            await handleRelist(orderId);
-            queryClient.setQueryData(
-                ['userListings', walletAddress, offset],
-                (oldData: { orders: Order[] } | undefined) => {
-                    if (!oldData) return oldData;
-
-                    const newOrders = oldData.orders.map((order) => {
-                        if (order.orderId === orderId) {
-                            return { ...order, status: SellOrderStatus.LISTED_FOR_SALE };
-                        }
-                        return order;
-                    });
-
-                    return { ...oldData, orders: newOrders };
-                },
-            );
-        } catch (error) {
-            // Revert the optimistic update on error
-            queryClient.invalidateQueries({ queryKey: ['userListings', walletAddress, offset] });
-            // Optionally show an error message to the user
-        } finally {
-            setIsRelistLoading(false);
-            setLoadingOrderId(null);
-        }
+        await handleRelist(orderId);
+        setIsRelistLoading(false);
+        setLoadingOrderId(null);
     };
 
     // Reset the loading state
@@ -234,8 +186,11 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         }
         setIsEditOrderLoading(true);
         await handleEditOrder(order.orderId, Number(pricePerToken), Number(totalPrice));
-        setIsEditOrderLoading(false);
         handleCloseEditDialog();
+        queryClient.invalidateQueries({ queryKey: ['userListings', walletAddress] });
+        setTimeout(() => {
+            setIsEditOrderLoading(false);
+        }, 700);
     };
 
     const cancelOrderHandler = async (orderId: string) => {

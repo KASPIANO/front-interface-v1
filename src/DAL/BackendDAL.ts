@@ -20,6 +20,7 @@ const P2PCONTROLLER = 'p2p';
 const P2PCONTROLLERDATA = 'p2p-data';
 const KRC20METADATA_CONTROLLER = 'krc20metadata';
 const USER_REFERRALS_CONTROLLER = 'referrals';
+const ADS_CONTROLLER = 'ads';
 const AUTH_CONTROLLER = 'auth';
 const DISCONNECT_ROUTE = `/${AUTH_CONTROLLER}/disconnect`;
 
@@ -350,5 +351,10 @@ export const doWalletSignIn = async (signInData: SignInWithWalletRequestDto): Pr
 
 export const removeCookieOnBackend = async () => {
     const response = await backendService.post<{ success: string }>(DISCONNECT_ROUTE, {});
+    return response.data;
+};
+
+export const getCurrentAds = async (type: string): Promise<any> => {
+    const response = await backendService.get<any>(`/${ADS_CONTROLLER}/currentAds/${type}`);
     return response.data;
 };

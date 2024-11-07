@@ -24,7 +24,7 @@ interface TokenPageProps {
     walletBalance: number;
     walletConnected: boolean;
 }
-const tradingDataTimeFramesToSelect = ['All', '30d', '7d', '1d', '6h', '1h', '15m'];
+const tradingDataTimeFramesToSelect = ['All', '30d', '7d', '1d', '6h', '1h'];
 const TokenPage: FC<TokenPageProps> = (props) => {
     const { walletConnected, walletBalance, walletAddress, backgroundBlur } = props;
     const { ticker } = useParams();

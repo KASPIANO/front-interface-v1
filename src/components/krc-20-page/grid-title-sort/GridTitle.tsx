@@ -1,4 +1,4 @@
-import { Typography, IconButton, Box, Tooltip } from '@mui/material';
+import { Typography, IconButton, Box, Tooltip, Button } from '@mui/material';
 import { FC } from 'react';
 import {
     HeaderContainer,
@@ -22,6 +22,10 @@ interface TokenGridTitleProps {
     setActiveHeader: (value: string) => void;
     changeTotalMintsDisabled: boolean;
     setChangeTotalMintsActive: (value: boolean) => void;
+    setChangeMCActive: (value: boolean) => void;
+    changeMCDisabled: boolean;
+    setChangeTotalHoldersActive: (value: boolean) => void;
+    changeTotalHoldersDisabled: boolean;
 }
 
 const GridTitle: FC<TokenGridTitleProps> = (props) => {
@@ -35,6 +39,10 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
         setActiveHeader,
         changeTotalMintsDisabled,
         setChangeTotalMintsActive,
+        setChangeMCActive,
+        changeMCDisabled,
+        setChangeTotalHoldersActive,
+        changeTotalHoldersDisabled,
     } = props;
 
     const handleSortChange = (sortOption: string) => {
@@ -43,11 +51,37 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
 
     const handleMintingRateSort = () => {
         // Handle sorting by minting rate
-        const orderedBy = changeTotalMintsDisabled ? 'changeTotalMints' : 'ticker';
-        const orderedByAsc = orderedBy !== 'ticker';
+        const orderedBy = changeTotalMintsDisabled ? 'changeTotalMints' : 'marketCap';
+        if (changeTotalMintsDisabled) {
+            setChangeMCActive(true);
+            setChangeTotalHoldersActive(true);
+        }
         setChangeTotalMintsActive(!changeTotalMintsDisabled);
         setActiveHeader('');
-        onSortBy(orderedBy, orderedByAsc);
+        onSortBy(orderedBy, true);
+    };
+
+    const handleMCChange = () => {
+        // Handle sorting by minting rate
+        const orderedBy = changeMCDisabled ? 'changeMarketCap' : 'marketCap';
+        if (changeMCDisabled) {
+            setChangeTotalMintsActive(true);
+            setChangeTotalHoldersActive(true);
+        }
+        setChangeMCActive(!changeMCDisabled);
+        setActiveHeader('');
+        onSortBy(orderedBy, true);
+    };
+    const handleHoldersChange = () => {
+        // Handle sorting by minting rate
+        const orderedBy = changeTotalHoldersDisabled ? 'changeTotalHolders' : 'marketCap';
+        if (changeTotalHoldersDisabled) {
+            setChangeTotalMintsActive(true);
+            setChangeMCActive(true);
+        }
+        setChangeTotalHoldersActive(!changeTotalHoldersDisabled);
+        setActiveHeader('');
+        onSortBy(orderedBy, true);
     };
 
     const handleNextPage = () => {
@@ -77,22 +111,47 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
             </Box>
 
             {/* Sort Time Period Buttons */}
+            <Tooltip title="Sort by the market cap change within the selected timeframe.">
+                <Button
+                    variant="contained"
+                    onClick={handleMCChange}
+                    sx={{
+                        borderRadius: '0.2rem',
+                        marginLeft: 'auto',
+                        fontSize: '0.65rem',
+                        padding: '2px 5px',
+                        marginRight: '0.4rem',
+                        opacity: changeMCDisabled ? 0.6 : 1,
+                    }}
+                    aria-label="sort by MC Change"
+                >
+                    MC Change
+                </Button>
+            </Tooltip>
+            <Tooltip title="Sort by the total holders change within the selected timeframe.">
+                <Button
+                    variant="contained"
+                    onClick={handleHoldersChange}
+                    aria-label="sort by Price Change"
+                    sx={{
+                        borderRadius: '0.2rem',
+                        padding: '2px 5px',
+                        fontSize: '0.65rem',
+                        opacity: changeTotalHoldersDisabled ? 0.6 : 1,
+                    }}
+                >
+                    Holders Change
+                </Button>
+            </Tooltip>
             <Tooltip title="Sort by the pace and change of minting activity. Mint heat-map.">
                 <IconButton
                     onClick={handleMintingRateSort}
                     sx={{
-                        marginLeft: 'auto',
+                        marginLeft: '0.2rem',
                     }}
                     aria-label="sort by minting rate"
                 >
-                    <FireIcon selected={!changeTotalMintsDisabled} />
-                    {/* <WhatshotRoundedIcon
-                        sx={{
-                            color: '#ff0000',
-                            borderRadius: '12px',
-                            backgroundColor: changeTotalMintsDisabled ? 'transparent' : 'rgba(255, 0, 0, 0.35)',
-                        }}
-                    /> */}
+                    <FireIcon selected={!changeTotalMintsDisabled} />{' '}
                 </IconButton>
             </Tooltip>
 
