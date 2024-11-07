@@ -133,19 +133,14 @@ export const getUSerListings = async (
 };
 
 export const relistSellOrder = async (orderId: string, walletAddress: string): Promise<any> => {
-    try {
-        const response = await backendService.post<any>(
-            `/${P2PCONTROLLER}/relistSellOrder/${orderId}`,
+    const response = await backendService.post<any>(
+        `/${P2PCONTROLLER}/relistSellOrder/${orderId}`,
 
-            {
-                walletAddress,
-            },
-        );
-        return response.status;
-    } catch (error) {
-        console.error(`Error relisting order ${orderId}:`, error.response ? error.response.data : error.message);
-        return { confirmed: false }; // Return empty array in case of an error
-    }
+        {
+            walletAddress,
+        },
+    );
+    return response;
 };
 export const updateSellOrder = async (
     orderId: string,
@@ -162,7 +157,7 @@ export const updateSellOrder = async (
             walletAddress,
         },
     );
-    return response.status;
+    return response;
 };
 export const removeFromMarketplace = async (orderId: string, walletAddress: string): Promise<any> => {
     try {
