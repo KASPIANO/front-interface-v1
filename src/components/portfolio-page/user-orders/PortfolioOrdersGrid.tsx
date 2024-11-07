@@ -278,7 +278,6 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                         ? orders.map((order) => (
                               <UserOrdersRow
                                   walletAddress={walletAddress}
-                                  offset={offset}
                                   cancelOrderWaitingPayment={cancelOrderWaitingPayment}
                                   cancelOrderWaitingConfirmation={cancelOrderWaitingConfirmation}
                                   setCancelOrderWaitingConfirmation={setCancelOrderWaitingConfirmation}

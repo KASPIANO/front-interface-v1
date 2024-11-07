@@ -32,7 +32,6 @@ interface UserOrdersRowProps {
     setCancelOrderWaitingConfirmation: (value: boolean) => void;
     loadingOrderId: string | null;
     setLoadingOrderId: (orderId: string | null) => void;
-    offset: number;
     walletAddress: string;
 }
 
@@ -49,7 +48,6 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         setCancelOrderWaitingConfirmation,
         setLoadingOrderId,
         loadingOrderId,
-        offset,
         walletAddress,
     } = props;
     const [openEditDialog, setOpenEditDialog] = useState(false);
