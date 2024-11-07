@@ -7,8 +7,8 @@ import { TokenListItemResponse } from '../../../types/Types';
 import { GlobalStyle } from '../../../utils/GlobalStyleScrollBar';
 import { TokenRow } from '../token-row-grid/TokenRow';
 import { GridHeadersComponent } from '../grid-header/GridHeaders';
-// import { useGetCurrentAds } from '../../../DAL/UseQueriesBackend';
-// import { AdsSlider } from './ads/AdsSlider';
+import { useGetCurrentAds } from '../../../DAL/UseQueriesBackend';
+import { AdsSlider } from './ads/AdsSlider';
 
 interface TokenDataGridProps {
     tokensList: TokenListItemResponse[];
@@ -46,18 +46,19 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
     const handleItemClick = (token) => {
         navigate(`/token/${token.ticker}`);
     };
-    // const handleItemClickAds = (link: string) => {
-    //     // Check if the link starts with http:// or https://
-    //     if (!link.startsWith('http://') && !link.startsWith('https://')) {
-    //         // If not, assume it's a domain and prepend https://
-    //         link = `https://${link}`;
-    //     }
 
-    //     // Open the link in a new tab
-    //     window.open(link, '_blank');
-    // };
+    const handleItemClickAds = (link: string) => {
+        // Check if the link starts with http:// or https://
+        if (!link.startsWith('http://') && !link.startsWith('https://')) {
+            // If not, assume it's a domain and prepend https://
+            link = `https://${link}`;
+        }
 
-    // const { data: adsData, isLoading: isAdsLoading } = useGetCurrentAds('main_page');
+        // Open the link in a new tab
+        window.open(link, '_blank');
+    };
+
+    const { data: adsData, isLoading: isAdsLoading } = useGetCurrentAds('main_page');
 
     const renderContent = () => {
         if (isLoading) {
@@ -86,34 +87,34 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         ));
     };
 
-    // const renderAds = () => {
-    //     if (isAdsLoading) {
-    //         return <Skeleton key="ads-row" width={'100%'} height={'12vh'} />;
-    //     }
+    const renderAds = () => {
+        if (isAdsLoading) {
+            return <Skeleton key="ads-row" width={'100%'} height={'12vh'} />;
+        }
 
-    //     if (!adsData || adsData.length === 0) {
-    //         return null;
-    //     }
+        if (!adsData || adsData.length === 0) {
+            return null;
+        }
 
-    //     return (
-    //         <Box
-    //             key="ads-row"
-    //             sx={{
-    //                 position: 'sticky',
-    //                 top: 0,
-    //                 zIndex: 1,
-    //                 backgroundColor: 'background.paper', // Adjust as necessary for your theme
-    //             }}
-    //         >
-    //             <AdsSlider
-    //                 adsData={adsData}
-    //                 handleItemClick={handleItemClickAds}
-    //                 walletBalance={walletBalance}
-    //                 walletConnected={walletConnected}
-    //             />
-    //         </Box>
-    //     );
-    // };
+        return (
+            <Box
+                key="ads-row"
+                sx={{
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 1,
+                    backgroundColor: 'background.paper', // Adjust as necessary for your theme
+                }}
+            >
+                <AdsSlider
+                    adsData={adsData}
+                    handleItemClick={handleItemClickAds}
+                    walletBalance={walletBalance}
+                    walletConnected={walletConnected}
+                />
+            </Box>
+        );
+    };
 
     return (
         <>
@@ -136,7 +137,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                     height: '70vh',
                 }}
             >
-                {/* {renderAds()} */}
+                {renderAds()}
                 {renderContent()}
             </List>
         </>
