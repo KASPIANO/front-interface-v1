@@ -201,6 +201,8 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                     severity: 'success',
                 });
                 return true;
+            } else {
+                throw new Error('Error Editing Order: Please try again later');
             }
         } catch (error) {
             console.error('Error in handleEditOrder:', error); // Log the error for debugging
