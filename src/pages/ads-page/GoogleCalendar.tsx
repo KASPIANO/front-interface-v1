@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, CircularProgress, Typography, Button, Grid } from '@mui/material';
-import { format, addDays, startOfWeek, setHours, setMinutes, setSeconds } from 'date-fns';
-import { fetchCalendarEvents } from '../../DAL/GoogleDal';
+import { format } from 'date-fns';
 
 interface CalendarEvent {
     id: string;
@@ -18,19 +17,19 @@ const GoogleCalendarEmbed: React.FC = () => {
 
     useEffect(() => {
         // Define Sunday 3 AM to the next Sunday 3 AM
-        const startOfWeekDate = setHours(
-            setMinutes(setSeconds(startOfWeek(new Date(), { weekStartsOn: 0 }), 0), 0),
-            3,
-        );
-        const endOfWeekDate = addDays(startOfWeekDate, 7);
+        // const startOfWeekDate = setHours(
+        //     setMinutes(setSeconds(startOfWeek(new Date(), { weekStartsOn: 0 }), 0), 0),
+        //     3,
+        // );
+        // const endOfWeekDate = addDays(startOfWeekDate, 7);
 
-        const startDate = startOfWeekDate.toISOString();
-        const endDate = endOfWeekDate.toISOString();
+        // const startDate = startOfWeekDate.toISOString();
+        // const endDate = endOfWeekDate.toISOString();
 
         const loadEvents = async () => {
             setLoading(true);
-            const fetchedEvents = await fetchCalendarEvents(startDate, endDate);
-            setEvents(fetchedEvents);
+            // const fetchedEvents = await fetchCalendarEvents(startDate, endDate);
+            setEvents([]);
             setLoading(false);
         };
 

@@ -195,7 +195,7 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
         try {
             const response = await updateSellOrder(orderId, walletAddress, pricePerToken, totalPrice);
 
-            if (response.status === 201) {
+            if (response.status === 201 || response.status === 200) {
                 showGlobalSnackbar({
                     message: 'Order Edited Successfully',
                     severity: 'success',
