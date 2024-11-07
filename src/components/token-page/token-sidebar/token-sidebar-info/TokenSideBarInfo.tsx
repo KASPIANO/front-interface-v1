@@ -156,6 +156,9 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             sx={{
                                 height: '9rem',
                                 width: '100%',
+                                '@media (min-width: 1500px)': {
+                                    height: '15rem',
+                                },
                             }}
                         />
                     ) : (
