@@ -40,7 +40,7 @@ export function simplifyNumber(value) {
     } else if (value >= 1e3) {
         return `${(value / 1e3).toFixed(0)}K`;
     } else {
-        return value?.toString().length <= 7 ? value : 'Value too BIG';
+        return `${value.toFixed(0)}`;
     }
 }
 
@@ -60,6 +60,18 @@ export const formatDate = (timestamp: string | number): string => moment(Number(
 export const capitalizeFirstLetter = (string: string): string => {
     if (!string) return string;
     return string.charAt(0).toUpperCase() + string.slice(1);
+};
+export const getFormattedDateDifference = (creationDate: string | number): string => {
+    const days = moment().diff(Number(creationDate), 'days');
+    if (days < 30) {
+        return `${days} days`;
+    } else if (days < 365) {
+        const months = moment().diff(Number(creationDate), 'months');
+        return `${months} ${months > 1 ? 'months' : 'month'}`;
+    } else {
+        const years = moment().diff(Number(creationDate), 'years');
+        return `${years} ${years > 1 ? 'years' : 'year'}`;
+    }
 };
 
 export const convertToProtocolFormat = (value: string): string => (parseFloat(value) * 1e8).toFixed(0);

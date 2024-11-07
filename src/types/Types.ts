@@ -42,6 +42,7 @@ export interface BackendTokenResponse {
     changePrice?: number;
     volumeUsd?: number;
     changeVolumeUsd?: number;
+    volumeKas?: number;
 }
 
 export interface BackendTokenMetadata {
@@ -75,6 +76,23 @@ export interface TokenListItemResponse {
     changePrice?: number;
     volumeUsd?: number;
     changeVolumeUsd?: number;
+}
+export interface AdsListItemResponse {
+    ticker: string;
+    creationDate: number;
+    totalSupply: number;
+    totalMinted: number;
+    totalMintedPercent: number;
+    totalHolders: number;
+    preMintedSupply: number;
+    logo: string;
+    state: string;
+    price?: number;
+    marketCap?: number;
+    volumeUsd?: number;
+    purpose: SlotPurpose;
+    telegram?: string;
+    website?: string;
 }
 export interface TokenSearchItems {
     ticker: string;
@@ -389,3 +407,22 @@ export interface BatchTransferItem {
     amount: number;
     tick: string;
 }
+
+export enum AdType {
+    BANNER = 'main_page',
+    SIDEBAR = 'token_page',
+}
+
+export enum SlotPurpose {
+    FEATURED = 'featured',
+    EVENT = 'event',
+    TRADING = 'trading',
+    MINT = 'mint_live',
+}
+
+export const slotPurposeDisplayMapper: { [key in SlotPurpose]: string } = {
+    [SlotPurpose.FEATURED]: 'Featured',
+    [SlotPurpose.EVENT]: 'Event',
+    [SlotPurpose.TRADING]: 'Trading Competition',
+    [SlotPurpose.MINT]: 'Mint Live',
+};

@@ -15,6 +15,7 @@ import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { sendKaspa } from '../../../utils/KaswareUtils';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUserListings } from '../../../DAL/UseQueriesBackend';
+import { Order, SellOrderStatus } from '../../../types/Types';
 
 interface PortfolioOrdersGridProps {
     kasPrice: number;
@@ -53,21 +54,73 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
 
     const disableNext = () => currentPage >= totalPages;
     const handleDelist = async (orderId: string) => {
-        const response = await removeFromMarketplace(orderId, walletAddress);
-        if (response.success) {
+        try {
+            const response = await removeFromMarketplace(orderId, walletAddress);
+            if (!response.success) {
+                showGlobalSnackbar({
+                    message: 'Failed to remove order from marketplace',
+                    severity: 'error',
+                });
+                return;
+            }
+            queryClient.setQueryData(
+                ['userListings', walletAddress, offset],
+                (oldData: { orders: Order[] } | undefined) => {
+                    if (!oldData) return oldData;
+
+                    const newOrders = oldData.orders.map((order) => {
+                        if (order.orderId === orderId) {
+                            return { ...order, status: SellOrderStatus.OFF_MARKETPLACE };
+                        }
+                        return order;
+                    });
+
+                    return { ...oldData, orders: newOrders };
+                },
+            );
             showGlobalSnackbar({
                 message: 'Order removed from marketplace',
                 severity: 'success',
             });
-            queryClient.invalidateQueries({ queryKey: ['userListings', walletAddress] });
+        } catch (error) {
+            queryClient.invalidateQueries({ queryKey: ['userListings', walletAddress, offset] });
+            console.error('Error in handleDelist:', error); // Log the error for debugging
+            showGlobalSnackbar({
+                message: 'Failed to remove order from marketplace',
+                severity: 'error',
+            });
         }
     };
+
     const handleRelist = async (orderId: string) => {
-        const response = await relistSellOrder(orderId, walletAddress);
-        if (response === 201) {
+        try {
+            const response = await relistSellOrder(orderId, walletAddress);
+            queryClient.setQueryData(
+                ['userListings', walletAddress, offset],
+                (oldData: { orders: Order[] } | undefined) => {
+                    if (!oldData) return oldData;
+
+                    const newOrders = oldData.orders.map((order) => {
+                        if (order.orderId === orderId) {
+                            return { ...order, status: SellOrderStatus.LISTED_FOR_SALE };
+                        }
+                        return order;
+                    });
+
+                    return { ...oldData, orders: newOrders };
+                },
+            );
+            if (response.status === 201) {
+                showGlobalSnackbar({
+                    message: 'Order relisted successfully',
+                    severity: 'success',
+                });
+            }
+        } catch (error) {
+            console.error('Error in handleRelist:', error); // Log the error for debugging
             showGlobalSnackbar({
-                message: 'Order relisted successfully',
-                severity: 'success',
+                message: 'Error relisting order: Please try again later',
+                severity: 'error',
             });
             queryClient.invalidateQueries({ queryKey: ['userListings', walletAddress] });
         }
@@ -139,13 +192,25 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
     };
 
     const handleEditOrder = async (orderId: string, pricePerToken: number, totalPrice: number) => {
-        const response = await updateSellOrder(orderId, walletAddress, pricePerToken, totalPrice);
-        if (response === 201) {
+        try {
+            const response = await updateSellOrder(orderId, walletAddress, pricePerToken, totalPrice);
+
+            if (response.status === 201 || response.status === 200) {
+                showGlobalSnackbar({
+                    message: 'Order Edited Successfully',
+                    severity: 'success',
+                });
+                return true;
+            } else {
+                throw new Error('Error Editing Order: Please try again later');
+            }
+        } catch (error) {
+            console.error('Error in handleEditOrder:', error); // Log the error for debugging
             showGlobalSnackbar({
-                message: 'Order Edited Successfully',
-                severity: 'success',
+                message: 'Error Editing Order: Please try again later',
+                severity: 'error',
             });
-            queryClient.invalidateQueries({ queryKey: ['userListings', walletAddress] });
+            return false;
         }
     };
 
@@ -215,7 +280,6 @@ const PortfolioOrdersGrid: FC<PortfolioOrdersGridProps> = (props) => {
                         ? orders.map((order) => (
                               <UserOrdersRow
                                   walletAddress={walletAddress}
-                                  offset={offset}
                                   cancelOrderWaitingPayment={cancelOrderWaitingPayment}
                                   cancelOrderWaitingConfirmation={cancelOrderWaitingConfirmation}
                                   setCancelOrderWaitingConfirmation={setCancelOrderWaitingConfirmation}

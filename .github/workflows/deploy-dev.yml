@@ -30,6 +30,7 @@ jobs:
         echo "VITE_WEBSERVER_API_KEY=${{ secrets.VITE_WEBSERVER_API_KEY_DEV }}" >> .env
         echo "VITE_ENV=${{ secrets.VITE_ENV_DEV }}" >> .env
 
+
     - name: Build React app
       run: npm run build
 
