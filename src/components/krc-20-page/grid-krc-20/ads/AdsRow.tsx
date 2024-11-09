@@ -18,19 +18,11 @@ import { AdsListItemResponse, SlotPurpose, slotPurposeDisplayMapper } from '../.
 import { DEFAULT_TOKEN_LOGO_URL } from '../../../../utils/Constants';
 import { capitalizeFirstLetter } from '../../../../utils/Utils';
 import { useNavigate } from 'react-router-dom';
-import { keyframes } from '@emotion/react';
 
 interface AdsRowProps {
     adData: AdsListItemResponse;
     handleItemClick: (adData: any) => void;
-    walletConnected: boolean;
-    walletBalance: number;
 }
-
-const blink = keyframes`
-  0%, 100% { color: inherit; }    // Default color
-  50% { color: red; }             // Blinking color
-`;
 
 export const AdsRow: FC<AdsRowProps> = (props) => {
     const { adData, handleItemClick } = props;
@@ -62,82 +54,71 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                             src={adData.logo || DEFAULT_TOKEN_LOGO_URL}
                         />
                     </ListItemAvatar>
-
                     <ListItemText
                         sx={{
-                            width: '7vw',
+                            maxWidth: '11rem',
                         }}
                         primary={
-                            <Tooltip title="">
-                                <Typography
-                                    component={'span'}
-                                    variant="body1"
-                                    style={{
-                                        fontSize: '1.4rem',
-                                        fontWeight: 550,
-                                        color: theme.palette.text.primary,
-                                        letterSpacing: '0.1rem', // Add spacing between letters
-                                        display: 'inline-flex', // Allows inline display with emoji
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    {capitalizeFirstLetter(adData.ticker)}
-                                </Typography>
-                            </Tooltip>
+                            <Typography
+                                style={{
+                                    minWidth: '1vw',
+                                    width: '2vw',
+                                    fontSize: '1.4rem',
+                                    fontWeight: 530,
+                                    color: theme.palette.text.primary,
+                                    letterSpacing: '0.1rem', // Add spacing between letters
+                                }}
+                            >
+                                {capitalizeFirstLetter(adData.ticker)}
+                            </Typography>
                         }
                     />
+                    {/* 36 chars max */}
                     <ListItemText
                         sx={{
-                            width: '7vw',
+                            maxWidth: '40rem',
+                            display: 'flex', // Use flex display
+                            justifyContent: 'center',
                         }}
                         primary={
-                            <Tooltip title="">
-                                <Typography
-                                    variant="body1"
-                                    style={{
-                                        fontSize: '1rem',
-                                        fontWeight: 350,
-                                        color: theme.palette.text.primary,
-                                        letterSpacing: '0.1rem', // Add spacing between letters
-                                    }}
-                                >
-                                    {adData.message}
-                                </Typography>
-                            </Tooltip>
+                            <Typography
+                                sx={{
+                                    fontSize: '1.2rem',
+                                    fontWeight: 350,
+                                    color: theme.palette.text.primary,
+                                    letterSpacing: '0.1rem', // Add spacing between letters
+                                }}
+                            >
+                                {adData.message}
+                            </Typography>
                         }
                     />
-
                     {/* Additional details if necessary, following similar structure */}
-
-                    {adData.state === 'finished' ? (
-                        <ListItemText
-                            sx={{ width: '4rem' }}
-                            primary={
-                                <Button
-                                    onClick={(event) => handleMint(event, adData.ticker)}
-                                    color="primary"
-                                    style={{
-                                        fontWeight: 450,
-                                        width: '7rem',
-                                        height: '2rem',
-                                        fontSize: '1rem',
-                                        color: theme.palette.primary.main,
-                                        animation: `${blink} 2s infinite`, // Apply animation
-                                    }}
-                                >
-                                    Mint Now
-                                </Button>
-                            }
-                        />
-                    ) : (
-                        <div style={{ width: '3vw' }} />
-                    )}
+                    <ListItemText
+                        sx={{
+                            maxWidth: '7rem',
+                            transform: 'translateY(12%)',
+                        }}
+                        primary={
+                            <Button
+                                onClick={(event) => handleMint(event, adData.ticker)}
+                                color="primary"
+                                style={{
+                                    fontWeight: 600,
+                                    fontSize: '0.8rem',
+                                    color: theme.palette.primary.main,
+                                }}
+                            >
+                                {adData.state === 'finished' ? 'Buy Now' : 'Mint Now'}
+                            </Button>
+                        }
+                    />
                     <ListItemText
                         sx={{
                             position: 'absolute',
-                            right: '5px', // Adjust this value as needed to position it precisely
-                            top: '55%', // Center vertically within the ListItem
-                            transform: 'translateY(-50%)', // Centering transformation
+                            right: '18%', // Adjust this value as needed to ensure it stays within bounds
+                            top: '50%',
+                            transform: 'translateY(-50%)',
                             width: '6vw',
                             justifyContent: 'start',
                         }}
@@ -145,9 +126,9 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                             <Box
                                 sx={{
                                     display: 'inline-block',
-                                    padding: '1px 4px', // Padding inside the border box
-                                    border: `0.5px solid rgba(111, 199, 186, 0.3)`, // Border color
-                                    borderRadius: '4px', // Rounded corners
+                                    padding: '2px 6px', // Adjust padding for a consistent look
+                                    border: `0.5px solid rgba(111, 199, 186, 0.3)`,
+                                    borderRadius: '4px',
                                 }}
                             >
                                 <Typography
