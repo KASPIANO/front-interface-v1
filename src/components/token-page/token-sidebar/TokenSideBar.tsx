@@ -8,6 +8,8 @@ import TokenSideBarInfo from './token-sidebar-info/TokenSideBarInfo';
 import { GlobalStyleTokenSideBar } from '../../../utils/GlobalStyleScrollBar';
 import BuyPanel from './token-sidebar-info/buy-panel/BuyPanel';
 import SellPanel from './token-sidebar-info/sell-panel/SellPanel';
+import StorefrontRoundedIcon from '@mui/icons-material/StorefrontRounded';
+import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
 // import SellPanel from './token-sidebar-info/sell-panel/SellPanel';
 
 interface TokenSideBarProps {
@@ -23,7 +25,6 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
     const { setTokenInfo, tokenInfo, walletAddress, walletConnected, walletBalance, kasPrice } = props;
     const [selectedSideActionTab, setSelectedSideActionTab] = useState('1');
     const [buyPanelRef, setBuyPanelRef] = useState<{ handleDrawerClose: () => void } | null>(null);
-
     const handleTabChange = (_event: SyntheticEvent, newValue: string) => {
         // Check if we're switching away from the "Buy" tab (value="2")
         if (selectedSideActionTab === '2' && newValue !== '2') {
@@ -53,8 +54,45 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                         }}
                     >
                         <TabStyled label="Info" value="1" />
-                        <TabStyled label="Buy" value="2" />
-                        <TabStyled label="Sell" value="3" />
+                        <TabStyled
+                            icon={<ShoppingCartRoundedIcon sx={{ fontSize: '1rem' }} />} // Add the icon
+                            iconPosition="end"
+                            label="Buy"
+                            value="2"
+                            sx={{
+                                '&.MuiTab-root': {
+                                    color: 'rgba(0, 128, 0, 0.9)', // 50% opacity green color
+                                },
+                                '&.Mui-selected': {
+                                    color: 'rgba(0, 128, 0, 1)',
+                                },
+                                color: 'rgba(0, 128, 0, 0.9)', // 50% opacity green color as default
+                            }}
+                        />
+
+                        <TabStyled
+                            icon={<StorefrontRoundedIcon sx={{ fontSize: '1rem' }} />} // Add the icon
+                            iconPosition="end"
+                            TouchRippleProps={{
+                                style: {
+                                    borderBottom: 'rgba(255, 0, 0, 0.65)',
+                                },
+                            }}
+                            label="Sell"
+                            value="3"
+                            sx={{
+                                '&.MuiButtonBase-root': {
+                                    borderBottom: 'rgba(255, 0, 0, 0.65)',
+                                },
+                                '&.MuiTab-root': {
+                                    color: 'rgba(255, 0, 0, 0.65)',
+                                },
+                                '&.Mui-selected': {
+                                    color: 'rgba(255, 0, 0, 0.85)', // Full opacity color when selected
+                                },
+                                color: 'rgba(255, 0, 0, 0.65)', // 80% opacity
+                            }}
+                        />
                     </Tabs>
                     <TabPanel
                         sx={{

@@ -157,10 +157,10 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemText
                         sx={{ width: '9vw' }}
                         primary={
-                            <Tooltip title={`${token.price} Kas`}>
+                            <Tooltip title={token.price ? `${token.price} Kas` : ''}>
                                 <Stat>
                                     <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
-                                        {formatPrice(token.price)}
+                                        {token.price ? formatPrice(token.price) : '0'}
                                     </StatNumber>
                                     {token.changePrice !== null && (
                                         <StatHelpText
@@ -220,10 +220,16 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemText
                         sx={{ width: '8vw', justifyContent: 'start' }}
                         primary={
-                            <Tooltip title={`${formatNumberWithCommas(token.marketCap.toFixed(0))} USD`}>
+                            <Tooltip
+                                title={`${
+                                    Number.isFinite(token?.marketCap)
+                                        ? formatNumberWithCommas(token.marketCap.toFixed(0))
+                                        : '0'
+                                } USD`}
+                            >
                                 <Stat>
                                     <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
-                                        {simplifyNumber(token.marketCap)}
+                                        {token.marketCap ? simplifyNumber(token.marketCap) : '0'}
                                     </StatNumber>
                                     {token.changeMarketCap !== null && (
                                         <StatHelpText

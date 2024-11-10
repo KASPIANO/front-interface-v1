@@ -18,6 +18,7 @@ import LoadingSpinner from '../../../common/spinner/LoadingSpinner';
 import { useQueryClient } from '@tanstack/react-query';
 import { highGasWarning } from '../../../../DAL/KaspaApiDal';
 import { HighGasWarning } from '../../../common/HighGasWarning';
+import { useFetchFloorPrice } from '../../../../DAL/UseQueriesBackend';
 
 interface UserOrdersRowProps {
     order: Order;
@@ -61,6 +62,16 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
     const [cancelDialogButtonLoader, setCancelDialogButtonLoader] = useState(false);
     const [pricePerTokenError, setPricePerTokenError] = useState('');
     const [showHighGasWarning, setShowHighGasWarning] = useState(false);
+    const [floorPrice, setFloorPrice] = useState<number | null>(null);
+
+    const { data: data, isLoading } = useFetchFloorPrice(order.ticker);
+    useEffect(() => {
+        if (!isLoading && data.floor_price) {
+            setFloorPrice(data.floor_price);
+        } else {
+            setFloorPrice(null);
+        }
+    }, [data, isLoading]);
 
     const queryClient = useQueryClient();
     const handleCloseEditDialog = () => {
@@ -85,7 +96,6 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
     const delistHandler = async (orderId: string) => {
         setLoadingOrderId(orderId);
         await handleDelist(orderId);
-
         setLoadingOrderId(null);
     };
 
@@ -214,6 +224,10 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         setLoadingOrderId(null);
         setOpenCancelDialog(false);
     };
+    const openEditDialogHandler = () => {
+        setOpenEditDialog(true);
+        queryClient.invalidateQueries({ queryKey: ['floor_price', order.ticker] });
+    };
 
     return (
         <div key={order.orderId}>
@@ -337,7 +351,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                             <Tooltip title="Edit is to change the order details">
                                 {isCancelOrderLoading || isRelistLoading ? null : (
                                     <Button
-                                        onClick={() => setOpenEditDialog(true)}
+                                        onClick={openEditDialogHandler}
                                         variant="contained"
                                         color="primary"
                                         sx={{
@@ -434,6 +448,9 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                                 disabled
                                 error={!!editError}
                             />
+                            <Typography variant="body2" sx={{ marginTop: 1, fontSize: '1rem', fontWeight: 500 }}>
+                                {floorPrice ? `Floor Price: ${floorPrice} KAS` : ''}
+                            </Typography>
                         </>
                     )}
 

@@ -43,17 +43,17 @@ const BuyHeader: React.FC<BuyHeaderProps> = ({ sortBy, onSortChange, ticker, isL
                 </Typography>
                 <StyledButton
                     size="small"
-                    variant={sortBy === 'pricePerToken' ? 'outlined' : 'contained'}
-                    onClick={() => handleSortChange('pricePerToken')}
-                >
-                    Price
-                </StyledButton>
-                <StyledButton
-                    size="small"
                     variant={sortBy === 'totalPrice' ? 'outlined' : 'contained'}
                     onClick={() => handleSortChange('totalPrice')}
                 >
                     Total Price
+                </StyledButton>
+                <StyledButton
+                    size="small"
+                    variant={sortBy === 'pricePerToken' ? 'outlined' : 'contained'}
+                    onClick={() => handleSortChange('pricePerToken')}
+                >
+                    Unit Price
                 </StyledButton>
                 <Box sx={{ marginLeft: 'auto' }}>
                     {isLoading ? (
@@ -79,18 +79,18 @@ const BuyHeader: React.FC<BuyHeaderProps> = ({ sortBy, onSortChange, ticker, isL
                 }}
             >
                 <Tooltip title={`Total Amount of ${ticker} Tokens for Sale`}>
-                    <Typography variant="subtitle2" sx={{ width: '22%', fontWeight: 'bold' }}>
+                    <Typography variant="subtitle2" sx={{ width: '20%', fontWeight: 'bold' }}>
                         Amount
                     </Typography>
                 </Tooltip>
-                <Tooltip title="Price per token">
+                <Tooltip title="Total KAS requested for the tokens">
                     <Typography variant="subtitle2" sx={{ width: '22%', fontWeight: 'bold' }}>
-                        Price
+                        Total Price
                     </Typography>
                 </Tooltip>
-                <Tooltip title="Total KAS requested for the tokens">
+                <Tooltip title="Price per token">
                     <Typography variant="subtitle2" sx={{ width: '25%', fontWeight: 'bold' }}>
-                        Total Price
+                        Unit Price
                     </Typography>
                 </Tooltip>
                 <Typography variant="subtitle2" sx={{ width: '10%' }} /> {/* Empty space for the button */}
