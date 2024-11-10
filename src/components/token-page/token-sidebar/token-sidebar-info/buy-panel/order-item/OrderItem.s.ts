@@ -3,6 +3,7 @@ import { styled, Typography } from '@mui/material';
 export const OrderItemPrimary = styled(Typography)({
     fontWeight: 500,
     fontSize: '0.75rem',
+    width: '8rem',
 });
 
 export const OrderItemSecondary = styled(Typography)({

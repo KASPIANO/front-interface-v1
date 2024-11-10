@@ -86,7 +86,7 @@ const Navbar: React.FC<NavbarProps> = ({
             className={isWalletConnecting ? 'connecting' : ''}
             disabled={isWalletConnecting}
         >
-            {isWalletConnecting ? 'Connecting...' : walletConnected ? 'Disconnect' : 'Connect'}
+            {isWalletConnecting ? 'Connecting...' : walletConnected ? 'Disconnect' : 'Connect Wallet'}
         </ConnectButton>
     );
 
