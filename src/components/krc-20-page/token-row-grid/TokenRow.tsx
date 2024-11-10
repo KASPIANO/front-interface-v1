@@ -116,7 +116,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             }}
                             style={{
                                 marginLeft: '0.1vw',
-                                borderRadius: 7,
+                                borderRadius: '100%',
                             }}
                             variant="square"
                             alt={token.ticker}

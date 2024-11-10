@@ -115,8 +115,8 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                     <ListItemText
                         sx={{
                             position: 'absolute',
-                            right: '18%', // Adjust this value as needed to ensure it stays within bounds
-                            top: '50%',
+                            right: '19%', // Adjust this value as needed to ensure it stays within bounds
+                            top: '47%',
                             transform: 'translateY(-50%)',
                             width: '6vw',
                             justifyContent: 'start',
