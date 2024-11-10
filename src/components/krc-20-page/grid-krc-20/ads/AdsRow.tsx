@@ -62,7 +62,7 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                                 style={{
                                     minWidth: '1vw',
                                     width: '2vw',
-                                    fontSize: '1.2rem',
+                                    fontSize: '1rem',
                                     fontWeight: 530,
                                     color: theme.palette.text.primary,
                                     letterSpacing: '0.1rem', // Add spacing between letters
@@ -104,7 +104,7 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                                 color="primary"
                                 style={{
                                     fontWeight: 600,
-                                    fontSize: '0.8rem',
+                                    fontSize: '0.65rem',
                                     color: theme.palette.primary.main,
                                 }}
                             >
@@ -135,7 +135,7 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                                     style={{
                                         fontSize: '0.6rem',
                                         color: 'gray',
-                                        fontWeight: 'bold',
+                                        fontWeight: 700,
                                     }}
                                 >
                                     {slotPurposeDisplayMapper[
