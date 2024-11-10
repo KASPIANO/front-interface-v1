@@ -62,7 +62,7 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                                 style={{
                                     minWidth: '1vw',
                                     width: '2vw',
-                                    fontSize: '1.4rem',
+                                    fontSize: '1.2rem',
                                     fontWeight: 530,
                                     color: theme.palette.text.primary,
                                     letterSpacing: '0.1rem', // Add spacing between letters
@@ -82,7 +82,7 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                         primary={
                             <Typography
                                 sx={{
-                                    fontSize: '1.2rem',
+                                    fontSize: '1rem',
                                     fontWeight: 350,
                                     color: theme.palette.text.primary,
                                     letterSpacing: '0.1rem', // Add spacing between letters
