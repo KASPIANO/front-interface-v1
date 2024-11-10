@@ -4,6 +4,8 @@ import { StyledDataGridContainer } from '../../components/krc-20-page/grid-krc-2
 import GridTitle from '../../components/krc-20-page/grid-title-sort/GridTitle';
 import { useFetchCountTokensQuery, useFetchTokens } from '../../DAL/UseQueriesBackend';
 import { GridLayout } from './GridPageLayout';
+import { Box } from '@mui/material';
+import { PrevPageButton, NextPageButton } from '../../components/krc-20-page/grid-title-sort/GridTitle.s';
 
 interface GridPageProps {
     walletAddress: string | null;
@@ -51,6 +53,18 @@ const GridPage: FC<GridPageProps> = (props) => {
         setTimeInterval(newInterval);
     };
 
+    const handleNextPage = () => {
+        if (page < totalPages) {
+            handlePageChange(page + 1);
+        }
+    };
+
+    const handlePrevPage = () => {
+        if (page > 0) {
+            handlePageChange(page - 1);
+        }
+    };
+
     return (
         <GridLayout backgroundBlur={backgroundBlur}>
             <GridTitle
@@ -86,6 +100,12 @@ const GridPage: FC<GridPageProps> = (props) => {
                     error={error}
                 />
             </StyledDataGridContainer>
+            <Box sx={{ display: 'flex', alignItems: 'center', mt: 1, justifyContent: 'center' }}>
+                <PrevPageButton onClick={handlePrevPage} disabled={page === 0}>
+                    Prev
+                </PrevPageButton>
+                <NextPageButton onClick={handleNextPage}>Next</NextPageButton>
+            </Box>
         </GridLayout>
     );
 };

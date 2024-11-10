@@ -265,6 +265,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                         }
                     >
                         <OrderList
+                            ticker={tokenInfo.ticker}
                             setSelectedOrder={setSelectedOrder}
                             selectedOrder={selectedOrder}
                             walletConnected={walletConnected}

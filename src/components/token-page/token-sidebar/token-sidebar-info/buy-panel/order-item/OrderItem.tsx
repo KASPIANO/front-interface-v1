@@ -14,10 +14,11 @@ interface OrderItemProps {
     selectedOrder: Order | null;
     setSelectedOrder;
     walletConnected: boolean;
+    ticker: string;
 }
 
 const OrderItem: React.FC<OrderItemProps> = (props) => {
-    const { order, onSelect, kasPrice, selectedOrder, setSelectedOrder, walletConnected } = props;
+    const { order, onSelect, kasPrice, selectedOrder, setSelectedOrder, walletConnected, ticker } = props;
 
     // const floorPriceDifference = ((order.pricePerToken - floorPrice) / floorPrice) * 100;
 
@@ -44,7 +45,7 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                 {/* Amount with Floor Difference */}
                 <Box sx={{ width: '17%' }}>
                     <OrderItemPrimary variant="body2">
-                        {formatNumberWithCommas(order.quantity)}
+                        {formatNumberWithCommas(order.quantity)}{' '}
                         {/* <Tooltip title="Difference from floor price"> */}
                         {/* <Typography
                                 variant="caption"
@@ -54,26 +55,40 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                                 ({floorPriceDifference.toFixed(2)}%)
                             </Typography> */}
                         {/* </Tooltip> */}
+                        <Box component="span" sx={{ fontSize: '0.5rem', display: 'inline' }}>
+                            {/* Adjust fontSize as needed */}
+                            {ticker}
+                        </Box>
                     </OrderItemPrimary>
                 </Box>
                 {/* Price per Token */}
-                <Box sx={{ width: '17%' }}>
-                    <Tooltip title={`${order.pricePerToken} KAS`}>
-                        <OrderItemPrimary variant="body2">{formatPrice(order.pricePerToken)}</OrderItemPrimary>
-                    </Tooltip>
-                    <OrderItemSecondary variant="caption" color="textSecondary">
-                        (${(order.pricePerToken * kasPrice).toFixed(2)})
-                    </OrderItemSecondary>
-                </Box>
-                {/* Total Price */}
                 <Box sx={{ width: '15%' }}>
                     <OrderItemPrimary variant="body2">
-                        {formatNumberWithCommas(order.totalPrice.toFixed(2))}
+                        {formatNumberWithCommas(order.totalPrice.toFixed(2))}{' '}
+                        <Box component="span" sx={{ fontSize: '0.5rem', display: 'inline' }}>
+                            {/* Adjust fontSize as needed */}
+                            KAS
+                        </Box>
                     </OrderItemPrimary>
                     <OrderItemSecondary variant="caption" color="textSecondary">
                         (${formatNumberWithCommas((order.totalPrice * kasPrice).toFixed(2))})
                     </OrderItemSecondary>
                 </Box>
+                <Box sx={{ width: '20%' }}>
+                    <Tooltip title={`${order.pricePerToken} KAS`}>
+                        <OrderItemPrimary variant="body2">
+                            {formatPrice(order.pricePerToken)}{' '}
+                            <Box component="span" sx={{ fontSize: '0.5rem', display: 'inline' }}>
+                                {/* Adjust fontSize as needed */}
+                                KAS
+                            </Box>
+                        </OrderItemPrimary>
+                    </Tooltip>
+                    <OrderItemSecondary variant="caption" color="textSecondary">
+                        (${(order.pricePerToken * kasPrice).toFixed(5)})
+                    </OrderItemSecondary>
+                </Box>
+                {/* Total Price */}
                 {/* Buy/Close Button */}
                 <Box>
                     {selectedOrder && selectedOrder.orderId === order.orderId ? (
