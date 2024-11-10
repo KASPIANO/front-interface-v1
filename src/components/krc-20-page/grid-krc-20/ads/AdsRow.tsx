@@ -9,7 +9,6 @@ import {
     ListItemAvatar,
     ListItemButton,
     ListItemText,
-    Tooltip,
     Typography,
     useTheme,
 } from '@mui/material';
