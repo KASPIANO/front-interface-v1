@@ -9,6 +9,7 @@ import { TokenRow } from '../token-row-grid/TokenRow';
 import { GridHeadersComponent } from '../grid-header/GridHeaders';
 import { useGetCurrentAds } from '../../../DAL/UseQueriesBackend';
 import { AdsSlider } from './ads/AdsSlider';
+import ReactGA from 'react-ga';
 
 interface TokenDataGridProps {
     tokensList: TokenListItemResponse[];
@@ -47,7 +48,12 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         navigate(`/token/${token.ticker}`);
     };
 
-    const handleItemClickAds = (link: string) => {
+    const handleItemClickAds = (link: string, ticker: string) => {
+        ReactGA.event({
+            category: 'Link', // Event category (e.g., 'Link' for all external links)
+            action: 'Click', // Event action (e.g., 'Click')
+            label: `Telegram - ${ticker}`, // Event label (e.g., 'Telegram - MyAdName')
+        });
         // Check if the link starts with http:// or https://
         if (!link.startsWith('http://') && !link.startsWith('https://')) {
             // If not, assume it's a domain and prepend https://
@@ -106,12 +112,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
                     backgroundColor: 'background.paper', // Adjust as necessary for your theme
                 }}
             >
-                <AdsSlider
-                    adsData={adsData}
-                    handleItemClick={handleItemClickAds}
-                    walletBalance={walletBalance}
-                    walletConnected={walletConnected}
-                />
+                <AdsSlider adsData={adsData} handleItemClick={handleItemClickAds} />
             </Box>
         );
     };

@@ -17,10 +17,11 @@ import { AdsListItemResponse, SlotPurpose, slotPurposeDisplayMapper } from '../.
 import { DEFAULT_TOKEN_LOGO_URL } from '../../../../utils/Constants';
 import { capitalizeFirstLetter } from '../../../../utils/Utils';
 import { useNavigate } from 'react-router-dom';
+import ReactGA from 'react-ga';
 
 interface AdsRowProps {
     adData: AdsListItemResponse;
-    handleItemClick: (adData: any) => void;
+    handleItemClick: (telegram: string, ticker: string) => void;
 }
 
 export const AdsRow: FC<AdsRowProps> = (props) => {
@@ -30,12 +31,21 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
 
     const handleMint = (event, ticker) => {
         event.stopPropagation();
+        ReactGA.event({
+            category: 'Link', // Event category (e.g., 'Link' for all external links)
+            action: 'Click', // Event action (e.g., 'Click')
+            label: `Token Page - ${ticker}`, // Event label (e.g., 'Telegram - MyAdName')
+        });
         navigate(`/token/${ticker}`);
     };
 
     return (
         <div>
-            <ListItem onClick={() => handleItemClick(adData.telegram)} disablePadding sx={{ height: '7vh' }}>
+            <ListItem
+                onClick={() => handleItemClick(adData.telegram, adData.ticker)}
+                disablePadding
+                sx={{ height: '7vh' }}
+            >
                 <ListItemButton>
                     <ListItemAvatar>
                         <Avatar

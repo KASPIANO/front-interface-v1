@@ -5,7 +5,7 @@ import { AdsListItemResponse } from '../../../../types/Types';
 
 interface AdsSliderProps {
     adsData: AdsListItemResponse[];
-    handleItemClick: (adData: any) => void;
+    handleItemClick: (telegram: string, ticker: string) => void;
 }
 
 export const AdsSlider: FC<AdsSliderProps> = ({ adsData, handleItemClick }) => {
