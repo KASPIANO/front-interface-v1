@@ -12,7 +12,7 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { TokenListItemResponse } from '../../../types/Types';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import {
@@ -26,6 +26,7 @@ import {
 } from '../../../utils/Utils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { DEFAULT_TOKEN_LOGO_URL } from '../../../utils/Constants';
+import { getFyiLogo } from '../../../DAL/KaspaApiDal';
 
 interface TokenRowProps {
     token: TokenListItemResponse;
@@ -37,6 +38,7 @@ interface TokenRowProps {
 
 export const TokenRow: FC<TokenRowProps> = (props) => {
     const { token, handleItemClick, walletBalance, walletConnected } = props;
+    const [fyiLogo, setFyiLogo] = useState<any>(null);
 
     const handleMint = async (event, ticker: string) => {
         event.stopPropagation();
@@ -80,6 +82,19 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
         }
     };
 
+    useEffect(() => {
+        if (!token.logoUrl) {
+            getFyiLogo(token.ticker)
+                .then((response) => {
+                    const imageUrl = URL.createObjectURL(response); // Use the blob data here
+                    setFyiLogo(imageUrl);
+                    console.log('Logo URL:', imageUrl); // Log to verify URL creation
+                })
+                .catch(() => {
+                    setFyiLogo(DEFAULT_TOKEN_LOGO_URL); // Fallback if there's an error
+                });
+        }
+    }, [token]);
     const preMintedIcons = (preMinted: number, totalSupply: number) => {
         const preMintPercentage = ((preMinted / totalSupply) * 100)?.toFixed(2);
 
@@ -110,17 +125,17 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemAvatar>
                         <Avatar
                             sx={{
-                                width: '2.3rem',
-                                height: '2.3rem',
+                                width: '2.5rem',
+                                height: '2.5rem',
                                 marginRight: '1vw',
                             }}
                             style={{
                                 marginLeft: '0.1vw',
-                                borderRadius: 7,
+                                borderRadius: '100%',
                             }}
                             variant="square"
                             alt={token.ticker}
-                            src={isEmptyString(token.logoUrl) ? DEFAULT_TOKEN_LOGO_URL : token.logoUrl}
+                            src={isEmptyString(token.logoUrl) ? fyiLogo : token.logoUrl}
                         />
                     </ListItemAvatar>
 

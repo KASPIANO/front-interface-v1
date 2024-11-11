@@ -55,42 +55,34 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                     >
                         <TabStyled label="Info" value="1" />
                         <TabStyled
-                            icon={<ShoppingCartRoundedIcon sx={{ fontSize: '1rem' }} />} // Add the icon
+                            icon={<ShoppingCartRoundedIcon sx={{ fontSize: '0.85rem' }} />} // Add the icon
                             iconPosition="end"
                             label="Buy"
                             value="2"
                             sx={{
                                 '&.MuiTab-root': {
-                                    color: 'rgba(0, 128, 0, 0.9)', // 50% opacity green color
+                                    color: 'rgba(0, 128, 0, 0.8)', // 50% opacity green color
                                 },
                                 '&.Mui-selected': {
-                                    color: 'rgba(0, 128, 0, 1)',
+                                    color: 'rgba(0, 128, 0, 0.9)',
                                 },
-                                color: 'rgba(0, 128, 0, 0.9)', // 50% opacity green color as default
+                                color: 'rgba(0, 128, 0, 0.8)', // 50% opacity green color as default
                             }}
                         />
 
                         <TabStyled
-                            icon={<StorefrontRoundedIcon sx={{ fontSize: '1rem' }} />} // Add the icon
+                            icon={<StorefrontRoundedIcon sx={{ fontSize: '0.85rem' }} />} // Add the icon
                             iconPosition="end"
-                            TouchRippleProps={{
-                                style: {
-                                    borderBottom: 'rgba(255, 0, 0, 0.65)',
-                                },
-                            }}
                             label="Sell"
                             value="3"
                             sx={{
-                                '&.MuiButtonBase-root': {
-                                    borderBottom: 'rgba(255, 0, 0, 0.65)',
-                                },
                                 '&.MuiTab-root': {
-                                    color: 'rgba(255, 0, 0, 0.65)',
+                                    color: 'rgba(255, 0, 0, 0.6)',
                                 },
                                 '&.Mui-selected': {
                                     color: 'rgba(255, 0, 0, 0.85)', // Full opacity color when selected
                                 },
-                                color: 'rgba(255, 0, 0, 0.65)', // 80% opacity
+                                color: 'rgba(255, 0, 0, 0.6)', // 80% opacity
                             }}
                         />
                     </Tabs>
