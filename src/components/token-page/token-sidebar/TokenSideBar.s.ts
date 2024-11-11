@@ -19,6 +19,6 @@ export const TabStyled = styled(Tab)(({ theme }) => ({
     height: '2rem',
     minHeight: '5px',
     fontWeight: 600,
-    fontSize: '0.95rem',
+    fontSize: '0.9rem',
     color: alpha(theme.palette.primary.main, 0.5),
 }));

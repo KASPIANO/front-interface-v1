@@ -1,5 +1,5 @@
 import { getBalance } from '../utils/KaswareUtils';
-import { kasInfoMainnetService, kasInfoService } from './AxiosInstaces';
+import { fyiLogoService, kasInfoMainnetService, kasInfoService } from './AxiosInstaces';
 import { delay } from '../utils/Utils';
 
 const KASPA_TRANSACTION_MASS = 3000;
@@ -185,4 +185,18 @@ export const highGasWarning = async (type: 'TRANSFER' | '' = '') => {
 
     // For other types, check if the priority fee is between WARNING_LIMIT_KAS and CANCEL_LIMIT_KAS
     return WARNING_LIMIT_KAS < kaspaPriorityFee && kaspaPriorityFee < CANCEL_LIMIT_KAS;
+};
+
+export const getFyiLogo = async (ticker: string): Promise<any> => {
+    try {
+        const jpgString = `${ticker}.jpg`;
+        const response = await fyiLogoService.get<any>(`${jpgString}`, {
+            responseType: 'blob',
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching token logo:', error);
+        return '';
+    }
 };
