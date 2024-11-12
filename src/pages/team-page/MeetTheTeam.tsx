@@ -64,7 +64,7 @@ const teamMembers = [
     {
         name: 'Tomer',
         position: 'Software Engineer',
-        image: 'https://krc20data.s3.amazonaws.com/verified/benbo.png', // Replace with actual image URL
+        image: 'https://krc20data.s3.amazonaws.com/verified/gilad.png', // Replace with actual image URL
         description:
             "Tomer is a full-stack developer with a strong passion for back-end development, specializing in workflow automation, ETL processes, API integrations, and database management.",
     },
