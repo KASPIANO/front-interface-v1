@@ -61,6 +61,13 @@ const teamMembers = [
             "Arnon specializes in back-end infrastructure, DevOps, and workflow automation, ensuring that Kaspiano's system can scale efficiently while remaining performant.",
         twitter: 'https://x.com/ArnonHillel',
     },
+    {
+        name: 'Tomer',
+        position: 'Software Engineer',
+        image: 'https://krc20data.s3.amazonaws.com/verified/benbo.png', // Replace with actual image URL
+        description:
+            "Tomer is a full-stack developer with a strong passion for back-end development, specializing in workflow automation, ETL processes, API integrations, and database management.",
+    },
 ];
 
 const TeamPage = () => (
