@@ -39,8 +39,17 @@ const teamMembers = [
         linkedIn: 'https://www.linkedin.com/in/abrahammilhem/',
     },
     {
+        name: 'Itamar Amith',
+        position: 'Devops Engineer',
+        image: 'https://krc20data.s3.us-east-1.amazonaws.com/verified/WhatsApp+Image+2024-11-12+at+12.43.00.jpeg', // Replace with actual image URL
+        description:
+            "Itamar brings to the team over a decade of experience designing and building backend systems for businesses across a variety of industries. His first commercial experience with Blockchain was as the chief architect at Illuvium, and he's looking forward to staying in the forefront of web3 technology with Kaspiano",
+        twitter: 'https://x.com/itabot',
+        linkedIn: 'https://au.linkedin.com/in/itamaramith',
+    },
+    {
         name: 'Dor Zion',
-        position: 'Senior Developer',
+        position: 'Founder',
         image: 'https://krc20data.s3.amazonaws.com/verified/dorzi.png', // Replace with actual image URL
         description:
             'Dor began his career in the Israeli military’s elite tech units and played a key role in system architecture and development across various startups and corporations.',

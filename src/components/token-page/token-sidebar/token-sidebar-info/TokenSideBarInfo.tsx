@@ -185,7 +185,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             backgroundColor: 'grey',
                         }}
                     >
-                        <AddText>+ List Token</AddText>
+                        <AddText>+ Add Banner</AddText>
                     </AddBanner>
                 )}
                 {socials !== null && Object.keys(socials).length > 0 && (
@@ -260,7 +260,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                     </Box>
                 ) : (
                     <AddBox onClick={handleShowTokenInfoDialog}>
-                        <AddText>+ List Token</AddText>
+                        <AddText>+ Add Description</AddText>
                     </AddBox>
                 )}
             </Box>

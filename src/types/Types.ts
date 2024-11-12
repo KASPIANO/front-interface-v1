@@ -96,7 +96,7 @@ export interface AdsListItemResponse {
 }
 export interface TokenSearchItems {
     ticker: string;
-    logo: string;
+    logo: string | any;
     minted?: string;
     holders?: number;
 }

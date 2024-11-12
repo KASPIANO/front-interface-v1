@@ -32,7 +32,7 @@ const Navbar: React.FC<NavbarProps> = ({
     backgroundBlur,
     isWalletConnecting,
 }) => {
-    const [activePage, setActivePage] = useState('/KRC-20');
+    const [activePage, setActivePage] = useState('/marketplace');
     const [drawerOpen, setDrawerOpen] = useState(false);
     const themeContext = useContext(ThemeContext);
     const [gas, setGas] = useState('');
@@ -86,7 +86,7 @@ const Navbar: React.FC<NavbarProps> = ({
             className={isWalletConnecting ? 'connecting' : ''}
             disabled={isWalletConnecting}
         >
-            {isWalletConnecting ? 'Connecting...' : walletConnected ? 'Disconnect' : 'Connect Wallet'}
+            {isWalletConnecting ? 'Connecting...' : walletConnected ? 'Disconnect Wallet' : 'Connect Wallet'}
         </ConnectButton>
     );
 
@@ -105,7 +105,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 {getConnectButton({ marginLeft: '1vw', display: { xs: 'flex', md: 'none' } })}
 
                 <Logo
-                    onClick={() => handleNavButtonClick('/KRC-20')}
+                    onClick={() => handleNavButtonClick('/marketplace')}
                     sx={{ display: 'flex', alignItems: 'center', marginRight: '1vw' }}
                 >
                     <Avatar
@@ -127,7 +127,7 @@ const Navbar: React.FC<NavbarProps> = ({
             {/* Drawer Menu */}
             <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
                 <List>
-                    {['KRC-20', 'deploy', 'portfolio', 'airdrop'].map((page) => (
+                    {['marketplace', 'deploy', 'portfolio', 'airdrop'].map((page) => (
                         <ListItem key={page} onClick={() => handleNavButtonClick(page)}>
                             <ListItemText primary={page.charAt(0).toUpperCase() + page.slice(1)} />
                         </ListItem>
@@ -155,7 +155,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
             {/* Full Navigation for Larger Screens */}
             <NavCenter sx={{ display: { xs: 'none', md: 'flex' } }}>
-                {['KRC-20', 'deploy', 'portfolio', 'airdrop'].map((page) => (
+                {['marketplace', 'deploy', 'portfolio', 'airdrop'].map((page) => (
                     <NavButton
                         key={page}
                         isActive={activePage === page}

@@ -21,7 +21,6 @@ const TokenHeader: FC<TokenHeaderProps> = (props) => {
                 .then((response) => {
                     const imageUrl = URL.createObjectURL(response); // Use the blob data here
                     setFyiLogo(imageUrl);
-                    console.log('Logo URL:', imageUrl); // Log to verify URL creation
                 })
                 .catch(() => {
                     setFyiLogo(DEFAULT_TOKEN_LOGO_URL); // Fallback if there's an error
