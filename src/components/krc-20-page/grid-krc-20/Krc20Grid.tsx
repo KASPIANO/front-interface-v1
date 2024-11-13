@@ -24,6 +24,7 @@ interface TokenDataGridProps {
     setChangeTotalMintsActive: (value: boolean) => void;
     setChangeMCActive: (value: boolean) => void;
     setChangeTotalHoldersActive: (value: boolean) => void;
+    setChangeVolumeUsd: (value: boolean) => void;
 }
 
 const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
@@ -40,6 +41,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         setChangeTotalMintsActive,
         setChangeMCActive,
         setChangeTotalHoldersActive,
+        setChangeVolumeUsd,
     } = props;
     const navigate = useNavigate();
 
@@ -119,6 +121,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         <>
             <GlobalStyle />
             <GridHeadersComponent
+                setChangeVolumeUsd={setChangeVolumeUsd}
                 setChangeTotalMintsActive={setChangeTotalMintsActive}
                 setChangeMCActive={setChangeMCActive}
                 setChangeTotalHoldersActive={setChangeTotalHoldersActive}

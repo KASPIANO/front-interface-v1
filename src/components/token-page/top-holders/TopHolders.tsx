@@ -56,7 +56,6 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
                     } catch (e) {
                         console.error('Error fetching burnt wallet balance:', e);
                     }
-
                     const totalSupplyAdjusted = burntWalletBalance
                         ? totalSupply - burntWalletBalance
                         : totalSupply;

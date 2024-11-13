@@ -73,9 +73,9 @@ const teamMembers = [
     {
         name: 'Tomer',
         position: 'Software Engineer',
-        image: 'https://krc20data.s3.amazonaws.com/verified/gilad.png', // Replace with actual image URL
+        image: 'https://krc20data.s3.us-east-1.amazonaws.com/verified/1ad8a15a4e5608aca594888c3a6a59f38d7cdf80e18c2587f795658b2e621b95i0.png', // Replace with actual image URL
         description:
-            "Tomer is a full-stack developer with a strong passion for back-end development, specializing in workflow automation, ETL processes, API integrations, and database management.",
+            'Tomer is a full-stack developer with a strong passion for back-end development, specializing in workflow automation, ETL processes, API integrations, and database management.',
     },
 ];
 
