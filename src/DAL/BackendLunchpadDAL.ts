@@ -5,7 +5,7 @@ import {
     SortDirection,
     CreateLunchpadOrderParams,
     LunchpadWalletType,
-} from '../utils/Constants';
+} from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const LUNCHPAD_CONTROLLER = 'lunchpad';
