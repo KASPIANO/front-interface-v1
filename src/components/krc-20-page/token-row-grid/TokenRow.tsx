@@ -3,6 +3,7 @@ import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlin
 import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
 import {
     Avatar,
+    Box,
     Button,
     Divider,
     ListItem,
@@ -26,7 +27,7 @@ import {
 } from '../../../utils/Utils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { DEFAULT_TOKEN_LOGO_URL } from '../../../utils/Constants';
-import { getFyiLogo } from '../../../DAL/KaspaApiDal';
+import { getFyiLogo, kaspaLivePrice } from '../../../DAL/KaspaApiDal';
 
 interface TokenRowProps {
     token: TokenListItemResponse;
@@ -39,6 +40,23 @@ interface TokenRowProps {
 export const TokenRow: FC<TokenRowProps> = (props) => {
     const { token, handleItemClick, walletBalance, walletConnected } = props;
     const [fyiLogo, setFyiLogo] = useState<any>(null);
+    const [kasPrice, setKasPrice] = useState<number>(0);
+
+    useEffect(() => {
+        const fetchPrice = async () => {
+            const newPrice = await kaspaLivePrice();
+            setKasPrice(newPrice);
+        };
+
+        // Fetch the price immediately when the component mounts
+        fetchPrice();
+
+        // Set up the interval to fetch the price every 30 seconds
+        const interval = setInterval(fetchPrice, 30000);
+
+        // Clean up the interval when the component unmounts
+        return () => clearInterval(interval);
+    }, []);
 
     const handleMint = async (event, ticker: string) => {
         event.stopPropagation();
@@ -171,10 +189,14 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemText
                         sx={{ width: '9vw' }}
                         primary={
-                            <Tooltip title={token.price ? `${token.price} Kas` : ''}>
+                            <Tooltip title={token.price ? `$${(token.price * kasPrice).toFixed(6)}` : ''}>
                                 <Stat>
                                     <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
-                                        {token.price ? formatPrice(token.price) : '0'}
+                                        {token.price ? formatPrice(token.price) : '0'}{' '}
+                                        <Box component="span" sx={{ fontSize: '0.5rem', display: 'inline' }}>
+                                            {/* Adjust fontSize as needed */}
+                                            KAS
+                                        </Box>
                                     </StatNumber>
                                     {token.changePrice !== null && (
                                         <StatHelpText
@@ -211,7 +233,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                                 <Stat>
                                     <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
                                         {Number.isFinite(token?.volumeUsd)
-                                            ? formatNumberWithCommas(token.volumeUsd.toFixed(0))
+                                            ? `$${formatNumberWithCommas(token.volumeUsd.toFixed(0))}`
                                             : '0'}
                                     </StatNumber>
                                     {Number.isFinite(token?.changeVolumeUsd) && token.changeVolumeUsd !== 0 && (
@@ -243,7 +265,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             >
                                 <Stat>
                                     <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
-                                        {token.marketCap ? simplifyNumber(token.marketCap) : '0'}
+                                        {token.marketCap ? `$${simplifyNumber(token.marketCap)}` : '0'}
                                     </StatNumber>
                                     {token.changeMarketCap !== null && (
                                         <StatHelpText
