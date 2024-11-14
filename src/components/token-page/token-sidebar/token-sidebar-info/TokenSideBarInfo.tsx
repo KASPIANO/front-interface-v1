@@ -226,9 +226,9 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                         >
                             SUPPLY
                         </Typography>
-                        <Tooltip title={formatNumberWithCommas(tokenInfo.marketCap)}>
+                        <Tooltip title={formatNumberWithCommas(tokenInfo.totalSupply)}>
                             <Typography variant="body2" align="center">
-                                {simplifyNumber(tokenInfo.marketCap)}
+                                {simplifyNumber(tokenInfo.totalSupply)}
                             </Typography>
                         </Tooltip>
                     </StatCard>
