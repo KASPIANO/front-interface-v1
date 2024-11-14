@@ -10,7 +10,7 @@ import {
     SortMiddleButton,
 } from './GridTitle.s';
 import { FireIcon } from './FireIcon';
-import WhatshotIcon from '@mui/icons-material/Whatshot';
+// import WhatshotIcon from '@mui/icons-material/Whatshot';
 
 interface TokenGridTitleProps {
     timeInterval: string;
@@ -46,7 +46,6 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
         changeMCDisabled,
         setChangeTotalHoldersActive,
         changeTotalHoldersDisabled,
-        changeVolumeUsd,
         setChangeVolumeUsd,
     } = props;
 
@@ -91,18 +90,41 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
         setActiveHeader('');
         onSortBy(orderedBy, true);
     };
-    const handleChangeVolumeUsd = () => {
-        // Handle sorting by minting rate
-        const orderedBy = changeVolumeUsd ? 'changeVolumeUsd' : 'volumeUsd';
-        if (changeVolumeUsd) {
-            setChangeTotalMintsActive(true);
-            setChangeMCActive(true);
-            setChangeTotalHoldersActive(true);
-        }
-        setChangeVolumeUsd(!changeVolumeUsd);
-        setActiveHeader('');
-        onSortBy(orderedBy, true);
-    };
+
+    // const handleChangeVolumeUsd = () => {
+    //     // Handle sorting by minting rate
+    //     const orderedBy = changeVolumeUsd ? 'changeVolumeUsd' : 'volumeUsd';
+    //     if (changeVolumeUsd) {
+    //         setChangeTotalMintsActive(true);
+    //         setChangeMCActive(true);
+    //         setChangeTotalHoldersActive(true);
+    //     }
+    //     setChangeVolumeUsd(!changeVolumeUsd);
+    //     setActiveHeader('');
+    //     onSortBy(orderedBy, true);
+    // };
+
+    //     <Tooltip title="Sort by the percentage change in trading volume over the selected timeframe to identify trending assets.">
+    //     <Button
+    //         variant="contained"
+    //         onClick={handleChangeVolumeUsd}
+    //         sx={{
+    //             borderRadius: '0.2rem',
+    //             marginLeft: 'auto',
+    //             fontSize: '0.65rem',
+    //             padding: '2px 5px',
+    //             opacity: changeVolumeUsd ? 0.6 : 1,
+    //             display: 'flex',
+    //             marginRight: '0.4rem',
+    //             alignItems: 'center',
+    //             gap: '4px', // Adds space between the icon and text
+    //         }}
+    //         aria-label="sort by Volume Change"
+    //     >
+    //         Trending
+    //         <WhatshotIcon sx={{ color: '#FFFFFF', fontSize: '1rem' }} /> {/* White fire icon */}
+    //     </Button>
+    // </Tooltip>
 
     const handleNextPage = () => {
         if (currentPage < totalPages) {
@@ -130,28 +152,6 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
                 <NextPageButton onClick={handleNextPage}>Next</NextPageButton>
             </Box>
 
-            {/* Sort Time Period Buttons */}
-            <Tooltip title="Sort by the percentage change in trading volume over the selected timeframe to identify trending assets.">
-                <Button
-                    variant="contained"
-                    onClick={handleChangeVolumeUsd}
-                    sx={{
-                        borderRadius: '0.2rem',
-                        marginLeft: 'auto',
-                        fontSize: '0.65rem',
-                        padding: '2px 5px',
-                        opacity: changeVolumeUsd ? 0.6 : 1,
-                        display: 'flex',
-                        marginRight: '0.4rem',
-                        alignItems: 'center',
-                        gap: '4px', // Adds space between the icon and text
-                    }}
-                    aria-label="sort by Volume Change"
-                >
-                    Trending
-                    <WhatshotIcon sx={{ color: '#FFFFFF', fontSize: '1rem' }} /> {/* White fire icon */}
-                </Button>
-            </Tooltip>
             <Tooltip title="Sort by the market cap change within the selected timeframe.">
                 <Button
                     variant="contained"
