@@ -15,7 +15,6 @@ import OrdersManagement from './pages/orders-management/OrdersManagement';
 import TeamPage from './pages/team-page/MeetTheTeam';
 import FAQ from './pages/faqs/Faqs';
 import { UserReferral } from './types/Types';
-import { Launch } from '@mui/icons-material';
 import LaunchpadPage from './pages/launchpad-page/LaunchpadPage';
 // import PartnersPage from './pages/partners/Partners';
 // import AdsPage from './pages/ads-page/AdsPage';
