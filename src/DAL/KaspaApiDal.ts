@@ -193,7 +193,6 @@ export const getFyiLogo = async (ticker: string): Promise<any> => {
         const response = await fyiLogoService.get<any>(`${jpgString}`, {
             responseType: 'blob',
         });
-
         return response.data;
     } catch (error) {
         console.error('Error fetching token logo:', error);

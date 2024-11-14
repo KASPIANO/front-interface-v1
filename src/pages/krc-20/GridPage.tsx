@@ -25,6 +25,7 @@ const GridPage: FC<GridPageProps> = (props) => {
     const [changeTotalMintsDisabled, setChangeTotalMintsActive] = useState(true);
     const [changeTotalHoldersDisabled, setChangeTotalHoldersActive] = useState(true);
     const [changeMCDisabled, setChangeMCActive] = useState(true);
+    const [changeVolumeUsd, setChangeVolumeUsd] = useState(true);
     const {
         data: tokenList,
         isLoading: isTokenListLoading,
@@ -68,6 +69,8 @@ const GridPage: FC<GridPageProps> = (props) => {
     return (
         <GridLayout backgroundBlur={backgroundBlur}>
             <GridTitle
+                changeVolumeUsd={changeVolumeUsd}
+                setChangeVolumeUsd={setChangeVolumeUsd}
                 changeTotalMintsDisabled={changeTotalMintsDisabled}
                 setChangeTotalMintsActive={setChangeTotalMintsActive}
                 timeInterval={timeInterval}
@@ -85,6 +88,7 @@ const GridPage: FC<GridPageProps> = (props) => {
             />
             <StyledDataGridContainer>
                 <TokenDataGrid
+                    setChangeVolumeUsd={setChangeVolumeUsd}
                     setChangeTotalMintsActive={setChangeTotalMintsActive}
                     setChangeMCActive={setChangeMCActive}
                     setChangeTotalHoldersActive={setChangeTotalHoldersActive}
