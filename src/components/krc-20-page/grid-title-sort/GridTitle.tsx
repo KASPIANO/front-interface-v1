@@ -157,6 +157,7 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
                     variant="contained"
                     onClick={handleMCChange}
                     sx={{
+                        marginLeft: 'auto',
                         borderRadius: '0.2rem',
                         fontSize: '0.65rem',
                         padding: '2px 5px',
