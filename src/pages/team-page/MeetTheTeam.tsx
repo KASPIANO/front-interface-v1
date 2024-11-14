@@ -14,12 +14,13 @@ const teamMembers = [
         linkedIn: 'https://www.linkedin.com/in/sione-milhem/',
     },
     {
-        name: 'Avidan Abitbol',
-        position: 'Co-Founder & Development Lead',
-        image: 'https://krc20data.s3.amazonaws.com/verified/avidan.jpg', // Replace with actual image URL
+        name: 'Christian Ludwig',
+        position: 'Advisor & Investor',
+        image: 'https://krc20data.s3.us-east-1.amazonaws.com/verified/chirsd20-24-00.jpg', // Replace with actual image URL
         description:
-            'Avidan is a seasoned member of the Kaspa community with extensive experience in management and business development. As co-founder of Kaspiano, he leads the development efforts, overseeing architecture and aligning technical execution with company goals.',
-        twitter: 'https://x.com/avidanab',
+            'Christian is an Inc. 500 entrepreneur and crypto fanatic. He owns an eight figure Kaspa mining company and has mined/owned Kaspa since Q4 22’. Christian believes Kaspa is cryptos “endgame” and that Kaspiano will empower end users to “make their own music” and unlock the full power of KRC-20 trading.',
+        twitter: 'https://x.com/christi61026749',
+        linkedIn: 'https://www.linkedin.com/in/davidchristianludwig/',
     },
     {
         name: 'Gilad',
@@ -37,6 +38,14 @@ const teamMembers = [
             'Abraham excels at building engaged communities in the crypto space, focusing on keeping Kaspiano transparent and community-driven, ensuring all feedback is heard and addressed.',
         twitter: 'https://x.com/BabyKrakennn',
         linkedIn: 'https://www.linkedin.com/in/abrahammilhem/',
+    },
+    {
+        name: 'Avidan Abitbol',
+        position: 'Co-Founder & Development Lead',
+        image: 'https://krc20data.s3.amazonaws.com/verified/avidan.jpg', // Replace with actual image URL
+        description:
+            'Avidan is a seasoned member of the Kaspa community with extensive experience in management and business development. As co-founder of Kaspiano, he leads the development efforts, overseeing architecture and aligning technical execution with company goals.',
+        twitter: 'https://x.com/avidanab',
     },
     {
         name: 'Itamar Amith',
