@@ -61,12 +61,12 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                             value="2"
                             sx={{
                                 '&.MuiTab-root': {
-                                    color: 'rgba(0, 128, 0, 0.8)', // 50% opacity green color
+                                    color: 'rgba(0, 200, 0, 0.8)', // Lighter green with 70% opacity
                                 },
                                 '&.Mui-selected': {
-                                    color: 'rgba(0, 128, 0, 0.9)',
+                                    color: 'rgba(0, 200, 0, 0.89)', // Slightly darker when selected with 85% opacity
                                 },
-                                color: 'rgba(0, 128, 0, 0.8)', // 50% opacity green color as default
+                                color: 'rgba(0, 200, 0, 0.8)', // Default lighter green color with 70% opacity
                             }}
                         />
 
