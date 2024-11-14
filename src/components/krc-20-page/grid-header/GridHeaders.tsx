@@ -9,6 +9,7 @@ interface GridHeadersComponentProps {
     setChangeTotalMintsActive: (value: boolean) => void;
     setChangeMCActive: (value: boolean) => void;
     setChangeTotalHoldersActive: (value: boolean) => void;
+    setChangeVolumeUsd;
 }
 
 export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
@@ -19,6 +20,7 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
         setChangeTotalMintsActive,
         setChangeMCActive,
         setChangeTotalHoldersActive,
+        setChangeVolumeUsd,
     } = props;
 
     return (
@@ -41,6 +43,7 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                             onSortBy={onSortBy}
                             activeHeader={activeHeader}
                             setActiveHeader={setActiveHeader}
+                            setChangeVolumeUsd={setChangeVolumeUsd}
                         />
                         <GridHeader
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
@@ -51,8 +54,10 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                             onSortBy={onSortBy}
                             activeHeader={activeHeader}
                             setActiveHeader={setActiveHeader}
+                            setChangeVolumeUsd={setChangeVolumeUsd}
                         />
                         <GridHeader
+                            setChangeVolumeUsd={setChangeVolumeUsd}
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
                             setChangeTotalHoldersActive={setChangeTotalHoldersActive}
                             setChangeMCActive={setChangeMCActive}
@@ -63,6 +68,7 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                             setActiveHeader={setActiveHeader}
                         />
                         <GridHeader
+                            setChangeVolumeUsd={setChangeVolumeUsd}
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
                             setChangeTotalHoldersActive={setChangeTotalHoldersActive}
                             setChangeMCActive={setChangeMCActive}
@@ -73,6 +79,7 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                             setActiveHeader={setActiveHeader}
                         />
                         <GridHeader
+                            setChangeVolumeUsd={setChangeVolumeUsd}
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
                             setChangeTotalHoldersActive={setChangeTotalHoldersActive}
                             setChangeMCActive={setChangeMCActive}
@@ -83,6 +90,7 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                             setActiveHeader={setActiveHeader}
                         />
                         <GridHeader
+                            setChangeVolumeUsd={setChangeVolumeUsd}
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
                             setChangeTotalHoldersActive={setChangeTotalHoldersActive}
                             setChangeMCActive={setChangeMCActive}
@@ -93,6 +101,7 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                             setActiveHeader={setActiveHeader}
                         />
                         <GridHeader
+                            setChangeVolumeUsd={setChangeVolumeUsd}
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
                             setChangeTotalHoldersActive={setChangeTotalHoldersActive}
                             setChangeMCActive={setChangeMCActive}
@@ -103,6 +112,7 @@ export const GridHeadersComponent: FC<GridHeadersComponentProps> = (props) => {
                             setActiveHeader={setActiveHeader}
                         />
                         <GridHeader
+                            setChangeVolumeUsd={setChangeVolumeUsd}
                             setChangeTotalMintsActive={setChangeTotalMintsActive}
                             setChangeTotalHoldersActive={setChangeTotalHoldersActive}
                             setChangeMCActive={setChangeMCActive}

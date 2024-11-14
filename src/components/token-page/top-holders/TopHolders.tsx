@@ -3,7 +3,7 @@ import { Box, Card, Divider, IconButton, Snackbar, Tooltip, Typography } from '@
 import OptionSelection from '../option-selection/OptionSelection';
 import { BackendTokenResponse } from '../../../types/Types';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { fetchBurntRC20Balance, fetchDevWalletBalance } from '../../../DAL/Krc20DAL';
+import { fetchDevWalletBalance } from '../../../DAL/Krc20DAL';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 
 interface TopHoldersProps {
@@ -16,7 +16,6 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
     const [topHoldersPercentage, setTopHoldersPercentage] = useState('---');
     const [devWalletPercentage, setDevWalletPercentage] = useState('---');
     const [holderTitle, setHolderTitle] = useState(numberOfHoldersToSelect[0]);
-    const [totalSupplyAfterBurn, setTotalSupplyAfterBurn] = useState<number>(0);
     const [copied, setCopied] = useState(false);
 
     const updateTokenHoldersToShow = (value: number) => {
@@ -50,23 +49,22 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
                     const { totalSupply } = tokenInfo;
 
                     // Fetch burnt wallet balance with error handling
-                    let burntWalletBalance = 0;
-                    try {
-                        burntWalletBalance = await fetchBurntRC20Balance(tokenInfo.ticker);
-                    } catch (e) {
-                        console.error('Error fetching burnt wallet balance:', e);
-                    }
-
-                    const totalSupplyAdjusted = burntWalletBalance
-                        ? totalSupply - burntWalletBalance
-                        : totalSupply;
-                    setTotalSupplyAfterBurn(totalSupplyAdjusted);
+                    // let burntWalletBalance = 0;
+                    // try {
+                    //     burntWalletBalance = await fetchBurntRC20Balance(tokenInfo.ticker);
+                    // } catch (e) {
+                    //     console.error('Error fetching burnt wallet balance:', e);
+                    // }
+                    // const totalSupplyAdjusted = burntWalletBalance
+                    //     ? totalSupply - burntWalletBalance
+                    //     : totalSupply;
+                    // setTotalSupplyAfterBurn(totalSupplyAdjusted);
 
                     // Calculate total holding and percentage
                     const totalHolding = holdersToCalculate
                         .map((h) => h.balance)
                         .reduce((acc, curr) => acc + curr, 0);
-                    const totalPercentage = (totalHolding / totalSupplyAdjusted) * 100;
+                    const totalPercentage = (totalHolding / totalSupply) * 100;
                     const totalPercentageFixed = totalPercentage ? totalPercentage.toFixed(2) : '---';
                     const totalPercentageString =
                         totalPercentageFixed === '---' ? '---' : `${totalPercentageFixed}%`;
@@ -81,7 +79,7 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
             // Call the async function inside the useEffect
             calculatePercentages();
         }
-    }, [tokenHoldersToShow, tokenInfo, totalSupplyAfterBurn]);
+    }, [tokenHoldersToShow, tokenInfo]);
 
     useEffect(() => {
         const fetchDevWalletPercentage = async () => {
@@ -89,7 +87,7 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
                 // Fetch dev wallet balance and calculate the percentage
                 const devWalletBalance = await fetchDevWalletBalance(tokenInfo.ticker, tokenInfo.devWallet);
                 const devWalletPercent =
-                    devWalletBalance === 0 ? 0 : (devWalletBalance / totalSupplyAfterBurn) * 100;
+                    devWalletBalance === 0 ? 0 : (devWalletBalance / tokenInfo.totalSupply) * 100;
                 setDevWalletPercentage(`${devWalletPercent.toFixed(2)}%`);
             } catch (error) {
                 console.error('Error fetching dev wallet percentage:', error);
@@ -100,7 +98,7 @@ const TopHolders: FC<TopHoldersProps> = ({ tokenInfo }) => {
         if (tokenInfo) {
             fetchDevWalletPercentage();
         }
-    }, [totalSupplyAfterBurn, tokenInfo]);
+    }, [tokenInfo]);
 
     return (
         <Card sx={{ height: '18vh', padding: '8px 10px' }}>
