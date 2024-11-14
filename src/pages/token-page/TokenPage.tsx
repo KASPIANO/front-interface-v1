@@ -33,7 +33,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const [recalculateRugScoreLoading, setRecalculateRugScoreLoading] = useState(false);
     const [kasPrice, setkasPrice] = useState(0);
     const [tradingDataTimeFrame, setTradingDataTimeFrame] = useState(
-        tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 6],
+        tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 4],
     );
 
     useEffect(() => {

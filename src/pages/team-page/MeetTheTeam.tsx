@@ -23,7 +23,7 @@ const teamMembers = [
     },
     {
         name: 'Gilad',
-        position: 'Senior Full Stack Developer',
+        position: 'Founder & Senior Full Stack Developer',
         image: 'https://krc20data.s3.amazonaws.com/verified/gilad.png', // Replace with actual image URL
         description:
             "Gilad is a highly skilled Full Stack Developer, focusing on backend development and contributing to Kaspiano's success, including Rug Score calculations and Kaspa blockchain integration.",
@@ -49,7 +49,7 @@ const teamMembers = [
     },
     {
         name: 'Dor Zion',
-        position: 'Founder',
+        position: 'Founder & Senior Developer',
         image: 'https://krc20data.s3.amazonaws.com/verified/dorzi.png', // Replace with actual image URL
         description:
             'Dor began his career in the Israeli military’s elite tech units and played a key role in system architecture and development across various startups and corporations.',
@@ -57,14 +57,14 @@ const teamMembers = [
     },
     {
         name: 'Ben Brizovsky',
-        position: 'Senior Developer',
+        position: 'Co-Founder & CTO',
         image: 'https://krc20data.s3.amazonaws.com/verified/benbo.png', // Replace with actual image URL
         description:
             "With a passion for development, Ben has been instrumental in building Kaspiano's back-end infrastructure and API, integrating key data with MongoDB.",
     },
     {
         name: 'Arnon',
-        position: 'Senior Software Engineer',
+        position: 'Co-Founder & Senior Software Engineer',
         image: 'https://krc20data.s3.amazonaws.com/verified/arnon.png', // Replace with actual image URL
         description:
             "Arnon specializes in back-end infrastructure, DevOps, and workflow automation, ensuring that Kaspiano's system can scale efficiently while remaining performant.",
