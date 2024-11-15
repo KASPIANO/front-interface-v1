@@ -127,7 +127,7 @@ const Navbar: React.FC<NavbarProps> = ({
             {/* Drawer Menu */}
             <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
                 <List>
-                    {['marketplace', 'deploy', 'portfolio', 'airdrop'].map((page) => (
+                    {['marketplace', 'deploy', 'portfolio', 'airdrop', 'launchpad'].map((page) => (
                         <ListItem key={page} onClick={() => handleNavButtonClick(page)}>
                             <ListItemText primary={page.charAt(0).toUpperCase() + page.slice(1)} />
                         </ListItem>
@@ -155,7 +155,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
             {/* Full Navigation for Larger Screens */}
             <NavCenter sx={{ display: { xs: 'none', md: 'flex' } }}>
-                {['marketplace', 'deploy', 'portfolio', 'airdrop'].map((page) => (
+                {['marketplace', 'deploy', 'portfolio', 'airdrop', 'launchpad'].map((page) => (
                     <NavButton
                         key={page}
                         isActive={activePage === page}

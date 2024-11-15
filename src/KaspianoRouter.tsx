@@ -15,6 +15,7 @@ import OrdersManagement from './pages/orders-management/OrdersManagement';
 import TeamPage from './pages/team-page/MeetTheTeam';
 import FAQ from './pages/faqs/Faqs';
 import { UserReferral } from './types/Types';
+import LaunchpadPage from './pages/launchpad-page/LaunchpadPage';
 // import PartnersPage from './pages/partners/Partners';
 // import AdsPage from './pages/ads-page/AdsPage';
 
@@ -107,6 +108,17 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
             path="/airdrop"
             element={
                 <BatchTransferPage
+                    walletBalance={walletBalance}
+                    walletAddress={walletAddress}
+                    backgroundBlur={backgroundBlur}
+                    walletConnected={walletConnected}
+                />
+            }
+        />
+        <Route
+            path="/launchpad"
+            element={
+                <LaunchpadPage
                     walletBalance={walletBalance}
                     walletAddress={walletAddress}
                     backgroundBlur={backgroundBlur}
