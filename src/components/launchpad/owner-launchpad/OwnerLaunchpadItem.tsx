@@ -1,19 +1,5 @@
 import React, { useState } from 'react';
-import {
-    Box,
-    Card,
-    CardContent,
-    Typography,
-    Button,
-    Modal,
-    IconButton,
-    useTheme,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    TextField,
-} from '@mui/material';
+import { Box, Card, CardContent, Typography, IconButton, useTheme } from '@mui/material';
 import {
     useLaunchpadOwnerInfo,
     useRetrieveFunds,
@@ -22,11 +8,12 @@ import {
 } from '../../../DAL/LaunchPadQueries';
 import OpenWithRoundedIcon from '@mui/icons-material/OpenWithRounded';
 import { LunchpadWalletType, TransferObj } from '../../../types/Types';
-import CloseIcon from '@mui/icons-material/CloseRounded';
 import { fetchWalletKRC20Balance } from '../../../DAL/Krc20DAL';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { sendKaspa, transferKRC20Token } from '../../../utils/KaswareUtils';
 import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
+import ExpandedView from './ExpandedLaunchpad';
+import { useQueryClient } from '@tanstack/react-query';
 
 type LaunchpadCardProps = {
     ticker: string;
@@ -39,8 +26,6 @@ type LaunchpadCardProps = {
 
 const KASPA_TO_SOMPI = 100000000;
 
-type FundType = 'tokens' | 'gas';
-
 const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
     ticker,
     availabeUnits,
@@ -50,10 +35,10 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
     walletAddress,
 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
-    const [isFundDialogOpen, setIsFundDialogOpen] = useState(false);
-    const [fundType, setFundType] = useState<FundType>('tokens');
-    const [fundAmount, setFundAmount] = useState('');
-    const [isFunding, setIsFunding] = useState(false);
+    const [fundTokensAmount, setFundTokensAmount] = useState('');
+    const [fundGasAmount, setFundGasAmount] = useState('');
+    const [isTokensFunding, setIsTokensFunding] = useState(false);
+    const [isGasFunding, setIsGasFunding] = useState(false);
     const { data: expandedData, isLoading, error } = useLaunchpadOwnerInfo(ticker);
     const theme = useTheme();
     const startLaunchpadMutation = useStartLaunchpad(ticker);
@@ -80,19 +65,7 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
         setIsExpanded(false);
     };
 
-    const handleOpenFundDialog = (type: FundType) => {
-        setFundType(type);
-        setIsFundDialogOpen(true);
-    };
-
-    const handleCloseFundDialog = () => {
-        if (isFunding) return;
-
-        setIsFundDialogOpen(false);
-        setFundAmount('');
-    };
-
-    const handleFund = async () => {
+    const handleFund = async (fundType: string) => {
         if (fundType === 'tokens') {
             handleFundTokens();
         } else {
@@ -100,179 +73,74 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
         }
     };
 
+    const queryClient = useQueryClient();
+
     const handleFundTokens = async () => {
         const balance = await fetchWalletKRC20Balance(walletAddress, ticker);
-        if (Number(fundAmount) > balance) {
-            showGlobalSnackbar({ message: 'Insufficient balance', severity: 'error' });
+        if (Number(fundTokensAmount) > balance) {
+            showGlobalSnackbar({ message: 'Insufficient Token balance', severity: 'error' });
+            return;
+        }
+        if (fundTokensAmount === '') {
+            showGlobalSnackbar({ message: 'Please enter an amount', severity: 'error' });
             return;
         }
 
-        setIsFunding(true);
+        setIsTokensFunding(true);
         try {
             const inscribeJsonString: TransferObj = {
                 p: 'KRC-20',
                 op: 'transfer',
                 tick: ticker,
-                amt: (parseInt(fundAmount) * KASPA_TO_SOMPI).toString(),
+                amt: (parseInt(fundTokensAmount) * KASPA_TO_SOMPI).toString(),
                 to: expandedData.lunchpad.senderWalletAddress,
             };
             const jsonStringified = JSON.stringify(inscribeJsonString);
             await transferKRC20Token(jsonStringified);
+            queryClient.invalidateQueries({ queryKey: ['launchpadOwnerInfo', ticker] });
             showGlobalSnackbar({ message: 'Tokens funded successfully', severity: 'success' });
         } catch (error) {
             console.error('Error funding tokens:', error);
             // Handle error (e.g., show an error message)
         } finally {
-            setIsFunding(false);
-            handleCloseFundDialog();
+            setIsTokensFunding(false);
+            setFundTokensAmount('');
         }
     };
 
     const handleFundGas = async () => {
         const balance = await fetchWalletBalance(walletAddress);
-        if (Number(fundAmount) > balance) {
-            showGlobalSnackbar({ message: 'Insufficient balance', severity: 'error' });
+        if (Number(fundGasAmount) > balance) {
+            showGlobalSnackbar({ message: 'Insufficient Kas balance', severity: 'error' });
+            return;
+        }
+        if (fundGasAmount === '') {
+            showGlobalSnackbar({ message: 'Please enter an amount', severity: 'error' });
             return;
         }
 
-        setIsFunding(true);
+        setIsGasFunding(true);
         try {
-            const sompiAmount = parseInt(fundAmount) * KASPA_TO_SOMPI;
+            const sompiAmount = parseInt(fundGasAmount) * KASPA_TO_SOMPI;
             await sendKaspa(expandedData.lunchpad.senderWalletAddress, sompiAmount);
             showGlobalSnackbar({ message: 'Tokens funded successfully', severity: 'success' });
+            queryClient.invalidateQueries({ queryKey: ['launchpadOwnerInfo', ticker] });
         } catch (error) {
             console.error('Error funding tokens:', error);
             // Handle error (e.g., show an error message)
         } finally {
-            setIsFunding(false);
-            handleCloseFundDialog();
+            setIsGasFunding(false);
+            setFundGasAmount('');
         }
     };
 
-    const ExpandedView = () => (
-        <Modal
-            open={isExpanded}
-            onClose={handleClose}
-            aria-labelledby="expanded-launchpad-modal"
-            aria-describedby="expanded-launchpad-description"
-        >
-            <Box
-                sx={{
-                    borderRadius: 2,
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: 900,
-                    bgcolor: 'background.paper',
-                    border: '1px solid #000',
-                    boxShadow: 15,
-                    p: 4,
-                    borderColor: theme.palette.primary.main,
-                    position: 'relative',
-                }}
-            >
-                <IconButton
-                    aria-label="close"
-                    onClick={handleClose}
-                    sx={{
-                        position: 'absolute',
-                        right: 8,
-                        top: 8,
-                        color: (theme) => theme.palette.grey[500],
-                    }}
-                >
-                    <CloseIcon />
-                </IconButton>
-                {isLoading && <Typography>Loading additional details...</Typography>}
-                {error && <Typography color="error">Error loading details: {error.message}</Typography>}
-                {expandedData && expandedData.success && (
-                    <>
-                        <Typography variant="h5" component="h2">
-                            {expandedData.lunchpad.ticker}
-                        </Typography>
-                        {/* ... (other Typography components) */}
-                        <Typography sx={{ fontSize: '1rem' }}>
-                            Round Number: {expandedData.lunchpad.roundNumber}
-                        </Typography>
-                        <Typography sx={{ fontSize: '1rem' }}>
-                            Total Units: {expandedData.lunchpad.totalUnits}
-                        </Typography>
-                        <Typography sx={{ fontSize: '1rem' }}>
-                            Available Units: {expandedData.lunchpad.availabeUnits}
-                        </Typography>
-                        <Typography sx={{ fontSize: '1rem' }}>
-                            KAS per Unit: {expandedData.lunchpad.kasPerUnit}
-                        </Typography>
-                        <Typography sx={{ fontSize: '1rem' }}>
-                            Tokens per Unit: {expandedData.lunchpad.tokenPerUnit}
-                        </Typography>
-                        <Typography sx={{ fontSize: '1rem' }}>Status: {expandedData.lunchpad.status}</Typography>
-                        <Typography sx={{ fontSize: '1rem' }}>
-                            Min Units per Order: {expandedData.lunchpad.minUnitsPerOrder || 'N/A'}
-                        </Typography>
-                        <Typography sx={{ fontSize: '1rem' }}>
-                            Max Units per Order: {expandedData.lunchpad.maxUnitsPerOrder || 'N/A'}
-                        </Typography>
-                        <Typography sx={{ fontSize: '1rem' }}>
-                            KRC20 Tokens Amount: {expandedData.lunchpad.krc20TokensAmount || 'N/A'}
-                        </Typography>
-                        <Typography sx={{ fontSize: '1rem' }}>
-                            Required Kaspa: {expandedData.lunchpad.requiredKaspa || 'N/A'}
-                        </Typography>
-                        <Typography sx={{ fontSize: '1rem' }}>
-                            Open Orders: {expandedData.lunchpad.openOrders || 'N/A'}
-                        </Typography>
-                        <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                            <Button
-                                sx={{ fontSize: '0.75rem', minWidth: '9rem' }}
-                                variant="contained"
-                                onClick={handleStartStop}
-                                disabled={startLaunchpadMutation.isPending || stopLaunchpadMutation.isPending}
-                            >
-                                {startLaunchpadMutation.isPending || stopLaunchpadMutation.isPending
-                                    ? expandedData.lunchpad.status === 'INACTIVE'
-                                        ? 'Starting...'
-                                        : 'Stopping...'
-                                    : expandedData.lunchpad.status === 'INACTIVE'
-                                      ? 'Start Launchpad'
-                                      : 'Stop Launchpad'}
-                            </Button>
-                            <Button
-                                onClick={() => handleOpenFundDialog('tokens')}
-                                variant="contained"
-                                sx={{ fontSize: '0.75rem', minWidth: '8rem' }}
-                            >
-                                Fund Tokens
-                            </Button>
-                            <Button
-                                onClick={() => handleOpenFundDialog('gas')}
-                                variant="contained"
-                                sx={{ fontSize: '0.75rem', minWidth: '8rem' }}
-                            >
-                                Fund Gas
-                            </Button>
-                            <Button
-                                sx={{ fontSize: '0.75rem', minWidth: '8rem' }}
-                                variant="contained"
-                                onClick={() => handleRetrieveFunds(LunchpadWalletType.RECEIVER)}
-                                disabled={retrieveFundsMutation.isPending}
-                            >
-                                {retrieveFundsMutation.isPending ? 'Retrieving...' : 'Retrieve Funds (Receiver)'}
-                            </Button>
-                            <Button
-                                sx={{ fontSize: '0.75rem', minWidth: '8rem' }}
-                                variant="contained"
-                                onClick={() => handleRetrieveFunds(LunchpadWalletType.SENDER)}
-                                disabled={retrieveFundsMutation.isPending}
-                            >
-                                {retrieveFundsMutation.isPending ? 'Retrieving...' : 'Retrieve Funds (Sender)'}
-                            </Button>
-                        </Box>
-                    </>
-                )}
-            </Box>
-        </Modal>
-    );
+    const validateNumbersOnly = (value: string) => {
+        if (value === '') {
+            return true; // Allow empty input
+        }
+        const regex = /^(\d+(\.\d{0,2})?|\.?\d{1,2})$/; // Allows integers and up to 2 decimals
+        return regex.test(value);
+    };
 
     return (
         <>
@@ -323,29 +191,29 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
                     </Typography>
                 </CardContent>
             </Card>
-            {isExpanded && <ExpandedView />}
-            <Dialog open={isFundDialogOpen} onClose={handleCloseFundDialog}>
-                <DialogTitle>Fund {fundType === 'tokens' ? 'Tokens' : 'Gas'}</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="amount"
-                        label={`Amount of ${fundType === 'tokens' ? 'Tokens' : 'Gas'}`}
-                        type="number"
-                        fullWidth
-                        variant="standard"
-                        value={fundAmount}
-                        onChange={(e) => setFundAmount(e.target.value)}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseFundDialog}>Cancel</Button>
-                    <Button onClick={handleFund} disabled={isFunding}>
-                        {isFunding ? 'Funding...' : 'Fund'}
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            {isExpanded && (
+                <ExpandedView
+                    isExpanded={isExpanded}
+                    onClose={handleClose}
+                    isLoading={isLoading}
+                    error={error}
+                    expandedData={expandedData}
+                    handleStartStop={handleStartStop}
+                    handleRetrieveFunds={handleRetrieveFunds}
+                    fundTokensAmount={fundTokensAmount}
+                    setFundTokensAmount={setFundTokensAmount}
+                    fundGasAmount={fundGasAmount}
+                    setFundGasAmount={setFundGasAmount}
+                    handleFund={handleFund}
+                    isTokensFunding={isTokensFunding}
+                    isGasFunding={isGasFunding}
+                    validateNumbersOnly={validateNumbersOnly}
+                    startLaunchpadMutation={startLaunchpadMutation}
+                    stopLaunchpadMutation={stopLaunchpadMutation}
+                    retrieveFundsMutation={retrieveFundsMutation}
+                    theme={theme}
+                />
+            )}
         </>
     );
 };
