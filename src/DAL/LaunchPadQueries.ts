@@ -38,8 +38,8 @@ export const useLaunchpadOwnerInfo = (ticker: string) =>
         // Only run the query if ticker is provided
         enabled: !!ticker,
         // You can add more options here, such as:
-        // staleTime: 60000, // Consider data fresh for 1 minute
-        // refetchInterval: 300000, // Refetch every 5 minutes
+        staleTime: 60000, // Consider data fresh for 1 minute
+        refetchInterval: 300000, // Refetch every 5 minutes
     });
 
 // launchpadMutations.ts

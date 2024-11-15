@@ -483,7 +483,7 @@ export const ERROR_MESSAGES: Record<ErrorCodes, string> = {
     [ErrorCodes.TRANSACTION_VERIFICATION_FAILED]: 'Transaction verification failed.',
     [ErrorCodes.TRANSACTION_DB_UPDATE_FAILED]: 'Failed to update transaction in the database.',
     [ErrorCodes.INVALID_USER_WALLET]: 'User wallet is invalid.',
-    [ErrorCodes.INVALID_SENDER_WALLET_KASPA_AMOUNT]: 'The sender wallet Kaspa amount is invalid.',
+    [ErrorCodes.INVALID_SENDER_WALLET_KASPA_AMOUNT]: 'The Launchpad wallet is missing Kaspa for Gas, Fund Gas.',
     [ErrorCodes.LUNCHPAD_HAVE_OPEN_ORDERS]: 'Lunchpad has open orders.',
     [ErrorCodes.INVALID_WALLET_TYPE]: 'The wallet type is invalid.',
 
