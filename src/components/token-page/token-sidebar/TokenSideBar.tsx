@@ -50,6 +50,7 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                             '& .MuiTabs-flexContainer': {
                                 height: '2rem',
                                 justifyContent: 'center',
+                                gap: '1.3rem',
                             },
                         }}
                     >

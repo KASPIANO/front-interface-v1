@@ -435,7 +435,9 @@ export type ClientSideLunchpad = {
     kasPerUnit: number;
     tokenPerUnit: number;
     roundNumber: number;
+    totalUnits: number;
     minUnitsPerOrder?: number;
+    maxUnitsPerOrder?: number;
     walletAddress?: string;
     senderWalletAddress?: string;
     krc20TokensAmount?: number;
@@ -472,7 +474,7 @@ export const ERROR_MESSAGES: Record<ErrorCodes, string> = {
 
     [ErrorCodes.HIGH_PRIORITY_FEE]: 'Priority fee is too high.',
 
-    [ErrorCodes.NOT_ENOUGH_KRC20_TOKENS]: "You don't have enough KRC20 tokens.",
+    [ErrorCodes.NOT_ENOUGH_KRC20_TOKENS]: "You don't have enough KRC20 tokens, Fund Tokens.",
     [ErrorCodes.INVALID_LUNCHPAD_STATUS]: 'Invalid lunchpad status.',
     [ErrorCodes.INVALID_LUNCHPAD_ORDER_STATUS]: 'Invalid lunchpad order status.',
     [ErrorCodes.INVALID_ORDER_UNITS]: 'The order units are invalid.',
@@ -512,8 +514,8 @@ export enum LunchpadOrderStatus {
 // Types for sorting, pagination, and filters in the getLunchpads request
 
 export enum SortDirection {
-    ASC = 'ASC',
-    DESC = 'DESC',
+    ASC = 'asc',
+    DESC = 'desc',
 }
 
 export type GetLunchpadListFilters = {
@@ -543,7 +545,7 @@ export type CreateLunchpadOrderParams = {
     ticker: string;
     kasPerUnit: number;
     tokenPerUnit: number;
-    maxFeeRatePerTransaction: number;
+    maxFeeRatePerTransaction?: number;
     minUnitsPerOrder?: number;
     maxUnitsPerOrder?: number;
 };
@@ -552,3 +554,27 @@ export enum LunchpadWalletType {
     RECEIVER = 'receiver',
     SENDER = 'sender',
 }
+
+export type ClientSideLunchpadWithStatus = {
+    success: boolean;
+    errorCode?: number;
+    lunchpad: ClientSideLunchpad;
+};
+
+export type ClientSideLunchpadListItem = {
+    id: string;
+    ticker: string;
+    availabeUnits: number;
+    status: LunchpadStatus;
+    kasPerUnit: number;
+    tokenPerUnit: number;
+    roundNumber: number;
+};
+
+export type ClientSideLunchpadListWithStatus = {
+    success: boolean;
+    errorCode?: number;
+    lunchpads: ClientSideLunchpadListItem[];
+    totalCount?: number;
+    allTickers?: string[];
+};

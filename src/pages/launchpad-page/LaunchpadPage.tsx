@@ -3,6 +3,7 @@ import TabPanel from '@mui/lab/TabPanel';
 import TabContext from '@mui/lab/TabContext';
 import { FC, useState, SyntheticEvent } from 'react';
 import CreateLaunchpadForm from '../../components/launchpad/create-launchpad-tab/CreateLaunchpad';
+import OwnerLaunchpadPage from '../../components/launchpad/owner-launchpad/OwnerLaunchpads';
 
 interface LaunchpadPageProps {
     walletAddress: string | null;
@@ -12,7 +13,7 @@ interface LaunchpadPageProps {
 }
 
 const LaunchpadPage: FC<LaunchpadPageProps> = (props) => {
-    const { backgroundBlur } = props;
+    const { backgroundBlur, walletAddress, walletConnected } = props;
     const [activeTab, setActiveTab] = useState('1');
 
     const handleTabChange = (_event: SyntheticEvent, newValue: string) => {
@@ -46,9 +47,11 @@ const LaunchpadPage: FC<LaunchpadPageProps> = (props) => {
                 </Tabs>
                 <TabPanel value="1">{/* <LaunchpadsList /> */}</TabPanel>
                 <TabPanel value="2">
-                    <CreateLaunchpadForm />
+                    <CreateLaunchpadForm walletConnected={walletConnected} />
                 </TabPanel>
-                <TabPanel value="3">{/* <MyLaunchpads /> */}</TabPanel>
+                <TabPanel value="3">
+                    <OwnerLaunchpadPage walletAddress={walletAddress} walletConnected={walletConnected} />
+                </TabPanel>
             </TabContext>
         </div>
     );

@@ -5,26 +5,29 @@ import {
     SortDirection,
     CreateLunchpadOrderParams,
     LunchpadWalletType,
+    ClientSideLunchpad,
+    ClientSideLunchpadWithStatus,
+    ClientSideLunchpadListWithStatus,
 } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const LUNCHPAD_CONTROLLER = 'lunchpad';
 
-export const getLunchpad = async (ticker: string) => {
+export const getLaunchpad = async (ticker: string) => {
     const response = await backendService.get(`/${LUNCHPAD_CONTROLLER}/${ticker}`);
     return response.data;
 };
 
-export const getLunchpadForOwner = async (ticker: string) => {
+export const getLaunchpadForOwner = async (ticker: string): Promise<ClientSideLunchpadWithStatus> => {
     const response = await backendService.post(`/${LUNCHPAD_CONTROLLER}/${ticker}/owner-info`);
     return response.data;
 };
 
-export const getLunchpads = async (
+export const getLaunchpads = async (
     filters: GetLunchpadListParams['filters'] = {},
     pagination: Pagination = { limit: 20, offset: 0 },
     sort: Sort = { direction: SortDirection.DESC },
-): Promise<any> => {
+): Promise<ClientSideLunchpadListWithStatus> => {
     const response = await backendService.post(`/${LUNCHPAD_CONTROLLER}/list`, {
         filters,
         pagination,
@@ -34,41 +37,31 @@ export const getLunchpads = async (
 };
 
 // Creates a new lunchpad order
-export const createLunchpadOrder = async ({
-    ticker,
-    kasPerUnit,
-    tokenPerUnit,
-    maxFeeRatePerTransaction,
-    minUnitsPerOrder,
-    maxUnitsPerOrder,
-}: CreateLunchpadOrderParams): Promise<any> => {
-    const response = await backendService.post(`/${LUNCHPAD_CONTROLLER}/create`, {
-        ticker,
-        kasPerUnit,
-        tokenPerUnit,
-        maxFeeRatePerTransaction,
-        minUnitsPerOrder,
-        maxUnitsPerOrder,
-    });
+
+export const createLaunchpad = async (params: CreateLunchpadOrderParams): Promise<ClientSideLunchpad> => {
+    const response = await backendService.post(`/${LUNCHPAD_CONTROLLER}/create`, params);
     return response.data;
 };
 
-export const startLunchpad = async (id: string) => {
+export const startLaunchpad = async (id: string): Promise<ClientSideLunchpadWithStatus> => {
     const response = await backendService.post(`/${LUNCHPAD_CONTROLLER}/${id}/start`);
     return response.data;
 };
 
-export const stopLunchpad = async (id: string) => {
+export const stopLaunchpad = async (id: string): Promise<ClientSideLunchpadWithStatus> => {
     const response = await backendService.post(`/${LUNCHPAD_CONTROLLER}/${id}/stop`);
     return response.data;
 };
 
-export const retrieveFunds = async (id: string, walletType: LunchpadWalletType) => {
+export const retrieveFunds = async (
+    id: string,
+    walletType: LunchpadWalletType,
+): Promise<ClientSideLunchpadWithStatus> => {
     const response = await backendService.post(`/${LUNCHPAD_CONTROLLER}/${id}/retrieve-funds/${walletType}`);
     return response.data;
 };
 
-export const createLunchpadOrderWithId = async (ticker: string, units: number) => {
+export const createLaunchpadOrderWithId = async (ticker: string, units: number) => {
     const response = await backendService.post(`/${LUNCHPAD_CONTROLLER}/${ticker}/create-order`, {
         units,
     });
