@@ -29,7 +29,7 @@ export const useGetOwnerLaunchpads = (
     sort: Sort = { direction: SortDirection.DESC },
 ) =>
     useQuery({
-        queryKey: ['launchpads', , filters, pagination, sort],
+        queryKey: ['launchpads', filters, pagination, sort],
         queryFn: () => getLaunchpads(filters, pagination, sort),
         // You can add more options here, such as:
         // refetchInterval: 5000, // Refetch every 5 seconds

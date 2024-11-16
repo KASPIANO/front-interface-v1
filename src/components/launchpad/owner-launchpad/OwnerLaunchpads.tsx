@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import { useGetOwnerLaunchpads } from '../../../DAL/LaunchPadQueries';
 import LaunchpadCard from './OwnerLaunchpadItem';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface OwnerLaunchpadPageProps {
     walletAddress: string;
@@ -11,6 +12,11 @@ interface OwnerLaunchpadPageProps {
 const OwnerLaunchpadPage: React.FC<OwnerLaunchpadPageProps> = (props) => {
     const { walletAddress, walletConnected } = props;
     const { data, isLoading, error } = useGetOwnerLaunchpads();
+    const queryClient = useQueryClient();
+    useEffect(() => {
+        queryClient.invalidateQueries({ queryKey: ['launchpads'] });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [walletAddress]);
 
     if (!walletConnected) {
         return (
