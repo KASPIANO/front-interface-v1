@@ -72,9 +72,10 @@ const ExpandedView: React.FC<{
                 aria-label="close"
                 onClick={onClose}
                 sx={{
+                    padding: 0,
                     position: 'absolute',
-                    right: 8,
-                    top: 8,
+                    right: 7,
+                    top: 7,
                     color: (theme) => theme.palette.grey[500],
                 }}
             >
@@ -177,7 +178,6 @@ const ExpandedView: React.FC<{
                         Fund Tokens
                     </Typography>
                     <TextField
-                        autoFocus
                         margin="dense"
                         id="amount"
                         label={'Amount of Tokens'}
@@ -220,7 +220,6 @@ const ExpandedView: React.FC<{
                         Fund Gas Fees
                     </Typography>
                     <TextField
-                        autoFocus
                         margin="dense"
                         id="amount"
                         label={'Kas Amount for Fees'}

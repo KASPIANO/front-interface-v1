@@ -8,18 +8,21 @@ import {
     ClientSideLunchpad,
     ClientSideLunchpadWithStatus,
     ClientSideLunchpadListWithStatus,
+    ClientSideLunchpadOrderWithStatus,
 } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const LUNCHPAD_CONTROLLER = 'lunchpad';
 
-export const getLaunchpad = async (ticker: string) => {
-    const response = await backendService.get(`/${LUNCHPAD_CONTROLLER}/${ticker}`);
-    return response.data;
+export const getLaunchpad = async (ticker: string): Promise<ClientSideLunchpad> => {
+    const upperCaseTicker = ticker.toUpperCase();
+    const response = await backendService.get(`/${LUNCHPAD_CONTROLLER}/${upperCaseTicker}`);
+    return response.data.lunchpad;
 };
 
 export const getLaunchpadForOwner = async (ticker: string): Promise<ClientSideLunchpadWithStatus> => {
-    const response = await backendService.post(`/${LUNCHPAD_CONTROLLER}/${ticker}/owner-info`);
+    const upperCaseTicker = ticker.toUpperCase();
+    const response = await backendService.post(`/${LUNCHPAD_CONTROLLER}/${upperCaseTicker}/owner-info`);
     return response.data;
 };
 
@@ -61,8 +64,12 @@ export const retrieveFunds = async (
     return response.data;
 };
 
-export const createLaunchpadOrderWithId = async (ticker: string, units: number) => {
-    const response = await backendService.post(`/${LUNCHPAD_CONTROLLER}/${ticker}/create-order`, {
+export const createLaunchpadOrderWithId = async (
+    ticker: string,
+    units: number,
+): Promise<ClientSideLunchpadOrderWithStatus> => {
+    const upperCaseTicker = ticker.toUpperCase();
+    const response = await backendService.post(`/${LUNCHPAD_CONTROLLER}/${upperCaseTicker}/create-order`, {
         units,
     });
     return response.data;

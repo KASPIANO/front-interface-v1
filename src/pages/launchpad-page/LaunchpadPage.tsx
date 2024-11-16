@@ -25,6 +25,7 @@ const LaunchpadPage: FC<LaunchpadPageProps> = (props) => {
             style={{
                 filter: backgroundBlur ? 'blur(6px)' : 'none',
                 transition: 'backdrop-filter 0.3s ease',
+                padding: '0.2rem 1rem 0.1rem 1rem',
             }}
         >
             <TabContext value={activeTab}>

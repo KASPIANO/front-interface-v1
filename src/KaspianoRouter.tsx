@@ -16,6 +16,7 @@ import TeamPage from './pages/team-page/MeetTheTeam';
 import FAQ from './pages/faqs/Faqs';
 import { UserReferral } from './types/Types';
 import LaunchpadPage from './pages/launchpad-page/LaunchpadPage';
+import Launchpad from './components/launchpad/Launchpad';
 // import PartnersPage from './pages/partners/Partners';
 // import AdsPage from './pages/ads-page/AdsPage';
 
@@ -119,6 +120,17 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
             path="/launchpad"
             element={
                 <LaunchpadPage
+                    walletBalance={walletBalance}
+                    walletAddress={walletAddress}
+                    backgroundBlur={backgroundBlur}
+                    walletConnected={walletConnected}
+                />
+            }
+        />
+        <Route
+            path="/launchpad/:ticker"
+            element={
+                <Launchpad
                     walletBalance={walletBalance}
                     walletAddress={walletAddress}
                     backgroundBlur={backgroundBlur}
