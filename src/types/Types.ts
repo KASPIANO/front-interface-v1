@@ -578,3 +578,19 @@ export type ClientSideLunchpadListWithStatus = {
     totalCount?: number;
     allTickers?: string[];
 };
+
+export type ClientSideLunchpadOrderWithStatus = {
+    success: boolean;
+    errorCode?: number;
+    lunchpad?: ClientSideLunchpad;
+    lunchpadOrder: ClientSideLunchpadOrder;
+};
+
+export type ClientSideLunchpadOrder = {
+    id: string;
+    totalUnits: number;
+    kasPerUnit: number;
+    tokenPerUnit: number;
+    status: LunchpadOrderStatus;
+    createdAt: Date;
+};

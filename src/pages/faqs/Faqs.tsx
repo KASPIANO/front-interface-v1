@@ -81,9 +81,6 @@ const FAQ: React.FC = () => (
                     </Link>
                 </Box>
                 <Box sx={{ width: '23%' }}>
-                    <Link href="#features" underline="hover" sx={{ display: 'block', marginBottom: '0.5rem' }}>
-                        Features
-                    </Link>
                     <Link
                         href="#mainnet-testnet"
                         underline="hover"
@@ -97,6 +94,25 @@ const FAQ: React.FC = () => (
                         sx={{ display: 'block', marginBottom: '0.5rem' }}
                     >
                         About Kaspiano
+                    </Link>
+                </Box>
+                <Box sx={{ width: '23%' }}>
+                    <Link href="#features" underline="hover" sx={{ display: 'block', marginBottom: '0.5rem' }}>
+                        Features
+                    </Link>
+                    <Link
+                        href="#launchpad-tool"
+                        underline="hover"
+                        sx={{ display: 'block', marginBottom: '0.5rem' }}
+                    >
+                        Launchpad Tool
+                    </Link>
+                    <Link
+                        href="#launchpad-tool"
+                        underline="hover"
+                        sx={{ display: 'block', marginBottom: '0.5rem' }}
+                    >
+                        Airdrop Tool
                     </Link>
                 </Box>
             </Box>

@@ -121,7 +121,7 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = (props) => {
     };
 
     return (
-        <Box sx={{ padding: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ padding: '30px 60px', display: 'flex', flexDirection: 'column', gap: 2 }}>
             <TextField
                 label="Ticker"
                 fullWidth
