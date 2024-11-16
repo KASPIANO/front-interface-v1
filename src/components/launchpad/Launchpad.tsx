@@ -256,6 +256,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
+                padding: 8,
             }}
         >
             <Box
@@ -265,6 +266,8 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: 4,
+                    paddingBottom: 2,
+                    paddingTop: 2,
                     gap: 4,
                     bgcolor: 'background.paper',
                     border: `1px solid ${theme.palette.primary.main}`,
