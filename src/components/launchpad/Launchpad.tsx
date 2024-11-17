@@ -131,7 +131,6 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                 const kaspaToSompi = kaspaNeeded * KASPA_TO_SOMPI;
 
                 try {
-                    debugger;
                     const txData = await sendKaspa(launchpad.walletAddress, kaspaToSompi);
                     const parsedTxData = JSON.parse(txData);
                     const txId = parsedTxData.id;
@@ -144,7 +143,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                         severity: 'error',
                     });
                     // Optionally, you might want to cancel the order here
-                    await handleCancelOrder(orderResult.lunchpad.id);
+                    await handleCancelOrder(orderResult.lunchpadOrder.id);
                 }
             } else {
                 showGlobalSnackbar({
