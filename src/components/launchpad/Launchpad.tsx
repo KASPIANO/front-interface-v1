@@ -127,8 +127,16 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
             const orderResult = await createOrderMutation.mutateAsync(selectedUnits);
 
             if (orderResult.success) {
-                setOrderId(orderResult.lunchpad.id);
-                const kaspaToSompi = kaspaNeeded * KASPA_TO_SOMPI;
+                setOrderId(orderResult.lunchpadOrder.id);
+                const updatedKaspaNeeded =
+                    orderResult.lunchpadOrder.kasPerUnit * orderResult.lunchpadOrder.totalUnits;
+                const kaspaToSompi = updatedKaspaNeeded * KASPA_TO_SOMPI;
+                if (selectedUnits !== orderResult.lunchpadOrder.totalUnits) {
+                    showGlobalSnackbar({
+                        message: `Only ${orderResult.lunchpadOrder.totalUnits} units available. Purchase adjusted.`,
+                        severity: 'warning',
+                    });
+                }
 
                 try {
                     const txData = await sendKaspa(launchpad.walletAddress, kaspaToSompi);
