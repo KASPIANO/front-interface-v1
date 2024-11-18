@@ -31,7 +31,8 @@ interface BuyPanelProps {
 }
 
 const KASPA_TO_SOMPI = 100000000;
-
+const KASPIANO_TRADE_COMMISSION = import.meta.env.VITE_TRADE_COMMISSION;
+const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const { tokenInfo, walletBalance, walletConnected, kasPrice, walletAddress, setBuyPanelRef } = props;
     const [sortBy, setSortBy] = useState('pricePerToken');
@@ -165,6 +166,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         try {
             const { psktSeller, success } = await startBuyOrderV2(order.orderId);
             // validation
+
             if (!success) {
                 showGlobalSnackbar({
                     message: 'Order already taken. Please select another order.',
@@ -264,11 +266,14 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         }
     };
 
-    const handlePurchaseV2 = async () => {
+    const handlePurchaseV2 = async (order: Order) => {
         let txId;
         try {
+            const fee = KASPIANO_TRADE_COMMISSION > 0 ? KASPIANO_TRADE_COMMISSION * order.totalPrice : 0;
+            const extraOutput = [{ address: KASPIANO_WALLET, amount: fee }];
             setWaitingForWalletConfirmation(true);
-            txId = await buyOrderKRC20(psktSeller);
+            const finalFee = fee > 0 ? extraOutput : [];
+            txId = await buyOrderKRC20(psktSeller, finalFee);
             console.log('txId', txId);
 
             if (isEmptyString(txId)) {

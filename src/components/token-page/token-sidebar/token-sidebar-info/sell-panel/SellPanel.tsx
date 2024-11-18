@@ -248,17 +248,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             return;
         }
 
-        if (parseInt(totalPrice) < 25) {
-            showGlobalSnackbar({
-                message: 'Please enter a valid total price has to be more than 25 KAS',
-                severity: 'error',
-            });
-            setDisableSellButton(false);
-            return;
-        }
         try {
-            // Retrieve wallet temp wallert address and order id and set it
-
             setIsDialogOpen(true);
         } catch (error) {
             console.error(error);

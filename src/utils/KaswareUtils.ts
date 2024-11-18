@@ -4,7 +4,6 @@ import Cookies from 'js-cookie';
 import { getPriorityFee } from '../DAL/KaspaApiDal';
 import { KaswareSendKaspaResult } from '../types/Types';
 import { saveMintData } from '../DAL/BackendDAL';
-import { showGlobalDialog } from '../components/dialog-context/DialogContext';
 import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
 
 export const USER_REJECTED_TRANSACTION_ERROR_CODE = 4001;
@@ -266,6 +265,20 @@ export const buyOrderKRC20 = async (
             txJsonString,
             extraOutput,
             priorityFee: kasPriorityFee,
+        });
+        return txId; // txId is a string
+    } catch (error) {
+        console.error('Failed to transfer KRC20 token:', error);
+        throw error;
+    }
+};
+export const cancelOrderKRC20 = async (ticker: string, txJsonString: string): Promise<string> => {
+    if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
+    await versionCheck(PKST_VERSION);
+    try {
+        const txId = await window.kasware.cancelKRC20Order({
+            krc20Tick: ticker,
+            txJsonString,
         });
         return txId; // txId is a string
     } catch (error) {
