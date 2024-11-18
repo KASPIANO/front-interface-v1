@@ -26,7 +26,7 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
 
     const handleSelect = async (order: Order) => {
         setSelectedOrder(order);
-        if (order.isNew) {
+        if (order.isDecentralized) {
             await onSelectV2(order);
         } else {
             await onSelect(order);

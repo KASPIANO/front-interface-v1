@@ -14,7 +14,7 @@ interface OrderDetailsProps {
     walletConnected: boolean;
     walletBalance: number;
     kasPrice: number;
-    onClose: (orderId: string, isNew: boolean) => void;
+    onClose: (orderId: string, isDecentralized: boolean) => void;
     timeLeft: number;
     handlePurchase: (order: Order, finalTotal: number) => void;
     waitingForWalletConfirmation: boolean;
@@ -40,11 +40,11 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     const [showHighGasWarning, setShowHighGasWarning] = useState(false);
     const [showGasLimitExceeded, setShowGasLimitExceeded] = useState(false);
     // Fee Calculations
-    const networkFee = order.isNew ? 2 : 5;
+    const networkFee = order.isDecentralized ? 2 : 5;
     const finalTotal = order.totalPrice + networkFee;
     const platformFee = KASPIANO_TRADE_COMMISSION > 0 ? order.totalPrice * KASPIANO_TRADE_COMMISSION : 0;
     const finalTotalWithCommission = finalTotal + platformFee;
-    const feeText = order.isNew ? 'PKST Fee' : 'Network Fee';
+    const feeText = order.isDecentralized ? 'PKST Fee' : 'Network Fee';
 
     const formatTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60)
@@ -67,7 +67,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     }, []);
 
     const handleOrderPurchase = async (order: Order, finalTotal: number) => {
-        if (order.isNew) {
+        if (order.isDecentralized) {
             await handlePurchaseV2(order, finalTotalWithCommission);
         } else {
             await handlePurchase(order, finalTotal);
@@ -129,7 +129,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                 {showGasLimitExceeded && <GasLimitExceeded />}
                                 {showHighGasWarning && !showGasLimitExceeded && <HighGasWarning />}
                             </Box>
-                            <IconButton onClick={() => onClose(order.orderId, order.isNew)}>
+                            <IconButton onClick={() => onClose(order.orderId, order.isDecentralized)}>
                                 <CloseIcon
                                     sx={{
                                         fontSize: '1rem',
@@ -187,7 +187,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                 </Typography>
                             </OrderItemPrimary>
                         </OrderDetailsItem>
-                        {order.isNew && KASPIANO_TRADE_COMMISSION > 0 && (
+                        {order.isDecentralized && KASPIANO_TRADE_COMMISSION > 0 && (
                             <OrderDetailsItem variant="body1">
                                 Platform Fee ({KASPIANO_TRADE_COMMISSION * 100}%):
                                 <OrderItemPrimary

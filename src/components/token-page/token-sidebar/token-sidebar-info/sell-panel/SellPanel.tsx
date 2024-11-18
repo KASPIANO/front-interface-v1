@@ -366,6 +366,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     parseInt(totalPrice),
                     parseFloat(pricePerToken),
                     txJsonString,
+                    sendCommitTxId,
                 );
                 showGlobalSnackbar({
                     message: 'Sell order created successfully',
