@@ -6,8 +6,14 @@ import OrderList from './order-list/OrderList';
 import BuyHeader from './buy-header/BuyHeader';
 import OrderDetails from './order-details/OrderDetails';
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
-import { sendKaspa, USER_REJECTED_TRANSACTION_ERROR_CODE } from '../../../../../utils/KaswareUtils';
-import { startBuyOrder, confirmBuyOrder, releaseBuyLock, startBuyOrderV2 } from '../../../../../DAL/BackendP2PDAL';
+import { buyOrderKRC20, sendKaspa, USER_REJECTED_TRANSACTION_ERROR_CODE } from '../../../../../utils/KaswareUtils';
+import {
+    startBuyOrder,
+    confirmBuyOrder,
+    releaseBuyLock,
+    startBuyOrderV2,
+    releaseBuyLockV2,
+} from '../../../../../DAL/BackendP2PDAL';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material'; // Import CircularProgress for the spinner
 import { useFetchOrders } from '../../../../../DAL/UseQueriesBackend';
@@ -50,7 +56,11 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setBuyPanelRef({
                 handleDrawerClose: () => {
                     if (selectedOrder) {
-                        releaseBuyLock(selectedOrder.orderId);
+                        if (selectedOrder.isNew) {
+                            releaseBuyLockV2(selectedOrder.orderId);
+                        } else {
+                            releaseBuyLock(selectedOrder.orderId);
+                        }
                         setIsPanelOpen(false);
                         setSelectedOrder(null);
                     }
@@ -62,7 +72,11 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     useEffect(() => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
             if (selectedOrder) {
-                releaseBuyLock(selectedOrder.orderId);
+                if (selectedOrder.isNew) {
+                    releaseBuyLockV2(selectedOrder.orderId);
+                } else {
+                    releaseBuyLock(selectedOrder.orderId);
+                }
                 setIsPanelOpen(false);
                 setSelectedOrder(null);
                 event.preventDefault();
@@ -100,7 +114,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 message: 'Purchase canceled due to timeout.',
                 severity: 'info',
             });
-            handleDrawerClose(selectedOrder.orderId); // Close the OrderDetails panel
+            handleDrawerClose(selectedOrder.orderId, selectedOrder.isNew); // Close the OrderDetails panel
         };
 
         // Reset the timer when selectedOrder changes
@@ -250,9 +264,67 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         }
     };
 
+    const handlePurchaseV2 = async () => {
+        let txId;
+        try {
+            setWaitingForWalletConfirmation(true);
+            txId = await buyOrderKRC20(psktSeller);
+            console.log('txId', txId);
+
+            if (isEmptyString(txId)) {
+                throw new Error('paymentTxn is empty');
+            }
+        } catch (err) {
+            console.error(err);
+            if (err?.code !== USER_REJECTED_TRANSACTION_ERROR_CODE) {
+                showGlobalSnackbar({
+                    message:
+                        "Payment failed. Please ensure you're using the latest version of the wallet and try to compound your UTXOs before retrying.",
+                    severity: 'error',
+                });
+            }
+
+            setWaitingForWalletConfirmation(false);
+            return;
+        }
+        setWaitingForWalletConfirmation(false);
+
+        if (txId) {
+            showGlobalSnackbar({
+                message: 'Purchase successful!',
+                severity: 'success',
+                txIds: [txId],
+            });
+            queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker] });
+            setIsPanelOpen(false);
+            setSelectedOrder(null);
+        } else {
+            const errorMessage =
+                "Purchase failed in the process. Please wait 10 minutes and contact support if you didn't receive the tokens.";
+
+            // if (priorityFeeTooHigh) {
+            //     errorMessage =
+            //         "The network fee is currently too high, so we can't process your order. Your order will be executed when the fee returns to normal.";
+            // }
+            showGlobalSnackbar({
+                message: errorMessage,
+                severity: 'error',
+            });
+
+            setIsProcessingBuyOrder(false);
+            setIsPanelOpen(false);
+            setSelectedOrder(null);
+        }
+    };
+
     // Handler to close the drawer
-    const handleDrawerClose = async (orderId: string) => {
-        releaseBuyLock(orderId);
+    const handleDrawerClose = async (orderId: string, isNew: boolean) => {
+        if (isNew) {
+            releaseBuyLockV2(orderId);
+        } else {
+            releaseBuyLock(orderId);
+        }
+
         setIsPanelOpen(false);
         setSelectedOrder(null);
     };
@@ -320,6 +392,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                             isProcessingBuyOrder={isProcessingBuyOrder}
                             waitingForWalletConfirmation={waitingForWalletConfirmation}
                             handlePurchase={handlePurchase}
+                            handlePurchaseV2={handlePurchaseV2}
                             order={selectedOrder}
                             kasPrice={kasPrice}
                             walletConnected={walletConnected}

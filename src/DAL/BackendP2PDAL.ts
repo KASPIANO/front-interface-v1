@@ -64,7 +64,7 @@ export const startBuyOrderV2 = async (
         id: string;
         status: string;
         success: boolean;
-    }>(`/${P2PCONTROLLER}/buy/${orderId}`);
+    }>(`/${P2PCONTROLLER}/buy-v2/${orderId}`);
     return response.data;
 };
 
@@ -205,6 +205,15 @@ export const removeFromMarketplace = async (orderId: string, walletAddress: stri
 export const releaseBuyLock = async (orderId: string): Promise<any> => {
     try {
         const response = await backendService.post<any>(`/${P2PCONTROLLER}/releaseBuyLock/${orderId}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error deleting order ${orderId}:`, error.response ? error.response.data : error.message);
+        return { confirmed: false }; // Return empty array in case of an error
+    }
+};
+export const releaseBuyLockV2 = async (orderId: string): Promise<any> => {
+    try {
+        const response = await backendService.post<any>(`/${P2PCONTROLLER}/releaseBuyLock-v2/${orderId}`);
         return response.data;
     } catch (error) {
         console.error(`Error deleting order ${orderId}:`, error.response ? error.response.data : error.message);

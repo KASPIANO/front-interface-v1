@@ -14,11 +14,12 @@ interface OrderDetailsProps {
     walletConnected: boolean;
     walletBalance: number;
     kasPrice: number;
-    onClose: (orderId: string) => void;
+    onClose: (orderId: string, isNew: boolean) => void;
     timeLeft: number;
     handlePurchase: (order: Order, finalTotal: number) => void;
     waitingForWalletConfirmation: boolean;
     isProcessingBuyOrder: boolean;
+    handlePurchaseV2: (order: Order) => void;
 }
 
 const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
@@ -32,6 +33,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
         handlePurchase,
         waitingForWalletConfirmation,
         isProcessingBuyOrder,
+        handlePurchaseV2,
     } = props;
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [showHighGasWarning, setShowHighGasWarning] = useState(false);
@@ -59,6 +61,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
 
         checkGasLimits();
     }, []);
+
+    const handleOrderPurchase = async (order: Order, finalTotal: number) => {
+        if (order.isNew) {
+            await handlePurchaseV2(order);
+        } else {
+            await handlePurchase(order, finalTotal);
+        }
+    };
 
     const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setAgreedToTerms(event.target.checked);
@@ -115,7 +125,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                 {showGasLimitExceeded && <GasLimitExceeded />}
                                 {showHighGasWarning && !showGasLimitExceeded && <HighGasWarning />}
                             </Box>
-                            <IconButton onClick={() => onClose(order.orderId)}>
+                            <IconButton onClick={() => onClose(order.orderId, order.isNew)}>
                                 <CloseIcon
                                     sx={{
                                         fontSize: '1rem',
@@ -225,7 +235,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                             <Button
                                 variant="contained"
                                 color="primary"
-                                onClick={() => handlePurchase(order, finalTotal)}
+                                onClick={() => handleOrderPurchase(order, finalTotal)}
                                 disabled={!walletConnected || walletBalance < finalTotal || !agreedToTerms}
                                 sx={{ width: '100%' }}
                             >
