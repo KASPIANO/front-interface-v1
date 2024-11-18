@@ -19,7 +19,7 @@ interface OrderDetailsProps {
     handlePurchase: (order: Order, finalTotal: number) => void;
     waitingForWalletConfirmation: boolean;
     isProcessingBuyOrder: boolean;
-    handlePurchaseV2: (order: Order) => void;
+    handlePurchaseV2: (order: Order, finalTotal: number) => void;
 }
 
 const KASPIANO_TRADE_COMMISSION = import.meta.env.VITE_TRADE_COMMISSION;
@@ -42,7 +42,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     // Fee Calculations
     const networkFee = order.isNew ? 2 : 5;
     const finalTotal = order.totalPrice + networkFee;
-    const platformFee = KASPIANO_TRADE_COMMISSION > 0 ? finalTotal * KASPIANO_TRADE_COMMISSION : 0;
+    const platformFee = KASPIANO_TRADE_COMMISSION > 0 ? order.totalPrice * KASPIANO_TRADE_COMMISSION : 0;
     const finalTotalWithCommission = finalTotal + platformFee;
     const feeText = order.isNew ? 'PKST Fee' : 'Network Fee';
 
@@ -68,7 +68,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
 
     const handleOrderPurchase = async (order: Order, finalTotal: number) => {
         if (order.isNew) {
-            await handlePurchaseV2(order);
+            await handlePurchaseV2(order, finalTotalWithCommission);
         } else {
             await handlePurchase(order, finalTotal);
         }
@@ -196,14 +196,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                         alignItems: 'center',
                                     }}
                                 >
-                                    <IconButton size="small">
-                                        <InfoOutlinedIcon
-                                            sx={{
-                                                fontSize: '0.7rem',
-                                            }}
-                                            fontSize="small"
-                                        />
-                                    </IconButton>
                                     {platformFee.toFixed(2)} KAS
                                     <Typography
                                         sx={{ ml: '0.3rem' }}

@@ -266,13 +266,21 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         }
     };
 
-    const handlePurchaseV2 = async (order: Order) => {
+    const handlePurchaseV2 = async (order: Order, finalTotal: number) => {
         let txId;
+        if (walletBalance < finalTotal) {
+            showGlobalSnackbar({
+                message: 'Insufficient balance for this order',
+                severity: 'error',
+            });
+            return;
+        }
         try {
             const fee = KASPIANO_TRADE_COMMISSION > 0 ? KASPIANO_TRADE_COMMISSION * order.totalPrice : 0;
             const extraOutput = [{ address: KASPIANO_WALLET, amount: fee }];
             setWaitingForWalletConfirmation(true);
             const finalFee = fee > 0 ? extraOutput : [];
+
             txId = await buyOrderKRC20(psktSeller, finalFee);
             console.log('txId', txId);
 
