@@ -6,8 +6,12 @@ import { fetchWalletKRC20Balance } from '../../../../../DAL/Krc20DAL';
 import { SwapHoriz } from '@mui/icons-material'; // MUI icon for swap
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
-import { MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION, transferKRC20Token } from '../../../../../utils/KaswareUtils';
-import { confirmSellOrder, createSellOrder } from '../../../../../DAL/BackendP2PDAL';
+import {
+    createOrderKRC20,
+    MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION,
+    transferKRC20Token,
+} from '../../../../../utils/KaswareUtils';
+import { confirmSellOrder, createSellOrder, createSellOrderV2 } from '../../../../../DAL/BackendP2PDAL';
 import { doPolling } from '../../../../../utils/Utils';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -351,6 +355,68 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         }
     };
 
+    const handleTransferV2 = async () => {
+        try {
+        } catch (error) {
+            showGlobalSnackbar({
+                message: 'Failed to create sell order for the token. Please try again later.',
+                severity: 'error',
+            });
+            return;
+        }
+        setWalletConfirmation(true);
+        try {
+            const { txJsonString, sendCommitTxId } = await createOrderKRC20(
+                tokenInfo.ticker,
+                parseInt(tokenAmount),
+                parseInt(totalPrice),
+            );
+            setCreatingSellOrder(true);
+            setWalletConfirmation(false);
+            if (txJsonString || sendCommitTxId) {
+                console.log('txJsonString', txJsonString);
+                await createSellOrderV2(
+                    tokenInfo.ticker,
+                    parseInt(tokenAmount),
+                    parseInt(totalPrice),
+                    parseFloat(pricePerToken),
+                    txJsonString,
+                );
+                showGlobalSnackbar({
+                    message: 'Sell order created successfully',
+                    severity: 'success',
+                    commitId: sendCommitTxId,
+                });
+                // add kasplex valdiation of utxo creation sendcommit
+                setIsDialogOpen(false);
+                setDisableSellButton(false);
+                cleanFields();
+                queryClient.invalidateQueries({ queryKey: ['orders'] });
+                setFinishedSellOrder((prev) => !prev);
+                setTimeout(() => {
+                    setCreatingSellOrder(false); // Ensures it closes after a slight delay
+                }, 500);
+
+                return true;
+            } else {
+                showGlobalSnackbar({
+                    message: 'Failed to create sell order',
+                    severity: 'error',
+                });
+                return false;
+            }
+        } catch (error) {
+            setCreatingSellOrder(false);
+            setWalletConfirmation(false);
+            showGlobalSnackbar({
+                message: 'Failed to Transfer Token',
+                severity: 'error',
+                details: error.message,
+            });
+            return false;
+        }
+    };
+
     const handleCloseDialog = () => {
         setIsDialogOpen(false);
         setDisableSellButton(false);
@@ -542,6 +608,15 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                         >
                             {disableSellButton ? 'Creating Your Sell Order...' : 'Create Sell Order'}
                         </StyledButton>
+                        <StyledButton
+                            sx={{ marginTop: '10px' }}
+                            variant="contained"
+                            onClick={handleCreateSellOrder}
+                            fullWidth
+                            disabled={!walletConnected || walletTickerBalance === 0 || disableSellButton}
+                        >
+                            {disableSellButton ? 'Creating Your Sell Order...' : 'Create SellV2 Order'}
+                        </StyledButton>
                     </span>
                 </Tooltip>
             </StyledSellPanel>
@@ -550,7 +625,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 waitingForWalletConfirmation={walletConfirmation}
                 open={isDialogOpen}
                 onClose={handleCloseDialog}
-                onConfirm={handleTransfer}
+                onConfirm={handleTransferV2}
                 ticker={tokenInfo.ticker}
                 tokenAmount={tokenAmount}
                 totalPrice={totalPrice}

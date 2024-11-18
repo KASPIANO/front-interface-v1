@@ -7,7 +7,7 @@ import BuyHeader from './buy-header/BuyHeader';
 import OrderDetails from './order-details/OrderDetails';
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import { sendKaspa, USER_REJECTED_TRANSACTION_ERROR_CODE } from '../../../../../utils/KaswareUtils';
-import { startBuyOrder, confirmBuyOrder, releaseBuyLock } from '../../../../../DAL/BackendP2PDAL';
+import { startBuyOrder, confirmBuyOrder, releaseBuyLock, startBuyOrderV2 } from '../../../../../DAL/BackendP2PDAL';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material'; // Import CircularProgress for the spinner
 import { useFetchOrders } from '../../../../../DAL/UseQueriesBackend';
@@ -34,6 +34,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [timeLeft, setTimeLeft] = useState(240);
     const [tempWalletAddress, setTempWalletAddress] = useState('');
+    const [psktSeller, setPsktSeller] = useState('');
     const [isProcessingBuyOrder, setIsProcessingBuyOrder] = useState(false);
     const [waitingForWalletConfirmation, setWaitingForWalletConfirmation] = useState(false);
     const queryClient = useQueryClient();
@@ -136,6 +137,30 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 return;
             }
             setTempWalletAddress(temporaryWalletAddress);
+            setIsPanelOpen(true);
+        } catch (error) {
+            console.error(error);
+            showGlobalSnackbar({
+                message: 'Failed to start the buying process. Please try again later.',
+                severity: 'error',
+            });
+        }
+    };
+
+    const handleOrderSelectV2 = async (order: Order) => {
+        try {
+            const { psktSeller, success } = await startBuyOrderV2(order.orderId);
+            // validation
+            if (!success) {
+                showGlobalSnackbar({
+                    message: 'Order already taken. Please select another order.',
+                    severity: 'error',
+                });
+                setSelectedOrder(null);
+                setIsPanelOpen(false);
+                return;
+            }
+            setPsktSeller(psktSeller);
             setIsPanelOpen(true);
         } catch (error) {
             console.error(error);
@@ -273,6 +298,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                             kasPrice={kasPrice}
                             orders={orders}
                             onOrderSelect={handleOrderSelect}
+                            onOrderSelectV2={handleOrderSelectV2}
                             floorPrice={tokenInfo.price}
                         />
                     </InfiniteScroll>

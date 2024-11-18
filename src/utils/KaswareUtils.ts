@@ -226,6 +226,29 @@ export const transferKRC20Token = async (inscribeJsonString: string): Promise<st
     }
 };
 
+// NEED to revise priorityfee
+export const createOrderKRC20 = async (
+    krc20Tick: string,
+    krc20Amount: number,
+    kasAmount: number,
+): Promise<{ txJsonString: string; sendCommitTxId: string }> => {
+    if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
+    try {
+        const priorityFee = await getPriorityFee('TRANSFER');
+        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
+        const { txJsonString, sendCommitTxId } = await window.kasware.createKRC20Order({
+            krc20Tick,
+            krc20Amount,
+            kasAmount,
+            priorityFee: kasPriorityFee,
+        });
+        return { txJsonString, sendCommitTxId };
+    } catch (error) {
+        console.error('Failed to transfer KRC20 token:', error);
+        throw error;
+    }
+};
+
 // Event handling for account changes
 export const onAccountsChanged = (handler: (accounts: Array<string>) => void) => {
     window.kasware.on('accountsChanged', handler);

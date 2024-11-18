@@ -15,16 +15,22 @@ interface OrderItemProps {
     setSelectedOrder;
     walletConnected: boolean;
     ticker: string;
+    onSelectV2;
 }
 
 const OrderItem: React.FC<OrderItemProps> = (props) => {
-    const { order, onSelect, kasPrice, selectedOrder, setSelectedOrder, walletConnected, ticker } = props;
+    const { order, onSelect, kasPrice, selectedOrder, setSelectedOrder, walletConnected, ticker, onSelectV2 } =
+        props;
 
     // const floorPriceDifference = ((order.pricePerToken - floorPrice) / floorPrice) * 100;
 
     const handleSelect = async (order: Order) => {
         setSelectedOrder(order);
-        await onSelect(order);
+        if (order.isNew) {
+            await onSelectV2(order);
+        } else {
+            await onSelect(order);
+        }
     };
 
     const formatPrice = (price: number) => {

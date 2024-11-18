@@ -24,6 +24,23 @@ export const createSellOrder = async (
     );
     return response.data;
 };
+export const createSellOrderV2 = async (
+    ticker: string,
+    quantity: number,
+    totalPrice: number,
+    pricePerToken: number,
+    psktSeller: string,
+): Promise<{ id: string; status: string }> => {
+    const capitalTicker = ticker.toUpperCase();
+    const response = await backendService.post<{ id: string; status: string }>(`/${P2PCONTROLLER}/sell-v2`, {
+        ticker: capitalTicker,
+        quantity,
+        totalPrice,
+        pricePerToken,
+        psktSeller,
+    });
+    return response.data;
+};
 
 export const startBuyOrder = async (
     orderId,
@@ -37,6 +54,17 @@ export const startBuyOrder = async (
     }>(`/${P2PCONTROLLER}/buy/${orderId}`, {
         walletAddress,
     });
+    return response.data;
+};
+export const startBuyOrderV2 = async (
+    orderId,
+): Promise<{ id: string; psktSeller: string; status: string; success: boolean }> => {
+    const response = await backendService.post<{
+        psktSeller: string;
+        id: string;
+        status: string;
+        success: boolean;
+    }>(`/${P2PCONTROLLER}/buy/${orderId}`);
     return response.data;
 };
 

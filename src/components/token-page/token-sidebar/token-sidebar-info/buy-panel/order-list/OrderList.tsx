@@ -12,6 +12,7 @@ interface OrderListProps {
     selectedOrder: Order | null;
     setSelectedOrder: (order: Order) => void;
     ticker: string;
+    onOrderSelectV2: (order: Order) => void;
 }
 
 const OrderList: React.FC<OrderListProps> = ({
@@ -23,6 +24,7 @@ const OrderList: React.FC<OrderListProps> = ({
     walletConnected,
     setSelectedOrder,
     ticker,
+    onOrderSelectV2,
 }) => (
     <div style={{ width: '100%' }}>
         {/* Header Row */}
@@ -30,6 +32,7 @@ const OrderList: React.FC<OrderListProps> = ({
         {/* Order Items */}
         {orders.map((order) => (
             <OrderItem
+                onSelectV2={onOrderSelectV2}
                 ticker={ticker}
                 setSelectedOrder={setSelectedOrder}
                 selectedOrder={selectedOrder}

@@ -15,6 +15,17 @@ export const fetchReceivingBalance = async (address: string, tokenSymbol: string
         return 0;
     }
 };
+export const checkSendCommitTxId = async (tokenSymbol: string, txId: string, address: string): Promise<number> => {
+    try {
+        const response = await KRC20InfoService.get<any>(
+            `krc20/market/${tokenSymbol}?address=${address}&txid=${txId}`,
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching receiving balance:', error);
+        return 0;
+    }
+};
 
 export async function fetchTransferHistory(ticker: string, urlParams = ''): Promise<any[]> {
     try {

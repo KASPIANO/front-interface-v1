@@ -300,6 +300,8 @@ export interface Order {
     ticker: string;
     createdAt: string;
     status: SellOrderStatus;
+    psktSeller: string;
+    isNew: boolean;
 }
 
 export interface SwapTransactionsResult {
