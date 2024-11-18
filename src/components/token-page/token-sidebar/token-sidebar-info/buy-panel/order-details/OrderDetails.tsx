@@ -22,6 +22,7 @@ interface OrderDetailsProps {
     handlePurchaseV2: (order: Order) => void;
 }
 
+const KASPIANO_TRADE_COMMISSION = import.meta.env.VITE_TRADE_COMMISSION;
 const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     const {
         order,
@@ -39,8 +40,11 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     const [showHighGasWarning, setShowHighGasWarning] = useState(false);
     const [showGasLimitExceeded, setShowGasLimitExceeded] = useState(false);
     // Fee Calculations
-    const networkFee = 5; // Fixed network fee
+    const networkFee = order.isNew ? 2 : 5;
     const finalTotal = order.totalPrice + networkFee;
+    const platformFee = KASPIANO_TRADE_COMMISSION > 0 ? finalTotal * KASPIANO_TRADE_COMMISSION : 0;
+    const finalTotalWithCommission = finalTotal + platformFee;
+    const feeText = order.isNew ? 'PKST Fee' : 'Network Fee';
 
     const formatTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60)
@@ -152,7 +156,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
 
                         {/* Network Fee */}
                         <OrderDetailsItem variant="body1">
-                            Network Fee:
+                            {feeText}:
                             <OrderItemPrimary
                                 sx={{
                                     display: 'flex',
@@ -161,7 +165,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                             >
                                 <Tooltip
                                     placement="left"
-                                    title="Network fee for processing the transaction, the fee unused will be refunded, usually you receive a refund of 4.9 KAS"
+                                    title={`${feeText} for processing the transaction, the fee unused will be refunded, usually you receive most of it back`}
                                 >
                                     <IconButton size="small">
                                         <InfoOutlinedIcon
@@ -183,19 +187,48 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                 </Typography>
                             </OrderItemPrimary>
                         </OrderDetailsItem>
+                        {order.isNew && KASPIANO_TRADE_COMMISSION > 0 && (
+                            <OrderDetailsItem variant="body1">
+                                Platform Fee ({KASPIANO_TRADE_COMMISSION * 100}%):
+                                <OrderItemPrimary
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <IconButton size="small">
+                                        <InfoOutlinedIcon
+                                            sx={{
+                                                fontSize: '0.7rem',
+                                            }}
+                                            fontSize="small"
+                                        />
+                                    </IconButton>
+                                    {platformFee.toFixed(2)} KAS
+                                    <Typography
+                                        sx={{ ml: '0.3rem' }}
+                                        variant="body2"
+                                        color="textSecondary"
+                                        component="span"
+                                    >
+                                        (${(platformFee * kasPrice).toFixed(2)})
+                                    </Typography>
+                                </OrderItemPrimary>
+                            </OrderDetailsItem>
+                        )}
 
                         {/* Final Total */}
                         <OrderDetailsItem variant="body1" sx={{ fontWeight: 'bold' }}>
                             Final Total:
                             <OrderItemPrimary>
-                                {finalTotal.toFixed(2)} KAS
+                                {finalTotalWithCommission.toFixed(2)} KAS
                                 <Typography
                                     sx={{ ml: '0.3rem' }}
                                     variant="body2"
                                     color="textSecondary"
                                     component="span"
                                 >
-                                    (${(finalTotal * kasPrice).toFixed(2)})
+                                    (${(finalTotalWithCommission * kasPrice).toFixed(2)})
                                 </Typography>
                             </OrderItemPrimary>
                         </OrderDetailsItem>

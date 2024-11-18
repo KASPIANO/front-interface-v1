@@ -379,7 +379,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     sx={{
                         position: 'absolute',
                         bottom: isPanelOpen ? 0 : '-100%',
-                        height: '45%',
+                        height: '50%',
                         width: '100%',
                         backgroundColor: 'background.paper',
                         transition: 'bottom 0.5s ease-in-out',
