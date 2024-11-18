@@ -29,7 +29,7 @@ export interface BatchTransferProps {
     walletAddress: string | null;
     walletBalance: number;
 }
-
+const AIRDROP_VERSION = '0.7.5.4';
 const KASPA_TO_SOMPI = 100000000; // 1 KAS = 100,000,000 sompi
 const AIRDROP_FEE_KAS = 500;
 const AIRDROP_FEE_SOMPI = AIRDROP_FEE_KAS * KASPA_TO_SOMPI;
@@ -233,7 +233,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
 
     const handleBatchTransfer = async () => {
         setIsVerifying(true);
-        if (await versionCheck()) {
+        if (await versionCheck(AIRDROP_VERSION)) {
             window.kasware.on('krc20BatchTransferChanged', handleKRC20BatchTransferChangedChanged);
         } else {
             showGlobalSnackbar({

@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Box, IconButton, InputAdornment, Tooltip, Typography } from '@mui/material';
-import { BackendTokenResponse, TransferObj } from '../../../../../types/Types';
+import { BackendTokenResponse } from '../../../../../types/Types';
 import { StyledButton, StyledSellPanel, StyledTextField } from './SellPanel.s';
 import { fetchWalletKRC20Balance } from '../../../../../DAL/Krc20DAL';
 import { SwapHoriz } from '@mui/icons-material'; // MUI icon for swap
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
-import {
-    createOrderKRC20,
-    MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION,
-    transferKRC20Token,
-} from '../../../../../utils/KaswareUtils';
-import { confirmSellOrder, createSellOrder, createSellOrderV2 } from '../../../../../DAL/BackendP2PDAL';
-import { doPolling } from '../../../../../utils/Utils';
+import { createOrderKRC20, MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION } from '../../../../../utils/KaswareUtils';
+import { createSellOrderV2 } from '../../../../../DAL/BackendP2PDAL';
+// import { doPolling } from '../../../../../utils/Utils';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface SellPanelProps {
@@ -23,7 +19,7 @@ interface SellPanelProps {
     walletBalance: number;
 }
 
-const KASPA_TO_SOMPI = 100000000;
+// const KASPA_TO_SOMPI = 100000000;
 
 const SellPanel: React.FC<SellPanelProps> = (props) => {
     const { tokenInfo, kasPrice, walletAddress, walletConnected, walletBalance } = props;
