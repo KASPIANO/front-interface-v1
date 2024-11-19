@@ -314,6 +314,8 @@ export interface DecentralizedOrder {
     status: DecentralizedOrderStatus;
     psktSeller: string;
     psktTransactionId: string;
+    sellerWalletAddress: string;
+    isDecentralized: boolean;
 }
 
 export interface SwapTransactionsResult {

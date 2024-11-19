@@ -1,7 +1,7 @@
 // BuyPanel.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Box } from '@mui/material';
-import { BackendTokenResponse, Order } from '../../../../../types/Types';
+import { BackendTokenResponse, DecentralizedOrder, Order } from '../../../../../types/Types';
 import OrderList from './order-list/OrderList';
 import BuyHeader from './buy-header/BuyHeader';
 import OrderDetails from './order-details/OrderDetails';
@@ -159,11 +159,33 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         }
     };
 
-    const handleOrderSelectV2 = async (order: Order) => {
+    const handleOrderSelectV2 = async (order: DecentralizedOrder) => {
         try {
-            const { psktSeller } = await getDecentralizedOrder(order.orderId);
-            // validation
+            const { psktSeller, sellerWalletAddress, psktTransactionId } = await getDecentralizedOrder(
+                order.orderId,
+            );
             setPsktSeller(psktSeller);
+            const orderDataKasplex = await checkOrderExists(
+                tokenInfo.ticker,
+                psktTransactionId,
+                sellerWalletAddress,
+            );
+            if (orderDataKasplex.length === 0) {
+                showGlobalSnackbar({
+                    message: 'Order already taken. Please select another order.',
+                    severity: 'error',
+                });
+                setSelectedOrder(null);
+                return;
+            }
+            if (orderDataKasplex[0].amount / 1e8 !== order.quantity) {
+                showGlobalSnackbar({
+                    message: 'Order not correct. Please select another order.',
+                    severity: 'error',
+                });
+                setSelectedOrder(null);
+                return;
+            }
             setIsPanelOpen(true);
         } catch (error) {
             console.error(error);
@@ -255,7 +277,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         }
     };
 
-    const handlePurchaseV2 = async (order: Order, finalTotal: number) => {
+    const handlePurchaseV2 = async (order: DecentralizedOrder, finalTotal: number) => {
         let txId;
         if (walletBalance < finalTotal) {
             showGlobalSnackbar({
@@ -266,31 +288,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setIsPanelOpen(false);
             return;
         }
-        const { inputs } = JSON.parse(psktSeller);
 
-        const orderDataKasplex = await checkOrderExists(
-            tokenInfo.ticker,
-            inputs[0].transactionId,
-            order.sellerWalletAddress,
-        );
-        if (orderDataKasplex.length === 0) {
-            showGlobalSnackbar({
-                message: 'Order already taken. Please select another order.',
-                severity: 'error',
-            });
-            setSelectedOrder(null);
-            setIsPanelOpen(false);
-            return;
-        }
-        if (orderDataKasplex[0].amount / 1e8 !== order.totalPrice) {
-            showGlobalSnackbar({
-                message: 'Order not correct. Please select another order.',
-                severity: 'error',
-            });
-            setSelectedOrder(null);
-            setIsPanelOpen(false);
-            return;
-        }
         try {
             const fee = KASPIANO_TRADE_COMMISSION > 0 ? KASPIANO_TRADE_COMMISSION * order.totalPrice : 0;
             const extraOutput = [{ address: KASPIANO_WALLET, amount: fee }];

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Order } from '../../../../../../types/Types';
+import { DecentralizedOrder, Order } from '../../../../../../types/Types';
 import OrderItem from '../order-item/OrderItem';
 
 interface OrderListProps {
@@ -12,7 +12,7 @@ interface OrderListProps {
     selectedOrder: Order | null;
     setSelectedOrder: (order: Order) => void;
     ticker: string;
-    onOrderSelectV2: (order: Order) => void;
+    onOrderSelectV2: (order: DecentralizedOrder) => void;
 }
 
 const OrderList: React.FC<OrderListProps> = ({

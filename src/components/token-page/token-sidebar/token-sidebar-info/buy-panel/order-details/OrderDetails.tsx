@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, IconButton, Tooltip, FormControlLabel, Checkbox, Link } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { Order } from '../../../../../../types/Types';
+import { DecentralizedOrder, Order } from '../../../../../../types/Types';
 import { OrderDetailsItem, OrderItemPrimary } from './OrderDetails.s';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
@@ -19,7 +19,7 @@ interface OrderDetailsProps {
     handlePurchase: (order: Order, finalTotal: number) => void;
     waitingForWalletConfirmation: boolean;
     isProcessingBuyOrder: boolean;
-    handlePurchaseV2: (order: Order, finalTotal: number) => void;
+    handlePurchaseV2: (order: DecentralizedOrder, finalTotal: number) => void;
 }
 
 const KASPIANO_TRADE_COMMISSION = import.meta.env.VITE_TRADE_COMMISSION;
@@ -66,11 +66,11 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
         checkGasLimits();
     }, []);
 
-    const handleOrderPurchase = async (order: Order, finalTotal: number) => {
+    const handleOrderPurchase = async (order: Order | DecentralizedOrder, finalTotal: number) => {
         if (order.isDecentralized) {
-            await handlePurchaseV2(order, finalTotalWithCommission);
+            await handlePurchaseV2(order as DecentralizedOrder, finalTotalWithCommission);
         } else {
-            await handlePurchase(order, finalTotal);
+            await handlePurchase(order as Order, finalTotal);
         }
     };
 

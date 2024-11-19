@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Tooltip } from '@mui/material';
-import { Order } from '../../../../../../types/Types';
+import { DecentralizedOrder, Order } from '../../../../../../types/Types';
 import { OrderItemPrimary, OrderItemSecondary } from './OrderItem.s';
 import { StyledButton } from '../../sell-panel/SellPanel.s';
 import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
@@ -10,7 +10,7 @@ interface OrderItemProps {
     order: Order;
     floorPrice: number;
     kasPrice: number;
-    onSelect: (order: Order) => void;
+    onSelect: (order: Order | DecentralizedOrder) => void;
     selectedOrder: Order | null;
     setSelectedOrder;
     walletConnected: boolean;
@@ -24,7 +24,7 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
 
     // const floorPriceDifference = ((order.pricePerToken - floorPrice) / floorPrice) * 100;
 
-    const handleSelect = async (order: Order) => {
+    const handleSelect = async (order: Order | DecentralizedOrder) => {
         setSelectedOrder(order);
         if (order.isDecentralized) {
             await onSelectV2(order);

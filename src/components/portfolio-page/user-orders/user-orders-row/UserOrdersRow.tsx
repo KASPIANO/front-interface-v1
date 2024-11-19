@@ -315,7 +315,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                         </Typography>
                     }
                 />
-                {!order.isNew && (
+                {!order.isDecentralized && (
                     <Box
                         sx={{
                             display: 'flex',
