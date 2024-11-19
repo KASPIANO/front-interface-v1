@@ -15,6 +15,9 @@ import OrdersManagement from './pages/orders-management/OrdersManagement';
 import TeamPage from './pages/team-page/MeetTheTeam';
 import FAQ from './pages/faqs/Faqs';
 import { UserReferral } from './types/Types';
+import LaunchpadPage from './pages/launchpad-page/LaunchpadPage';
+import Launchpad from './components/launchpad/Launchpad';
+// import PartnersPage from './pages/partners/Partners';
 // import AdsPage from './pages/ads-page/AdsPage';
 
 interface KaspianoRouterProps {
@@ -42,7 +45,7 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
 }) => (
     <Routes>
         <Route
-            path="/KRC-20"
+            path="/marketplace"
             element={
                 <GridPage
                     backgroundBlur={backgroundBlur}
@@ -113,6 +116,28 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
                 />
             }
         />
+        <Route
+            path="/launchpad"
+            element={
+                <LaunchpadPage
+                    walletBalance={walletBalance}
+                    walletAddress={walletAddress}
+                    backgroundBlur={backgroundBlur}
+                    walletConnected={walletConnected}
+                />
+            }
+        />
+        <Route
+            path="/launchpad/:ticker"
+            element={
+                <Launchpad
+                    walletBalance={walletBalance}
+                    walletAddress={walletAddress}
+                    backgroundBlur={backgroundBlur}
+                    walletConnected={walletConnected}
+                />
+            }
+        />
         <Route path="/orders-management/:id" element={<OrdersManagement />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-service" element={<TermsOfService />} />
@@ -121,6 +146,7 @@ export const KaspianoRouter: FC<KaspianoRouterProps> = ({
         <Route path="/trade-terms" element={<TermsOfTrade />} />
         <Route path="/team" element={<TeamPage />} />
         <Route path="/faqs" element={<FAQ />} />
+        {/* <Route path="/partners" element={<PartnersPage />} /> */}
         {/* <Route path="/ads" element={<AdsPage />} /> */}
         <Route path="*" element={<div>404 - Not Found</div>} />
     </Routes>

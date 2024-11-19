@@ -140,6 +140,7 @@ export const useFetchFloorPrice = (ticker: string) =>
         queryFn: () => fetchTickerFloorPrice(ticker),
         staleTime: 20000, // Data stays fresh for 25 seconds
         refetchOnWindowFocus: false,
+        enabled: !!ticker,
     });
 
 export const useFetchTradeStats = (ticker: string, timeInterval: string) =>

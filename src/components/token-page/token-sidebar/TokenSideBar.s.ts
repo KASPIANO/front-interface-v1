@@ -1,4 +1,5 @@
 import { styled, Card, Tab } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 
 export const SideBarContainer = styled(Card)({
     borderRadius: '8px',
@@ -17,6 +18,7 @@ export const TabStyled = styled(Tab)(({ theme }) => ({
     paddingTop: 0,
     height: '2rem',
     minHeight: '5px',
-    fontWeight: 600,
-    color: theme.palette.primary.main,
+    fontWeight: 700,
+    fontSize: '0.9rem',
+    color: alpha(theme.palette.primary.main, 0.5),
 }));

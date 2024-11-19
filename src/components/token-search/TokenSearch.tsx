@@ -8,7 +8,6 @@ import { searchToken } from '../../DAL/BackendDAL';
 import { TokenSearchItems } from '../../types/Types';
 import { GlobalStyleAutoComplete, GlobalStyleTokenSideBar } from '../../utils/GlobalStyleScrollBar';
 import { SearchContainer } from './TokenSearch.s';
-import { isEmptyString } from '../../utils/Utils';
 import { DEFAULT_TOKEN_LOGO_URL } from '../../utils/Constants';
 
 const styles = `
@@ -43,6 +42,7 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
     // Trigger this useEffect whenever the path changes
 
     const cancelTokenRef = useRef<CancelTokenSource>(null);
+
     const handleKeyDown = (event: React.KeyboardEvent) => {
         if (event.key === 'Escape') {
             setIsFocused(false);
@@ -75,6 +75,7 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
 
             try {
                 const resultTokens = await searchToken(query, cancelTokenRef.current.token);
+
                 setTokens(resultTokens);
 
                 setLoading(false);
@@ -179,13 +180,13 @@ const TokenSearch: FC<TokenSearchProps> = (props) => {
                     onChange={handleTokenSelect}
                     options={showOptions && searchValue ? (loading ? loadingArray : tokens) : []} // Show options only when focused
                     renderOption={(props, option) => (
-                        <MenuItem {...props} key={`{option.ticker}`} sx={{ width: '28vw' }}>
+                        <MenuItem {...props} key={`${option.ticker}`} sx={{ width: '28vw' }}>
                             {loading ? (
                                 <Skeleton key={`${option.ticker}-s1`} variant="circular" width={24} height={24} />
                             ) : (
                                 <Avatar
                                     key={`${option.ticker}-avatar`}
-                                    src={isEmptyString(option.logo) ? DEFAULT_TOKEN_LOGO_URL : option.logo}
+                                    src={option.logo || DEFAULT_TOKEN_LOGO_URL}
                                     alt={option.ticker}
                                     sx={{ width: 24, height: 24, mr: 1 }}
                                 />

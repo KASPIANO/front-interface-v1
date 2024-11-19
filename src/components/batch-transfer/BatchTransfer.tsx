@@ -584,7 +584,7 @@ const BatchTransfer: FC<BatchTransferProps> = (props) => {
                         )}
 
                         {/* Pagination Buttons */}
-                        {walletListProgress.length > 2000 && (
+                        {walletListProgress.length > 500 && (
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                 <Button
                                     variant="outlined"

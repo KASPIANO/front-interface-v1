@@ -68,6 +68,9 @@ const Footer: React.FC = () => (
                             <li>
                                 <FooterLink href="/portfolio">Portfolio</FooterLink>
                             </li>
+                            <li>
+                                <FooterLink href="/launchpad">Launchpad</FooterLink>
+                            </li>
                         </FooterList>
                     </Grid>
 
@@ -82,6 +85,9 @@ const Footer: React.FC = () => (
                             <li>
                                 <FooterLink href="/faqs">FAQs</FooterLink>
                             </li>
+                            {/* <li>
+                                <FooterLink href="/partners">Partners</FooterLink>
+                            </li> */}
                         </FooterList>
                     </Grid>
                     {/* <Grid item xs={2.4} md={2.4} sm={2.4} lg={2.4}>

@@ -129,6 +129,7 @@ export const useKasware = () => {
                 disconnectTimeout = setTimeout(() => disconnectWallet(), Math.max(COOKIE_TTL - timeDiff, 0));
             }
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [updateBalance],
     );
 
@@ -159,7 +160,6 @@ export const useKasware = () => {
                     handleUserVerification(_accounts[0]);
                 }
             } else {
-                console.log('No accounts found');
                 clearConnectionData();
             }
         },

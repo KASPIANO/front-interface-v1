@@ -47,7 +47,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
     const [selectedSentiment, setSelectedSentiment] = useState<string>(null);
     const [sentimentValues, setSentimentValues] = useState<TokenSentiment | null>(null);
     const [socials, setSocials] = useState<TokenSidebarSocialsBarOptions>(null);
-    const [totalSupplyAfterBurn, setTotalSupplyAfterBurn] = useState<number>(0);
+    const [burnedSupply, setBurnedSupply] = useState<number>(0);
 
     const sentimentButtonsConfig: SentimentButtonsConfig[] = [
         { key: 'love', icon: <FavoriteBorderRoundedIcon sx={{ fontSize: '1.1rem' }} color="success" /> },
@@ -59,10 +59,9 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
     const { data: floorPrice } = useFetchFloorPrice(tokenInfo.ticker);
     useEffect(() => {
         const fetchAndSetSupplyAfterBurn = async () => {
-            const { totalSupply, ticker } = tokenInfo;
+            const { ticker } = tokenInfo;
             const burntWalletBalance = await fetchBurntRC20Balance(ticker); // Fetch burnt balance
-            const newSupplyAfterBurn = burntWalletBalance ? totalSupply - burntWalletBalance : totalSupply;
-            setTotalSupplyAfterBurn(newSupplyAfterBurn);
+            setBurnedSupply(burntWalletBalance);
         };
 
         if (tokenInfo && tokenInfo.totalSupply && tokenInfo.ticker) {
@@ -185,7 +184,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                             backgroundColor: 'grey',
                         }}
                     >
-                        <AddText>+ List Token</AddText>
+                        <AddText>+ Add Banner</AddText>
                     </AddBanner>
                 )}
                 {socials !== null && Object.keys(socials).length > 0 && (
@@ -219,17 +218,44 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                 </Stack>
                 <Stack marginTop={8} direction={'row'} justify={'center'}>
                     <StatCard>
-                        <Typography variant="body2" align="center" color="text.secondary">
+                        <Typography
+                            variant="body2"
+                            align="center"
+                            color="text.secondary"
+                            sx={{ fontSize: '0.8rem' }}
+                        >
                             SUPPLY
                         </Typography>
-                        <Tooltip title={formatNumberWithCommas(totalSupplyAfterBurn)}>
+                        <Tooltip title={formatNumberWithCommas(tokenInfo.totalSupply)}>
                             <Typography variant="body2" align="center">
-                                {simplifyNumber(totalSupplyAfterBurn)}
+                                {simplifyNumber(tokenInfo.totalSupply)}
                             </Typography>
                         </Tooltip>
                     </StatCard>
+                    {burnedSupply > 0 && (
+                        <StatCard>
+                            <Typography
+                                variant="body2"
+                                align="center"
+                                color="text.secondary"
+                                sx={{ fontSize: '0.8rem' }}
+                            >
+                                BURNED
+                            </Typography>
+                            <Tooltip title={formatNumberWithCommas(burnedSupply.toFixed(2))}>
+                                <Typography variant="body2" align="center">
+                                    {simplifyNumber(burnedSupply)}
+                                </Typography>
+                            </Tooltip>
+                        </StatCard>
+                    )}
                     <StatCard>
-                        <Typography variant="body2" align="center" color="text.secondary">
+                        <Typography
+                            variant="body2"
+                            align="center"
+                            color="text.secondary"
+                            sx={{ fontSize: '0.8rem' }}
+                        >
                             PREMINTED
                         </Typography>
                         <Typography variant="body2" align="center">
@@ -237,7 +263,12 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                         </Typography>
                     </StatCard>
                     <StatCard>
-                        <Typography variant="body2" align="center" color="text.secondary">
+                        <Typography
+                            variant="body2"
+                            align="center"
+                            color="text.secondary"
+                            sx={{ fontSize: '0.8rem' }}
+                        >
                             MKT CAP
                         </Typography>
                         <Tooltip title={formatNumberWithCommas(tokenInfo.marketCap)}>
@@ -260,7 +291,7 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
                     </Box>
                 ) : (
                     <AddBox onClick={handleShowTokenInfoDialog}>
-                        <AddText>+ List Token</AddText>
+                        <AddText>+ Add Description</AddText>
                     </AddBox>
                 )}
             </Box>

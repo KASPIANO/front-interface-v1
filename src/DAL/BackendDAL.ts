@@ -282,10 +282,12 @@ export const fetchTickerTradeStats = async (ticker: string, timeInterval?: strin
 };
 export const fetchTickerFloorPrice = async (ticker: string): Promise<{ ticker: string; floor_price: number }> => {
     const capitalTicker = ticker.toUpperCase();
-    const response = await backendService.get<{ ticker: string; floor_price: number }>(
+    const response = await backendService.get<{ ticker: string; floor_price: number }[]>(
         `/${P2PCONTROLLERDATA}/floor-price?ticker=${capitalTicker}`,
     );
-    return response.data[0];
+
+    // Return the first item if available, otherwise a default object
+    return response.data?.[0] || { ticker: capitalTicker, floor_price: 0 };
 };
 
 export const getHolderChange = async (ticker: string, timeInterval?: string): Promise<any> => {
