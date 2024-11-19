@@ -1,16 +1,16 @@
 import React from 'react';
-import { DecentralizedOrder, Order } from '../../../../../../types/Types';
+import { DecentralizedOrder, MixedOrder, Order } from '../../../../../../types/Types';
 import OrderItem from '../order-item/OrderItem';
 
 interface OrderListProps {
-    orders: Order[];
+    orders: MixedOrder[];
     floorPrice: number;
     kasPrice: number;
     walletBalance: number;
     walletConnected: boolean;
     onOrderSelect: (order: Order) => void;
-    selectedOrder: Order | null;
-    setSelectedOrder: (order: Order) => void;
+    selectedOrder: MixedOrder | null;
+    setSelectedOrder: (order: MixedOrder) => void;
     ticker: string;
     onOrderSelectV2: (order: DecentralizedOrder) => void;
 }

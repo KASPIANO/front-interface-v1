@@ -1,7 +1,7 @@
 // BuyPanel.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Box } from '@mui/material';
-import { BackendTokenResponse, DecentralizedOrder, Order } from '../../../../../types/Types';
+import { BackendTokenResponse, DecentralizedOrder, MixedOrder, Order } from '../../../../../types/Types';
 import OrderList from './order-list/OrderList';
 import BuyHeader from './buy-header/BuyHeader';
 import OrderDetails from './order-details/OrderDetails';
@@ -39,7 +39,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const [sortBy, setSortBy] = useState('pricePerToken');
     const [sortOrder] = useState<'asc' | 'desc'>('asc');
     const [isPanelOpen, setIsPanelOpen] = useState(false);
-    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [selectedOrder, setSelectedOrder] = useState<MixedOrder | null>(null);
     const [timeLeft, setTimeLeft] = useState(240);
     const [tempWalletAddress, setTempWalletAddress] = useState('');
     const [psktSeller, setPsktSeller] = useState('');

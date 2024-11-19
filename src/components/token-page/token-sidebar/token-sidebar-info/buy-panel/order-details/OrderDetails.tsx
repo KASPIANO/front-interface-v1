@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, IconButton, Tooltip, FormControlLabel, Checkbox, Link } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { DecentralizedOrder, Order } from '../../../../../../types/Types';
+import { DecentralizedOrder, MixedOrder, Order } from '../../../../../../types/Types';
 import { OrderDetailsItem, OrderItemPrimary } from './OrderDetails.s';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
@@ -10,7 +10,7 @@ import { GasLimitExceeded } from '../../../../../common/HighGasLimitExceeded';
 import { HighGasWarning } from '../../../../../common/HighGasWarning';
 
 interface OrderDetailsProps {
-    order: Order;
+    order: MixedOrder;
     walletConnected: boolean;
     walletBalance: number;
     kasPrice: number;

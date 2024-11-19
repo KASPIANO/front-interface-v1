@@ -1,4 +1,4 @@
-import { DecentralizedOrder, MixedOrder, Order, SortPaginationParams, UserOrdersParams } from '../types/Types';
+import { DecentralizedOrder, MixedOrder, SortPaginationParams, UserOrdersParams } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const P2PCONTROLLER = 'p2p';
@@ -270,7 +270,7 @@ export const getUserOrders = async (
 export const getTickerSellOrders = async (
     ticker: string,
     params: SortPaginationParams,
-): Promise<{ orders: Order[]; totalCount: number; allTickers: string[] }> => {
+): Promise<{ orders: MixedOrder[]; totalCount: number; allTickers: string[] }> => {
     const capitalTicker = ticker.toUpperCase();
 
     const response = await backendService.post<any>(

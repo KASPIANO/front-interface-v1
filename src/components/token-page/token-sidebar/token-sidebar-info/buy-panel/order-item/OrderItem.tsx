@@ -1,17 +1,17 @@
 import React from 'react';
 import { Box, Tooltip } from '@mui/material';
-import { DecentralizedOrder, Order } from '../../../../../../types/Types';
+import { DecentralizedOrder, MixedOrder, Order } from '../../../../../../types/Types';
 import { OrderItemPrimary, OrderItemSecondary } from './OrderItem.s';
 import { StyledButton } from '../../sell-panel/SellPanel.s';
 import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
 import { formatNumberWithCommas } from '../../../../../../utils/Utils';
 
 interface OrderItemProps {
-    order: Order;
+    order: MixedOrder;
     floorPrice: number;
     kasPrice: number;
-    onSelect: (order: Order | DecentralizedOrder) => void;
-    selectedOrder: Order | null;
+    onSelect: (order: MixedOrder) => void;
+    selectedOrder: MixedOrder | null;
     setSelectedOrder;
     walletConnected: boolean;
     ticker: string;
