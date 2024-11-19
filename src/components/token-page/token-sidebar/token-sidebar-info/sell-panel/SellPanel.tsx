@@ -19,6 +19,10 @@ interface SellPanelProps {
     walletBalance: number;
 }
 
+const POLLING_INTERVAL = 5000; // 5 seconds
+const MAX_RETRIES = 10;
+const STORAGE_KEY = 'pendingPSKT';
+
 // const KASPA_TO_SOMPI = 100000000;
 
 const SellPanel: React.FC<SellPanelProps> = (props) => {
@@ -41,11 +45,116 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [showInputTooltip, setShowInputTooltip] = useState<boolean>(false);
     const queryClient = useQueryClient();
 
+    let pollingInterval;
+
+    // Helper function to clean up polling
+    const stopPolling = () => {
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+        }
+    };
+
+    const pollPendingTransactions = async () => {
+        const pendingTransactions = getStoredTransactions();
+
+        if (pendingTransactions.length === 0) {
+            stopPolling();
+            return;
+        }
+
+        for (const tx of pendingTransactions) {
+            try {
+                // Attempt to create sell order
+                await createSellOrderV2(
+                    tx.ticker,
+                    tx.amount,
+                    tx.totalPrice,
+                    tx.pricePerToken,
+                    tx.txJsonString,
+                    tx.sendCommitTxId,
+                );
+
+                // On success
+                removeTransaction(tx.sendCommitTxId);
+                showGlobalSnackbar({
+                    message: 'Recovered transaction: Sell order created successfully',
+                    severity: 'success',
+                    commitId: tx.sendCommitTxId,
+                });
+            } catch (error) {
+                const updatedTx = {
+                    ...tx,
+                    retryCount: (tx.retryCount || 0) + 1,
+                };
+
+                if (updatedTx.retryCount >= MAX_RETRIES) {
+                    removeTransaction(tx.sendCommitTxId);
+                    showGlobalSnackbar({
+                        message: 'Failed to recover transaction after maximum retries',
+                        severity: 'error',
+                        details: error.message,
+                    });
+                } else {
+                    const transactions = getStoredTransactions();
+                    const updatedTransactions = transactions.map((t) =>
+                        t.sendCommitTxId === tx.sendCommitTxId ? updatedTx : t,
+                    );
+                    saveTransactionsToStorage(updatedTransactions);
+                }
+            }
+        }
+    };
+
+    const startPolling = () => {
+        pollingInterval = setInterval(pollPendingTransactions, POLLING_INTERVAL);
+        return pollingInterval;
+    };
+
     useEffect(() => {
         fetchWalletKRC20Balance(walletAddress, tokenInfo.ticker).then((balance) => {
             setWalletTickerBalance(balance);
         });
     }, [walletAddress, tokenInfo.ticker, finishedSellOrder]);
+
+    const getStoredTransactions = () => {
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : [];
+        } catch (error) {
+            console.error('Error reading from localStorage:', error);
+            return [];
+        }
+    };
+
+    const saveTransactionsToStorage = (transactions) => {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+        } catch (error) {
+            console.error('Error saving to localStorage:', error);
+        }
+    };
+
+    const saveFailedTransaction = (txData) => {
+        const pendingTransactions = getStoredTransactions();
+        const newTransaction = {
+            ...txData,
+            retryCount: 0,
+            timestamp: Date.now(),
+        };
+
+        saveTransactionsToStorage([...pendingTransactions, newTransaction]);
+        return startPolling();
+    };
+
+    const removeTransaction = (txId) => {
+        const pendingTransactions = getStoredTransactions();
+        const updatedTransactions = pendingTransactions.filter((tx) => tx.sendCommitTxId !== txId);
+        saveTransactionsToStorage(updatedTransactions);
+
+        if (updatedTransactions.length === 0) {
+            stopPolling();
+        }
+    };
 
     const handleTokenAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setIsPriceFromButton(false);
@@ -360,30 +469,43 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             setCreatingSellOrder(true);
             setWalletConfirmation(false);
             if (txJsonString || sendCommitTxId) {
-                await createSellOrderV2(
-                    tokenInfo.ticker,
-                    parseInt(tokenAmount),
-                    parseInt(totalPrice),
-                    parseFloat(pricePerToken),
-                    txJsonString,
-                    sendCommitTxId,
-                );
-                showGlobalSnackbar({
-                    message: 'Sell order created successfully',
-                    severity: 'success',
-                    commitId: sendCommitTxId,
-                });
-                // add kasplex valdiation of utxo creation sendcommit
-                setIsDialogOpen(false);
-                setDisableSellButton(false);
-                cleanFields();
-                queryClient.invalidateQueries({ queryKey: ['orders'] });
-                setFinishedSellOrder((prev) => !prev);
-                setTimeout(() => {
-                    setCreatingSellOrder(false); // Ensures it closes after a slight delay
-                }, 500);
+                try {
+                    await createSellOrderV2(
+                        tokenInfo.ticker,
+                        parseInt(tokenAmount),
+                        parseInt(totalPrice),
+                        parseFloat(pricePerToken),
+                        txJsonString,
+                        sendCommitTxId,
+                    );
+                    showGlobalSnackbar({
+                        message: 'Sell order created successfully',
+                        severity: 'success',
+                        commitId: sendCommitTxId,
+                    });
+                    // add kasplex valdiation of utxo creation sendcommit
+                    setIsDialogOpen(false);
+                    setDisableSellButton(false);
+                    cleanFields();
+                    queryClient.invalidateQueries({ queryKey: ['orders'] });
+                    setFinishedSellOrder((prev) => !prev);
+                    setTimeout(() => {
+                        setCreatingSellOrder(false); // Ensures it closes after a slight delay
+                    }, 500);
 
-                return true;
+                    return true;
+                } catch (error) {
+                    saveFailedTransaction({
+                        ticker: tokenInfo.ticker,
+                        amount: parseInt(tokenAmount),
+                        totalPrice: parseInt(totalPrice),
+                        pricePerToken: parseFloat(pricePerToken),
+                        txJsonString,
+                        sendCommitTxId,
+                    });
+                    setCreatingSellOrder(false);
+                    return false;
+                }
             } else {
                 showGlobalSnackbar({
                     message: 'Failed to create sell order',
