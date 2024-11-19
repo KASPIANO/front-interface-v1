@@ -282,7 +282,6 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
 
     const handlePurchaseV2 = async (order: DecentralizedOrder, finalTotal: number) => {
         let txId;
-        let fee;
         if (walletBalance < finalTotal) {
             showGlobalSnackbar({
                 message: 'Insufficient balance for this order',
@@ -294,7 +293,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         }
 
         try {
-            fee = KASPIANO_TRADE_COMMISSION > 0 ? KASPIANO_TRADE_COMMISSION * order.totalPrice : 0;
+            const fee = KASPIANO_TRADE_COMMISSION > 0 ? KASPIANO_TRADE_COMMISSION * order.totalPrice : 0;
             const extraOutput = [{ address: KASPIANO_WALLET, amount: fee }];
             setWaitingForWalletConfirmation(true);
             const finalFee = fee > 0 ? extraOutput : [];
@@ -321,7 +320,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
 
         if (txId) {
             // wihtout await for fast finish
-            buyDecentralizedOrder(order.orderId, txId, fee);
+            buyDecentralizedOrder(order.orderId, txId, KASPIANO_TRADE_COMMISSION);
         }
 
         setWaitingForWalletConfirmation(false);
