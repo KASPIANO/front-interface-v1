@@ -11,8 +11,8 @@ import {
     startBuyOrder,
     confirmBuyOrder,
     releaseBuyLock,
-    startBuyOrderV2,
-    releaseBuyLockV2,
+    getDecentralizedOrder,
+    buyDecentralizedOrder,
 } from '../../../../../DAL/BackendP2PDAL';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material'; // Import CircularProgress for the spinner
@@ -58,9 +58,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setBuyPanelRef({
                 handleDrawerClose: () => {
                     if (selectedOrder) {
-                        if (selectedOrder.isNew) {
-                            releaseBuyLockV2(selectedOrder.orderId);
-                        } else {
+                        if (!selectedOrder.isDecentralized) {
                             releaseBuyLock(selectedOrder.orderId);
                         }
                         setIsPanelOpen(false);
@@ -74,9 +72,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     useEffect(() => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
             if (selectedOrder) {
-                if (selectedOrder.isNew) {
-                    releaseBuyLockV2(selectedOrder.orderId);
-                } else {
+                if (!selectedOrder.isDecentralized) {
                     releaseBuyLock(selectedOrder.orderId);
                 }
                 setIsPanelOpen(false);
@@ -116,7 +112,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 message: 'Purchase canceled due to timeout.',
                 severity: 'info',
             });
-            handleDrawerClose(selectedOrder.orderId, selectedOrder.isNew); // Close the OrderDetails panel
+            handleDrawerClose(selectedOrder.orderId, selectedOrder.isDecentralized); // Close the OrderDetails panel
         };
 
         // Reset the timer when selectedOrder changes
@@ -165,22 +161,14 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
 
     const handleOrderSelectV2 = async (order: Order) => {
         try {
-            const { psktSeller, success } = await startBuyOrderV2(order.orderId);
+            const { psktSeller } = await getDecentralizedOrder(order.orderId);
             // validation
-
-            if (!success) {
-                showGlobalSnackbar({
-                    message: 'Order already taken. Please select another order.',
-                    severity: 'error',
-                });
-                setSelectedOrder(null);
-                setIsPanelOpen(false);
-                return;
-            }
             setPsktSeller(psktSeller);
             setIsPanelOpen(true);
         } catch (error) {
             console.error(error);
+            setSelectedOrder(null);
+            setIsPanelOpen(false);
             showGlobalSnackbar({
                 message: 'Failed to start the buying process. Please try again later.',
                 severity: 'error',
@@ -328,6 +316,12 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setWaitingForWalletConfirmation(false);
             return;
         }
+
+        if (txId) {
+            // wihtout await for fast finish
+            buyDecentralizedOrder(order.orderId, txId);
+        }
+
         setWaitingForWalletConfirmation(false);
 
         if (txId) {
@@ -358,10 +352,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     };
 
     // Handler to close the drawer
-    const handleDrawerClose = async (orderId: string, isNew: boolean) => {
-        if (isNew) {
-            releaseBuyLockV2(orderId);
-        } else {
+    const handleDrawerClose = async (orderId: string, isDecentralized: boolean) => {
+        if (!isDecentralized) {
             releaseBuyLock(orderId);
         }
 

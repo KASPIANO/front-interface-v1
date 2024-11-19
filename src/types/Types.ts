@@ -301,8 +301,19 @@ export interface Order {
     createdAt: string;
     status: SellOrderStatus;
     psktSeller: string;
-    isNew: boolean;
-    sellerWalletAddress?: string;
+    isDecentralized: boolean;
+}
+
+export interface DecentralizedOrder {
+    orderId: string;
+    pricePerToken: number;
+    quantity: number;
+    ticker: string;
+    totalPrice: number;
+    createdAt: Date;
+    status: DecentralizedOrderStatus;
+    psktSeller: string;
+    psktTransactionId: string;
 }
 
 export interface SwapTransactionsResult {
@@ -328,6 +339,11 @@ export enum SellOrderStatus {
     DELISTING = 'DELISTING',
     DELIST_ERROR = 'DELIST_ERROR',
     COMPLETED_DELISTING = 'COMPLETED_DELISTING',
+}
+export enum DecentralizedOrderStatus {
+    LISTED_FOR_SALE = 'LISTED_FOR_SALE',
+    COMPLETED = 'COMPLETED',
+    CANCELED = 'CANCELED',
 }
 export type FilterSellOrderStatus =
     | SellOrderStatus.LISTED_FOR_SALE

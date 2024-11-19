@@ -1,8 +1,9 @@
-import { Order } from '../types/Types';
+import { DecentralizedOrder, Order } from '../types/Types';
 import { cleanFilters } from '../utils/Utils';
 import { backendService } from './AxiosInstaces';
 
 const P2PCONTROLLER = 'p2p';
+const P2PV2CONTROLLER = 'p2p-v2';
 
 export const createSellOrder = async (
     ticker: string,
@@ -24,23 +25,6 @@ export const createSellOrder = async (
     );
     return response.data;
 };
-export const createSellOrderV2 = async (
-    ticker: string,
-    quantity: number,
-    totalPrice: number,
-    pricePerToken: number,
-    psktSeller: string,
-): Promise<{ id: string; status: string }> => {
-    const capitalTicker = ticker.toUpperCase();
-    const response = await backendService.post<{ id: string; status: string }>(`/${P2PCONTROLLER}/sell-v2`, {
-        ticker: capitalTicker,
-        quantity,
-        totalPrice,
-        pricePerToken,
-        psktSeller,
-    });
-    return response.data;
-};
 
 export const startBuyOrder = async (
     orderId,
@@ -54,17 +38,6 @@ export const startBuyOrder = async (
     }>(`/${P2PCONTROLLER}/buy/${orderId}`, {
         walletAddress,
     });
-    return response.data;
-};
-export const startBuyOrderV2 = async (
-    orderId,
-): Promise<{ id: string; psktSeller: string; status: string; success: boolean }> => {
-    const response = await backendService.post<{
-        psktSeller: string;
-        id: string;
-        status: string;
-        success: boolean;
-    }>(`/${P2PCONTROLLER}/buy-v2/${orderId}`);
     return response.data;
 };
 
@@ -211,15 +184,6 @@ export const releaseBuyLock = async (orderId: string): Promise<any> => {
         return { confirmed: false }; // Return empty array in case of an error
     }
 };
-export const releaseBuyLockV2 = async (orderId: string): Promise<any> => {
-    try {
-        const response = await backendService.post<any>(`/${P2PCONTROLLER}/releaseBuyLock-v2/${orderId}`);
-        return response.data;
-    } catch (error) {
-        console.error(`Error deleting order ${orderId}:`, error.response ? error.response.data : error.message);
-        return { confirmed: false }; // Return empty array in case of an error
-    }
-};
 
 export const confirmDelistOrder = async (
     orderId: string,
@@ -257,5 +221,42 @@ export const getOrdersHistory = async (
         pagination: pagination || { limit: 20, offset: 0 }, // Default pagination (limit of 10)
         filters: cleanedFilters || {}, // Optional filters
     });
+    return response.data;
+};
+
+export const createSellOrderV2 = async (
+    ticker: string,
+    quantity: number,
+    totalPrice: number,
+    pricePerToken: number,
+    psktSeller: string,
+    psktTransactionId: string,
+): Promise<{ id: string; status: string }> => {
+    const capitalTicker = ticker.toUpperCase();
+    const response = await backendService.post<{ id: string; status: string }>(`/${P2PV2CONTROLLER}/`, {
+        ticker: capitalTicker,
+        quantity,
+        totalPrice,
+        pricePerToken,
+        psktSeller,
+        psktTransactionId,
+    });
+    return response.data;
+};
+
+export const getDecentralizedOrder = async (orderId): Promise<DecentralizedOrder> => {
+    const response = await backendService.get<DecentralizedOrder>(`/${P2PV2CONTROLLER}/${orderId}`);
+    return response.data;
+};
+
+export const buyDecentralizedOrder = async (orderId, transactionId): Promise<DecentralizedOrder> => {
+    const response = await backendService.post<DecentralizedOrder>(`/${P2PV2CONTROLLER}/buy/${orderId}`, {
+        transactionId,
+    });
+    return response.data;
+};
+
+export const cancelDecentralizedOrder = async (orderId): Promise<DecentralizedOrder> => {
+    const response = await backendService.post<DecentralizedOrder>(`/${P2PV2CONTROLLER}/cancel/${orderId}`);
     return response.data;
 };
