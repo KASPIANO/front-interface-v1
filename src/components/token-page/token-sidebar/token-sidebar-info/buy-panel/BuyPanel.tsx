@@ -290,11 +290,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         }
 
         if (txId) {
-            try {
-                await buyDecentralizedOrder(order.orderId, txId);
-            } catch (error) {
-                console.error(error);
-            }
+            // wihtout await for fast finish
+            buyDecentralizedOrder(order.orderId, txId);
         }
 
         setWaitingForWalletConfirmation(false);
