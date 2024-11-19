@@ -68,6 +68,9 @@ const Footer: React.FC = () => (
                             <li>
                                 <FooterLink href="/portfolio">Portfolio</FooterLink>
                             </li>
+                            <li>
+                                <FooterLink href="/launchpad">Launchpad</FooterLink>
+                            </li>
                         </FooterList>
                     </Grid>
 
