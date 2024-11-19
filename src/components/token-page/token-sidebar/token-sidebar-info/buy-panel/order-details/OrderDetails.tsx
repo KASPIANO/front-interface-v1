@@ -40,9 +40,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     const [showHighGasWarning, setShowHighGasWarning] = useState(false);
     const [showGasLimitExceeded, setShowGasLimitExceeded] = useState(false);
     // Fee Calculations
+    const kaspianoCommissionInt = parseInt(KASPIANO_TRADE_COMMISSION);
     const networkFee = order.isDecentralized ? 2 : 5;
     const finalTotal = order.totalPrice + networkFee;
-    const platformFee = KASPIANO_TRADE_COMMISSION > 0 ? order.totalPrice * KASPIANO_TRADE_COMMISSION : 0;
+    const platformFee = kaspianoCommissionInt > 0 ? order.totalPrice * kaspianoCommissionInt : 0;
     const finalTotalWithCommission = finalTotal + platformFee;
     const feeText = order.isDecentralized ? 'PKST Fee' : 'Network Fee';
 
@@ -187,9 +188,9 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                 </Typography>
                             </OrderItemPrimary>
                         </OrderDetailsItem>
-                        {order.isDecentralized && KASPIANO_TRADE_COMMISSION > 0 && (
+                        {order.isDecentralized && kaspianoCommissionInt > 0 && (
                             <OrderDetailsItem variant="body1">
-                                Platform Fee ({KASPIANO_TRADE_COMMISSION * 100}%):
+                                Platform Fee ({kaspianoCommissionInt * 100}%):
                                 <OrderItemPrimary
                                     sx={{
                                         display: 'flex',
