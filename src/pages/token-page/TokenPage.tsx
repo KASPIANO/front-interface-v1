@@ -14,7 +14,8 @@ import { fetchTokenByTicker, getTokenPriceHistory, recalculateRugScore } from '.
 import { AxiosError } from 'axios';
 import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
 import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { createSellOrderV2 } from '../../DAL/BackendP2PDAL';
 
 interface TokenPageProps {
     walletAddress: string | null;
@@ -25,6 +26,9 @@ interface TokenPageProps {
     walletConnected: boolean;
 }
 const tradingDataTimeFramesToSelect = ['All', '30d', '7d', '1d', '6h', '1h'];
+const POLLING_INTERVAL = 15000; // 5 seconds
+const STORAGE_KEY = 'pendingPSKT';
+
 const TokenPage: FC<TokenPageProps> = (props) => {
     const { walletConnected, walletBalance, walletAddress, backgroundBlur } = props;
     const { ticker } = useParams();
@@ -35,6 +39,91 @@ const TokenPage: FC<TokenPageProps> = (props) => {
     const [tradingDataTimeFrame, setTradingDataTimeFrame] = useState(
         tradingDataTimeFramesToSelect[tradingDataTimeFramesToSelect.length - 4],
     );
+    const queryClient = useQueryClient();
+    let pollingInterval;
+
+    const removeTransaction = (txId) => {
+        const pendingTransactions = getStoredTransactions();
+        const updatedTransactions = pendingTransactions.filter((tx) => tx.sendCommitTxId !== txId);
+        saveTransactionsToStorage(updatedTransactions);
+
+        if (updatedTransactions.length === 0) {
+            stopPolling();
+        }
+    };
+
+    const getStoredTransactions = () => {
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : [];
+        } catch (error) {
+            console.error('Error reading from localStorage:', error);
+            return [];
+        }
+    };
+
+    const saveTransactionsToStorage = (transactions) => {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+        } catch (error) {
+            console.error('Error saving to localStorage:', error);
+        }
+    };
+
+    // Helper function to clean up polling
+    const stopPolling = () => {
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+            queryClient.invalidateQueries({ queryKey: ['orders'] });
+        }
+    };
+
+    const pollPendingTransactions = async () => {
+        const pendingTransactions = getStoredTransactions();
+
+        if (pendingTransactions.length === 0) {
+            stopPolling();
+            return;
+        }
+
+        for (const tx of pendingTransactions) {
+            try {
+                // Attempt to create sell order
+                await createSellOrderV2(
+                    tx.ticker,
+                    tx.amount,
+                    tx.totalPrice,
+                    tx.pricePerToken,
+                    tx.txJsonString,
+                    tx.sendCommitTxId,
+                );
+
+                // On success
+                removeTransaction(tx.sendCommitTxId);
+                showGlobalSnackbar({
+                    message: 'Recovered transaction: Sell order created successfully',
+                    severity: 'success',
+                    commitId: tx.sendCommitTxId,
+                });
+            } catch (error) {
+                const updatedTx = {
+                    ...tx,
+                    retryCount: (tx.retryCount || 0) + 1,
+                };
+
+                const transactions = getStoredTransactions();
+                const updatedTransactions = transactions.map((t) =>
+                    t.sendCommitTxId === tx.sendCommitTxId ? updatedTx : t,
+                );
+                saveTransactionsToStorage(updatedTransactions);
+            }
+        }
+    };
+
+    const startPolling = () => {
+        pollingInterval = setInterval(pollPendingTransactions, POLLING_INTERVAL);
+        return pollingInterval;
+    };
 
     useEffect(() => {
         const fetchPrice = async () => {
@@ -183,6 +272,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             {/* {getComponentToShow(<TokenHolders tokenInfo={tokenInfo} />)} */}
             {getComponentToShow(
                 <TokenSideBar
+                    startPolling={startPolling}
                     kasPrice={kasPrice}
                     tokenInfo={tokenInfo}
                     setTokenInfo={setTokenInfo}
