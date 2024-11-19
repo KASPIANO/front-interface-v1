@@ -459,9 +459,18 @@ export const slotPurposeDisplayMapper: { [key in SlotPurpose]: string } = {
     [SlotPurpose.MINT]: 'Mint Live',
 };
 
+export interface SortParams {
+    field?: string;
+    direction?: 'asc' | 'desc';
+}
+export interface PaginationParams {
+    limit?: number;
+    offset?: number;
+}
+
 export interface UserOrdersParams {
-    sort?: { field?: string; direction?: 'asc' | 'desc' }; // Sort object
-    pagination?: { limit?: number; offset?: number }; // Pagination object
+    sort?: SortParams; // Sort object
+    pagination?: PaginationParams; // Pagination object
     filters?: {
         // Filters object
         statuses?: (SellOrderStatus | SellOrderStatusV2)[];
@@ -472,4 +481,9 @@ export interface UserOrdersParams {
         startDateTimestamp?: number;
         endDateTimestamp?: number;
     };
+}
+
+export interface SortPaginationParams {
+    sort?: SortParams; // Sort object
+    pagination?: PaginationParams; // Pagination object
 }

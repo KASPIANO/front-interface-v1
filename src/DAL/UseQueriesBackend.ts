@@ -9,7 +9,7 @@ import {
 } from './BackendDAL';
 import { useQuery } from '@tanstack/react-query';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { getOrders, getUserOrders } from './BackendP2PDAL'; // Adjust the
+import { getTickerSellOrders, getUserOrders } from './BackendP2PDAL'; // Adjust the
 import { SellOrderStatus, SellOrderStatusV2 } from '../types/Types';
 
 export interface UseOrdersHistoryProps {
@@ -56,9 +56,15 @@ export const useFetchOrders = (tokenInfo, sortBy, sortOrder) =>
     useInfiniteQuery({
         queryKey: ['orders', tokenInfo.ticker, sortBy, sortOrder],
         queryFn: async ({ pageParam = 0 }) => {
-            const response = await getOrders(tokenInfo.ticker, pageParam, LIMIT, {
-                field: sortBy,
-                direction: sortOrder,
+            const response = await getTickerSellOrders(tokenInfo.ticker, {
+                pagination: {
+                    limit: LIMIT,
+                    offset: pageParam,
+                },
+                sort: {
+                    field: sortBy,
+                    direction: sortOrder,
+                },
             });
             return {
                 orders: response.orders || [],
