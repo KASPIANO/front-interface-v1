@@ -19,10 +19,12 @@ interface TokenSideBarProps {
     walletConnected: boolean;
     walletBalance: number;
     kasPrice: number;
+    startPolling: () => void;
 }
 
 const TokenSideBar: FC<TokenSideBarProps> = (props) => {
-    const { setTokenInfo, tokenInfo, walletAddress, walletConnected, walletBalance, kasPrice } = props;
+    const { setTokenInfo, tokenInfo, walletAddress, walletConnected, walletBalance, kasPrice, startPolling } =
+        props;
     const [selectedSideActionTab, setSelectedSideActionTab] = useState('1');
     const [buyPanelRef, setBuyPanelRef] = useState<{ handleDrawerClose: () => void } | null>(null);
     const handleTabChange = (_event: SyntheticEvent, newValue: string) => {
@@ -140,6 +142,7 @@ const TokenSideBar: FC<TokenSideBarProps> = (props) => {
                             kasPrice={kasPrice}
                             walletAddress={walletAddress}
                             walletBalance={walletBalance}
+                            startPolling={startPolling}
                         />
                         {/* <Typography variant="h5">Coming Soon</Typography> */}
                     </TabPanel>

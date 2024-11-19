@@ -17,16 +17,14 @@ interface SellPanelProps {
     walletAddress: string | null;
     walletConnected;
     walletBalance: number;
+    startPolling: () => void;
 }
 
-const POLLING_INTERVAL = 5000; // 5 seconds
-const MAX_RETRIES = 10;
+// const KASPA_TO_SOMPI = 100000000;
 const STORAGE_KEY = 'pendingPSKT';
 
-// const KASPA_TO_SOMPI = 100000000;
-
 const SellPanel: React.FC<SellPanelProps> = (props) => {
-    const { tokenInfo, kasPrice, walletAddress, walletConnected, walletBalance } = props;
+    const { tokenInfo, kasPrice, walletAddress, walletConnected, walletBalance, startPolling } = props;
     const [tokenAmount, setTokenAmount] = useState<string>(''); // Changed to string
     const [totalPrice, setTotalPrice] = useState<string>(''); // Changed to string
     const [pricePerToken, setPricePerToken] = useState<string>(''); // Changed to string
@@ -45,116 +43,11 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [showInputTooltip, setShowInputTooltip] = useState<boolean>(false);
     const queryClient = useQueryClient();
 
-    let pollingInterval;
-
-    // Helper function to clean up polling
-    const stopPolling = () => {
-        if (pollingInterval) {
-            clearInterval(pollingInterval);
-        }
-    };
-
-    const pollPendingTransactions = async () => {
-        const pendingTransactions = getStoredTransactions();
-
-        if (pendingTransactions.length === 0) {
-            stopPolling();
-            return;
-        }
-
-        for (const tx of pendingTransactions) {
-            try {
-                // Attempt to create sell order
-                await createSellOrderV2(
-                    tx.ticker,
-                    tx.amount,
-                    tx.totalPrice,
-                    tx.pricePerToken,
-                    tx.txJsonString,
-                    tx.sendCommitTxId,
-                );
-
-                // On success
-                removeTransaction(tx.sendCommitTxId);
-                showGlobalSnackbar({
-                    message: 'Recovered transaction: Sell order created successfully',
-                    severity: 'success',
-                    commitId: tx.sendCommitTxId,
-                });
-            } catch (error) {
-                const updatedTx = {
-                    ...tx,
-                    retryCount: (tx.retryCount || 0) + 1,
-                };
-
-                if (updatedTx.retryCount >= MAX_RETRIES) {
-                    removeTransaction(tx.sendCommitTxId);
-                    showGlobalSnackbar({
-                        message: 'Failed to recover transaction after maximum retries',
-                        severity: 'error',
-                        details: error.message,
-                    });
-                } else {
-                    const transactions = getStoredTransactions();
-                    const updatedTransactions = transactions.map((t) =>
-                        t.sendCommitTxId === tx.sendCommitTxId ? updatedTx : t,
-                    );
-                    saveTransactionsToStorage(updatedTransactions);
-                }
-            }
-        }
-    };
-
-    const startPolling = () => {
-        pollingInterval = setInterval(pollPendingTransactions, POLLING_INTERVAL);
-        return pollingInterval;
-    };
-
     useEffect(() => {
         fetchWalletKRC20Balance(walletAddress, tokenInfo.ticker).then((balance) => {
             setWalletTickerBalance(balance);
         });
     }, [walletAddress, tokenInfo.ticker, finishedSellOrder]);
-
-    const getStoredTransactions = () => {
-        try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            return stored ? JSON.parse(stored) : [];
-        } catch (error) {
-            console.error('Error reading from localStorage:', error);
-            return [];
-        }
-    };
-
-    const saveTransactionsToStorage = (transactions) => {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
-        } catch (error) {
-            console.error('Error saving to localStorage:', error);
-        }
-    };
-
-    const saveFailedTransaction = (txData) => {
-        const pendingTransactions = getStoredTransactions();
-        const newTransaction = {
-            ...txData,
-            retryCount: 0,
-            timestamp: Date.now(),
-        };
-
-        saveTransactionsToStorage([...pendingTransactions, newTransaction]);
-        return startPolling();
-    };
-
-    const removeTransaction = (txId) => {
-        const pendingTransactions = getStoredTransactions();
-        const updatedTransactions = pendingTransactions.filter((tx) => tx.sendCommitTxId !== txId);
-        saveTransactionsToStorage(updatedTransactions);
-
-        if (updatedTransactions.length === 0) {
-            stopPolling();
-        }
-    };
 
     const handleTokenAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setIsPriceFromButton(false);
@@ -450,6 +343,36 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     //     }
     // };
 
+    const getStoredTransactions = () => {
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : [];
+        } catch (error) {
+            console.error('Error reading from localStorage:', error);
+            return [];
+        }
+    };
+
+    const saveTransactionsToStorage = (transactions) => {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+        } catch (error) {
+            console.error('Error saving to localStorage:', error);
+        }
+    };
+
+    const saveFailedTransaction = (txData) => {
+        const pendingTransactions = getStoredTransactions();
+        const newTransaction = {
+            ...txData,
+            retryCount: 0,
+            timestamp: Date.now(),
+        };
+
+        saveTransactionsToStorage([...pendingTransactions, newTransaction]);
+        return startPolling();
+    };
+
     const handleTransferV2 = async () => {
         try {
         } catch (error) {
@@ -488,8 +411,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     setDisableSellButton(false);
                     cleanFields();
                     queryClient.invalidateQueries({ queryKey: ['orders'] });
-                    setFinishedSellOrder((prev) => !prev);
                     setTimeout(() => {
+                        setFinishedSellOrder((prev) => !prev);
                         setCreatingSellOrder(false); // Ensures it closes after a slight delay
                     }, 500);
 
@@ -503,7 +426,17 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                         txJsonString,
                         sendCommitTxId,
                     });
-                    setCreatingSellOrder(false);
+                    setIsDialogOpen(false);
+                    setDisableSellButton(false);
+                    cleanFields();
+                    setTimeout(() => {
+                        setFinishedSellOrder((prev) => !prev);
+                        setCreatingSellOrder(false); // Ensures it closes after a slight delay
+                    }, 500);
+                    showGlobalSnackbar({
+                        message: 'Sell order Failed, it will be created in the background',
+                        severity: 'warning',
+                    });
                     return false;
                 }
             } else {
