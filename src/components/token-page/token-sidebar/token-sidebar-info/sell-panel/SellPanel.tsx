@@ -374,14 +374,6 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     };
 
     const handleTransferV2 = async () => {
-        try {
-        } catch (error) {
-            showGlobalSnackbar({
-                message: 'Failed to create sell order for the token. Please try again later.',
-                severity: 'error',
-            });
-            return;
-        }
         setWalletConfirmation(true);
         try {
             const { txJsonString, sendCommitTxId } = await createOrderKRC20(

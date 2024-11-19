@@ -40,7 +40,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     const [showHighGasWarning, setShowHighGasWarning] = useState(false);
     const [showGasLimitExceeded, setShowGasLimitExceeded] = useState(false);
     // Fee Calculations
-    const kaspianoCommissionInt = parseInt(KASPIANO_TRADE_COMMISSION);
+    const kaspianoCommissionInt = parseFloat(KASPIANO_TRADE_COMMISSION);
     const networkFee = order.isDecentralized ? 2 : 5;
     const finalTotal = order.totalPrice + networkFee;
     const platformFee = kaspianoCommissionInt > 0 ? order.totalPrice * kaspianoCommissionInt : 0;
