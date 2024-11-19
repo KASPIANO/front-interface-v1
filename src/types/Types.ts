@@ -348,8 +348,8 @@ export enum SellOrderStatusV2 {
     VERIFYING = 'VERIFYING',
     COMPLETED = 'COMPLETED',
     CANCELED = 'CANCELED',
-  }
-    
+}
+
 export enum DecentralizedOrderStatus {
     LISTED_FOR_SALE = 'LISTED_FOR_SALE',
     COMPLETED = 'COMPLETED',
