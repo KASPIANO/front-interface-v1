@@ -342,6 +342,14 @@ export enum SellOrderStatus {
     DELIST_ERROR = 'DELIST_ERROR',
     COMPLETED_DELISTING = 'COMPLETED_DELISTING',
 }
+
+export enum SellOrderStatusV2 {
+    LISTED_FOR_SALE = 'LISTED_FOR_SALE',
+    VERIFYING = 'VERIFYING',
+    COMPLETED = 'COMPLETED',
+    CANCELED = 'CANCELED',
+  }
+    
 export enum DecentralizedOrderStatus {
     LISTED_FOR_SALE = 'LISTED_FOR_SALE',
     COMPLETED = 'COMPLETED',
@@ -447,3 +455,18 @@ export const slotPurposeDisplayMapper: { [key in SlotPurpose]: string } = {
     [SlotPurpose.TRADING]: 'Trading Competition',
     [SlotPurpose.MINT]: 'Mint Live',
 };
+
+export interface UserOrdersParams {
+    sort?: { field?: string; direction?: 'asc' | 'desc' }; // Sort object
+    pagination?: { limit?: number; offset?: number }; // Pagination object
+    filters?: {
+        // Filters object
+        statuses?: (SellOrderStatus | SellOrderStatusV2)[];
+        tickers?: string[];
+        isSeller?: boolean;
+        isBuyer?: boolean;
+        totalPrice?: { min?: number; max?: number };
+        startDateTimestamp?: number;
+        endDateTimestamp?: number;
+    };
+}
