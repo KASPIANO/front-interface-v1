@@ -310,7 +310,7 @@ export interface DecentralizedOrder {
     ticker: string;
     totalPrice: number;
     createdAt: string;
-    status: DecentralizedOrderStatus;
+    status: SellOrderStatusV2;
     psktSeller: string;
     psktTransactionId: string;
     sellerWalletAddress: string;
@@ -351,11 +351,6 @@ export enum SellOrderStatusV2 {
     CANCELED = 'CANCELED',
 }
 
-export enum DecentralizedOrderStatus {
-    LISTED_FOR_SALE = 'LISTED_FOR_SALE',
-    COMPLETED = 'COMPLETED',
-    CANCELED = 'CANCELED',
-}
 export type FilterSellOrderStatus =
     | SellOrderStatus.LISTED_FOR_SALE
     | SellOrderStatus.COMPLETED
