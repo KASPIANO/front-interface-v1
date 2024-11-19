@@ -300,7 +300,24 @@ export interface Order {
     ticker: string;
     createdAt: string;
     status: SellOrderStatus;
+    isDecentralized: boolean;
 }
+
+export interface DecentralizedOrder {
+    orderId: string;
+    pricePerToken: number;
+    quantity: number;
+    ticker: string;
+    totalPrice: number;
+    createdAt: string;
+    status: SellOrderStatusV2;
+    psktSeller: string;
+    psktTransactionId: string;
+    sellerWalletAddress: string;
+    isDecentralized: boolean;
+}
+
+export type MixedOrder = Order | DecentralizedOrder;
 
 export interface SwapTransactionsResult {
     readonly commitTransactionId?: string;
@@ -326,17 +343,27 @@ export enum SellOrderStatus {
     DELIST_ERROR = 'DELIST_ERROR',
     COMPLETED_DELISTING = 'COMPLETED_DELISTING',
 }
+
+export enum SellOrderStatusV2 {
+    LISTED_FOR_SALE = 'LISTED_FOR_SALE',
+    VERIFYING = 'VERIFYING',
+    COMPLETED = 'COMPLETED',
+    CANCELED = 'CANCELED',
+}
+
 export type FilterSellOrderStatus =
     | SellOrderStatus.LISTED_FOR_SALE
     | SellOrderStatus.COMPLETED
     | SellOrderStatus.OFF_MARKETPLACE
-    | SellOrderStatus.COMPLETED_DELISTING;
+    | SellOrderStatus.COMPLETED_DELISTING
+    | SellOrderStatus.CANCELED;
 
 export const filterSellOrderStatuses: FilterSellOrderStatus[] = [
     SellOrderStatus.LISTED_FOR_SALE,
     SellOrderStatus.COMPLETED,
     SellOrderStatus.OFF_MARKETPLACE,
     SellOrderStatus.COMPLETED_DELISTING,
+    SellOrderStatus.CANCELED,
 ];
 
 export type UserReferral = {
@@ -427,6 +454,34 @@ export const slotPurposeDisplayMapper: { [key in SlotPurpose]: string } = {
     [SlotPurpose.MINT]: 'Mint Live',
 };
 
+export interface SortParams {
+    field?: string;
+    direction?: 'asc' | 'desc';
+}
+export interface PaginationParams {
+    limit?: number;
+    offset?: number;
+}
+
+export interface UserOrdersParams {
+    sort?: SortParams; // Sort object
+    pagination?: PaginationParams; // Pagination object
+    filters?: {
+        // Filters object
+        statuses?: (SellOrderStatus | SellOrderStatusV2)[];
+        tickers?: string[];
+        isSeller?: boolean;
+        isBuyer?: boolean;
+        totalPrice?: { min?: number; max?: number };
+        startDateTimestamp?: number;
+        endDateTimestamp?: number;
+    };
+}
+
+export interface SortPaginationParams {
+    sort?: SortParams; // Sort object
+    pagination?: PaginationParams; // Pagination object
+}
 export type ClientSideLunchpad = {
     id: string;
     ticker: string;
