@@ -1,4 +1,4 @@
-import { DecentralizedOrder, Order } from '../types/Types';
+import { DecentralizedOrder, Order, UserOrdersParams } from '../types/Types';
 import { cleanFilters } from '../utils/Utils';
 import { backendService } from './AxiosInstaces';
 
@@ -258,5 +258,12 @@ export const buyDecentralizedOrder = async (orderId, transactionId): Promise<Dec
 
 export const cancelDecentralizedOrder = async (orderId): Promise<DecentralizedOrder> => {
     const response = await backendService.post<DecentralizedOrder>(`/${P2PV2CONTROLLER}/cancel/${orderId}`);
+    return response.data;
+};
+
+export const getUserOrders = async (
+    params: UserOrdersParams,
+): Promise<{ orders: Order[]; totalCount: number; allTickers: string[] }> => {
+    const response = await backendService.post<any>(`/${P2PV2CONTROLLER}/user-orders`, params);
     return response.data;
 };
