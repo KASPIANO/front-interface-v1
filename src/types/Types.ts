@@ -302,6 +302,7 @@ export interface Order {
     status: SellOrderStatus;
     psktSeller: string;
     isNew: boolean;
+    sellerWalletAddress?: string;
 }
 
 export interface SwapTransactionsResult {

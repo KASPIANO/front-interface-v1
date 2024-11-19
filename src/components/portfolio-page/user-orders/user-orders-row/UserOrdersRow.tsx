@@ -315,25 +315,44 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                         </Typography>
                     }
                 />
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '1rem',
-                        width: '23vw',
-                        justifyContent: 'center',
-                        paddingRight: '8rem',
-                    }}
-                >
-                    {order.status === SellOrderStatus.OFF_MARKETPLACE && (
-                        <>
-                            <Tooltip title="Relist the item for sale">
-                                {loadingOrderId === order.orderId && isRelistLoading ? (
-                                    <LoadingSpinner size={20} />
-                                ) : (
-                                    !isCancelOrderLoading && (
+                {!order.isNew && (
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '1rem',
+                            width: '23vw',
+                            justifyContent: 'center',
+                            paddingRight: '8rem',
+                        }}
+                    >
+                        {order.status === SellOrderStatus.OFF_MARKETPLACE && (
+                            <>
+                                <Tooltip title="Relist the item for sale">
+                                    {loadingOrderId === order.orderId && isRelistLoading ? (
+                                        <LoadingSpinner size={20} />
+                                    ) : (
+                                        !isCancelOrderLoading && (
+                                            <Button
+                                                onClick={() => relistHandler(order.orderId)}
+                                                variant="contained"
+                                                color="primary"
+                                                sx={{
+                                                    minWidth: '3.5vw',
+                                                    width: '3vw',
+                                                    fontSize: '0.6rem',
+                                                }}
+                                            >
+                                                Relist
+                                            </Button>
+                                        )
+                                    )}
+                                </Tooltip>
+
+                                <Tooltip title="Edit is to change the order details">
+                                    {isCancelOrderLoading || isRelistLoading ? null : (
                                         <Button
-                                            onClick={() => relistHandler(order.orderId)}
+                                            onClick={openEditDialogHandler}
                                             variant="contained"
                                             color="primary"
                                             sx={{
@@ -342,69 +361,52 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                                                 fontSize: '0.6rem',
                                             }}
                                         >
-                                            Relist
+                                            Edit
                                         </Button>
-                                    )
-                                )}
-                            </Tooltip>
+                                    )}
+                                </Tooltip>
+                                <Tooltip title="Cancel is to retrieve the tokens back to your wallet">
+                                    {loadingOrderId === order.orderId && isCancelOrderLoading ? (
+                                        <LoadingSpinner size={20} />
+                                    ) : (
+                                        !isRelistLoading && (
+                                            <Button
+                                                onClick={() => hadleOpenCancelDialog(order.orderId)}
+                                                variant="contained"
+                                                color="primary"
+                                                sx={{
+                                                    minWidth: '3.5vw',
+                                                    width: '3vw',
+                                                    fontSize: '0.6rem',
+                                                }}
+                                            >
+                                                Cancel
+                                            </Button>
+                                        )
+                                    )}
+                                </Tooltip>
+                            </>
+                        )}
 
-                            <Tooltip title="Edit is to change the order details">
-                                {isCancelOrderLoading || isRelistLoading ? null : (
-                                    <Button
-                                        onClick={openEditDialogHandler}
-                                        variant="contained"
-                                        color="primary"
-                                        sx={{
-                                            minWidth: '3.5vw',
-                                            width: '3vw',
-                                            fontSize: '0.6rem',
-                                        }}
-                                    >
-                                        Edit
-                                    </Button>
-                                )}
-                            </Tooltip>
-                            <Tooltip title="Cancel is to retrieve the tokens back to your wallet">
-                                {loadingOrderId === order.orderId && isCancelOrderLoading ? (
-                                    <LoadingSpinner size={20} />
-                                ) : (
-                                    !isRelistLoading && (
-                                        <Button
-                                            onClick={() => hadleOpenCancelDialog(order.orderId)}
-                                            variant="contained"
-                                            color="primary"
-                                            sx={{
-                                                minWidth: '3.5vw',
-                                                width: '3vw',
-                                                fontSize: '0.6rem',
-                                            }}
-                                        >
-                                            Cancel
-                                        </Button>
-                                    )
-                                )}
-                            </Tooltip>
-                        </>
-                    )}
-
-                    {order.status === SellOrderStatus.LISTED_FOR_SALE &&
-                        (loadingOrderId === order.orderId ? (
-                            <LoadingSpinner size={20} />
-                        ) : (
-                            <Button
-                                onClick={() => delistHandler(order.orderId)}
-                                variant="contained"
-                                color="primary"
-                                sx={{
-                                    minWidth: '3.5vw',
-                                    width: '3vw',
-                                    fontSize: '0.7rem',
-                                }}
-                            >
-                                Delist
-                            </Button>
-                        ))}
-                </Box>
+                        {order.status === SellOrderStatus.LISTED_FOR_SALE &&
+                            (loadingOrderId === order.orderId ? (
+                                <LoadingSpinner size={20} />
+                            ) : (
+                                <Button
+                                    onClick={() => delistHandler(order.orderId)}
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{
+                                        minWidth: '3.5vw',
+                                        width: '3vw',
+                                        fontSize: '0.7rem',
+                                    }}
+                                >
+                                    Delist
+                                </Button>
+                            ))}
+                    </Box>
+                )}
             </ListItem>
             <Divider />
             <Dialog

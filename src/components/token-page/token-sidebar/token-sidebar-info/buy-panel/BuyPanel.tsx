@@ -20,6 +20,7 @@ import { useFetchOrders } from '../../../../../DAL/UseQueriesBackend';
 import { GlobalStyle } from '../../../../../utils/GlobalStyleScrollBar';
 import { useQueryClient } from '@tanstack/react-query';
 import { isEmptyString } from '../../../../../utils/Utils';
+import { checkOrderExists } from '../../../../../DAL/Krc20DAL';
 
 interface BuyPanelProps {
     tokenInfo: BackendTokenResponse;
@@ -273,6 +274,33 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 message: 'Insufficient balance for this order',
                 severity: 'error',
             });
+            setSelectedOrder(null);
+            setIsPanelOpen(false);
+            return;
+        }
+        const { inputs } = JSON.parse(psktSeller);
+
+        const orderDataKasplex = await checkOrderExists(
+            tokenInfo.ticker,
+            inputs[0].transactionId,
+            order.sellerWalletAddress,
+        );
+        if (orderDataKasplex.length === 0) {
+            showGlobalSnackbar({
+                message: 'Order already taken. Please select another order.',
+                severity: 'error',
+            });
+            setSelectedOrder(null);
+            setIsPanelOpen(false);
+            return;
+        }
+        if (orderDataKasplex[0].amount / 1e8 !== order.totalPrice) {
+            showGlobalSnackbar({
+                message: 'Order not correct. Please select another order.',
+                severity: 'error',
+            });
+            setSelectedOrder(null);
+            setIsPanelOpen(false);
             return;
         }
         try {
@@ -324,7 +352,6 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 severity: 'error',
             });
 
-            setIsProcessingBuyOrder(false);
             setIsPanelOpen(false);
             setSelectedOrder(null);
         }
