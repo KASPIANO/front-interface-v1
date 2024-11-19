@@ -300,7 +300,6 @@ export interface Order {
     ticker: string;
     createdAt: string;
     status: SellOrderStatus;
-    psktSeller: string;
     isDecentralized: boolean;
 }
 
@@ -310,13 +309,15 @@ export interface DecentralizedOrder {
     quantity: number;
     ticker: string;
     totalPrice: number;
-    createdAt: Date;
+    createdAt: string;
     status: DecentralizedOrderStatus;
     psktSeller: string;
     psktTransactionId: string;
     sellerWalletAddress: string;
     isDecentralized: boolean;
 }
+
+export type MixedOrder = Order | DecentralizedOrder;
 
 export interface SwapTransactionsResult {
     readonly commitTransactionId?: string;
@@ -359,13 +360,15 @@ export type FilterSellOrderStatus =
     | SellOrderStatus.LISTED_FOR_SALE
     | SellOrderStatus.COMPLETED
     | SellOrderStatus.OFF_MARKETPLACE
-    | SellOrderStatus.COMPLETED_DELISTING;
+    | SellOrderStatus.COMPLETED_DELISTING
+    | SellOrderStatus.CANCELED;
 
 export const filterSellOrderStatuses: FilterSellOrderStatus[] = [
     SellOrderStatus.LISTED_FOR_SALE,
     SellOrderStatus.COMPLETED,
     SellOrderStatus.OFF_MARKETPLACE,
     SellOrderStatus.COMPLETED_DELISTING,
+    SellOrderStatus.CANCELED,
 ];
 
 export type UserReferral = {
