@@ -13,6 +13,7 @@ import {
     releaseBuyLock,
     getDecentralizedOrder,
     buyDecentralizedOrder,
+    cancelDecentralizedOrder,
 } from '../../../../../DAL/BackendP2PDAL';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material'; // Import CircularProgress for the spinner
@@ -176,6 +177,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     severity: 'error',
                 });
                 setSelectedOrder(null);
+                await cancelDecentralizedOrder(order.orderId);
+                queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker] });
                 return;
             }
             if (orderDataKasplex[0].amount / 1e8 !== order.quantity) {
