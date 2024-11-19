@@ -176,6 +176,20 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     message: 'Order already taken. Please select another order.',
                     severity: 'error',
                 });
+
+                queryClient.setQueryData(
+                    ['orders', tokenInfo.ticker],
+                    (oldData: { orders: MixedOrder[] } | undefined) => {
+                        if (!oldData) return oldData;
+
+                        const newOrders = oldData.orders.filter(
+                            (order) => order.orderId !== selectedOrder.orderId,
+                        );
+
+                        return { ...oldData, orders: newOrders };
+                    },
+                );
+
                 setSelectedOrder(null);
                 await cancelDecentralizedOrder(order.orderId);
                 queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker] });
@@ -320,7 +334,17 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
 
         if (txId) {
             // wihtout await for fast finish
-            buyDecentralizedOrder(order.orderId, txId, KASPIANO_TRADE_COMMISSION);
+            buyDecentralizedOrder(order.orderId, txId);
+            queryClient.setQueryData(
+                ['orders', tokenInfo.ticker],
+                (oldData: { orders: MixedOrder[] } | undefined) => {
+                    if (!oldData) return oldData;
+
+                    const newOrders = oldData.orders.filter((order) => order.orderId !== selectedOrder.orderId);
+
+                    return { ...oldData, orders: newOrders };
+                },
+            );
         }
 
         setWaitingForWalletConfirmation(false);
@@ -331,9 +355,11 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 severity: 'success',
                 txIds: [txId],
             });
-            queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker] });
             setIsPanelOpen(false);
             setSelectedOrder(null);
+            setTimeout(() => {
+                queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker] });
+            }, 1300);
         } else {
             const errorMessage =
                 "Purchase failed in the process. Please wait 10 minutes and contact support if you didn't receive the tokens.";
