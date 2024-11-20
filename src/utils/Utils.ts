@@ -130,7 +130,7 @@ export const verifyPaymentTransaction = async (
 };
 
 export const isValidWalletAddress = (address: string): boolean => {
-    const regex = /^(kaspa|kaspatest):q[a-z0-9]{54,90}$/;
+    const regex = /^(kaspa|kaspatest):(q|p)[a-z0-9]{54,90}$/;
     return regex.test(address);
 };
 
