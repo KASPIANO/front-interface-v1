@@ -42,11 +42,19 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [showButtonsTooltip, setShowButtonsTooltip] = useState<boolean>(false);
     const [showInputTooltip, setShowInputTooltip] = useState<boolean>(false);
     const queryClient = useQueryClient();
-
     useEffect(() => {
-        fetchWalletKRC20Balance(walletAddress, tokenInfo.ticker).then((balance) => {
-            setWalletTickerBalance(balance);
-        });
+        const intervalId = setInterval(() => {
+            fetchWalletKRC20Balance(walletAddress, tokenInfo.ticker)
+                .then((balance) => {
+                    setWalletTickerBalance(balance);
+                })
+                .catch((error) => {
+                    console.error('Error fetching wallet balance:', error);
+                });
+        }, 4000); // 8 seconds in milliseconds
+
+        // Clear interval on component unmount or when dependencies change
+        return () => clearInterval(intervalId);
     }, [walletAddress, tokenInfo.ticker, finishedSellOrder]);
 
     const handleTokenAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
