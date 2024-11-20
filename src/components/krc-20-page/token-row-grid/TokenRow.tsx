@@ -3,6 +3,7 @@ import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlin
 import ErrorOutlineRoundedIcon from '@mui/icons-material/ErrorOutlineRounded';
 import {
     Avatar,
+    Box,
     Button,
     Divider,
     ListItem,
@@ -12,7 +13,7 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { TokenListItemResponse } from '../../../types/Types';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import {
@@ -26,6 +27,7 @@ import {
 } from '../../../utils/Utils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { DEFAULT_TOKEN_LOGO_URL } from '../../../utils/Constants';
+import { getFyiLogo, kaspaLivePrice } from '../../../DAL/KaspaApiDal';
 
 interface TokenRowProps {
     token: TokenListItemResponse;
@@ -37,6 +39,24 @@ interface TokenRowProps {
 
 export const TokenRow: FC<TokenRowProps> = (props) => {
     const { token, handleItemClick, walletBalance, walletConnected } = props;
+    const [fyiLogo, setFyiLogo] = useState<any>(null);
+    const [kasPrice, setKasPrice] = useState<number>(0);
+
+    useEffect(() => {
+        const fetchPrice = async () => {
+            const newPrice = await kaspaLivePrice();
+            setKasPrice(newPrice);
+        };
+
+        // Fetch the price immediately when the component mounts
+        fetchPrice();
+
+        // Set up the interval to fetch the price every 30 seconds
+        const interval = setInterval(fetchPrice, 30000);
+
+        // Clean up the interval when the component unmounts
+        return () => clearInterval(interval);
+    }, []);
 
     const handleMint = async (event, ticker: string) => {
         event.stopPropagation();
@@ -80,6 +100,18 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
         }
     };
 
+    useEffect(() => {
+        if (!token.logoUrl) {
+            getFyiLogo(token.ticker)
+                .then((response) => {
+                    const imageUrl = URL.createObjectURL(response); // Use the blob data here
+                    setFyiLogo(imageUrl);
+                })
+                .catch(() => {
+                    setFyiLogo(DEFAULT_TOKEN_LOGO_URL); // Fallback if there's an error
+                });
+        }
+    }, [token]);
     const preMintedIcons = (preMinted: number, totalSupply: number) => {
         const preMintPercentage = ((preMinted / totalSupply) * 100)?.toFixed(2);
 
@@ -110,8 +142,8 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemAvatar>
                         <Avatar
                             sx={{
-                                width: '2.3rem',
-                                height: '2.3rem',
+                                width: '2.5rem',
+                                height: '2.5rem',
                                 marginRight: '1vw',
                             }}
                             style={{
@@ -120,7 +152,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             }}
                             variant="square"
                             alt={token.ticker}
-                            src={isEmptyString(token.logoUrl) ? DEFAULT_TOKEN_LOGO_URL : token.logoUrl}
+                            src={isEmptyString(token.logoUrl) ? fyiLogo : token.logoUrl}
                         />
                     </ListItemAvatar>
 
@@ -157,10 +189,14 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemText
                         sx={{ width: '9vw' }}
                         primary={
-                            <Tooltip title={`${token.price} Kas`}>
+                            <Tooltip title={token.price ? `$${(token.price * kasPrice).toFixed(6)}` : ''}>
                                 <Stat>
                                     <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
-                                        {formatPrice(token.price)}
+                                        {token.price ? formatPrice(token.price) : '0'}{' '}
+                                        <Box component="span" sx={{ fontSize: '0.5rem', display: 'inline' }}>
+                                            {/* Adjust fontSize as needed */}
+                                            KAS
+                                        </Box>
                                     </StatNumber>
                                     {token.changePrice !== null && (
                                         <StatHelpText
@@ -197,7 +233,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                                 <Stat>
                                     <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
                                         {Number.isFinite(token?.volumeUsd)
-                                            ? formatNumberWithCommas(token.volumeUsd.toFixed(0))
+                                            ? `$${formatNumberWithCommas(token.volumeUsd.toFixed(0))}`
                                             : '0'}
                                     </StatNumber>
                                     {Number.isFinite(token?.changeVolumeUsd) && token.changeVolumeUsd !== 0 && (
@@ -220,10 +256,16 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemText
                         sx={{ width: '8vw', justifyContent: 'start' }}
                         primary={
-                            <Tooltip title={`${formatNumberWithCommas(token.marketCap.toFixed(0))} USD`}>
+                            <Tooltip
+                                title={`${
+                                    Number.isFinite(token?.marketCap)
+                                        ? formatNumberWithCommas(token.marketCap.toFixed(0))
+                                        : '0'
+                                } USD`}
+                            >
                                 <Stat>
                                     <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
-                                        {simplifyNumber(token.marketCap)}
+                                        {token.marketCap ? `$${simplifyNumber(token.marketCap)}` : '0'}
                                     </StatNumber>
                                     {token.changeMarketCap !== null && (
                                         <StatHelpText

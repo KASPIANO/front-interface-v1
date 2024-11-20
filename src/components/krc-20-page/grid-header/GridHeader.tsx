@@ -13,6 +13,7 @@ interface GridHeaderProps {
     setChangeTotalMintsActive: (value: boolean) => void;
     setChangeMCActive: (value: boolean) => void;
     setChangeTotalHoldersActive: (value: boolean) => void;
+    setChangeVolumeUsd: (value: boolean) => void;
 }
 
 const marginMapperByHeader = {
@@ -55,6 +56,7 @@ export const GridHeader: FC<GridHeaderProps> = (props) => {
         setChangeTotalMintsActive,
         setChangeMCActive,
         setChangeTotalHoldersActive,
+        setChangeVolumeUsd,
     } = props;
     const [currentFilterState, setCurrentFilterState] = useState<FilterState>(FilterState.NONE);
 
@@ -65,6 +67,7 @@ export const GridHeader: FC<GridHeaderProps> = (props) => {
         setChangeMCActive(true);
         setChangeTotalHoldersActive(true);
         setChangeTotalMintsActive(true);
+        setChangeVolumeUsd(true);
     };
 
     const handleDownClick = () => {
@@ -74,6 +77,7 @@ export const GridHeader: FC<GridHeaderProps> = (props) => {
         setChangeTotalMintsActive(true);
         setChangeMCActive(true);
         setChangeTotalHoldersActive(true);
+        setChangeVolumeUsd(true);
     };
 
     return (

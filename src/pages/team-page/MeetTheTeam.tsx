@@ -14,16 +14,17 @@ const teamMembers = [
         linkedIn: 'https://www.linkedin.com/in/sione-milhem/',
     },
     {
-        name: 'Avidan Abitbol',
-        position: 'Co-Founder & Development Lead',
-        image: 'https://krc20data.s3.amazonaws.com/verified/avidan.jpg', // Replace with actual image URL
+        name: 'Christian Ludwig',
+        position: 'Advisor & Investor',
+        image: 'https://krc20data.s3.us-east-1.amazonaws.com/verified/chirsd20-24-00.jpg', // Replace with actual image URL
         description:
-            'Avidan is a seasoned member of the Kaspa community with extensive experience in management and business development. As co-founder of Kaspiano, he leads the development efforts, overseeing architecture and aligning technical execution with company goals.',
-        twitter: 'https://x.com/avidanab',
+            'Christian is an Inc. 500 entrepreneur and crypto fanatic. He owns an eight figure Kaspa mining company and has mined/owned Kaspa since Q4 22’. Christian believes Kaspa is cryptos “endgame” and that Kaspiano will empower end users to “make their own music” and unlock the full power of KRC-20 trading.',
+        twitter: 'https://x.com/christi61026749',
+        linkedIn: 'https://www.linkedin.com/in/davidchristianludwig/',
     },
     {
         name: 'Gilad',
-        position: 'Senior Full Stack Developer',
+        position: 'Founder & Senior Full Stack Developer',
         image: 'https://krc20data.s3.amazonaws.com/verified/gilad.png', // Replace with actual image URL
         description:
             "Gilad is a highly skilled Full Stack Developer, focusing on backend development and contributing to Kaspiano's success, including Rug Score calculations and Kaspa blockchain integration.",
@@ -39,8 +40,25 @@ const teamMembers = [
         linkedIn: 'https://www.linkedin.com/in/abrahammilhem/',
     },
     {
+        name: 'Avidan Abitbol',
+        position: 'Co-Founder & Development Lead',
+        image: 'https://krc20data.s3.amazonaws.com/verified/avidan.jpg', // Replace with actual image URL
+        description:
+            'Avidan is a seasoned member of the Kaspa community with extensive experience in management and business development. As co-founder of Kaspiano, he leads the development efforts, overseeing architecture and aligning technical execution with company goals.',
+        twitter: 'https://x.com/avidanab',
+    },
+    {
+        name: 'Itamar Amith',
+        position: 'Devops Engineer',
+        image: 'https://krc20data.s3.us-east-1.amazonaws.com/verified/WhatsApp+Image+2024-11-12+at+12.43.00.jpeg', // Replace with actual image URL
+        description:
+            "Itamar brings to the team over a decade of experience designing and building backend systems for businesses across a variety of industries. His first commercial experience with Blockchain was as the chief architect at Illuvium, and he's looking forward to staying in the forefront of web3 technology with Kaspiano",
+        twitter: 'https://x.com/itabot',
+        linkedIn: 'https://au.linkedin.com/in/itamaramith',
+    },
+    {
         name: 'Dor Zion',
-        position: 'Senior Developer',
+        position: 'Founder & Senior Developer',
         image: 'https://krc20data.s3.amazonaws.com/verified/dorzi.png', // Replace with actual image URL
         description:
             'Dor began his career in the Israeli military’s elite tech units and played a key role in system architecture and development across various startups and corporations.',
@@ -48,18 +66,25 @@ const teamMembers = [
     },
     {
         name: 'Ben Brizovsky',
-        position: 'Senior Developer',
+        position: 'Co-Founder & CTO',
         image: 'https://krc20data.s3.amazonaws.com/verified/benbo.png', // Replace with actual image URL
         description:
             "With a passion for development, Ben has been instrumental in building Kaspiano's back-end infrastructure and API, integrating key data with MongoDB.",
     },
     {
         name: 'Arnon',
-        position: 'Senior Software Engineer',
+        position: 'Co-Founder & Senior Software Engineer',
         image: 'https://krc20data.s3.amazonaws.com/verified/arnon.png', // Replace with actual image URL
         description:
             "Arnon specializes in back-end infrastructure, DevOps, and workflow automation, ensuring that Kaspiano's system can scale efficiently while remaining performant.",
         twitter: 'https://x.com/ArnonHillel',
+    },
+    {
+        name: 'Tomer',
+        position: 'Software Engineer',
+        image: 'https://krc20data.s3.us-east-1.amazonaws.com/verified/1ad8a15a4e5608aca594888c3a6a59f38d7cdf80e18c2587f795658b2e621b95i0.png', // Replace with actual image URL
+        description:
+            'Tomer is a full-stack developer with a strong passion for back-end development, specializing in workflow automation, ETL processes, API integrations, and database management.',
     },
 ];
 
