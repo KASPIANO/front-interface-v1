@@ -47,6 +47,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const [isProcessingBuyOrder, setIsProcessingBuyOrder] = useState(false);
     const [waitingForWalletConfirmation, setWaitingForWalletConfirmation] = useState(false);
     const queryClient = useQueryClient();
+    const kaspianoCommissionInt = parseFloat(KASPIANO_TRADE_COMMISSION);
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isFetching } = useFetchOrders(
         tokenInfo,
@@ -305,9 +306,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setIsPanelOpen(false);
             return;
         }
-
         try {
-            const fee = KASPIANO_TRADE_COMMISSION > 0 ? KASPIANO_TRADE_COMMISSION * order.totalPrice : 0;
+            const fee = kaspianoCommissionInt > 0 ? Math.max(order.totalPrice * kaspianoCommissionInt, 0.5) : 0;
             const extraOutput = [{ address: KASPIANO_WALLET, amount: fee }];
             setWaitingForWalletConfirmation(true);
             const finalFee = fee > 0 ? extraOutput : [];

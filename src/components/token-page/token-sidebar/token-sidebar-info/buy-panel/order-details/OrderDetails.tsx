@@ -190,7 +190,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                         </OrderDetailsItem>
                         {order.isDecentralized && kaspianoCommissionInt > 0 && (
                             <OrderDetailsItem variant="body1">
-                                Platform Fee ({kaspianoCommissionInt * 100}%):
+                                Platform Fee:
                                 <OrderItemPrimary
                                     sx={{
                                         display: 'flex',
