@@ -11,6 +11,7 @@ import { darkTheme } from './theme/DarkTheme';
 import { lightTheme } from './theme/LightTheme';
 import { getLocalThemeMode, ThemeModes } from './utils/Utils';
 import Seo from './components/helmet-seo/Seo';
+import ReactGA from 'react-ga';
 
 const App = () => {
     const [themeMode, setThemeMode] = useState(getLocalThemeMode());
@@ -35,6 +36,14 @@ const App = () => {
         localStorage.setItem('theme_mode', newMode);
         setThemeMode(newMode);
     };
+
+    useEffect(() => {
+        // Initialize ReactGA with your Google Analytics Measurement ID
+        ReactGA.initialize('G-3EK3REW9W0');
+
+        // Track the initial page load
+        ReactGA.pageview(window.location.pathname + window.location.search);
+    }, []);
 
     useEffect(() => {
         const updateTokensInterval = setInterval(setNewBalance, 10 * 1000);

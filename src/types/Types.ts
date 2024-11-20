@@ -93,6 +93,7 @@ export interface AdsListItemResponse {
     purpose: SlotPurpose;
     telegram?: string;
     website?: string;
+    message?: string;
 }
 export interface TokenSearchItems {
     ticker: string;
