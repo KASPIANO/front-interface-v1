@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 
 import {
     Avatar,
@@ -15,9 +15,10 @@ import {
 
 import { AdsListItemResponse, SlotPurpose, slotPurposeDisplayMapper } from '../../../../types/Types';
 import { DEFAULT_TOKEN_LOGO_URL } from '../../../../utils/Constants';
-import { capitalizeFirstLetter } from '../../../../utils/Utils';
+import { capitalizeFirstLetter, isEmptyString } from '../../../../utils/Utils';
 import { useNavigate } from 'react-router-dom';
 import ReactGA from 'react-ga';
+import { getFyiLogo } from '../../../../DAL/KaspaApiDal';
 
 interface AdsRowProps {
     adData: AdsListItemResponse;
@@ -26,8 +27,23 @@ interface AdsRowProps {
 
 export const AdsRow: FC<AdsRowProps> = (props) => {
     const { adData, handleItemClick } = props;
+    const [fyiLogo, setFyiLogo] = useState<any>(null);
+
     const theme = useTheme();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!adData.logo) {
+            getFyiLogo(adData.ticker)
+                .then((response) => {
+                    const imageUrl = URL.createObjectURL(response); // Use the blob data here
+                    setFyiLogo(imageUrl);
+                })
+                .catch(() => {
+                    setFyiLogo(DEFAULT_TOKEN_LOGO_URL); // Fallback if there's an error
+                });
+        }
+    }, [adData]);
 
     const handleMint = (event, ticker) => {
         event.stopPropagation();
@@ -56,11 +72,11 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                             }}
                             style={{
                                 marginLeft: '0.5rem',
-                                borderRadius: 7,
+                                borderRadius: 14,
                             }}
                             variant="square"
                             alt={adData.ticker}
-                            src={adData.logo || DEFAULT_TOKEN_LOGO_URL}
+                            src={isEmptyString(adData.logo) ? fyiLogo : adData.logo}
                         />
                     </ListItemAvatar>
                     <ListItemText
