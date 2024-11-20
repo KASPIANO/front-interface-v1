@@ -304,6 +304,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             });
             setSelectedOrder(null);
             setIsPanelOpen(false);
+            queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker] });
             return;
         }
         try {
@@ -322,12 +323,24 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             console.error(err);
             if (err?.code !== USER_REJECTED_TRANSACTION_ERROR_CODE) {
                 showGlobalSnackbar({
-                    message:
-                        "Payment failed. Please ensure you're using the latest version of the wallet and try to compound your UTXOs before retrying.",
+                    message: 'Payment failed. Order Taken by another user',
                     severity: 'error',
                 });
-            }
+                queryClient.setQueryData(
+                    ['orders', tokenInfo.ticker],
+                    (oldData: { orders: MixedOrder[] } | undefined) => {
+                        if (!oldData) return oldData;
 
+                        const newOrders = oldData.orders.filter(
+                            (order) => order.orderId !== selectedOrder.orderId,
+                        );
+
+                        return { ...oldData, orders: newOrders };
+                    },
+                );
+            }
+            setSelectedOrder(null);
+            setIsPanelOpen(false);
             setWaitingForWalletConfirmation(false);
             return;
         }
