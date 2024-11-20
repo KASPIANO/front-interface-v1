@@ -11,8 +11,8 @@ interface AdsSliderProps {
 export const AdsSlider: FC<AdsSliderProps> = ({ adsData, handleItemClick }) => {
     const [currentAdIndex, setCurrentAdIndex] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(true);
+    const [intervalActive, setIntervalActive] = useState(true);
 
-    // Create a new ads array with the first ad duplicated at the end
     const extendedAdsData = [...adsData, adsData[0]];
 
     const handleTransitionEnd = () => {
@@ -23,13 +23,31 @@ export const AdsSlider: FC<AdsSliderProps> = ({ adsData, handleItemClick }) => {
     };
 
     useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                setIntervalActive(true); // Resume interval
+            } else {
+                setIntervalActive(false); // Pause interval
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!intervalActive) return;
+
         const adChangeInterval = setInterval(() => {
             setIsTransitioning(true);
             setCurrentAdIndex((prev) => prev + 1);
         }, 15000);
 
         return () => clearInterval(adChangeInterval);
-    }, []);
+    }, [intervalActive]);
 
     return (
         <Box sx={{ width: '100vw', overflow: 'hidden', position: 'relative' }}>
