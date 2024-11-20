@@ -248,10 +248,9 @@ export const getDecentralizedOrder = async (orderId): Promise<DecentralizedOrder
     return response.data;
 };
 
-export const buyDecentralizedOrder = async (orderId, transactionId, feeAmount): Promise<DecentralizedOrder> => {
+export const buyDecentralizedOrder = async (orderId, transactionId): Promise<DecentralizedOrder> => {
     const response = await backendService.post<DecentralizedOrder>(`/${P2PV2CONTROLLER}/buy/${orderId}`, {
         transactionId,
-        feeAmount,
     });
     return response.data;
 };

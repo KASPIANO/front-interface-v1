@@ -43,7 +43,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     const kaspianoCommissionInt = parseFloat(KASPIANO_TRADE_COMMISSION);
     const networkFee = order.isDecentralized ? 2 : 5;
     const finalTotal = order.totalPrice + networkFee;
-    const platformFee = kaspianoCommissionInt > 0 ? order.totalPrice * kaspianoCommissionInt : 0;
+    const platformFee = kaspianoCommissionInt > 0 ? Math.max(order.totalPrice * kaspianoCommissionInt, 0.5) : 0;
     const finalTotalWithCommission = finalTotal + platformFee;
     const feeText = order.isDecentralized ? 'PKST Fee' : 'Network Fee';
 

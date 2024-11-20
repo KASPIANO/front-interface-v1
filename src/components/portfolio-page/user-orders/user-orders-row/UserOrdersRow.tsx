@@ -22,6 +22,7 @@ import { useFetchFloorPrice } from '../../../../DAL/UseQueriesBackend';
 import { cancelDecentralizedOrder, getDecentralizedOrder } from '../../../../DAL/BackendP2PDAL';
 import { cancelOrderKRC20 } from '../../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../../alert-context/AlertContext';
+import { fetchTokenPrice } from '../../../../DAL/BackendDAL';
 
 interface UserOrdersRowProps {
     order: Order | DecentralizedOrder;
@@ -68,13 +69,22 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
     const [floorPrice, setFloorPrice] = useState<number | null>(null);
 
     const { data: data, isLoading } = useFetchFloorPrice(order.ticker);
+
     useEffect(() => {
-        if (!isLoading && data.floor_price) {
-            setFloorPrice(data.floor_price);
+        if (!isLoading && data?.floor_price) {
+            fetchTokenPrice(order.ticker)
+                .then((price) => {
+                    const lowest = price ? Math.min(data.floor_price, price) : data.floor_price;
+                    setFloorPrice(lowest);
+                })
+                .catch(() => {
+                    setFloorPrice(null);
+                });
         } else {
             setFloorPrice(null);
         }
-    }, [data, isLoading]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isLoading, order.ticker]);
 
     const queryClient = useQueryClient();
     const handleCloseEditDialog = () => {

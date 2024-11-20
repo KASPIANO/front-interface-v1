@@ -77,7 +77,7 @@ export const useFetchOrders = (tokenInfo, sortBy, sortOrder) =>
             // Return undefined if there are no more orders to fetch
             lastPage.hasMore ? lastPage.nextOffset : undefined,
         initialPageParam: 0, // Add this line
-        staleTime: 5000,
+        staleTime: 3000,
         retry: 2,
         refetchOnWindowFocus: false,
     });
