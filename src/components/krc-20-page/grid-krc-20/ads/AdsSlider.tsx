@@ -37,7 +37,7 @@ export const AdsSlider: FC<AdsSliderProps> = ({ adsData, handleItemClick }) => {
                 sx={{
                     display: 'flex',
                     transform: `translateX(-${currentAdIndex * 100}vw)`,
-                    transition: isTransitioning ? 'transform 3s ease-in-out' : 'none',
+                    transition: isTransitioning ? 'transform 4s ease-in-out' : 'none',
                     width: `${extendedAdsData.length * 100}vw`,
                 }}
                 onTransitionEnd={handleTransitionEnd}
