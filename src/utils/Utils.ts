@@ -74,7 +74,8 @@ export const getFormattedDateDifference = (creationDate: string | number): strin
     }
 };
 
-export const convertToProtocolFormat = (value: string): string => (parseFloat(value) * 1e8).toFixed(0);
+export const convertToProtocolFormat = (value: string): string =>
+    (parseFloat(value) * 1e8).toLocaleString('fullwide', { useGrouping: false });
 
 export function generateNonce() {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);

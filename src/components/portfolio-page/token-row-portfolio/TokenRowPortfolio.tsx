@@ -19,7 +19,7 @@ import { FC, useState } from 'react';
 import { mintKRC20Token, transferKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { TokenRowPortfolioItem, TransferObj } from '../../../types/Types';
-import { capitalizeFirstLetter, isEmptyString } from '../../../utils/Utils';
+import { capitalizeFirstLetter, convertToProtocolFormat, isEmptyString } from '../../../utils/Utils';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_TOKEN_LOGO_URL } from '../../../utils/Constants';
@@ -81,7 +81,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
             p: 'KRC-20',
             op: 'transfer',
             tick: currentTicker,
-            amt: (parseInt(amount) * 100000000).toString(),
+            amt: convertToProtocolFormat(amount),
             to: destAddress,
         };
         const jsonStringified = JSON.stringify(inscribeJsonString);
