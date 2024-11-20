@@ -14,6 +14,7 @@ import { sendKaspa, transferKRC20Token } from '../../../utils/KaswareUtils';
 import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
 import ExpandedView from './ExpandedLaunchpad';
 import { useQueryClient } from '@tanstack/react-query';
+import { convertToProtocolFormat } from '../../../utils/Utils';
 
 type LaunchpadCardProps = {
     ticker: string;
@@ -92,7 +93,7 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
                 p: 'KRC-20',
                 op: 'transfer',
                 tick: ticker,
-                amt: (parseInt(fundTokensAmount) * KASPA_TO_SOMPI).toString(),
+                amt: convertToProtocolFormat(fundTokensAmount),
                 to: expandedData.lunchpad.senderWalletAddress,
             };
             const jsonStringified = JSON.stringify(inscribeJsonString);
