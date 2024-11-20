@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Box, IconButton, InputAdornment, Tooltip, Typography } from '@mui/material';
-import { BackendTokenResponse, TransferObj } from '../../../../../types/Types';
+import { BackendTokenResponse } from '../../../../../types/Types';
 import { StyledButton, StyledSellPanel, StyledTextField } from './SellPanel.s';
 import { fetchWalletKRC20Balance } from '../../../../../DAL/Krc20DAL';
 import { SwapHoriz } from '@mui/icons-material'; // MUI icon for swap
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
-import { MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION, transferKRC20Token } from '../../../../../utils/KaswareUtils';
-import { confirmSellOrder, createSellOrder } from '../../../../../DAL/BackendP2PDAL';
-import { doPolling } from '../../../../../utils/Utils';
+import { createOrderKRC20, MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION } from '../../../../../utils/KaswareUtils';
+import { createSellOrderV2 } from '../../../../../DAL/BackendP2PDAL';
+// import { doPolling } from '../../../../../utils/Utils';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface SellPanelProps {
@@ -17,12 +17,14 @@ interface SellPanelProps {
     walletAddress: string | null;
     walletConnected;
     walletBalance: number;
+    startPolling: () => void;
 }
 
-const KASPA_TO_SOMPI = 100000000;
+// const KASPA_TO_SOMPI = 100000000;
+const STORAGE_KEY = 'pendingPSKT';
 
 const SellPanel: React.FC<SellPanelProps> = (props) => {
-    const { tokenInfo, kasPrice, walletAddress, walletConnected, walletBalance } = props;
+    const { tokenInfo, kasPrice, walletAddress, walletConnected, walletBalance, startPolling } = props;
     const [tokenAmount, setTokenAmount] = useState<string>(''); // Changed to string
     const [totalPrice, setTotalPrice] = useState<string>(''); // Changed to string
     const [pricePerToken, setPricePerToken] = useState<string>(''); // Changed to string
@@ -40,11 +42,19 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [showButtonsTooltip, setShowButtonsTooltip] = useState<boolean>(false);
     const [showInputTooltip, setShowInputTooltip] = useState<boolean>(false);
     const queryClient = useQueryClient();
-
     useEffect(() => {
-        fetchWalletKRC20Balance(walletAddress, tokenInfo.ticker).then((balance) => {
-            setWalletTickerBalance(balance);
-        });
+        const intervalId = setInterval(() => {
+            fetchWalletKRC20Balance(walletAddress, tokenInfo.ticker)
+                .then((balance) => {
+                    setWalletTickerBalance(balance);
+                })
+                .catch((error) => {
+                    console.error('Error fetching wallet balance:', error);
+                });
+        }, 4000); // 8 seconds in milliseconds
+
+        // Clear interval on component unmount or when dependencies change
+        return () => clearInterval(intervalId);
     }, [walletAddress, tokenInfo.ticker, finishedSellOrder]);
 
     const handleTokenAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -248,17 +258,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             return;
         }
 
-        if (parseInt(totalPrice) < 25) {
-            showGlobalSnackbar({
-                message: 'Please enter a valid total price has to be more than 25 KAS',
-                severity: 'error',
-            });
-            setDisableSellButton(false);
-            return;
-        }
         try {
-            // Retrieve wallet temp wallert address and order id and set it
-
             setIsDialogOpen(true);
         } catch (error) {
             console.error(error);
@@ -269,69 +269,176 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         }
     };
 
-    const handleTransfer = async () => {
-        let idResponse = '';
-        let temporaryWalletAddressResponse = '';
+    // const handleTransfer = async () => {
+    //     let idResponse = '';
+    //     let temporaryWalletAddressResponse = '';
+    //     try {
+    //         const { id, temporaryWalletAddress } = await createSellOrder(
+    //             tokenInfo.ticker,
+    //             parseInt(tokenAmount),
+    //             parseInt(totalPrice),
+    //             parseFloat(pricePerToken),
+    //             walletAddress,
+    //         );
+    //         idResponse = id;
+    //         temporaryWalletAddressResponse = temporaryWalletAddress;
+    //     } catch (error) {
+    //         showGlobalSnackbar({
+    //             message: 'Failed to create sell order for the token. Please try again later.',
+    //             severity: 'error',
+    //         });
+    //         return;
+    //     }
+    //     setWalletConfirmation(true);
+    //     const inscribeJsonString: TransferObj = {
+    //         p: 'KRC-20',
+    //         op: 'transfer',
+    //         tick: tokenInfo.ticker,
+    //         amt: (parseInt(tokenAmount) * KASPA_TO_SOMPI).toString(),
+    //         to: temporaryWalletAddressResponse,
+    //     };
+    //     const jsonStringified = JSON.stringify(inscribeJsonString);
+
+    //     try {
+    //         const result = await transferKRC20Token(jsonStringified);
+    //         setCreatingSellOrder(true);
+    //         setWalletConfirmation(false);
+    //         if (result) {
+    //             const { commitId, revealId } = JSON.parse(result);
+    //             showGlobalSnackbar({
+    //                 message: 'Token transferred successfully',
+    //                 severity: 'success',
+    //                 commitId,
+    //                 revealId,
+    //             });
+    //         }
+    //         const confirmation = await doPolling(
+    //             () => confirmSellOrder(idResponse),
+    //             (result) => result.confirmed,
+    //         );
+
+    //         if (confirmation) {
+    //             setIsDialogOpen(false);
+    //             setDisableSellButton(false);
+    //             showGlobalSnackbar({
+    //                 message: 'Sell order created successfully',
+    //                 severity: 'success',
+    //             });
+    //             cleanFields();
+    //             queryClient.invalidateQueries({ queryKey: ['orders'] });
+    //             setFinishedSellOrder((prev) => !prev);
+    //             setTimeout(() => {
+    //                 setCreatingSellOrder(false); // Ensures it closes after a slight delay
+    //             }, 500);
+
+    //             return true;
+    //         } else {
+    //             showGlobalSnackbar({
+    //                 message: 'Failed to create sell order',
+    //                 severity: 'error',
+    //             });
+    //             return false;
+    //         }
+    //     } catch (error) {
+    //         setCreatingSellOrder(false);
+    //         setWalletConfirmation(false);
+    //         showGlobalSnackbar({
+    //             message: 'Failed to Transfer Token',
+    //             severity: 'error',
+    //             details: error.message,
+    //         });
+    //         return false;
+    //     }
+    // };
+
+    const getStoredTransactions = () => {
         try {
-            const { id, temporaryWalletAddress } = await createSellOrder(
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : [];
+        } catch (error) {
+            console.error('Error reading from localStorage:', error);
+            return [];
+        }
+    };
+
+    const saveTransactionsToStorage = (transactions) => {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+        } catch (error) {
+            console.error('Error saving to localStorage:', error);
+        }
+    };
+
+    const saveFailedTransaction = (txData) => {
+        const pendingTransactions = getStoredTransactions();
+        const newTransaction = {
+            ...txData,
+            retryCount: 0,
+            timestamp: Date.now(),
+        };
+
+        saveTransactionsToStorage([...pendingTransactions, newTransaction]);
+        return startPolling();
+    };
+
+    const handleTransferV2 = async () => {
+        setWalletConfirmation(true);
+        try {
+            const { txJsonString, sendCommitTxId } = await createOrderKRC20(
                 tokenInfo.ticker,
                 parseInt(tokenAmount),
                 parseInt(totalPrice),
-                parseFloat(pricePerToken),
-                walletAddress,
             );
-            idResponse = id;
-            temporaryWalletAddressResponse = temporaryWalletAddress;
-        } catch (error) {
-            showGlobalSnackbar({
-                message: 'Failed to create sell order for the token. Please try again later.',
-                severity: 'error',
-            });
-            return;
-        }
-        setWalletConfirmation(true);
-        const inscribeJsonString: TransferObj = {
-            p: 'KRC-20',
-            op: 'transfer',
-            tick: tokenInfo.ticker,
-            amt: (parseInt(tokenAmount) * KASPA_TO_SOMPI).toString(),
-            to: temporaryWalletAddressResponse,
-        };
-        const jsonStringified = JSON.stringify(inscribeJsonString);
-
-        try {
-            const result = await transferKRC20Token(jsonStringified);
             setCreatingSellOrder(true);
             setWalletConfirmation(false);
-            if (result) {
-                const { commitId, revealId } = JSON.parse(result);
-                showGlobalSnackbar({
-                    message: 'Token transferred successfully',
-                    severity: 'success',
-                    commitId,
-                    revealId,
-                });
-            }
-            const confirmation = await doPolling(
-                () => confirmSellOrder(idResponse),
-                (result) => result.confirmed,
-            );
+            if (txJsonString || sendCommitTxId) {
+                try {
+                    await createSellOrderV2(
+                        tokenInfo.ticker,
+                        parseInt(tokenAmount),
+                        parseInt(totalPrice),
+                        parseFloat(pricePerToken),
+                        txJsonString,
+                        sendCommitTxId,
+                    );
+                    showGlobalSnackbar({
+                        message: 'Sell order created successfully',
+                        severity: 'success',
+                        commitId: sendCommitTxId,
+                    });
+                    // add kasplex valdiation of utxo creation sendcommit
+                    setIsDialogOpen(false);
+                    setDisableSellButton(false);
+                    cleanFields();
+                    queryClient.invalidateQueries({ queryKey: ['orders'] });
+                    setTimeout(() => {
+                        setFinishedSellOrder((prev) => !prev);
+                        setCreatingSellOrder(false); // Ensures it closes after a slight delay
+                    }, 500);
 
-            if (confirmation) {
-                setIsDialogOpen(false);
-                setDisableSellButton(false);
-                showGlobalSnackbar({
-                    message: 'Sell order created successfully',
-                    severity: 'success',
-                });
-                cleanFields();
-                queryClient.invalidateQueries({ queryKey: ['orders'] });
-                setFinishedSellOrder((prev) => !prev);
-                setTimeout(() => {
-                    setCreatingSellOrder(false); // Ensures it closes after a slight delay
-                }, 500);
-
-                return true;
+                    return true;
+                } catch (error) {
+                    saveFailedTransaction({
+                        ticker: tokenInfo.ticker,
+                        amount: parseInt(tokenAmount),
+                        totalPrice: parseInt(totalPrice),
+                        pricePerToken: parseFloat(pricePerToken),
+                        txJsonString,
+                        sendCommitTxId,
+                    });
+                    setIsDialogOpen(false);
+                    setDisableSellButton(false);
+                    cleanFields();
+                    setTimeout(() => {
+                        setFinishedSellOrder((prev) => !prev);
+                        setCreatingSellOrder(false); // Ensures it closes after a slight delay
+                    }, 500);
+                    showGlobalSnackbar({
+                        message: 'Sell order Failed, it will be created in the background',
+                        severity: 'warning',
+                    });
+                    return false;
+                }
             } else {
                 showGlobalSnackbar({
                     message: 'Failed to create sell order',
@@ -550,7 +657,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 waitingForWalletConfirmation={walletConfirmation}
                 open={isDialogOpen}
                 onClose={handleCloseDialog}
-                onConfirm={handleTransfer}
+                onConfirm={handleTransferV2}
                 ticker={tokenInfo.ticker}
                 tokenAmount={tokenAmount}
                 totalPrice={totalPrice}

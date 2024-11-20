@@ -1,8 +1,8 @@
-import { Order } from '../types/Types';
-import { cleanFilters } from '../utils/Utils';
+import { DecentralizedOrder, MixedOrder, SortPaginationParams, UserOrdersParams } from '../types/Types';
 import { backendService } from './AxiosInstaces';
 
 const P2PCONTROLLER = 'p2p';
+const P2PV2CONTROLLER = 'p2p-v2';
 
 export const createSellOrder = async (
     ticker: string,
@@ -87,50 +87,50 @@ export const confirmBuyOrder = async (
     return response.data;
 };
 
-export const getOrders = async (
-    ticker: string,
-    offset?: number,
-    limit?: number,
-    sort?: { field: string; direction: string },
-): Promise<{ orders: Order[]; totalCount: number }> => {
-    try {
-        const capitalTicker = ticker.toUpperCase();
-        const response = await backendService.post<any>(
-            `/${P2PCONTROLLER}/getSellOrders?ticker=${capitalTicker}`,
-            {
-                pagination: {
-                    offset,
-                    limit,
-                },
-                sort,
-            },
-        );
-        return response.data;
-    } catch (error) {
-        console.error(
-            `Error getting sell orders for ${ticker}:`,
-            error.response ? error.response.data : error.message,
-        );
-        return { orders: [], totalCount: 0 }; // Return empty array in case of an error
-    }
-};
+// export const getOrders = async (
+//     ticker: string,
+//     offset?: number,
+//     limit?: number,
+//     sort?: { field: string; direction: string },
+// ): Promise<{ orders: Order[]; totalCount: number }> => {
+//     try {
+//         const capitalTicker = ticker.toUpperCase();
+//         const response = await backendService.post<any>(
+//             `/${P2PCONTROLLER}/getSellOrders?ticker=${capitalTicker}`,
+//             {
+//                 pagination: {
+//                     offset,
+//                     limit,
+//                 },
+//                 sort,
+//             },
+//         );
+//         return response.data;
+//     } catch (error) {
+//         console.error(
+//             `Error getting sell orders for ${ticker}:`,
+//             error.response ? error.response.data : error.message,
+//         );
+//         return { orders: [], totalCount: 0 }; // Return empty array in case of an error
+//     }
+// };
 
-export const getUSerListings = async (
-    walletAddress: string,
-    offset = 0,
-    limit = 15,
-    sort?: { field: string; direction: string },
-): Promise<{ orders: Order[]; totalCount: number }> => {
-    const response = await backendService.post<any>(`/${P2PCONTROLLER}/getUserListings`, {
-        walletAddress,
-        pagination: {
-            offset,
-            limit,
-        },
-        sort,
-    });
-    return response.data;
-};
+// export const getUSerListings = async (
+//     walletAddress: string,
+//     offset = 0,
+//     limit = 15,
+//     sort?: { field: string; direction: string },
+// ): Promise<{ orders: Order[]; totalCount: number }> => {
+//     const response = await backendService.post<any>(`/${P2PCONTROLLER}/getUserListings`, {
+//         walletAddress,
+//         pagination: {
+//             offset,
+//             limit,
+//         },
+//         sort,
+//     });
+//     return response.data;
+// };
 
 export const relistSellOrder = async (orderId: string, walletAddress: string): Promise<any> => {
     const response = await backendService.post<any>(
@@ -200,25 +200,82 @@ export const confirmDelistOrder = async (
     return response.data;
 };
 
-export const getOrdersHistory = async (
-    sort?: { field?: string; direction?: 'asc' | 'desc' }, // Sort object
-    pagination?: { limit?: number; offset?: number }, // Pagination object
-    filters?: {
-        // Filters object
-        statuses?: string[];
-        tickers?: string[];
-        isSeller?: boolean;
-        isBuyer?: boolean;
-        totalPrice?: { min?: number; max?: number };
-        startDateTimestamp?: number;
-        endDateTimestamp?: number;
-    },
-): Promise<any> => {
-    const cleanedFilters = cleanFilters(filters);
-    const response = await backendService.post<any>(`/${P2PCONTROLLER}/getOrdersHistory`, {
-        sort: sort || { direction: 'desc' }, // Default sorting direction (DESC)
-        pagination: pagination || { limit: 20, offset: 0 }, // Default pagination (limit of 10)
-        filters: cleanedFilters || {}, // Optional filters
+// export const getOrdersHistory = async (
+//     sort?: { field?: string; direction?: 'asc' | 'desc' }, // Sort object
+//     pagination?: { limit?: number; offset?: number }, // Pagination object
+//     filters?: {
+//         // Filters object
+//         statuses?: string[];
+//         tickers?: string[];
+//         isSeller?: boolean;
+//         isBuyer?: boolean;
+//         totalPrice?: { min?: number; max?: number };
+//         startDateTimestamp?: number;
+//         endDateTimestamp?: number;
+//     },
+// ): Promise<any> => {
+//     const cleanedFilters = cleanFilters(filters);
+//     const response = await backendService.post<any>(`/${P2PCONTROLLER}/getOrdersHistory`, {
+//         sort: sort || { direction: 'desc' }, // Default sorting direction (DESC)
+//         pagination: pagination || { limit: 20, offset: 0 }, // Default pagination (limit of 10)
+//         filters: cleanedFilters || {}, // Optional filters
+//     });
+//     return response.data;
+// };
+
+export const createSellOrderV2 = async (
+    ticker: string,
+    quantity: number,
+    totalPrice: number,
+    pricePerToken: number,
+    psktSeller: string,
+    psktTransactionId: string,
+): Promise<{ id: string; status: string }> => {
+    const capitalTicker = ticker.toUpperCase();
+    const response = await backendService.post<{ id: string; status: string }>(`/${P2PV2CONTROLLER}/`, {
+        ticker: capitalTicker,
+        quantity,
+        totalPrice,
+        pricePerToken,
+        psktSeller,
+        psktTransactionId,
     });
+    return response.data;
+};
+
+export const getDecentralizedOrder = async (orderId): Promise<DecentralizedOrder> => {
+    const response = await backendService.get<DecentralizedOrder>(`/${P2PV2CONTROLLER}/${orderId}`);
+    return response.data;
+};
+
+export const buyDecentralizedOrder = async (orderId, transactionId): Promise<DecentralizedOrder> => {
+    const response = await backendService.post<DecentralizedOrder>(`/${P2PV2CONTROLLER}/buy/${orderId}`, {
+        transactionId,
+    });
+    return response.data;
+};
+
+export const cancelDecentralizedOrder = async (orderId): Promise<DecentralizedOrder> => {
+    const response = await backendService.post<DecentralizedOrder>(`/${P2PV2CONTROLLER}/cancel/${orderId}`);
+    return response.data;
+};
+
+export const getUserOrders = async (
+    params: UserOrdersParams,
+): Promise<{ orders: MixedOrder[]; totalCount: number; allTickers: string[] }> => {
+    const response = await backendService.post<any>(`/${P2PV2CONTROLLER}/user-orders`, params);
+    return response.data;
+};
+
+export const getTickerSellOrders = async (
+    ticker: string,
+    params: SortPaginationParams,
+): Promise<{ orders: MixedOrder[]; totalCount: number; allTickers: string[] }> => {
+    const capitalTicker = ticker.toUpperCase();
+
+    const response = await backendService.post<any>(
+        `/${P2PV2CONTROLLER}/sell-orders?ticker=${capitalTicker}`,
+        params,
+    );
     return response.data;
 };

@@ -4,10 +4,12 @@ import Cookies from 'js-cookie';
 import { getPriorityFee } from '../DAL/KaspaApiDal';
 import { KaswareSendKaspaResult } from '../types/Types';
 import { saveMintData } from '../DAL/BackendDAL';
+import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
 
 export const USER_REJECTED_TRANSACTION_ERROR_CODE = 4001;
 export const MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION = 21;
-export const LASTEST_VERSION = '0.7.5.4';
+export const AIRDROP_VERSION = '0.7.5.4';
+export const PKST_VERSION = '0.7.8';
 
 // Utility to detect if KasWare Wallet is installed
 export const isKasWareInstalled = (): boolean => typeof window.kasware !== 'undefined';
@@ -226,6 +228,65 @@ export const transferKRC20Token = async (inscribeJsonString: string): Promise<st
     }
 };
 
+// NEED to revise priorityfee
+export const createOrderKRC20 = async (
+    krc20Tick: string,
+    krc20Amount: number,
+    kasAmount: number,
+): Promise<{ txJsonString: string; sendCommitTxId: string }> => {
+    if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
+    await versionCheck(PKST_VERSION);
+    try {
+        const priorityFee = await getPriorityFee('TRANSFER');
+        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
+        const { txJsonString, sendCommitTxId } = await window.kasware.createKRC20Order({
+            krc20Tick,
+            krc20Amount,
+            kasAmount,
+            priorityFee: kasPriorityFee,
+        });
+        return { txJsonString, sendCommitTxId };
+    } catch (error) {
+        console.error('Failed to transfer KRC20 token:', error);
+        throw error;
+    }
+};
+
+export const buyOrderKRC20 = async (
+    txJsonString: string,
+    extraOutput?: Array<{ address: string; amount: number }>,
+): Promise<string> => {
+    if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
+    await versionCheck(PKST_VERSION);
+    try {
+        const priorityFee = await getPriorityFee('TRANSFER');
+        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
+        const txId = await window.kasware.buyKRC20Token({
+            txJsonString,
+            extraOutput,
+            priorityFee: kasPriorityFee,
+        });
+        return txId; // txId is a string
+    } catch (error) {
+        console.error('Failed to transfer KRC20 token:', error);
+        throw error;
+    }
+};
+export const cancelOrderKRC20 = async (ticker: string, txJsonString: string): Promise<string> => {
+    if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
+    await versionCheck(PKST_VERSION);
+    try {
+        const txId = await window.kasware.cancelKRC20Order({
+            krc20Tick: ticker,
+            txJsonString,
+        });
+        return txId; // txId is a string
+    } catch (error) {
+        console.error('Failed to transfer KRC20 token:', error);
+        throw error;
+    }
+};
+
 // Event handling for account changes
 export const onAccountsChanged = (handler: (accounts: Array<string>) => void) => {
     window.kasware.on('accountsChanged', handler);
@@ -260,9 +321,9 @@ export const signKRC20BatchTransfer = async (
     }
 };
 
-const isVersionLatestOrGreater = (currentVersion) => {
+const isVersionLatestOrGreater = (currentVersion, versionNeeded: string) => {
     const currentParts = currentVersion.split('.').map(Number);
-    const latestParts = LASTEST_VERSION.split('.').map(Number);
+    const latestParts = versionNeeded.split('.').map(Number);
 
     for (let i = 0; i < latestParts.length; i++) {
         if (currentParts[i] > latestParts[i]) return true;
@@ -270,13 +331,15 @@ const isVersionLatestOrGreater = (currentVersion) => {
     }
     return true; // If all parts are equal, the version is up-to-date
 };
-export const versionCheck = async () => {
+export const versionCheck = async (versionNeeded: string) => {
     const currentVersion = await window.kasware.getVersion();
-    if (isVersionLatestOrGreater(currentVersion)) {
-        console.log('User has the latest version or a newer one:', currentVersion);
+    if (isVersionLatestOrGreater(currentVersion, versionNeeded)) {
         return true;
     } else {
-        console.log("User's version is outdated:", currentVersion);
+        showGlobalSnackbar({
+            message: 'Please update your KasWare Wallet to the latest version.',
+            severity: 'error',
+        });
         return false;
     }
 };

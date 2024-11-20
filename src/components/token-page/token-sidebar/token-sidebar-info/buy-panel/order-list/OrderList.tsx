@@ -1,17 +1,18 @@
 import React from 'react';
-import { Order } from '../../../../../../types/Types';
+import { DecentralizedOrder, MixedOrder, Order } from '../../../../../../types/Types';
 import OrderItem from '../order-item/OrderItem';
 
 interface OrderListProps {
-    orders: Order[];
+    orders: MixedOrder[];
     floorPrice: number;
     kasPrice: number;
     walletBalance: number;
     walletConnected: boolean;
     onOrderSelect: (order: Order) => void;
-    selectedOrder: Order | null;
-    setSelectedOrder: (order: Order) => void;
+    selectedOrder: MixedOrder | null;
+    setSelectedOrder: (order: MixedOrder) => void;
     ticker: string;
+    onOrderSelectV2: (order: DecentralizedOrder) => void;
 }
 
 const OrderList: React.FC<OrderListProps> = ({
@@ -23,6 +24,7 @@ const OrderList: React.FC<OrderListProps> = ({
     walletConnected,
     setSelectedOrder,
     ticker,
+    onOrderSelectV2,
 }) => (
     <div style={{ width: '100%' }}>
         {/* Header Row */}
@@ -30,6 +32,7 @@ const OrderList: React.FC<OrderListProps> = ({
         {/* Order Items */}
         {orders.map((order) => (
             <OrderItem
+                onSelectV2={onOrderSelectV2}
                 ticker={ticker}
                 setSelectedOrder={setSelectedOrder}
                 selectedOrder={selectedOrder}

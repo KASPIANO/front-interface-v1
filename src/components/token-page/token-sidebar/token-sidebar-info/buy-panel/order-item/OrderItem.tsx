@@ -1,30 +1,36 @@
 import React from 'react';
 import { Box, Tooltip } from '@mui/material';
-import { Order } from '../../../../../../types/Types';
+import { DecentralizedOrder, MixedOrder, Order } from '../../../../../../types/Types';
 import { OrderItemPrimary, OrderItemSecondary } from './OrderItem.s';
 import { StyledButton } from '../../sell-panel/SellPanel.s';
 import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
 import { formatNumberWithCommas } from '../../../../../../utils/Utils';
 
 interface OrderItemProps {
-    order: Order;
+    order: MixedOrder;
     floorPrice: number;
     kasPrice: number;
-    onSelect: (order: Order) => void;
-    selectedOrder: Order | null;
+    onSelect: (order: MixedOrder) => void;
+    selectedOrder: MixedOrder | null;
     setSelectedOrder;
     walletConnected: boolean;
     ticker: string;
+    onSelectV2;
 }
 
 const OrderItem: React.FC<OrderItemProps> = (props) => {
-    const { order, onSelect, kasPrice, selectedOrder, setSelectedOrder, walletConnected, ticker } = props;
+    const { order, onSelect, kasPrice, selectedOrder, setSelectedOrder, walletConnected, ticker, onSelectV2 } =
+        props;
 
     // const floorPriceDifference = ((order.pricePerToken - floorPrice) / floorPrice) * 100;
 
-    const handleSelect = async (order: Order) => {
+    const handleSelect = async (order: Order | DecentralizedOrder) => {
         setSelectedOrder(order);
-        await onSelect(order);
+        if (order.isDecentralized) {
+            await onSelectV2(order);
+        } else {
+            await onSelect(order);
+        }
     };
 
     const formatPrice = (price: number) => {

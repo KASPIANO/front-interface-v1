@@ -30,6 +30,19 @@ interface Kasware {
         handler: (data: any) => void,
     ) => void;
     cancelKRC20BatchTransfer(): void;
+    getKRC20Balance(): Promise<any>;
+    createKRC20Order: ({
+        krc20Tick: string,
+        krc20Amount: number,
+        kasAmount: number,
+        priorityFee: number,
+    }) => Promise<{ txJsonString: string; sendCommitTxId: string }>;
+    buyKRC20Token: (params: {
+        txJsonString: string;
+        extraOutput: Array<{ address: string; amount: number }>;
+        priorityFee: number;
+    }) => Promise<string>;
+    cancelKRC20Order: ({ krc20Tick: string, txJsonString: string }) => Promise<string>;
 }
 
 interface Window {

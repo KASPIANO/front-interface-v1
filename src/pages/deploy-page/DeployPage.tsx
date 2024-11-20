@@ -1012,7 +1012,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                             fullWidth
                             disabled={!isTokenDeployed} // isTokenDeployed should be set to true after deployment
                         >
-                            List Token
+                            Add Token Metadata
                         </Button>
                     </Grid>
                 </Grid>
