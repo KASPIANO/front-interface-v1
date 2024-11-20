@@ -74,17 +74,17 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
         if (!isLoading && data?.floor_price) {
             fetchTokenPrice(order.ticker)
                 .then((price) => {
-                    const lowest = Math.min(data.floor_price, price);
+                    const lowest = price ? Math.min(data.floor_price, price) : data.floor_price;
                     setFloorPrice(lowest);
                 })
-                .catch((error) => {
-                    console.error('Error fetching token price:', error);
-                    setFloorPrice(data.floor_price); // Fallback in case of failure
+                .catch(() => {
+                    setFloorPrice(null);
                 });
         } else {
             setFloorPrice(null);
         }
-    }, [data, isLoading, order.ticker]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isLoading, order.ticker]);
 
     const queryClient = useQueryClient();
     const handleCloseEditDialog = () => {
