@@ -9,34 +9,43 @@ import {
     ListItemAvatar,
     ListItemButton,
     ListItemText,
-    Tooltip,
     Typography,
+    useTheme,
 } from '@mui/material';
 
 import { AdsListItemResponse, SlotPurpose, slotPurposeDisplayMapper } from '../../../../types/Types';
 import { DEFAULT_TOKEN_LOGO_URL } from '../../../../utils/Constants';
 import { capitalizeFirstLetter } from '../../../../utils/Utils';
 import { useNavigate } from 'react-router-dom';
+import ReactGA from 'react-ga';
 
 interface AdsRowProps {
     adData: AdsListItemResponse;
-    handleItemClick: (adData: any) => void;
-    walletConnected: boolean;
-    walletBalance: number;
+    handleItemClick: (telegram: string, ticker: string) => void;
 }
 
 export const AdsRow: FC<AdsRowProps> = (props) => {
     const { adData, handleItemClick } = props;
+    const theme = useTheme();
     const navigate = useNavigate();
 
     const handleMint = (event, ticker) => {
         event.stopPropagation();
+        ReactGA.event({
+            category: 'Link', // Event category (e.g., 'Link' for all external links)
+            action: 'Click', // Event action (e.g., 'Click')
+            label: `Token Page - ${ticker}`, // Event label (e.g., 'Telegram - MyAdName')
+        });
         navigate(`/token/${ticker}`);
     };
 
     return (
         <div>
-            <ListItem onClick={() => handleItemClick(adData.telegram)} disablePadding sx={{ height: '7vh' }}>
+            <ListItem
+                onClick={() => handleItemClick(adData.telegram, adData.ticker)}
+                disablePadding
+                sx={{ height: '7vh' }}
+            >
                 <ListItemButton>
                     <ListItemAvatar>
                         <Avatar
@@ -54,54 +63,71 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                             src={adData.logo || DEFAULT_TOKEN_LOGO_URL}
                         />
                     </ListItemAvatar>
-
                     <ListItemText
                         sx={{
-                            width: '7vw',
+                            maxWidth: '11rem',
                         }}
                         primary={
-                            <Tooltip title="">
-                                <Typography
-                                    component={'span'}
-                                    variant="body1"
-                                    style={{ fontSize: '0.8rem', fontWeight: 700 }}
-                                >
-                                    {capitalizeFirstLetter(adData.ticker)}
-                                </Typography>
-                            </Tooltip>
+                            <Typography
+                                style={{
+                                    minWidth: '1vw',
+                                    width: '2vw',
+                                    fontSize: '1rem',
+                                    fontWeight: 530,
+                                    color: theme.palette.text.primary,
+                                    letterSpacing: '0.1rem', // Add spacing between letters
+                                }}
+                            >
+                                {capitalizeFirstLetter(adData.ticker)}
+                            </Typography>
                         }
                     />
-
+                    {/* 36 chars max */}
+                    <ListItemText
+                        sx={{
+                            maxWidth: '40rem',
+                            display: 'flex', // Use flex display
+                            justifyContent: 'center',
+                        }}
+                        primary={
+                            <Typography
+                                sx={{
+                                    fontSize: '1rem',
+                                    fontWeight: 350,
+                                    color: theme.palette.text.primary,
+                                    letterSpacing: '0.1rem', // Add spacing between letters
+                                }}
+                            >
+                                {adData.message}
+                            </Typography>
+                        }
+                    />
                     {/* Additional details if necessary, following similar structure */}
-
-                    {adData.state === 'finished' ? (
-                        <ListItemText
-                            sx={{ width: '2rem' }}
-                            primary={
-                                <Button
-                                    onClick={(event) => handleMint(event, adData.ticker)}
-                                    variant="contained"
-                                    color="primary"
-                                    style={{
-                                        minWidth: '5rem',
-                                        width: '2rem',
-                                        height: '2rem',
-                                        fontSize: '0.6rem',
-                                    }}
-                                >
-                                    Mint Now
-                                </Button>
-                            }
-                        />
-                    ) : (
-                        <div style={{ width: '3vw' }} />
-                    )}
+                    <ListItemText
+                        sx={{
+                            maxWidth: '7rem',
+                            transform: 'translateY(12%)',
+                        }}
+                        primary={
+                            <Button
+                                onClick={(event) => handleMint(event, adData.ticker)}
+                                color="primary"
+                                style={{
+                                    fontWeight: 600,
+                                    fontSize: '0.65rem',
+                                    color: theme.palette.primary.main,
+                                }}
+                            >
+                                {adData.state === 'finished' ? 'Buy Now' : 'Mint Now'}
+                            </Button>
+                        }
+                    />
                     <ListItemText
                         sx={{
                             position: 'absolute',
-                            right: '5px', // Adjust this value as needed to position it precisely
-                            top: '55%', // Center vertically within the ListItem
-                            transform: 'translateY(-50%)', // Centering transformation
+                            right: '19%', // Adjust this value as needed to ensure it stays within bounds
+                            top: '47%',
+                            transform: 'translateY(-50%)',
                             width: '6vw',
                             justifyContent: 'start',
                         }}
@@ -109,9 +135,9 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                             <Box
                                 sx={{
                                     display: 'inline-block',
-                                    padding: '1px 4px', // Padding inside the border box
-                                    border: `0.5px solid rgba(111, 199, 186, 0.3)`, // Border color
-                                    borderRadius: '4px', // Rounded corners
+                                    padding: '2px 6px', // Adjust padding for a consistent look
+                                    border: `0.5px solid rgba(111, 199, 186, 0.3)`,
+                                    borderRadius: '4px',
                                 }}
                             >
                                 <Typography
@@ -119,7 +145,7 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                                     style={{
                                         fontSize: '0.6rem',
                                         color: 'gray',
-                                        fontWeight: 'bold',
+                                        fontWeight: 700,
                                     }}
                                 >
                                     {slotPurposeDisplayMapper[
