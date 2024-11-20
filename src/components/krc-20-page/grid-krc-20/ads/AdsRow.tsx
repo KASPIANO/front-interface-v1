@@ -72,7 +72,7 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                             }}
                             style={{
                                 marginLeft: '0.5rem',
-                                borderRadius: 12,
+                                borderRadius: 14,
                             }}
                             variant="square"
                             alt={adData.ticker}
