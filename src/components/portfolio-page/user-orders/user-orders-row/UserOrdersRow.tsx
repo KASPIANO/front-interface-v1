@@ -118,7 +118,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
             const orderData = await getDecentralizedOrder(order.orderId);
 
             try {
-                await cancelOrderKRC20(order.ticker, orderData.psktSeller);
+                await cancelOrderKRC20(order.ticker, orderData.psktTransactionId);
                 await cancelDecentralizedOrder(order.orderId);
 
                 showGlobalSnackbar({

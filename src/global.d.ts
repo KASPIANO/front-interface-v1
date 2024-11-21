@@ -42,7 +42,7 @@ interface Kasware {
         extraOutput: Array<{ address: string; amount: number }>;
         priorityFee: number;
     }) => Promise<string>;
-    cancelKRC20Order: ({ krc20Tick: string, txJsonString: string }) => Promise<string>;
+    cancelKRC20Order: ({ krc20Tick: string, sendCommitTxId: string }) => Promise<string>;
 }
 
 interface Window {
