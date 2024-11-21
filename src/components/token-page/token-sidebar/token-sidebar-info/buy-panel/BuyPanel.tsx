@@ -339,6 +339,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     },
                 );
             }
+            cancelDecentralizedOrder(order.orderId);
             setSelectedOrder(null);
             setIsPanelOpen(false);
             setWaitingForWalletConfirmation(false);
@@ -372,10 +373,9 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setSelectedOrder(null);
             setTimeout(() => {
                 queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker] });
-            }, 1300);
+            }, 1000);
         } else {
-            const errorMessage =
-                "Purchase failed in the process. Please wait 10 minutes and contact support if you didn't receive the tokens.";
+            const errorMessage = 'Purchase failed in the process';
 
             // if (priorityFeeTooHigh) {
             //     errorMessage =
