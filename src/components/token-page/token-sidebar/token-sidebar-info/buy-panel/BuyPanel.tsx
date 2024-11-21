@@ -169,8 +169,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setPsktSeller(psktSeller);
             const orderDataKasplex = await checkOrderExists(
                 tokenInfo.ticker,
-                psktTransactionId,
                 sellerWalletAddress,
+                psktTransactionId,
             );
             if (orderDataKasplex.length === 0) {
                 showGlobalSnackbar({

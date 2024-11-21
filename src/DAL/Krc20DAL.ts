@@ -15,10 +15,11 @@ export const fetchReceivingBalance = async (address: string, tokenSymbol: string
         return 0;
     }
 };
-export const checkOrderExists = async (tokenSymbol: string, txId: string, address: string): Promise<any> => {
+export const checkOrderExists = async (tokenSymbol: string, address: string, txId?: string): Promise<any> => {
+    const txidString = txId ? `&txid=${txId}` : '';
     try {
         const response = await KRC20InfoService.get<any>(
-            `krc20/market/${tokenSymbol}?address=${address}&txid=${txId}`,
+            `krc20/market/${tokenSymbol}?address=${address}${txidString}`,
         );
         return response.data.result;
     } catch (error) {

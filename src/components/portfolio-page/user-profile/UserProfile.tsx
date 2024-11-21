@@ -1,5 +1,17 @@
 import { FC, useEffect, useRef, useState } from 'react';
-import { Box, Avatar, Typography, Button, useTheme, TextField, alpha } from '@mui/material';
+import {
+    Box,
+    Avatar,
+    Typography,
+    Button,
+    useTheme,
+    TextField,
+    alpha,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+} from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { ProfileContainer, ProfileDetails } from './UserProfile.s';
 import { isEmptyString, isValidWalletAddress, shortenAddress } from '../../../utils/Utils';
@@ -9,6 +21,8 @@ import { ContentCopyRounded as ContentCopyRoundedIcon } from '@mui/icons-materia
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { debounce } from 'lodash';
 import { UserReferral } from '../../../types/Types';
+import SearchIcon from '@mui/icons-material/Search'; // Import the icon
+import { checkOrderExists } from '../../../DAL/Krc20DAL';
 
 interface UserProfileProps {
     walletAddress: string;
@@ -38,6 +52,10 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     const [, setCopied] = useState(false);
     const [walletAddressError, setWalletAddressError] = useState<string | null>(null);
     const [walletInputValue, setWalletInputValue] = useState<string>(walletAddress);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [ticker, setTicker] = useState('');
+    const [orders, setOrders] = useState([]);
+    const [selectedOrder, setSelectedOrder] = useState(null);
     // const [openXDialog, setOpenXDialog] = useState(false);
     // const [xUrl, setXUrl] = useState('');
     const debouncedSetCurrentWalletRef = useRef(null);
@@ -140,6 +158,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                             startIcon={<img style={{ height: '5vh', width: '5vh' }} src={kaspaIcon} alt="Kaspa" />}
                             sx={{
                                 color: theme.palette.text.secondary,
+                                fontSize: '0.75rem',
                             }}
                         >
                             {walletAddress ? shortenAddress(walletAddress) : 'Connect Wallet'}
@@ -155,7 +174,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                                 helperText={walletAddressError}
                                 sx={{
                                     minWidth: '3rem',
-                                    fontSize: '0.8rem',
+                                    fontSize: '0.75rem',
                                     position: 'relative',
 
                                     '& .MuiOutlinedInput-root': {
@@ -197,6 +216,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         </Button> */}
                         {!isEmptyString(userReferral?.code) && (
                             <Button
+                                sx={{ fontSize: '0.75rem' }}
                                 variant="outlined"
                                 size="medium"
                                 endIcon={<ContentCopyRoundedIcon fontSize="small" />}
@@ -207,6 +227,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         )}
                         {!isEmptyString(userReferral?.code) && (
                             <Button
+                                sx={{ fontSize: '0.75rem' }}
                                 variant="outlined"
                                 size="medium"
                                 endIcon={<ContentCopyRoundedIcon fontSize="small" />}
@@ -218,10 +239,25 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         {isEmptyString(userReferral?.referredBy) &&
                             !isEmptyString(walletAddress) &&
                             isUserReferralFinishedLoading && (
-                                <Button variant="outlined" size="medium" onClick={handleOpenReferralDialog}>
+                                <Button
+                                    sx={{ fontSize: '0.75rem' }}
+                                    variant="outlined"
+                                    size="medium"
+                                    onClick={handleOpenReferralDialog}
+                                >
                                     Apply Referral Code
                                 </Button>
                             )}
+
+                        <Button
+                            sx={{ fontSize: '0.75rem' }}
+                            variant="outlined"
+                            size="medium"
+                            onClick={() => setDialogOpen(true)}
+                            startIcon={<SearchIcon />} // Add the icon
+                        >
+                            Get Lost Orders
+                        </Button>
                     </Box>
                 </ProfileDetails>
             </Box>
@@ -242,34 +278,77 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                     {portfolioValue.change}% */}
                 </StatHelpText>
             </Stat>
-            {/* <Dialog
-                PaperProps={{
-                    sx: {
-                        width: '40vw',
-                    },
-                }}
-                open={openXDialog}
-                onClose={() => setOpenXDialog(false)}
-            >
-                <DialogTitle>Add X/Twitter URL</DialogTitle>
-                <DialogContent>
+            <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth>
+                <DialogTitle
+                    sx={{
+                        paddingBottom: '0.5rem',
+                    }}
+                >
+                    Retrieve Lost Orders
+                </DialogTitle>
+                <DialogContent
+                    sx={{
+                        padding: '1rem',
+                        paddingBottom: 0,
+                    }}
+                >
                     <TextField
-                        autoFocus
-                        margin="dense"
-                        id="Url"
-                        label="X/Twitter URL"
-                        type="text"
-                        fullWidth
                         variant="outlined"
-                        value={xUrl}
-                        onChange={(e) => setXUrl(e.target.value)}
+                        placeholder="Enter Ticker to see lost orders"
+                        fullWidth
+                        value={ticker}
+                        onChange={(e) => setTicker(e.target.value)}
+                        sx={{ marginBottom: '0.7rem' }}
                     />
+                    <Button
+                        variant="contained"
+                        onClick={async () => {
+                            const result = await checkOrderExists(ticker, walletAddress);
+                            setOrders(result || []);
+                        }}
+                    >
+                        Fetch Orders
+                    </Button>
+                    <Box sx={{ marginTop: '1rem' }}>
+                        {orders.map((order, index) => (
+                            <Box
+                                key={index}
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    margin: '0.5rem 0',
+                                    padding: '0.5rem',
+                                    border: '1px solid #ccc',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                }}
+                                onClick={() => setSelectedOrder(order.uTxid)}
+                            >
+                                <Typography>Ticker: {order.tick}</Typography>
+                                <Typography>Amount: {(order.amount / 1e8).toFixed(2)}</Typography>
+                            </Box>
+                        ))}
+                    </Box>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenXDialog(false)}>Cancel</Button>
-                    <Button onClick={handleAddXUrl}>Save</Button>
+                <DialogActions
+                    sx={{
+                        paddingTop: 0,
+                    }}
+                >
+                    <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+                    <Button
+                        variant="contained"
+                        onClick={() => {
+                            console.log('Selected Order:', selectedOrder);
+                            // Call recover logic here
+                        }}
+                        disabled={!selectedOrder}
+                    >
+                        Recover
+                    </Button>
                 </DialogActions>
-            </Dialog> */}
+            </Dialog>
         </ProfileContainer>
     );
 };
