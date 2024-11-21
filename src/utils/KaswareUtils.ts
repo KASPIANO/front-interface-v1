@@ -272,13 +272,13 @@ export const buyOrderKRC20 = async (
         throw error;
     }
 };
-export const cancelOrderKRC20 = async (ticker: string, txJsonString: string): Promise<string> => {
+export const cancelOrderKRC20 = async (ticker: string, sendCommitTxId: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     await versionCheck(PKST_VERSION);
     try {
         const txId = await window.kasware.cancelKRC20Order({
             krc20Tick: ticker,
-            txJsonString,
+            sendCommitTxId,
         });
         return txId; // txId is a string
     } catch (error) {
