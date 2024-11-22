@@ -396,8 +396,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 parseInt(tokenAmount),
                 parseInt(totalPrice),
             );
-            setCreatingSellOrder(true);
-            setWalletConfirmation(false);
+
             if (txJsonString || sendCommitTxId) {
                 try {
                     await createSellOrderV2(
@@ -420,7 +419,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     queryClient.invalidateQueries({ queryKey: ['orders'] });
                     setTimeout(() => {
                         setFinishedSellOrder((prev) => !prev);
-                        setCreatingSellOrder(false); // Ensures it closes after a slight delay
+                        setWalletConfirmation(false); // Ensures it closes after a slight delay
                     }, 500);
 
                     return true;
@@ -454,7 +453,6 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 return false;
             }
         } catch (error) {
-            setCreatingSellOrder(false);
             setWalletConfirmation(false);
             showGlobalSnackbar({
                 message: 'Failed to Transfer Token',

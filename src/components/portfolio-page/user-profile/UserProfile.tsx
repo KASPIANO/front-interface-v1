@@ -23,6 +23,7 @@ import { debounce } from 'lodash';
 import { UserReferral } from '../../../types/Types';
 import SearchIcon from '@mui/icons-material/Search'; // Import the icon
 import { checkOrderExists } from '../../../DAL/Krc20DAL';
+import { cancelOrderKRC20 } from '../../../utils/KaswareUtils';
 
 interface UserProfileProps {
     walletAddress: string;
@@ -55,7 +56,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [ticker, setTicker] = useState('');
     const [orders, setOrders] = useState([]);
-    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [psktTxId, setPsktTxId] = useState(null);
     // const [openXDialog, setOpenXDialog] = useState(false);
     // const [xUrl, setXUrl] = useState('');
     const debouncedSetCurrentWalletRef = useRef(null);
@@ -143,6 +144,38 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     const lightKaspaIcon =
         'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-Icon-Dark-Green-on-White.png';
     const kaspaIcon = theme.palette.mode === 'dark' ? lightKaspaIcon : darkKaspaIcon;
+
+    const handleRecovery = async () => {
+        if (psktTxId) {
+            try {
+                const result = await cancelOrderKRC20(ticker, psktTxId);
+
+                if (result) {
+                    showGlobalSnackbar({
+                        message: 'Order recovered successfully',
+                        severity: 'success',
+                    });
+                } else {
+                    showGlobalSnackbar({
+                        message: 'Failed to recover order',
+                        severity: 'error',
+                    });
+                }
+            } catch (error) {
+                console.error('Error during order recovery:', error);
+
+                showGlobalSnackbar({
+                    message: 'An error occurred while recovering the order. Please try again.',
+                    severity: 'error',
+                });
+            }
+        } else {
+            showGlobalSnackbar({
+                message: 'No transaction ID provided for recovery.',
+                severity: 'warning',
+            });
+        }
+    };
 
     return (
         <ProfileContainer>
@@ -323,7 +356,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                                     borderRadius: '4px',
                                     cursor: 'pointer',
                                 }}
-                                onClick={() => setSelectedOrder(order.uTxid)}
+                                onClick={() => setPsktTxId(order.uTxid)}
                             >
                                 <Typography>Ticker: {order.tick}</Typography>
                                 <Typography>Amount: {(order.amount / 1e8).toFixed(2)}</Typography>
@@ -337,14 +370,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                     }}
                 >
                     <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button
-                        variant="contained"
-                        onClick={() => {
-                            console.log('Selected Order:', selectedOrder);
-                            // Call recover logic here
-                        }}
-                        disabled={!selectedOrder}
-                    >
+                    <Button variant="contained" onClick={handleRecovery} disabled={!psktTxId}>
                         Recover
                     </Button>
                 </DialogActions>
