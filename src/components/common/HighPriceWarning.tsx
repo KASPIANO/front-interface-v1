@@ -22,9 +22,7 @@ export const HighPriceWarning: React.FC<HighPriceWarningProps> = (props) => {
                 backgroundColor: 'rgba(255, 165, 0, 0.1)', // Subtle warning background
             }}
         >
-            <Tooltip
-                title={`The current price (${currentPrice.toFixed(2)}) is ${percentageDifference}% higher than the floor price (${floorPrice.toFixed(2)}). Consider if this aligns with your budget before proceeding.`}
-            >
+            <Tooltip title={`The current price is ${percentageDifference}% higher than the floor price.`}>
                 <span style={{ display: 'flex', alignItems: 'center' }}>
                     <WarningIcon sx={{ color: 'orange', marginRight: '6px', fontSize: '0.5rem' }} />
                     <Typography

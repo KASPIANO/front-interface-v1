@@ -138,7 +138,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                             <Box sx={{ marginLeft: 'auto' }}>
                                 {showGasLimitExceeded && <GasLimitExceeded />}
                                 {showHighGasWarning && !showGasLimitExceeded && <HighGasWarning />}
-                                {true && (
+                                {floorPriceDifference && (
                                     <HighPriceWarning floorPrice={floorPrice} currentPrice={order.pricePerToken} />
                                 )}
                             </Box>
