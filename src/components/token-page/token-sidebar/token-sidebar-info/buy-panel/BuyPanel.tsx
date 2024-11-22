@@ -12,8 +12,7 @@ import {
     confirmBuyOrder,
     releaseBuyLock,
     getDecentralizedOrder,
-    buyDecentralizedOrder,
-    cancelDecentralizedOrder,
+    verifyDecentralizedOrder,
 } from '../../../../../DAL/BackendP2PDAL';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material'; // Import CircularProgress for the spinner
@@ -192,7 +191,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 );
 
                 setSelectedOrder(null);
-                await cancelDecentralizedOrder(order.orderId);
+                await verifyDecentralizedOrder(order.orderId);
                 queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker] });
                 return;
             }
@@ -347,7 +346,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
 
         if (txId) {
             // wihtout await for fast finish
-            buyDecentralizedOrder(order.orderId, txId);
+            verifyDecentralizedOrder(order.orderId, txId);
             queryClient.setQueryData(
                 ['orders', tokenInfo.ticker],
                 (oldData: { orders: MixedOrder[] } | undefined) => {
