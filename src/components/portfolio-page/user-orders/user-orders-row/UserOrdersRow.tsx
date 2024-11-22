@@ -19,7 +19,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { highGasWarning } from '../../../../DAL/KaspaApiDal';
 import { HighGasWarning } from '../../../common/HighGasWarning';
 import { useFetchFloorPrice } from '../../../../DAL/UseQueriesBackend';
-import { cancelDecentralizedOrder, getDecentralizedOrder } from '../../../../DAL/BackendP2PDAL';
+import { verifyDecentralizedOrder, getDecentralizedOrder } from '../../../../DAL/BackendP2PDAL';
 import { cancelOrderKRC20 } from '../../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../../alert-context/AlertContext';
 import { fetchTokenPrice } from '../../../../DAL/BackendDAL';
@@ -118,8 +118,8 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
             const orderData = await getDecentralizedOrder(order.orderId);
 
             try {
-                await cancelOrderKRC20(order.ticker, orderData.psktTransactionId);
-                await cancelDecentralizedOrder(order.orderId);
+                const txid = await cancelOrderKRC20(order.ticker, orderData.psktTransactionId);
+                await verifyDecentralizedOrder(order.orderId, txid);
 
                 showGlobalSnackbar({
                     message: 'Order cancelled successfully',
