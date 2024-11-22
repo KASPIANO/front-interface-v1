@@ -338,7 +338,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     },
                 );
             }
-            cancelDecentralizedOrder(order.orderId);
+            verifyDecentralizedOrder(order.orderId);
             setSelectedOrder(null);
             setIsPanelOpen(false);
             setWaitingForWalletConfirmation(false);
