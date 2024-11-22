@@ -12,8 +12,8 @@ export const GasLimitExceeded: React.FC = () => (
     >
         <Tooltip title="The gas fees have exceeded the allowed limit. Proceeding with the trade may result in delays, and it could get stuck until gas fees decrease. However, your funds or tokens will remain safe throughout the process.">
             <span style={{ display: 'flex', alignItems: 'center' }}>
-                <ReportIcon color="error" sx={{ color: 'red', marginRight: '6px', fontSize: '0.8rem' }} />
-                <Typography variant="body2" sx={{ color: '#FF0000', fontWeight: 'bold', fontSize: '0.6rem' }}>
+                <ReportIcon color="error" sx={{ color: 'red', marginRight: '6px', fontSize: '0.5rem' }} />
+                <Typography variant="body2" sx={{ color: '#FF0000', fontWeight: 'bold', fontSize: '0.5rem' }}>
                     Gas Limit Exceeded
                 </Typography>
             </span>

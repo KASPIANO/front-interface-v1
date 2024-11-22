@@ -8,6 +8,8 @@ import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
 import { highGasLimitExceeded, highGasWarning } from '../../../../../../DAL/KaspaApiDal';
 import { GasLimitExceeded } from '../../../../../common/HighGasLimitExceeded';
 import { HighGasWarning } from '../../../../../common/HighGasWarning';
+import { fetchTickerFloorPrice } from '../../../../../../DAL/BackendDAL';
+import { HighPriceWarning } from '../../../../../common/HighPriceWarning';
 
 interface OrderDetailsProps {
     order: MixedOrder;
@@ -39,6 +41,28 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [showHighGasWarning, setShowHighGasWarning] = useState(false);
     const [showGasLimitExceeded, setShowGasLimitExceeded] = useState(false);
+    const [floorPriceDifference, setFloorPriceDifference] = useState(false);
+    const [floorPrice, setFloorPrice] = useState<number>(0);
+
+    useEffect(() => {
+        const checkPriceDifference = async () => {
+            try {
+                const { floor_price } = await fetchTickerFloorPrice(order.ticker);
+                setFloorPrice(floor_price);
+                // Check if the order price is 30% higher than the floor price
+                if (order.pricePerToken > floor_price * 1.3) {
+                    setFloorPriceDifference(true);
+                } else {
+                    setFloorPriceDifference(false);
+                }
+            } catch (error) {
+                console.error('Error fetching floor price:', error);
+            }
+        };
+
+        checkPriceDifference();
+    }, [order]);
+
     // Fee Calculations
     const kaspianoCommissionInt = parseFloat(KASPIANO_TRADE_COMMISSION);
     const networkFee = order.isDecentralized ? 2 : 5;
@@ -129,6 +153,9 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                             <Box sx={{ marginLeft: 'auto' }}>
                                 {showGasLimitExceeded && <GasLimitExceeded />}
                                 {showHighGasWarning && !showGasLimitExceeded && <HighGasWarning />}
+                                {floorPriceDifference && (
+                                    <HighPriceWarning floorPrice={floorPrice} currentPrice={order.pricePerToken} />
+                                )}
                             </Box>
                             <IconButton onClick={() => onClose(order.orderId, order.isDecentralized)}>
                                 <CloseIcon
