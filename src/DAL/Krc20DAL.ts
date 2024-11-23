@@ -46,6 +46,19 @@ export const fetchTokenInfo = async (tick: string, holders = true): Promise<Krc2
     }
 };
 
+export const getTokenMintsLeft = async (ticker: string): Promise<number> => {
+    const response = await KRC20InfoService.get<any>(`krc20/token/${ticker}`);
+    const tickerData = response?.data?.result && response?.data?.result[0];
+
+    if (!tickerData) {
+        throw new Error(`Failed to fetch information about the token ${ticker}`);
+    }
+
+    const maxTokens = BigInt(tickerData.max);
+    const mintedTokens = BigInt(tickerData.minted);
+    return Number((maxTokens - mintedTokens) / BigInt(tickerData.lim));
+};
+
 export async function fetchTransactionCount(ticker: string): Promise<number> {
     try {
         const response = await KRC20InfoService.get<any>(`krc20/oplist/transfer?tick=${ticker}`);
