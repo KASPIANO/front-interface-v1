@@ -142,6 +142,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
             });
         } finally {
             setLoadingOrderId(null);
+            verifyDecentralizedOrder(order.orderId);
         }
     };
 

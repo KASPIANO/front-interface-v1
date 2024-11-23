@@ -162,11 +162,9 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                     });
                 }
             } catch (error) {
-                console.error('Error during order recovery:', error);
-
                 showGlobalSnackbar({
                     message: 'An error occurred while recovering the order. Please try again.',
-                    severity: 'error',
+                    severity: error.message,
                 });
             }
         } else {
