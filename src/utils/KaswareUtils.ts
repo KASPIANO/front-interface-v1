@@ -5,6 +5,7 @@ import { getPriorityFee } from '../DAL/KaspaApiDal';
 import { KaswareSendKaspaResult } from '../types/Types';
 import { saveMintData } from '../DAL/BackendDAL';
 import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
+import { getTokenMintsLeft } from '../DAL/Krc20DAL';
 
 export const USER_REJECTED_TRANSACTION_ERROR_CODE = 4001;
 export const MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION = 21;
@@ -202,6 +203,11 @@ export const deployKRC20Token = async (inscribeJsonString: string): Promise<stri
 export const mintKRC20Token = async (inscribeJsonString: string, ticker: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
+        const mintsLeft = await getTokenMintsLeft(ticker);
+
+        if (mintsLeft <= 0) {
+            throw new Error(`Minting for the ${ticker} token has ended`);
+        }
         const priorityFee = await getPriorityFee('TRANSFER');
         const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, '', kasPriorityFee);
