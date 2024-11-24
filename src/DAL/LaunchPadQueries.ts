@@ -37,7 +37,7 @@ export const useGetOwnerLaunchpads = (
 ) =>
     useQuery({
         queryKey: ['OwnerLaunchpads', filters, pagination, sort],
-        queryFn: () => getOwnerLaunchpads(filters, pagination, sort),
+        queryFn: () => getLaunchpads(filters, pagination, sort),
         // You can add more options here, such as:
         // refetchInterval: 5000, // Refetch every 5 seconds
         staleTime: 70000, // Consider data fresh for 1 minute

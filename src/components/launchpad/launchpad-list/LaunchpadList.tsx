@@ -1,6 +1,6 @@
 import React from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Box, LinearProgress, Typography, useTheme } from '@mui/material';
+import { Box, LinearProgress, Typography } from '@mui/material';
 import { useGetLaunchpads } from '../../../DAL/LaunchPadQueries';
 import { useNavigate } from 'react-router-dom';
 
