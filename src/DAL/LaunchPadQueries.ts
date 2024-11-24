@@ -1,8 +1,11 @@
 import { UseMutationResult, useQuery } from '@tanstack/react-query';
 import {
+    ClientSideLunchpadListWithStatus,
     ClientSideLunchpadOrderWithStatus,
     ClientSideLunchpadWithStatus,
+    CreateLunchpadOrderParams,
     GetLunchpadListParams,
+    LunchpadStatus,
     LunchpadWalletType,
     Pagination,
     Sort,
@@ -11,13 +14,17 @@ import {
 import {
     cancelOrder,
     createLaunchpadOrderWithId,
+    estimateKasRequirement,
     getLaunchpad,
     getLaunchpadForOwner,
     getLaunchpads,
+    getOwnerLaunchpads,
+    isWhitelisted,
     retrieveFunds,
     startLaunchpad,
     startVerifyAndProcessOrder,
     stopLaunchpad,
+    updateLaunchpad,
 } from './BackendLunchpadDAL';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
@@ -29,8 +36,8 @@ export const useGetOwnerLaunchpads = (
     sort: Sort = { direction: SortDirection.DESC },
 ) =>
     useQuery({
-        queryKey: ['launchpads', filters, pagination, sort],
-        queryFn: () => getLaunchpads(filters, pagination, sort),
+        queryKey: ['OwnerLaunchpads', filters, pagination, sort],
+        queryFn: () => getOwnerLaunchpads(filters, pagination, sort),
         // You can add more options here, such as:
         // refetchInterval: 5000, // Refetch every 5 seconds
         staleTime: 70000, // Consider data fresh for 1 minute
@@ -174,3 +181,53 @@ export const useCancelOrder = (
         onError: handleLaunchpadError,
     });
 };
+
+export const useGetLaunchpads = (
+    filters: GetLunchpadListParams['filters'] = { statuses: [LunchpadStatus.ACTIVE] },
+    pagination: Pagination = { limit: 20, offset: 0 },
+    sort: Sort = { direction: SortDirection.DESC },
+) =>
+    useQuery<ClientSideLunchpadListWithStatus>({
+        queryKey: ['launchpads', filters, pagination, sort],
+        queryFn: () => getLaunchpads(filters, pagination, sort),
+        // Additional options can be added here
+        staleTime: 60000, // Data is considered fresh for 1 minute
+        refetchOnWindowFocus: false, // Avoid refetching on window focus
+    });
+
+export const useUpdateLaunchpad = (
+    id: string,
+    ticker,
+): UseMutationResult<ClientSideLunchpadWithStatus, Error, Omit<CreateLunchpadOrderParams, 'ticker'>, unknown> => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (params) => updateLaunchpad(id, params),
+        onSuccess: (data) => {
+            if (data.success) {
+                showGlobalSnackbar({ message: 'Launchpad updated successfully', severity: 'success' });
+                queryClient.invalidateQueries({ queryKey: ['launchpadOwnerInfo', ticker] }); // Invalidate the launchpad query
+            } else {
+                handleLaunchpadError({ response: { data } });
+            }
+        },
+        onError: handleLaunchpadError,
+    });
+};
+
+export const useEstimateKasRequirement = (id: string) =>
+    useQuery({
+        queryKey: ['estimateKasRequirement', id],
+        queryFn: () => estimateKasRequirement(id),
+        enabled: !!id, // Only run the query if id is provided
+        staleTime: 60000, // Data is considered fresh for 1 minute
+        refetchOnWindowFocus: false, // Avoid refetching on window focus
+    });
+
+export const useIsWhitelisted = (ticker: string) =>
+    useQuery({
+        queryKey: ['isWhitelisted', ticker],
+        queryFn: () => isWhitelisted(ticker),
+        enabled: !!ticker, // Only run the query if ticker is provided
+        staleTime: 60000, // Data is considered fresh for 1 minute
+        refetchOnWindowFocus: false, // Avoid refetching on window focus
+    });

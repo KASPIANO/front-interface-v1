@@ -14,7 +14,7 @@ const OwnerLaunchpadPage: React.FC<OwnerLaunchpadPageProps> = (props) => {
     const { data, isLoading, error } = useGetOwnerLaunchpads();
     const queryClient = useQueryClient();
     useEffect(() => {
-        queryClient.invalidateQueries({ queryKey: ['launchpads'] });
+        queryClient.invalidateQueries({ queryKey: ['OwnerLaunchpads'] });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [walletAddress]);
 

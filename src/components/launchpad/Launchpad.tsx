@@ -8,16 +8,19 @@ import {
     CircularProgress,
     useTheme,
     TextField,
+    Tooltip,
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import {
     useCancelOrder,
     useCreateLaunchpadOrder,
+    useIsWhitelisted,
     useLaunchpad,
     useVerifyAndProcessOrder,
 } from '../../DAL/LaunchPadQueries';
 import { showGlobalSnackbar } from '../alert-context/AlertContext';
 import { sendKaspa } from '../../utils/KaswareUtils';
+import { handleLaunchpadError } from '../../utils/ErrorHandling';
 
 type LaunchpadProps = {
     walletBalance: number;
@@ -32,6 +35,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
     const { ticker } = useParams();
     const { walletBalance, backgroundBlur, walletConnected } = props;
     const { data: launchpad, isLoading, error } = useLaunchpad(ticker);
+    const { data: allowed, isLoading: whitelistLoading } = useIsWhitelisted(ticker);
     const createOrderMutation = useCreateLaunchpadOrder(ticker);
     const verifyAndProcessMutation = useVerifyAndProcessOrder(ticker);
     const cancelOrderMutation = useCancelOrder(ticker);
@@ -113,6 +117,20 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
             setTokensReceived(selectedUnits * tokenPerUnit);
         }
     }, [selectedUnits, launchpad]);
+
+    useEffect(() => {
+        if (launchpad && !whitelistLoading && !allowed.success) {
+            const simulatedError = {
+                response: {
+                    data: {
+                        success: false, // Explicitly indicate failure
+                        errorCode: allowed.errorCode, // Default to the whitelist error code
+                    },
+                },
+            };
+            handleLaunchpadError(simulatedError);
+        }
+    }, [launchpad, whitelistLoading, allowed]);
 
     const handlePurchase = async () => {
         if (walletBalance < kaspaNeeded) {
@@ -361,29 +379,44 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                         </Box>
 
                         {/* Purchase Button */}
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            sx={{ width: '100%' }}
-                            onClick={handlePurchase}
-                            disabled={
-                                selectedUnits > effectiveMaxUnits ||
-                                selectedUnits < launchpad.minUnitsPerOrder ||
-                                !walletConnected ||
-                                walletBalance < kaspaNeeded ||
-                                createOrderMutation.isPending ||
-                                verifyAndProcessMutation.isPending ||
-                                !!orderId
+                        <Tooltip
+                            title={
+                                !walletConnected
+                                    ? 'Please connect your wallet to proceed with the purchase.'
+                                    : !allowed.success
+                                      ? 'You are not whitelisted to participate in this launchpad.'
+                                      : ''
                             }
                         >
-                            {createOrderMutation.isPending
-                                ? 'Creating Order...'
-                                : verifyAndProcessMutation.isPending
-                                  ? 'Processing...'
-                                  : orderId
-                                    ? 'Order Pending'
-                                    : 'Purchase'}
-                        </Button>
+                            <span>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{ width: '100%' }}
+                                    onClick={handlePurchase}
+                                    disabled={
+                                        selectedUnits > effectiveMaxUnits ||
+                                        selectedUnits < launchpad.minUnitsPerOrder ||
+                                        !walletConnected ||
+                                        walletBalance < kaspaNeeded ||
+                                        createOrderMutation.isPending ||
+                                        verifyAndProcessMutation.isPending ||
+                                        !!orderId ||
+                                        !allowed.success
+                                    }
+                                >
+                                    {createOrderMutation.isPending
+                                        ? 'Creating Order...'
+                                        : verifyAndProcessMutation.isPending
+                                          ? 'Processing...'
+                                          : orderId
+                                            ? 'Order Pending'
+                                            : 'Purchase'}
+                                </Button>
+                            </span>
+                        </Tooltip>
+
+                        {/* Cancel Button */}
                     </>
                 ) : (
                     <Typography variant="h6" color="textSecondary" align="center">
