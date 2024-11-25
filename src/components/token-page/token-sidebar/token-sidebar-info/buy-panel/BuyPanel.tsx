@@ -59,6 +59,15 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     }, [selectedOrder, setBuyPanelRef]);
 
     useEffect(() => {
+        if (selectedOrder) {
+            releaseBuyLock(selectedOrder.orderId);
+            setIsPanelOpen(false);
+            setSelectedOrder(null);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [walletAddress]);
+
+    useEffect(() => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
             if (selectedOrder) {
                 releaseBuyLock(selectedOrder.orderId);
