@@ -176,21 +176,26 @@ const ExpandedView: React.FC<{
                                     sx={{ fontSize: '0.75rem', minWidth: '8rem' }}
                                     variant="contained"
                                     onClick={() => handleRetrieveFunds(LunchpadWalletType.RECEIVER)}
-                                    disabled={retrieveFundsMutation.isPending}
+                                    disabled={
+                                        retrieveFundType === 'receiver' ||
+                                        expandedData.lunchpad.status === 'ACTIVE'
+                                    }
                                 >
                                     {retrieveFundsMutation.isPending && retrieveFundType === 'receiver'
                                         ? 'Withdrawing...'
-                                        : 'Withdraw Funds (Kas)'}
+                                        : 'Withdraw Raised Funds (Kas)'}
                                 </Button>
                                 <Button
                                     sx={{ fontSize: '0.75rem', minWidth: '8rem' }}
                                     variant="contained"
                                     onClick={() => handleRetrieveFunds(LunchpadWalletType.SENDER)}
-                                    disabled={retrieveFundsMutation.isPending}
+                                    disabled={
+                                        retrieveFundType === 'sender' || expandedData.lunchpad.status === 'ACTIVE'
+                                    }
                                 >
                                     {retrieveFundsMutation.isPending && retrieveFundType === 'sender'
                                         ? 'Withdrawing...'
-                                        : 'Withdraw Funds (Tokens)'}
+                                        : 'Withdraw Funds (Tokens & Gas Fees)'}
                                 </Button>
                             </Box>
                         </>
@@ -254,7 +259,7 @@ const ExpandedView: React.FC<{
                                         sx={{ padding: 0.2 }}
                                         onClick={() => handleFund('tokens')}
                                         variant="contained"
-                                        disabled={isTokensFunding}
+                                        disabled={isTokensFunding || expandedData.lunchpad.status === 'ACTIVE'}
                                     >
                                         {isTokensFunding ? 'Funding...' : 'Fund'}
                                     </Button>
@@ -313,7 +318,7 @@ const ExpandedView: React.FC<{
                                         sx={{ padding: 0.2 }}
                                         onClick={() => handleFund('gas')}
                                         variant="contained"
-                                        disabled={isGasFunding}
+                                        disabled={isGasFunding || expandedData.lunchpad.status === 'ACTIVE'}
                                     >
                                         {isGasFunding ? 'Funding...' : 'Fund'}
                                     </Button>

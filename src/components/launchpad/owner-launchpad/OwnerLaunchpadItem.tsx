@@ -55,9 +55,10 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
         }
     };
 
-    const handleRetrieveFunds = (walletType: LunchpadWalletType) => {
+    const handleRetrieveFunds = async (walletType: LunchpadWalletType) => {
         setRetrieveFundType(walletType);
-        retrieveFundsMutation.mutate({ id: expandedData.lunchpad.id, walletType });
+        await retrieveFundsMutation.mutateAsync({ id: expandedData.lunchpad.id, walletType });
+        setRetrieveFundType('');
     };
 
     const handleExpand = () => {
@@ -126,7 +127,7 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
         try {
             const sompiAmount = parseInt(fundGasAmount) * KASPA_TO_SOMPI;
             await sendKaspa(expandedData.lunchpad.senderWalletAddress, sompiAmount);
-            showGlobalSnackbar({ message: 'Tokens funded successfully', severity: 'success' });
+            showGlobalSnackbar({ message: 'Kas funded successfully', severity: 'success' });
             queryClient.invalidateQueries({ queryKey: ['launchpadOwnerInfo', ticker] });
         } catch (error) {
             console.error('Error funding tokens:', error);

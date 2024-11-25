@@ -379,13 +379,15 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                                         !allowed.success
                                     }
                                 >
-                                    {createOrderMutation.isPending
-                                        ? 'Creating Order...'
-                                        : verifyAndProcessMutation.isPending
-                                          ? 'Processing...'
-                                          : orderId
-                                            ? 'Order Pending'
-                                            : 'Purchase'}
+                                    {!allowed.success
+                                        ? 'User not in Whitelist'
+                                        : createOrderMutation.isPending
+                                          ? 'Creating Order...'
+                                          : verifyAndProcessMutation.isPending
+                                            ? 'Processing...'
+                                            : orderId
+                                              ? 'Order Pending'
+                                              : 'Purchase'}
                                 </Button>
                             </span>
                         </Tooltip>
