@@ -3,6 +3,7 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Box, LinearProgress, Typography } from '@mui/material';
 import { useGetLaunchpads } from '../../../DAL/LaunchPadQueries';
 import { useNavigate } from 'react-router-dom';
+import LoadingSpinner from '../../common/spinner/LoadingSpinner';
 
 // Define the ProgressBar as a separate component for better clarity
 const ProgressBar = ({ value, total }: { value: number; total: number }) => {
@@ -62,7 +63,7 @@ const LaunchpadList: React.FC = () => {
     if (isLoading) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 400 }}>
-                <Typography>Connect Wallet</Typography>
+                <LoadingSpinner title="Loading.." />
             </Box>
         );
     }

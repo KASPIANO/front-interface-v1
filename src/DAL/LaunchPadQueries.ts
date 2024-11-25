@@ -18,7 +18,6 @@ import {
     getLaunchpad,
     getLaunchpadForOwner,
     getLaunchpads,
-    getOwnerLaunchpads,
     isWhitelisted,
     retrieveFunds,
     startLaunchpad,
@@ -31,12 +30,13 @@ import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
 import { handleLaunchpadError } from '../utils/ErrorHandling';
 
 export const useGetOwnerLaunchpads = (
+    walletAddress: string,
     filters: GetLunchpadListParams['filters'] = { ownerOnly: true },
     pagination: Pagination = { limit: 20, offset: 0 },
     sort: Sort = { direction: SortDirection.DESC },
 ) =>
     useQuery({
-        queryKey: ['OwnerLaunchpads', filters, pagination, sort],
+        queryKey: ['OwnerLaunchpads', walletAddress, filters, pagination, sort],
         queryFn: () => getLaunchpads(filters, pagination, sort),
         // You can add more options here, such as:
         // refetchInterval: 5000, // Refetch every 5 seconds
@@ -69,6 +69,7 @@ export const useLaunchpad = (ticker: string) =>
 
 export const useStartLaunchpad = (
     ticker: string,
+    walletAddress: string,
 ): UseMutationResult<ClientSideLunchpadWithStatus, Error, string, unknown> => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -77,6 +78,8 @@ export const useStartLaunchpad = (
             if (data.success) {
                 showGlobalSnackbar({ message: 'Launchpad started successfully', severity: 'success' });
                 queryClient.invalidateQueries({ queryKey: ['launchpadOwnerInfo', ticker] });
+                queryClient.invalidateQueries({ queryKey: ['launchpads'] });
+                queryClient.invalidateQueries({ queryKey: ['OwnerLaunchpads', walletAddress] });
             } else {
                 handleLaunchpadError({ response: { data } });
             }
@@ -87,6 +90,7 @@ export const useStartLaunchpad = (
 
 export const useStopLaunchpad = (
     ticker: string,
+    walletAddress: string,
 ): UseMutationResult<ClientSideLunchpadWithStatus, Error, string, unknown> => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -95,6 +99,8 @@ export const useStopLaunchpad = (
             if (data.success) {
                 showGlobalSnackbar({ message: 'Launchpad stopped successfully', severity: 'success' });
                 queryClient.invalidateQueries({ queryKey: ['launchpadOwnerInfo', ticker] });
+                queryClient.invalidateQueries({ queryKey: ['launchpads'] });
+                queryClient.invalidateQueries({ queryKey: ['OwnerLaunchpads', walletAddress] });
             } else {
                 handleLaunchpadError({ response: { data } });
             }

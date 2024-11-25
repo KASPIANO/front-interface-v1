@@ -40,10 +40,11 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
     const [fundGasAmount, setFundGasAmount] = useState('');
     const [isTokensFunding, setIsTokensFunding] = useState(false);
     const [isGasFunding, setIsGasFunding] = useState(false);
+    const [retrieveFundType, setRetrieveFundType] = useState('');
     const { data: expandedData, isLoading, error } = useLaunchpadOwnerInfo(ticker, walletAddress);
     const theme = useTheme();
-    const startLaunchpadMutation = useStartLaunchpad(ticker);
-    const stopLaunchpadMutation = useStopLaunchpad(ticker);
+    const startLaunchpadMutation = useStartLaunchpad(ticker, walletAddress);
+    const stopLaunchpadMutation = useStopLaunchpad(ticker, walletAddress);
     const retrieveFundsMutation = useRetrieveFunds(ticker);
 
     const handleStartStop = () => {
@@ -55,6 +56,7 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
     };
 
     const handleRetrieveFunds = (walletType: LunchpadWalletType) => {
+        setRetrieveFundType(walletType);
         retrieveFundsMutation.mutate({ id: expandedData.lunchpad.id, walletType });
     };
 
@@ -213,6 +215,7 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
                     stopLaunchpadMutation={stopLaunchpadMutation}
                     retrieveFundsMutation={retrieveFundsMutation}
                     theme={theme}
+                    retrieveFundType={retrieveFundType}
                 />
             )}
         </>

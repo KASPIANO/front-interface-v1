@@ -11,10 +11,11 @@ interface OwnerLaunchpadPageProps {
 
 const OwnerLaunchpadPage: React.FC<OwnerLaunchpadPageProps> = (props) => {
     const { walletAddress, walletConnected } = props;
-    const { data, isLoading, error } = useGetOwnerLaunchpads();
+    const { data, isLoading, error } = useGetOwnerLaunchpads(walletAddress);
     const queryClient = useQueryClient();
+
     useEffect(() => {
-        queryClient.invalidateQueries({ queryKey: ['OwnerLaunchpads'] });
+        queryClient.invalidateQueries({ queryKey: ['OwnerLaunchpads', walletAddress] });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [walletAddress]);
 

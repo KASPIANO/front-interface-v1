@@ -1,13 +1,14 @@
 import { Modal, Box, IconButton, Typography, TextField, Button, Collapse } from '@mui/material';
-import { LunchpadWalletType } from '../../../types/Types';
+import { ClientSideLunchpadWithStatus, LunchpadWalletType } from '../../../types/Types';
 import CloseIcon from '@mui/icons-material/CloseRounded';
 import { useEffect, useState } from 'react';
 import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
+import { formatNumberWithCommas } from '../../../utils/Utils';
 
 const ExpandedView: React.FC<{
     isExpanded: boolean;
     onClose: () => void;
-    expandedData: any;
+    expandedData: ClientSideLunchpadWithStatus;
     isLoading: boolean;
     error: any;
     fundTokensAmount: string;
@@ -23,6 +24,7 @@ const ExpandedView: React.FC<{
     startLaunchpadMutation: any;
     stopLaunchpadMutation: any;
     retrieveFundsMutation: any;
+    retrieveFundType: string;
     theme: any;
 }> = ({
     isExpanded,
@@ -43,12 +45,13 @@ const ExpandedView: React.FC<{
     startLaunchpadMutation,
     stopLaunchpadMutation,
     retrieveFundsMutation,
-
+    retrieveFundType,
     theme,
 }) => {
     const [isTokensFieldOpen, setIsTokensFieldOpen] = useState(false);
     const [isGasFieldOpen, setIsGasFieldOpen] = useState(false);
     const [kasWalletBalance, setKasWalletBalance] = useState(0);
+    const [raisedFunds, setRaisedFunds] = useState(0);
 
     useEffect(() => {
         if (expandedData && expandedData.success) {
@@ -57,6 +60,14 @@ const ExpandedView: React.FC<{
             });
         }
     }, [expandedData, isGasFunding]);
+
+    useEffect(() => {
+        if (expandedData && expandedData.success) {
+            fetchWalletBalance(expandedData.lunchpad.walletAddress, false).then((balance) => {
+                setRaisedFunds(balance);
+            });
+        }
+    }, [expandedData, retrieveFundsMutation]);
     return (
         <Modal
             open={isExpanded}
@@ -100,9 +111,14 @@ const ExpandedView: React.FC<{
                     {error && <Typography color="error">Error loading details: {error.message}</Typography>}
                     {expandedData && expandedData.success && (
                         <>
-                            <Typography variant="h5" component="h2">
-                                {expandedData.lunchpad.ticker}
-                            </Typography>
+                            <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                                <Typography variant="h5" component="h2" sx={{ fontWeight: 700 }}>
+                                    {expandedData.lunchpad.ticker}
+                                </Typography>
+                                <Typography variant="h6" component="h2" sx={{ fontWeight: 500 }}>
+                                    Raised Amount: {formatNumberWithCommas(raisedFunds)} Kas
+                                </Typography>
+                            </Box>
                             {/* ... (other Typography components) */}
                             <Typography sx={{ fontSize: '1rem' }}>
                                 Round Number: {expandedData.lunchpad.roundNumber}
@@ -114,7 +130,7 @@ const ExpandedView: React.FC<{
                                 Available Units: {expandedData.lunchpad.availabeUnits}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                KAS per Unit: {expandedData.lunchpad.kasPerUnit}
+                                Kas per Unit: {expandedData.lunchpad.kasPerUnit}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
                                 Tokens per Unit: {expandedData.lunchpad.tokenPerUnit}
@@ -133,7 +149,7 @@ const ExpandedView: React.FC<{
                                 {expandedData.lunchpad.krc20TokensAmount || 'N/A'}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                Kas Amount in Launchpad: {kasWalletBalance || 'N/A'}
+                                Kas Amount in Launchpad: {kasWalletBalance.toFixed(4) || 'N/A'}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
                                 Required Kaspa: {expandedData.lunchpad.requiredKaspa || 'N/A'}
@@ -162,7 +178,9 @@ const ExpandedView: React.FC<{
                                     onClick={() => handleRetrieveFunds(LunchpadWalletType.RECEIVER)}
                                     disabled={retrieveFundsMutation.isPending}
                                 >
-                                    {retrieveFundsMutation.isPending ? 'Retrieving...' : 'Retrieve Funds (Kas)'}
+                                    {retrieveFundsMutation.isPending && retrieveFundType === 'receiver'
+                                        ? 'Withdrawing...'
+                                        : 'Withdraw Funds (Kas)'}
                                 </Button>
                                 <Button
                                     sx={{ fontSize: '0.75rem', minWidth: '8rem' }}
@@ -170,7 +188,9 @@ const ExpandedView: React.FC<{
                                     onClick={() => handleRetrieveFunds(LunchpadWalletType.SENDER)}
                                     disabled={retrieveFundsMutation.isPending}
                                 >
-                                    {retrieveFundsMutation.isPending ? 'Retrieving...' : 'Retrieve Funds (Tokens)'}
+                                    {retrieveFundsMutation.isPending && retrieveFundType === 'sender'
+                                        ? 'Withdrawing...'
+                                        : 'Withdraw Funds (Tokens)'}
                                 </Button>
                             </Box>
                         </>
