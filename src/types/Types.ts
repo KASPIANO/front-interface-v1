@@ -538,7 +538,7 @@ export const ERROR_MESSAGES: Record<ErrorCodes, string> = {
     [ErrorCodes.INVALID_ORDER_UNITS]: 'The order units are invalid.',
     [ErrorCodes.LUNCHPAD_UNITS_EXCEEDS]: 'The units exceed the allowed limit.',
     [ErrorCodes.INVALID_ORDER_STATUS]: 'Invalid order status.',
-    [ErrorCodes.TRANSACTION_VERIFICATION_FAILED]: 'Transaction verification failed.',
+    [ErrorCodes.TRANSACTION_VERIFICATION_FAILED]: 'Please verify the KAS was sent, if yes, then wait for tokens.',
     [ErrorCodes.TRANSACTION_DB_UPDATE_FAILED]: 'Failed to update transaction in the database.',
     [ErrorCodes.INVALID_USER_WALLET]: 'User wallet is invalid.',
     [ErrorCodes.INVALID_SENDER_WALLET_KASPA_AMOUNT]: 'The Launchpad wallet is missing Kaspa for Gas, Fund Gas.',

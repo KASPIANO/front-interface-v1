@@ -22,6 +22,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createLaunchpad } from '../../../DAL/BackendLunchpadDAL';
 import { parse } from 'papaparse'; // For CSV parsing
 import FileDownloadIconRounded from '@mui/icons-material/FileDownloadRounded';
+import { isValidWalletAddress } from '../../../utils/Utils';
 
 interface CreateLaunchpadFormProps {
     walletConnected: boolean;
@@ -91,11 +92,17 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected }) 
                     transformHeader: (header) => header.trim(),
                     complete: (results) => {
                         const list = results.data
-                            .filter((row: any) => row.address?.trim()) // Ensure rows have a valid address
+                            .filter((row: any) => {
+                                const address = row.address?.trim();
+                                return address && isValidWalletAddress(address); // Validate address
+                            }) // Ensure rows have a valid address
                             .map((row: any) => ({ address: row.address.trim() })); // Map valid rows to an array of objects
 
                         if (list.length === 0) {
-                            alert('No valid addresses found in the CSV file.');
+                            showGlobalSnackbar({
+                                message: 'No valid addresses found in the CSV file.',
+                                severity: 'error',
+                            });
                             setCsvLoading(false);
                             return;
                         }
@@ -152,6 +159,16 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected }) 
         setMaxBatches('');
         setLimitPerWallet('');
         setErrors({ ticker: '', kasPerBatch: '', tokensPerBatch: '' });
+    };
+
+    const handleDownloadRecipientList = () => {
+        const csvContent = `data:text/csv;charset=utf-8,address\n${recipientList.map((item) => item.address).join('\n')}`;
+        const link = document.createElement('a');
+        link.href = encodeURI(csvContent);
+        link.download = 'added_addresses.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     return (
@@ -369,6 +386,17 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected }) 
                                 >
                                     Clear Wallet Address List
                                 </Button>
+                                {recipientList.length > 0 && (
+                                    <Button
+                                        variant="outlined"
+                                        startIcon={<FileDownloadIconRounded />}
+                                        onClick={handleDownloadRecipientList}
+                                        sx={{ textTransform: 'none', marginTop: '10px' }}
+                                    >
+                                        Download Added Addresses
+                                    </Button>
+                                )}
+
                                 <Typography variant="caption" sx={{ marginTop: '5px', display: 'block' }}>
                                     CSV format: One column header named "address" with wallet addresses in each
                                     row.

@@ -21,6 +21,7 @@ import {
 import { showGlobalSnackbar } from '../alert-context/AlertContext';
 import { sendKaspa } from '../../utils/KaswareUtils';
 import { handleLaunchpadError } from '../../utils/ErrorHandling';
+import { set } from 'lodash';
 
 type LaunchpadProps = {
     walletBalance: number;
@@ -155,15 +156,18 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                         severity: 'warning',
                     });
                 }
-
+                setKaspaNeeded(updatedKaspaNeeded);
+                setTokensReceived(orderResult.lunchpadOrder.totalUnits * orderResult.lunchpadOrder.tokenPerUnit);
                 try {
                     const txData = await sendKaspa(launchpad.walletAddress, kaspaToSompi);
                     const parsedTxData = JSON.parse(txData);
                     const txId = parsedTxData.id;
-
-                    await handleVerifyAndProcess(orderResult.lunchpadOrder.id, txId);
+                    try {
+                        await handleVerifyAndProcess(orderResult.lunchpadOrder.id, txId);
+                    } catch (error) {
+                        handleCleanFields();
+                    }
                 } catch (error) {
-                    console.error('Error sending Kaspa:', error);
                     showGlobalSnackbar({
                         message: 'Failed to send Kaspa. Please try again.',
                         severity: 'error',
@@ -172,14 +176,9 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                     await handleCancelOrder(orderResult.lunchpadOrder.id);
                 }
             } else {
-                showGlobalSnackbar({
-                    message: 'Failed to create order. Please try again.',
-                    severity: 'error',
-                });
                 handleCleanFields();
             }
         } catch (error) {
-            console.error('Error in purchase process:', error);
             showGlobalSnackbar({
                 message: 'An error occurred during the purchase. Please try again.',
                 severity: 'error',
