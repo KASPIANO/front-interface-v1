@@ -98,8 +98,8 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
             };
             const jsonStringified = JSON.stringify(inscribeJsonString);
             await transferKRC20Token(jsonStringified);
-            queryClient.invalidateQueries({ queryKey: ['launchpadOwnerInfo', ticker] });
             showGlobalSnackbar({ message: 'Tokens funded successfully', severity: 'success' });
+            queryClient.invalidateQueries({ queryKey: ['launchpadOwnerInfo', ticker] });
         } catch (error) {
             console.error('Error funding tokens:', error);
             // Handle error (e.g., show an error message)

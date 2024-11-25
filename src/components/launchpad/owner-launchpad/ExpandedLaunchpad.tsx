@@ -1,7 +1,8 @@
 import { Modal, Box, IconButton, Typography, TextField, Button, Collapse } from '@mui/material';
 import { LunchpadWalletType } from '../../../types/Types';
 import CloseIcon from '@mui/icons-material/CloseRounded';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
 
 const ExpandedView: React.FC<{
     isExpanded: boolean;
@@ -47,7 +48,15 @@ const ExpandedView: React.FC<{
 }) => {
     const [isTokensFieldOpen, setIsTokensFieldOpen] = useState(false);
     const [isGasFieldOpen, setIsGasFieldOpen] = useState(false);
+    const [kasWalletBalance, setKasWalletBalance] = useState(0);
 
+    useEffect(() => {
+        if (expandedData && expandedData.success) {
+            fetchWalletBalance(expandedData.lunchpad.senderWalletAddress, false).then((balance) => {
+                setKasWalletBalance(balance);
+            });
+        }
+    }, [expandedData, isGasFunding]);
     return (
         <Modal
             open={isExpanded}
@@ -124,7 +133,7 @@ const ExpandedView: React.FC<{
                                 {expandedData.lunchpad.krc20TokensAmount || 'N/A'}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                Kas Amount in Launchpad: {expandedData.lunchpad.krc20TokensAmount || 'N/A'}
+                                Kas Amount in Launchpad: {kasWalletBalance || 'N/A'}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
                                 Required Kaspa: {expandedData.lunchpad.requiredKaspa || 'N/A'}
@@ -153,9 +162,7 @@ const ExpandedView: React.FC<{
                                     onClick={() => handleRetrieveFunds(LunchpadWalletType.RECEIVER)}
                                     disabled={retrieveFundsMutation.isPending}
                                 >
-                                    {retrieveFundsMutation.isPending
-                                        ? 'Retrieving...'
-                                        : 'Retrieve Funds (Receiver)'}
+                                    {retrieveFundsMutation.isPending ? 'Retrieving...' : 'Retrieve Funds (Kas)'}
                                 </Button>
                                 <Button
                                     sx={{ fontSize: '0.75rem', minWidth: '8rem' }}
@@ -163,7 +170,7 @@ const ExpandedView: React.FC<{
                                     onClick={() => handleRetrieveFunds(LunchpadWalletType.SENDER)}
                                     disabled={retrieveFundsMutation.isPending}
                                 >
-                                    {retrieveFundsMutation.isPending ? 'Retrieving...' : 'Retrieve Funds (Sender)'}
+                                    {retrieveFundsMutation.isPending ? 'Retrieving...' : 'Retrieve Funds (Tokens)'}
                                 </Button>
                             </Box>
                         </>

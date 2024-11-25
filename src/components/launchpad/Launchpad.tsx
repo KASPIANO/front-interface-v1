@@ -21,7 +21,6 @@ import {
 import { showGlobalSnackbar } from '../alert-context/AlertContext';
 import { sendKaspa } from '../../utils/KaswareUtils';
 import { handleLaunchpadError } from '../../utils/ErrorHandling';
-import { set } from 'lodash';
 
 type LaunchpadProps = {
     walletBalance: number;
@@ -163,7 +162,10 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                     const parsedTxData = JSON.parse(txData);
                     const txId = parsedTxData.id;
                     try {
-                        await handleVerifyAndProcess(orderResult.lunchpadOrder.id, txId);
+                        await verifyAndProcessMutation.mutateAsync({
+                            orderId: orderResult.lunchpadOrder.id,
+                            transactionId: txId,
+                        });
                     } catch (error) {
                         handleCleanFields();
                     }
@@ -175,6 +177,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                     // Optionally, you might want to cancel the order here
                     await handleCancelOrder(orderResult.lunchpadOrder.id);
                 }
+                handleCleanFields();
             } else {
                 handleCleanFields();
             }
@@ -183,34 +186,6 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                 message: 'An error occurred during the purchase. Please try again.',
                 severity: 'error',
             });
-            handleCleanFields();
-        }
-    };
-
-    const handleVerifyAndProcess = async (orderId: string, transactionId: string) => {
-        try {
-            const result = await verifyAndProcessMutation.mutateAsync({ orderId, transactionId });
-            if (result.success) {
-                handleCleanFields();
-                showGlobalSnackbar({
-                    message: 'Order processed successfully',
-                    severity: 'success',
-                });
-            } else {
-                showGlobalSnackbar({
-                    message: 'Failed to process order. Please contact support.',
-                    severity: 'error',
-                });
-                handleCancelOrder(orderId);
-                handleCleanFields();
-            }
-        } catch (error) {
-            console.error('Error verifying and processing order:', error);
-            showGlobalSnackbar({
-                message: 'Error processing order. Please try again or contact support.',
-                severity: 'error',
-            });
-            handleCancelOrder(orderId);
             handleCleanFields();
         }
     };
