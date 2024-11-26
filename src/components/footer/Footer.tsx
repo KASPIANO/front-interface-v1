@@ -27,10 +27,10 @@ const Footer: React.FC = () => (
                             >
                                 <GitHubIcon fontSize="small" />
                             </IconButton>
-                            <IconButton aria-label="Twitter" href="https://x.com/KaspianoApp" target="_blank">
+                            <IconButton aria-label="Twitter" href="https://x.com/KaspaCom" target="_blank">
                                 <TwitterIcon fontSize="small" />
                             </IconButton>
-                            <IconButton aria-label="Telegram" href="https://t.me/KaspianoApp" target="_blank">
+                            <IconButton aria-label="Telegram" href="https://t.me/KaspaComOfficial" target="_blank">
                                 <TelegramIcon fontSize="small" />
                             </IconButton>
                         </SocialMediaIcons>
