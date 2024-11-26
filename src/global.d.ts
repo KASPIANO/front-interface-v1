@@ -31,11 +31,12 @@ interface Kasware {
     ) => void;
     cancelKRC20BatchTransfer(): void;
     getKRC20Balance(): Promise<any>;
-    createKRC20Order: ({
-        krc20Tick: string,
-        krc20Amount: number,
-        kasAmount: number,
-        priorityFee: number,
+    createKRC20Order: (params: {
+        krc20Tick: string;
+        krc20Amount: number;
+        kasAmount: number;
+        psktExtraOutput: Array<{ address: string; amount: number }>;
+        priorityFee: number;
     }) => Promise<{ txJsonString: string; sendCommitTxId: string }>;
     buyKRC20Token: (params: {
         txJsonString: string;

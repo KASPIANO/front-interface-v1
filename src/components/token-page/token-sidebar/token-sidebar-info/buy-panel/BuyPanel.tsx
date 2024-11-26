@@ -32,8 +32,6 @@ interface BuyPanelProps {
 }
 
 const KASPA_TO_SOMPI = 100000000;
-const KASPIANO_TRADE_COMMISSION = import.meta.env.VITE_TRADE_COMMISSION;
-const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const { tokenInfo, walletBalance, walletConnected, kasPrice, walletAddress, setBuyPanelRef } = props;
     const [sortBy, setSortBy] = useState('pricePerToken');
@@ -46,7 +44,6 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const [isProcessingBuyOrder, setIsProcessingBuyOrder] = useState(false);
     const [waitingForWalletConfirmation, setWaitingForWalletConfirmation] = useState(false);
     const queryClient = useQueryClient();
-    const kaspianoCommissionInt = parseFloat(KASPIANO_TRADE_COMMISSION);
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isFetching } = useFetchOrders(
         tokenInfo,
@@ -322,13 +319,9 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             return;
         }
         try {
-            const fee = kaspianoCommissionInt > 0 ? Math.max(order.totalPrice * kaspianoCommissionInt, 0.5) : 0;
-            const extraOutput = [{ address: KASPIANO_WALLET, amount: fee }];
             setWaitingForWalletConfirmation(true);
-            const finalFee = fee > 0 ? extraOutput : [];
 
-            txId = await buyOrderKRC20(psktSeller, finalFee);
-            console.log('txId', txId);
+            txId = await buyOrderKRC20(psktSeller);
 
             if (isEmptyString(txId)) {
                 throw new Error('paymentTxn is empty');

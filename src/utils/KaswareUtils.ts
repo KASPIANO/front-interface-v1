@@ -188,9 +188,10 @@ export const pushTx = async (options: { rawtx: string }): Promise<string> => {
 export const deployKRC20Token = async (inscribeJsonString: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        const priorityFee = await getPriorityFee('TRANSFER');
+        const priorityFee = await getPriorityFee('TRADE');
         const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, '', kasPriorityFee);
+        console.log('kasPriorityFee', kasPriorityFee);
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, '');
         return txid;
     } catch (error) {
         console.error('Failed to deploy KRC20 token:', error);
@@ -210,7 +211,8 @@ export const mintKRC20Token = async (inscribeJsonString: string, ticker: string)
         }
         const priorityFee = await getPriorityFee('TRANSFER');
         const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, '', kasPriorityFee);
+        console.log('kasPriorityFee', kasPriorityFee);
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, '');
         saveMintData(ticker);
         return txid;
     } catch (error) {
@@ -239,6 +241,7 @@ export const createOrderKRC20 = async (
     krc20Tick: string,
     krc20Amount: number,
     kasAmount: number,
+    psktExtraOutput?: Array<{ address: string; amount: number }>,
 ): Promise<{ txJsonString: string; sendCommitTxId: string }> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     await versionCheck(PKST_VERSION);
@@ -249,6 +252,7 @@ export const createOrderKRC20 = async (
             krc20Tick,
             krc20Amount,
             kasAmount,
+            psktExtraOutput,
             priorityFee: kasPriorityFee,
         });
         return { txJsonString, sendCommitTxId };
