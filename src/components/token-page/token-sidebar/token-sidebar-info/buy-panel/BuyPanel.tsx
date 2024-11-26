@@ -52,11 +52,21 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                         releaseBuyLock(selectedOrder.orderId);
                         setIsPanelOpen(false);
                         setSelectedOrder(null);
+                        localStorage.removeItem('orderId');
                     }
                 },
             });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedOrder, setBuyPanelRef]);
+
+    useEffect(() => {
+        if (selectedOrder) {
+            setIsPanelOpen(false);
+            setSelectedOrder(null);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [walletAddress]);
 
     useEffect(() => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -120,6 +130,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         }, 1000);
 
         return () => clearInterval(timer); // Cleanup on unmount
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedOrder]);
 
     const handleOrderSelect = async (order: Order) => {
@@ -132,9 +143,11 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     severity: 'error',
                 });
                 setSelectedOrder(null);
+                localStorage.removeItem('orderId');
                 setIsPanelOpen(false);
                 return;
             }
+            localStorage.setItem('orderId', order.orderId);
             setTempWalletAddress(temporaryWalletAddress);
             setIsPanelOpen(true);
         } catch (error) {
@@ -206,6 +219,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setIsProcessingBuyOrder(false);
             setIsPanelOpen(false);
             setSelectedOrder(null);
+            localStorage.removeItem('orderId');
         } else {
             let errorMessage =
                 "Purchase failed in the process. Please wait 10 minutes and contact support if you didn't receive the tokens.";
@@ -222,6 +236,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setIsProcessingBuyOrder(false);
             setIsPanelOpen(false);
             setSelectedOrder(null);
+            localStorage.removeItem('orderId');
         }
     };
 
@@ -230,6 +245,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         releaseBuyLock(orderId);
         setIsPanelOpen(false);
         setSelectedOrder(null);
+        localStorage.removeItem('orderId');
     };
 
     return (
