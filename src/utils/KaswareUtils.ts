@@ -190,8 +190,7 @@ export const deployKRC20Token = async (inscribeJsonString: string): Promise<stri
     try {
         const priorityFee = await getPriorityFee('TRADE');
         const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
-        console.log('kasPriorityFee', kasPriorityFee);
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, '');
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, '', kasPriorityFee);
         return txid;
     } catch (error) {
         console.error('Failed to deploy KRC20 token:', error);
@@ -211,8 +210,7 @@ export const mintKRC20Token = async (inscribeJsonString: string, ticker: string)
         }
         const priorityFee = await getPriorityFee('TRANSFER');
         const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
-        console.log('kasPriorityFee', kasPriorityFee);
-        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, '');
+        const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, '', kasPriorityFee);
         saveMintData(ticker);
         return txid;
     } catch (error) {
