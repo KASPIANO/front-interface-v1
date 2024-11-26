@@ -100,7 +100,7 @@ const TokenStats: FC<TokenStatsProps> = (props) => {
 
     const displayPrice = floorPrice?.floor_price
         ? formatPrice(Math.min(floorPrice.floor_price, tokenInfo.price))
-        : formatPrice(tokenInfo.price);
+        : 0;
 
     useEffect(() => {
         if (!tradeloading24 && tradeStats24) {
