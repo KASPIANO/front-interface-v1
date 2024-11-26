@@ -32,7 +32,7 @@ const Seo = () => (
                 content="Trade, Deploy, Airdrop, and Mint KRC-20 tokens on the Kaspiano platform."
             />
             <meta name="twitter:image" content="https://kaspiano.com/Logo.png" />
-            <meta name="twitter:site" content="@KaspianoApp" />
+            <meta name="twitter:site" content="@KaspaCom" />
 
             {/* Structured Data (Rich Snippets) */}
             <script type="application/ld+json">

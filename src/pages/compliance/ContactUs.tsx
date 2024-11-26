@@ -26,10 +26,10 @@ const ContactUs: React.FC = () => (
                     Join our community:
                 </Typography>
                 <Box sx={{ display: 'flex' }}>
-                    <IconButton aria-label="Twitter" href="https://x.com/KaspianoApp" target="_blank">
+                    <IconButton aria-label="Twitter" href="https://x.com/KaspaCom" target="_blank">
                         <TwitterIcon fontSize="large" />
                     </IconButton>
-                    <IconButton aria-label="Telegram" href="https://t.me/KaspianoApp" target="_blank">
+                    <IconButton aria-label="Telegram" href="https://t.me/KaspaComOfficial" target="_blank">
                         <TelegramIcon fontSize="large" />
                     </IconButton>
                 </Box>
@@ -49,20 +49,11 @@ const ContactUs: React.FC = () => (
                         If you have any support-related inquiries, feel free to reach out to us at:
                     </Typography>
 
-                    <Link href="mailto:support@kaspiano.com" underline="hover">
-                        support@kaspiano.com
-                    </Link>
-
-                    <Typography variant="body2" color="textSecondary" sx={{ marginTop: '0.5rem' }}>
-                        Please note: This email is strictly for support-related queries.
-                    </Typography>
-
                     <Typography variant="body1" sx={{ marginTop: '2rem', marginBottom: '1rem' }}>
                         For any listings-related questions or inquiries, please contact us at:
                     </Typography>
-
-                    <Link href="mailto:listings@kaspiano.com" underline="hover">
-                        listings@kaspiano.com
+                    <Link href="mailto:support@kaspiano.com" underline="hover">
+                        support@kaspiano.com
                     </Link>
 
                     <Typography variant="body2" color="textSecondary" sx={{ marginTop: '0.5rem' }}>
