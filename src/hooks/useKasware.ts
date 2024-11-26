@@ -34,7 +34,6 @@ export const useKasware = () => {
     const [userReferral, setUserReferral] = useState<UserReferral | null>(null);
     const [isUserReferralFinishedLoading, setIsUserReferralFinishedLoading] = useState(false);
     const [isConnecting, setIsConnecting] = useState(false);
-    const [orderId, setOrderId] = useState<string | null>(null);
     const queryClient = useQueryClient();
     // eslint-disable-next-line react-hooks/exhaustive-deps
 
@@ -416,6 +415,5 @@ export const useKasware = () => {
         updateAndGetUserReferral,
         isUserReferralFinishedLoading,
         isConnecting,
-        setOrderId,
     };
 };
