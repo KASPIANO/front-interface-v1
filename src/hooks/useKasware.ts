@@ -15,6 +15,7 @@ import {
     setAxiosInterceptorToDisconnect,
 } from '../DAL/BackendDAL';
 import { useQueryClient } from '@tanstack/react-query';
+import { releaseBuyLock } from '../DAL/BackendP2PDAL';
 
 const COOKIE_TTL = 4 * 60 * 60 * 1000;
 let walletAddressBeforeVerification = null;
@@ -33,6 +34,7 @@ export const useKasware = () => {
     const [userReferral, setUserReferral] = useState<UserReferral | null>(null);
     const [isUserReferralFinishedLoading, setIsUserReferralFinishedLoading] = useState(false);
     const [isConnecting, setIsConnecting] = useState(false);
+    const [orderId, setOrderId] = useState<string | null>(null);
     const queryClient = useQueryClient();
     // eslint-disable-next-line react-hooks/exhaustive-deps
 
@@ -143,8 +145,13 @@ export const useKasware = () => {
 
             self.accounts = _accounts;
             if (_accounts.length > 0) {
+                const orderId = localStorage.getItem('orderId');
+                if (orderId) {
+                    releaseBuyLock(orderId);
+                }
                 queryClient.invalidateQueries({ queryKey: ['userListings'] });
                 queryClient.invalidateQueries({ queryKey: ['ordersHistory'] });
+                localStorage.removeItem('orderId');
 
                 // setConnected(true);
 
@@ -208,6 +215,11 @@ export const useKasware = () => {
         const { origin } = window.location;
         await window.kasware.disconnect(origin);
         clearConnectionData();
+        const orderId = localStorage.getItem('orderId');
+        if (orderId) {
+            releaseBuyLock(orderId);
+        }
+        localStorage.removeItem('orderId');
 
         if (!ignoreMessage) {
             showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
@@ -404,5 +416,6 @@ export const useKasware = () => {
         updateAndGetUserReferral,
         isUserReferralFinishedLoading,
         isConnecting,
+        setOrderId,
     };
 };
