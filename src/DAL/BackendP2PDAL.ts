@@ -274,3 +274,12 @@ export const getTickerSellOrders = async (
     );
     return response.data;
 };
+export const getUserUnlistedTransactions = async (transactions: string[]): Promise<any> => {
+    // Ensure the transactions array is wrapped in an object
+    const payload = { transactions }; // Wrap array in an object with the key 'transactions'
+
+    // Make the POST request
+    const response = await backendService.post<any>(`/${P2PV2CONTROLLER}/unlisted-transactions`, payload);
+
+    return response.data;
+};

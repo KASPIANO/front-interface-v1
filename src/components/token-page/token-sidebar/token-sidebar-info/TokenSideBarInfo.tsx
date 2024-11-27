@@ -132,8 +132,9 @@ const TokenSideBarInfo: FC<TokenSideBarInfoProps> = (props) => {
     const tokenPriceKAS = floorPrice?.floor_price
         ? Math.min(floorPrice.floor_price, tokenInfo.price)
         : tokenInfo.price;
-    const tokenPrice = `${tokenPriceKAS.toFixed(7)} KAS`;
-    const tokenPriceDollars = (tokenPriceKAS * kasPrice).toFixed(7);
+
+    const tokenPrice = tokenInfo.price ? `${tokenPriceKAS.toFixed(7)} KAS` : '---';
+    const tokenPriceDollars = tokenInfo.price ? (tokenPriceKAS * kasPrice).toFixed(7) : '---';
 
     return (
         <Box
