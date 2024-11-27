@@ -1,4 +1,4 @@
-import { Modal, Box, IconButton, Typography, TextField, Button, Collapse } from '@mui/material';
+import { Modal, Box, IconButton, Typography, TextField, Button, Collapse, Tooltip } from '@mui/material';
 import { ClientSideLunchpadWithStatus, LunchpadWalletType } from '../../../types/Types';
 import CloseIcon from '@mui/icons-material/CloseRounded';
 import { useEffect, useState } from 'react';
@@ -160,7 +160,7 @@ const ExpandedView: React.FC<{
                                 Total Units: {expandedData.lunchpad.totalUnits}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                Available Units: {expandedData.lunchpad.availabeUnits}
+                                Available Units to sale: {expandedData.lunchpad.availabeUnits}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
                                 Kas per Unit: {expandedData.lunchpad.kasPerUnit}
@@ -209,31 +209,61 @@ const ExpandedView: React.FC<{
                                           ? 'Start Launchpad'
                                           : 'Stop Launchpad'}
                                 </Button>
-                                <Button
-                                    sx={{ fontSize: '0.75rem', minWidth: '8rem' }}
-                                    variant="contained"
-                                    onClick={() => handleRetrieveFunds(LunchpadWalletType.RECEIVER)}
-                                    disabled={
-                                        retrieveFundType === 'receiver' ||
+                                <Tooltip
+                                    title={
                                         expandedData.lunchpad.status === 'ACTIVE'
+                                            ? 'You need to stop the launchpad to withdraw funds.'
+                                            : kasWalletBalance === 0
+                                              ? 'You need to have Kas in the launchpad for gas to withdraw.'
+                                              : ''
                                     }
+                                    arrow
                                 >
-                                    {retrieveFundsMutation.isPending && retrieveFundType === 'receiver'
-                                        ? 'Withdrawing...'
-                                        : 'Withdraw Raised Funds (Kas)'}
-                                </Button>
-                                <Button
-                                    sx={{ fontSize: '0.75rem', minWidth: '8rem' }}
-                                    variant="contained"
-                                    onClick={() => handleRetrieveFunds(LunchpadWalletType.SENDER)}
-                                    disabled={
-                                        retrieveFundType === 'sender' || expandedData.lunchpad.status === 'ACTIVE'
+                                    <span>
+                                        <Button
+                                            sx={{ fontSize: '0.75rem', minWidth: '8rem' }}
+                                            variant="contained"
+                                            onClick={() => handleRetrieveFunds(LunchpadWalletType.RECEIVER)}
+                                            disabled={
+                                                retrieveFundType === 'receiver' ||
+                                                expandedData.lunchpad.status === 'ACTIVE' ||
+                                                kasWalletBalance === 0
+                                            }
+                                        >
+                                            {retrieveFundsMutation.isPending && retrieveFundType === 'receiver'
+                                                ? 'Withdrawing...'
+                                                : 'Withdraw Raised Funds (Kas)'}
+                                        </Button>
+                                    </span>
+                                </Tooltip>
+
+                                <Tooltip
+                                    title={
+                                        expandedData.lunchpad.status === 'ACTIVE'
+                                            ? 'You need to stop the launchpad to withdraw funds.'
+                                            : kasWalletBalance === 0
+                                              ? 'You need to have Kas in the launchpad for gas to withdraw.'
+                                              : ''
                                     }
+                                    arrow
                                 >
-                                    {retrieveFundsMutation.isPending && retrieveFundType === 'sender'
-                                        ? 'Withdrawing...'
-                                        : 'Withdraw Funds (Tokens & Gas Fees)'}
-                                </Button>
+                                    <span>
+                                        <Button
+                                            sx={{ fontSize: '0.75rem', minWidth: '8rem' }}
+                                            variant="contained"
+                                            onClick={() => handleRetrieveFunds(LunchpadWalletType.SENDER)}
+                                            disabled={
+                                                retrieveFundType === 'sender' ||
+                                                expandedData.lunchpad.status === 'ACTIVE' ||
+                                                kasWalletBalance === 0
+                                            }
+                                        >
+                                            {retrieveFundsMutation.isPending && retrieveFundType === 'sender'
+                                                ? 'Withdrawing...'
+                                                : 'Withdraw Funds (Tokens & Gas Fees)'}
+                                        </Button>
+                                    </span>
+                                </Tooltip>
                             </Box>
                         </>
                     )}

@@ -141,7 +141,9 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
             const sompiAmount = parseInt(fundGasAmount) * KASPA_TO_SOMPI;
             await sendKaspa(expandedData.lunchpad.senderWalletAddress, sompiAmount);
             showGlobalSnackbar({ message: 'Kas funded successfully', severity: 'success' });
-            queryClient.invalidateQueries({ queryKey: ['launchpadOwnerInfo', ticker] });
+            setTimeout(() => {
+                queryClient.invalidateQueries({ queryKey: ['launchpadOwnerInfo', ticker] });
+            }, 2000);
         } catch (error) {
             console.error('Error funding tokens:', error);
             // Handle error (e.g., show an error message)
@@ -191,7 +193,7 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
                             }}
                         >
                             {isLoading ? (
-                                <LoadingSpinner size={10} boxStyle={{ height: '3rem' }} />
+                                <LoadingSpinner size={20} boxStyle={{ height: '2rem' }} />
                             ) : (
                                 <OpenWithRoundedIcon />
                             )}
