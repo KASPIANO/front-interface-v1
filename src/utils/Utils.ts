@@ -3,7 +3,6 @@ import moment from 'moment';
 import { getTxnInfo } from '../DAL/KaspaApiDal';
 import { fetchTokenInfo } from '../DAL/Krc20DAL';
 import { SellOrderStatus } from '../types/Types';
-import { formatDistanceToNow } from 'date-fns';
 
 export enum ThemeModes {
     DARK = 'dark',
