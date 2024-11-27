@@ -19,7 +19,7 @@ import { Stat, StatHelpText, StatNumber } from '@chakra-ui/react';
 import { showGlobalDialog } from '../../dialog-context/DialogContext';
 import { ContentCopyRounded as ContentCopyRoundedIcon } from '@mui/icons-material';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
-import { debounce, set } from 'lodash';
+import { debounce } from 'lodash';
 import { UserReferral } from '../../../types/Types';
 import SearchIcon from '@mui/icons-material/Search'; // Import the icon
 import { checkOrderExists } from '../../../DAL/Krc20DAL';
