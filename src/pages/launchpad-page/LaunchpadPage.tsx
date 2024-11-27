@@ -4,6 +4,7 @@ import TabContext from '@mui/lab/TabContext';
 import { FC, useState, SyntheticEvent } from 'react';
 import CreateLaunchpadForm from '../../components/launchpad/create-launchpad-tab/CreateLaunchpad';
 import OwnerLaunchpadPage from '../../components/launchpad/owner-launchpad/OwnerLaunchpads';
+import LaunchpadList from '../../components/launchpad/launchpad-list/LaunchpadList';
 
 interface LaunchpadPageProps {
     walletAddress: string | null;
@@ -34,7 +35,7 @@ const LaunchpadPage: FC<LaunchpadPageProps> = (props) => {
                     onChange={handleTabChange}
                     sx={{
                         '&.MuiTabs-root': {
-                            height: '2rem',
+                            height: '2.4rem',
                             minHeight: '5px',
                         },
                         // '& .MuiTabs-flexContainer': {
@@ -42,13 +43,39 @@ const LaunchpadPage: FC<LaunchpadPageProps> = (props) => {
                         // },
                     }}
                 >
-                    <Tab label="Launchpads" value="1" />
-                    <Tab label="Create Launchpad" value="2" />
-                    <Tab label="My Launchpads" value="3" />
+                    <Tab
+                        sx={{
+                            '&.MuiTab-root': {
+                                minWidth: '15%',
+                            },
+                        }}
+                        label="Launchpads"
+                        value="1"
+                    />
+                    <Tab
+                        sx={{
+                            '&.MuiTab-root': {
+                                minWidth: '15%',
+                            },
+                        }}
+                        label="Create Launchpad"
+                        value="2"
+                    />
+                    <Tab
+                        sx={{
+                            '&.MuiTab-root': {
+                                minWidth: '15%',
+                            },
+                        }}
+                        label="My Launchpads"
+                        value="3"
+                    />
                 </Tabs>
-                <TabPanel value="1">{/* <LaunchpadsList /> */}</TabPanel>
+                <TabPanel value="1">
+                    <LaunchpadList />
+                </TabPanel>
                 <TabPanel value="2">
-                    <CreateLaunchpadForm walletConnected={walletConnected} />
+                    <CreateLaunchpadForm walletConnected={walletConnected} handleTabChange={handleTabChange} />
                 </TabPanel>
                 <TabPanel value="3">
                     <OwnerLaunchpadPage walletAddress={walletAddress} walletConnected={walletConnected} />

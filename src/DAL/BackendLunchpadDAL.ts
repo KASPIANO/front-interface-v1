@@ -38,6 +38,18 @@ export const getLaunchpads = async (
     });
     return response.data;
 };
+export const getOwnerLaunchpads = async (
+    filters: GetLunchpadListParams['filters'] = {},
+    pagination: Pagination = { limit: 20, offset: 0 },
+    sort: Sort = { direction: SortDirection.DESC },
+): Promise<ClientSideLunchpadListWithStatus> => {
+    const response = await backendService.post(`/${LUNCHPAD_CONTROLLER}/list-owner`, {
+        filters,
+        pagination,
+        sort,
+    });
+    return response.data;
+};
 
 // Creates a new lunchpad order
 
@@ -84,5 +96,22 @@ export const startVerifyAndProcessOrder = async (orderId: string, transactionId:
 
 export const cancelOrder = async (orderId: string) => {
     const response = await backendService.post(`/${LUNCHPAD_CONTROLLER}/${orderId}/cancel-order`);
+    return response.data;
+};
+
+export const updateLaunchpad = async (
+    id: string,
+    params: Omit<CreateLunchpadOrderParams, 'ticker'>,
+): Promise<ClientSideLunchpadWithStatus> => {
+    const response = await backendService.post(`/${LUNCHPAD_CONTROLLER}/${id}/update`, params);
+    return response.data;
+};
+
+export const estimateKasRequirement = async (id: string): Promise<ClientSideLunchpadWithStatus> => {
+    const response = await backendService.get(`/${LUNCHPAD_CONTROLLER}/${id}/estimate-kas`);
+    return response.data;
+};
+export const isWhitelisted = async (ticker: string): Promise<ClientSideLunchpadWithStatus> => {
+    const response = await backendService.get(`/${LUNCHPAD_CONTROLLER}/${ticker}/is-whitelisted`);
     return response.data;
 };

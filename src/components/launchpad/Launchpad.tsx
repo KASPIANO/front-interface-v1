@@ -8,16 +8,19 @@ import {
     CircularProgress,
     useTheme,
     TextField,
+    Tooltip,
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import {
     useCancelOrder,
     useCreateLaunchpadOrder,
+    useIsWhitelisted,
     useLaunchpad,
     useVerifyAndProcessOrder,
 } from '../../DAL/LaunchPadQueries';
 import { showGlobalSnackbar } from '../alert-context/AlertContext';
 import { sendKaspa } from '../../utils/KaswareUtils';
+import { handleLaunchpadError } from '../../utils/ErrorHandling';
 
 type LaunchpadProps = {
     walletBalance: number;
@@ -32,6 +35,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
     const { ticker } = useParams();
     const { walletBalance, backgroundBlur, walletConnected } = props;
     const { data: launchpad, isLoading, error } = useLaunchpad(ticker);
+    const { data: allowed, isLoading: whitelistLoading } = useIsWhitelisted(ticker);
     const createOrderMutation = useCreateLaunchpadOrder(ticker);
     const verifyAndProcessMutation = useVerifyAndProcessOrder(ticker);
     const cancelOrderMutation = useCancelOrder(ticker);
@@ -114,6 +118,20 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
         }
     }, [selectedUnits, launchpad]);
 
+    useEffect(() => {
+        if (launchpad && !whitelistLoading && !allowed.success) {
+            const simulatedError = {
+                response: {
+                    data: {
+                        success: false, // Explicitly indicate failure
+                        errorCode: allowed.errorCode, // Default to the whitelist error code
+                    },
+                },
+            };
+            handleLaunchpadError(simulatedError);
+        }
+    }, [launchpad, whitelistLoading, allowed]);
+
     const handlePurchase = async () => {
         if (walletBalance < kaspaNeeded) {
             showGlobalSnackbar({
@@ -137,15 +155,21 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                         severity: 'warning',
                     });
                 }
-
+                setKaspaNeeded(updatedKaspaNeeded);
+                setTokensReceived(orderResult.lunchpadOrder.totalUnits * orderResult.lunchpadOrder.tokenPerUnit);
                 try {
                     const txData = await sendKaspa(launchpad.walletAddress, kaspaToSompi);
                     const parsedTxData = JSON.parse(txData);
                     const txId = parsedTxData.id;
-
-                    await handleVerifyAndProcess(orderResult.lunchpadOrder.id, txId);
+                    try {
+                        await verifyAndProcessMutation.mutateAsync({
+                            orderId: orderResult.lunchpadOrder.id,
+                            transactionId: txId,
+                        });
+                    } catch (error) {
+                        handleCleanFields();
+                    }
                 } catch (error) {
-                    console.error('Error sending Kaspa:', error);
                     showGlobalSnackbar({
                         message: 'Failed to send Kaspa. Please try again.',
                         severity: 'error',
@@ -153,47 +177,15 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                     // Optionally, you might want to cancel the order here
                     await handleCancelOrder(orderResult.lunchpadOrder.id);
                 }
+                handleCleanFields();
             } else {
-                showGlobalSnackbar({
-                    message: 'Failed to create order. Please try again.',
-                    severity: 'error',
-                });
                 handleCleanFields();
             }
         } catch (error) {
-            console.error('Error in purchase process:', error);
             showGlobalSnackbar({
                 message: 'An error occurred during the purchase. Please try again.',
                 severity: 'error',
             });
-            handleCleanFields();
-        }
-    };
-
-    const handleVerifyAndProcess = async (orderId: string, transactionId: string) => {
-        try {
-            const result = await verifyAndProcessMutation.mutateAsync({ orderId, transactionId });
-            if (result.success) {
-                handleCleanFields();
-                showGlobalSnackbar({
-                    message: 'Order processed successfully',
-                    severity: 'success',
-                });
-            } else {
-                showGlobalSnackbar({
-                    message: 'Failed to process order. Please contact support.',
-                    severity: 'error',
-                });
-                handleCancelOrder(orderId);
-                handleCleanFields();
-            }
-        } catch (error) {
-            console.error('Error verifying and processing order:', error);
-            showGlobalSnackbar({
-                message: 'Error processing order. Please try again or contact support.',
-                severity: 'error',
-            });
-            handleCancelOrder(orderId);
             handleCleanFields();
         }
     };
@@ -361,29 +353,46 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                         </Box>
 
                         {/* Purchase Button */}
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            sx={{ width: '100%' }}
-                            onClick={handlePurchase}
-                            disabled={
-                                selectedUnits > effectiveMaxUnits ||
-                                selectedUnits < launchpad.minUnitsPerOrder ||
-                                !walletConnected ||
-                                walletBalance < kaspaNeeded ||
-                                createOrderMutation.isPending ||
-                                verifyAndProcessMutation.isPending ||
-                                !!orderId
+                        <Tooltip
+                            title={
+                                !walletConnected
+                                    ? 'Please connect your wallet to proceed with the purchase.'
+                                    : !allowed.success
+                                      ? 'You are not whitelisted to participate in this launchpad.'
+                                      : ''
                             }
                         >
-                            {createOrderMutation.isPending
-                                ? 'Creating Order...'
-                                : verifyAndProcessMutation.isPending
-                                  ? 'Processing...'
-                                  : orderId
-                                    ? 'Order Pending'
-                                    : 'Purchase'}
-                        </Button>
+                            <span>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{ width: '100%' }}
+                                    onClick={handlePurchase}
+                                    disabled={
+                                        selectedUnits > effectiveMaxUnits ||
+                                        selectedUnits < launchpad.minUnitsPerOrder ||
+                                        !walletConnected ||
+                                        walletBalance < kaspaNeeded ||
+                                        createOrderMutation.isPending ||
+                                        verifyAndProcessMutation.isPending ||
+                                        !!orderId ||
+                                        !allowed.success
+                                    }
+                                >
+                                    {!allowed.success
+                                        ? 'User not in Whitelist'
+                                        : createOrderMutation.isPending
+                                          ? 'Creating Order...'
+                                          : verifyAndProcessMutation.isPending
+                                            ? 'Processing...'
+                                            : orderId
+                                              ? 'Order Pending'
+                                              : 'Purchase'}
+                                </Button>
+                            </span>
+                        </Tooltip>
+
+                        {/* Cancel Button */}
                     </>
                 ) : (
                     <Typography variant="h6" color="textSecondary" align="center">

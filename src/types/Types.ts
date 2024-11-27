@@ -519,6 +519,8 @@ export enum ErrorCodes {
     INVALID_SENDER_WALLET_KASPA_AMOUNT = 20010,
     LUNCHPAD_HAVE_OPEN_ORDERS = 20011,
     INVALID_WALLET_TYPE = 20012,
+    WALLET_NOT_IN_WHITELIST = 20013,
+    LUNCHPAD_WALLET_UNITS_EXCEEDS = 20014,
 
     INVALID_KASPA_AMOUNT = 30001,
     INVALID_BATCH_MINT_STATUS = 30002,
@@ -536,12 +538,14 @@ export const ERROR_MESSAGES: Record<ErrorCodes, string> = {
     [ErrorCodes.INVALID_ORDER_UNITS]: 'The order units are invalid.',
     [ErrorCodes.LUNCHPAD_UNITS_EXCEEDS]: 'The units exceed the allowed limit.',
     [ErrorCodes.INVALID_ORDER_STATUS]: 'Invalid order status.',
-    [ErrorCodes.TRANSACTION_VERIFICATION_FAILED]: 'Transaction verification failed.',
+    [ErrorCodes.TRANSACTION_VERIFICATION_FAILED]: 'Please verify the KAS was sent, if yes, then wait for tokens.',
     [ErrorCodes.TRANSACTION_DB_UPDATE_FAILED]: 'Failed to update transaction in the database.',
     [ErrorCodes.INVALID_USER_WALLET]: 'User wallet is invalid.',
     [ErrorCodes.INVALID_SENDER_WALLET_KASPA_AMOUNT]: 'The Launchpad wallet is missing Kaspa for Gas, Fund Gas.',
     [ErrorCodes.LUNCHPAD_HAVE_OPEN_ORDERS]: 'Lunchpad has open orders.',
     [ErrorCodes.INVALID_WALLET_TYPE]: 'The wallet type is invalid.',
+    [ErrorCodes.WALLET_NOT_IN_WHITELIST]: 'The wallet is not in the whitelist.',
+    [ErrorCodes.LUNCHPAD_WALLET_UNITS_EXCEEDS]: 'The wallet units exceed the allowed limit.',
 
     [ErrorCodes.INVALID_KASPA_AMOUNT]: 'Kaspa amount is invalid.',
     [ErrorCodes.INVALID_BATCH_MINT_STATUS]: 'Batch mint status is invalid.',
@@ -604,6 +608,9 @@ export type CreateLunchpadOrderParams = {
     maxFeeRatePerTransaction?: number;
     minUnitsPerOrder?: number;
     maxUnitsPerOrder?: number;
+    maxUnitsPerWallet?: number;
+    useWhitelist?: boolean;
+    whitelistWalletAddresses?: string[];
 };
 
 export enum LunchpadWalletType {
@@ -625,6 +632,9 @@ export type ClientSideLunchpadListItem = {
     kasPerUnit: number;
     tokenPerUnit: number;
     roundNumber: number;
+    maxUnitsPerWallet?: number;
+    useWhitelist?: boolean;
+    totalUnits: number;
 };
 
 export type ClientSideLunchpadListWithStatus = {

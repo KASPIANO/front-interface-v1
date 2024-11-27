@@ -15,6 +15,7 @@ import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
 import ExpandedView from './ExpandedLaunchpad';
 import { useQueryClient } from '@tanstack/react-query';
 import { convertToProtocolFormat } from '../../../utils/Utils';
+import LoadingSpinner from '../../common/spinner/LoadingSpinner';
 
 type LaunchpadCardProps = {
     ticker: string;
@@ -40,11 +41,20 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
     const [fundGasAmount, setFundGasAmount] = useState('');
     const [isTokensFunding, setIsTokensFunding] = useState(false);
     const [isGasFunding, setIsGasFunding] = useState(false);
-    const { data: expandedData, isLoading, error } = useLaunchpadOwnerInfo(ticker, walletAddress);
+    const [retrieveFundType, setRetrieveFundType] = useState('');
     const theme = useTheme();
-    const startLaunchpadMutation = useStartLaunchpad(ticker);
-    const stopLaunchpadMutation = useStopLaunchpad(ticker);
+    const startLaunchpadMutation = useStartLaunchpad(ticker, walletAddress);
+    const stopLaunchpadMutation = useStopLaunchpad(ticker, walletAddress);
     const retrieveFundsMutation = useRetrieveFunds(ticker);
+    const {
+        data: expandedData,
+        isLoading,
+        error,
+    } = useLaunchpadOwnerInfo(
+        ticker,
+        walletAddress,
+        isExpanded, // Pass the isExpanded state to control when the query runs
+    );
 
     const handleStartStop = () => {
         if (expandedData?.lunchpad.status === 'INACTIVE') {
@@ -54,8 +64,12 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
         }
     };
 
-    const handleRetrieveFunds = (walletType: LunchpadWalletType) => {
-        retrieveFundsMutation.mutate({ id: expandedData.lunchpad.id, walletType });
+    // cant withdraw if no gas + update if sent tokens
+
+    const handleRetrieveFunds = async (walletType: LunchpadWalletType) => {
+        setRetrieveFundType(walletType);
+        await retrieveFundsMutation.mutateAsync({ id: expandedData.lunchpad.id, walletType });
+        setRetrieveFundType('');
     };
 
     const handleExpand = () => {
@@ -98,8 +112,10 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
             };
             const jsonStringified = JSON.stringify(inscribeJsonString);
             await transferKRC20Token(jsonStringified);
-            queryClient.invalidateQueries({ queryKey: ['launchpadOwnerInfo', ticker] });
             showGlobalSnackbar({ message: 'Tokens funded successfully', severity: 'success' });
+            setTimeout(() => {
+                queryClient.invalidateQueries({ queryKey: ['launchpadOwnerInfo', ticker] });
+            }, 5000); // 5000 milliseconds = 5 seconds
         } catch (error) {
             console.error('Error funding tokens:', error);
             // Handle error (e.g., show an error message)
@@ -124,8 +140,10 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
         try {
             const sompiAmount = parseInt(fundGasAmount) * KASPA_TO_SOMPI;
             await sendKaspa(expandedData.lunchpad.senderWalletAddress, sompiAmount);
-            showGlobalSnackbar({ message: 'Tokens funded successfully', severity: 'success' });
-            queryClient.invalidateQueries({ queryKey: ['launchpadOwnerInfo', ticker] });
+            showGlobalSnackbar({ message: 'Kas funded successfully', severity: 'success' });
+            setTimeout(() => {
+                queryClient.invalidateQueries({ queryKey: ['launchpadOwnerInfo', ticker] });
+            }, 2000);
         } catch (error) {
             console.error('Error funding tokens:', error);
             // Handle error (e.g., show an error message)
@@ -174,7 +192,11 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
                                 },
                             }}
                         >
-                            <OpenWithRoundedIcon />
+                            {isLoading ? (
+                                <LoadingSpinner size={20} boxStyle={{ height: '2rem' }} />
+                            ) : (
+                                <OpenWithRoundedIcon />
+                            )}
                         </IconButton>
                     </Box>
 
@@ -192,7 +214,7 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
                     </Typography>
                 </CardContent>
             </Card>
-            {isExpanded && (
+            {isExpanded && !isLoading && (
                 <ExpandedView
                     isExpanded={isExpanded}
                     onClose={handleClose}
@@ -213,6 +235,7 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
                     stopLaunchpadMutation={stopLaunchpadMutation}
                     retrieveFundsMutation={retrieveFundsMutation}
                     theme={theme}
+                    retrieveFundType={retrieveFundType}
                 />
             )}
         </>
