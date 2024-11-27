@@ -32,8 +32,6 @@ interface BuyPanelProps {
 }
 
 const KASPA_TO_SOMPI = 100000000;
-const KASPIANO_TRADE_COMMISSION = import.meta.env.VITE_TRADE_COMMISSION;
-const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const { tokenInfo, walletBalance, walletConnected, kasPrice, walletAddress, setBuyPanelRef } = props;
     const [sortBy, setSortBy] = useState('pricePerToken');
@@ -46,7 +44,6 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const [isProcessingBuyOrder, setIsProcessingBuyOrder] = useState(false);
     const [waitingForWalletConfirmation, setWaitingForWalletConfirmation] = useState(false);
     const queryClient = useQueryClient();
-    const kaspianoCommissionInt = parseFloat(KASPIANO_TRADE_COMMISSION);
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isFetching } = useFetchOrders(
         tokenInfo,
@@ -64,11 +61,21 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                         }
                         setIsPanelOpen(false);
                         setSelectedOrder(null);
+                        localStorage.removeItem('orderId');
                     }
                 },
             });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedOrder, setBuyPanelRef]);
+
+    useEffect(() => {
+        if (selectedOrder) {
+            setIsPanelOpen(false);
+            setSelectedOrder(null);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [walletAddress]);
 
     useEffect(() => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -134,6 +141,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         }, 1000);
 
         return () => clearInterval(timer); // Cleanup on unmount
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedOrder]);
 
     const handleOrderSelect = async (order: Order) => {
@@ -146,9 +154,11 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     severity: 'error',
                 });
                 setSelectedOrder(null);
+                localStorage.removeItem('orderId');
                 setIsPanelOpen(false);
                 return;
             }
+            localStorage.setItem('orderId', order.orderId);
             setTempWalletAddress(temporaryWalletAddress);
             setIsPanelOpen(true);
         } catch (error) {
@@ -168,8 +178,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setPsktSeller(psktSeller);
             const orderDataKasplex = await checkOrderExists(
                 tokenInfo.ticker,
-                psktTransactionId,
                 sellerWalletAddress,
+                psktTransactionId,
             );
             if (orderDataKasplex.length === 0) {
                 showGlobalSnackbar({
@@ -275,6 +285,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setIsProcessingBuyOrder(false);
             setIsPanelOpen(false);
             setSelectedOrder(null);
+            localStorage.removeItem('orderId');
         } else {
             let errorMessage =
                 "Purchase failed in the process. Please wait 10 minutes and contact support if you didn't receive the tokens.";
@@ -291,6 +302,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setIsProcessingBuyOrder(false);
             setIsPanelOpen(false);
             setSelectedOrder(null);
+            localStorage.removeItem('orderId');
         }
     };
 
@@ -307,13 +319,9 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             return;
         }
         try {
-            const fee = kaspianoCommissionInt > 0 ? Math.max(order.totalPrice * kaspianoCommissionInt, 0.5) : 0;
-            const extraOutput = [{ address: KASPIANO_WALLET, amount: fee }];
             setWaitingForWalletConfirmation(true);
-            const finalFee = fee > 0 ? extraOutput : [];
 
-            txId = await buyOrderKRC20(psktSeller, finalFee);
-            console.log('txId', txId);
+            txId = await buyOrderKRC20(psktSeller);
 
             if (isEmptyString(txId)) {
                 throw new Error('paymentTxn is empty');
@@ -338,6 +346,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     },
                 );
             }
+            verifyDecentralizedOrder(order.orderId);
             setSelectedOrder(null);
             setIsPanelOpen(false);
             setWaitingForWalletConfirmation(false);
@@ -371,10 +380,9 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setSelectedOrder(null);
             setTimeout(() => {
                 queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker] });
-            }, 1300);
+            }, 1000);
         } else {
-            const errorMessage =
-                "Purchase failed in the process. Please wait 10 minutes and contact support if you didn't receive the tokens.";
+            const errorMessage = 'Purchase failed in the process';
 
             // if (priorityFeeTooHigh) {
             //     errorMessage =
@@ -398,6 +406,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
 
         setIsPanelOpen(false);
         setSelectedOrder(null);
+        localStorage.removeItem('orderId');
     };
 
     return (

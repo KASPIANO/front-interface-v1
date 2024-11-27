@@ -12,8 +12,8 @@ export const HighGasWarning: React.FC = () => (
     >
         <Tooltip title="Gas fees are currently high. It's recommended to wait for them to decrease. However, you can proceed if you accept the current fees.">
             <span style={{ display: 'flex', alignItems: 'center' }}>
-                <WarningIcon sx={{ color: 'orange', marginRight: '6px', fontSize: '0.8rem' }} />
-                <Typography variant="body2" sx={{ color: 'orange', fontWeight: 'bold', fontSize: '0.6rem' }}>
+                <WarningIcon sx={{ color: 'orange', marginRight: '6px', fontSize: '0.5rem' }} />
+                <Typography variant="body2" sx={{ color: 'orange', fontWeight: 'bold', fontSize: '0.5rem' }}>
                     High Gas Warning
                 </Typography>
             </span>

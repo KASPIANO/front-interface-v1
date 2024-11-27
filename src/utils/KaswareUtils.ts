@@ -239,6 +239,7 @@ export const createOrderKRC20 = async (
     krc20Tick: string,
     krc20Amount: number,
     kasAmount: number,
+    psktExtraOutput?: Array<{ address: string; amount: number }>,
 ): Promise<{ txJsonString: string; sendCommitTxId: string }> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     await versionCheck(PKST_VERSION);
@@ -249,6 +250,7 @@ export const createOrderKRC20 = async (
             krc20Tick,
             krc20Amount,
             kasAmount,
+            psktExtraOutput,
             priorityFee: kasPriorityFee,
         });
         return { txJsonString, sendCommitTxId };
