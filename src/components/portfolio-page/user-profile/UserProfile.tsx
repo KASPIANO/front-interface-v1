@@ -19,11 +19,12 @@ import { Stat, StatHelpText, StatNumber } from '@chakra-ui/react';
 import { showGlobalDialog } from '../../dialog-context/DialogContext';
 import { ContentCopyRounded as ContentCopyRoundedIcon } from '@mui/icons-material';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
-import { debounce } from 'lodash';
+import { debounce, set } from 'lodash';
 import { UserReferral } from '../../../types/Types';
 import SearchIcon from '@mui/icons-material/Search'; // Import the icon
 import { checkOrderExists } from '../../../DAL/Krc20DAL';
 import { cancelOrderKRC20 } from '../../../utils/KaswareUtils';
+import { getUserUnlistedTransactions } from '../../../DAL/BackendP2PDAL';
 
 interface UserProfileProps {
     walletAddress: string;
@@ -57,6 +58,8 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     const [ticker, setTicker] = useState('');
     const [orders, setOrders] = useState([]);
     const [psktTxId, setPsktTxId] = useState(null);
+    const [fetchingLostOrders, setFetchingLostORders] = useState(false);
+    const [recovering, setRecovering] = useState(false);
     // const [openXDialog, setOpenXDialog] = useState(false);
     // const [xUrl, setXUrl] = useState('');
     const debouncedSetCurrentWalletRef = useRef(null);
@@ -135,6 +138,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     const handleCopy = () => {
         navigator.clipboard.writeText(walletAddress);
     };
+
     const porfolioUSDValue = (portfolioValue * kasPrice).toFixed(2);
     // const arrowColor = portfolioValue.changeDirection === 'increase' ? 'green' : 'red';
 
@@ -145,9 +149,33 @@ const UserProfile: FC<UserProfileProps> = (props) => {
         'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-Icon-Dark-Green-on-White.png';
     const kaspaIcon = theme.palette.mode === 'dark' ? lightKaspaIcon : darkKaspaIcon;
 
+    const handlePsktRecovery = async () => {
+        try {
+            setFetchingLostORders(true); // Indicate fetching started
+
+            // Fetch orders
+            const result = await checkOrderExists(ticker, walletAddress);
+
+            // Extract uTxid array
+            const uTxidArray = result.map((item) => item.uTxid);
+            // Fetch lost orders
+            const lostOrders = await getUserUnlistedTransactions(uTxidArray);
+            if (lostOrders.length === 0) {
+                showGlobalSnackbar({ message: 'No Lost Orders', severity: 'warning' });
+            }
+            const matchingOrders = result.filter((item) => lostOrders.includes(item.uTxid));
+            setOrders(matchingOrders || []); // Update state with lost orders
+        } catch (error) {
+            console.error('Error during PSKT recovery:', error); // Log any error
+        } finally {
+            setFetchingLostORders(false); // Indicate fetching ended
+        }
+    };
+
     const handleRecovery = async () => {
         if (psktTxId) {
             try {
+                setRecovering(true);
                 const result = await cancelOrderKRC20(ticker, psktTxId);
 
                 if (result) {
@@ -164,15 +192,28 @@ const UserProfile: FC<UserProfileProps> = (props) => {
             } catch (error) {
                 showGlobalSnackbar({
                     message: 'An error occurred while recovering the order. Please try again.',
-                    severity: error.message,
+                    severity: 'error',
                 });
+                console.error('Recovery Error:', error); // Log error for debugging
+            } finally {
+                // Always close the dialog, even if there's an error
+                handleCloseDialog();
             }
         } else {
             showGlobalSnackbar({
                 message: 'No transaction ID provided for recovery.',
                 severity: 'warning',
             });
+            handleCloseDialog(); // Close the dialog even if no transaction ID is provided
         }
+    };
+
+    const handleCloseDialog = () => {
+        setDialogOpen(false);
+        setRecovering(false);
+        setFetchingLostORders(false);
+        setTicker('');
+        setPsktTxId('');
     };
 
     return (
@@ -309,7 +350,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                     {portfolioValue.change}% */}
                 </StatHelpText>
             </Stat>
-            <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth>
+            <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth>
                 <DialogTitle
                     sx={{
                         paddingBottom: '0.5rem',
@@ -331,14 +372,8 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         onChange={(e) => setTicker(e.target.value)}
                         sx={{ marginBottom: '0.7rem' }}
                     />
-                    <Button
-                        variant="contained"
-                        onClick={async () => {
-                            const result = await checkOrderExists(ticker, walletAddress);
-                            setOrders(result || []);
-                        }}
-                    >
-                        Fetch Orders
+                    <Button variant="contained" onClick={handlePsktRecovery}>
+                        {fetchingLostOrders ? 'Fetching..' : 'Fetch Orders'}
                     </Button>
                     <Box sx={{ marginTop: '1rem' }}>
                         {orders.map((order, index) => (
@@ -353,6 +388,8 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                                     border: '1px solid #ccc',
                                     borderRadius: '4px',
                                     cursor: 'pointer',
+                                    borderColor: psktTxId === order.uTxid ? theme.palette.primary.main : '#ccc', // Border color for selected order
+                                    transition: 'background-color 0.3s, border-color 0.3s', // Smooth transition for better UI
                                 }}
                                 onClick={() => setPsktTxId(order.uTxid)}
                             >
@@ -367,9 +404,9 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         paddingTop: 0,
                     }}
                 >
-                    <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+                    <Button onClick={handleCloseDialog}>Cancel</Button>
                     <Button variant="contained" onClick={handleRecovery} disabled={!psktTxId}>
-                        Recover
+                        {recovering ? 'Recovering..' : 'Recover'}
                     </Button>
                 </DialogActions>
             </Dialog>
