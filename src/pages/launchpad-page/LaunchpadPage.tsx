@@ -75,7 +75,7 @@ const LaunchpadPage: FC<LaunchpadPageProps> = (props) => {
                     <LaunchpadList />
                 </TabPanel>
                 <TabPanel value="2">
-                    <CreateLaunchpadForm walletConnected={walletConnected} />
+                    <CreateLaunchpadForm walletConnected={walletConnected} handleTabChange={handleTabChange} />
                 </TabPanel>
                 <TabPanel value="3">
                     <OwnerLaunchpadPage walletAddress={walletAddress} walletConnected={walletConnected} />

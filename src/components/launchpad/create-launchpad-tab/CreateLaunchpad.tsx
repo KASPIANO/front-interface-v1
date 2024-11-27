@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, SyntheticEvent, useState } from 'react';
 import {
     TextField,
     Tooltip,
@@ -28,9 +28,10 @@ import CreateLaunchpadGuideDialog from '../guides/CreateLaunchpadGuide';
 
 interface CreateLaunchpadFormProps {
     walletConnected: boolean;
+    handleTabChange: (_event: SyntheticEvent, index: string) => void;
 }
 
-const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected }) => {
+const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected, handleTabChange }) => {
     const [ticker, setTicker] = useState('');
     const [kasPerBatch, setKasPerBatch] = useState('');
     const [tokensPerBatch, setTokensPerBatch] = useState('');
@@ -141,17 +142,24 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected }) 
         };
 
         if (Object.values(errors).every((error) => !error)) {
-            createLaunchpadMutation.mutate({
-                ticker: ticker.toUpperCase(),
-                kasPerUnit: Number(kasPerBatch),
-                tokenPerUnit: Number(tokensPerBatch),
-                maxFeeRatePerTransaction: maxFeeRate ? Number(maxFeeRate) : undefined,
-                minUnitsPerOrder: minBatches ? Number(minBatches) : undefined,
-                maxUnitsPerOrder: maxBatches ? Number(maxBatches) : undefined,
-                maxUnitsPerWallet: limitPerWallet ? Number(limitPerWallet) : undefined,
-                useWhitelist: whitelistEnabled,
-                whitelistWalletAddresses: recipientList,
-            });
+            createLaunchpadMutation.mutate(
+                {
+                    ticker: ticker.toUpperCase(),
+                    kasPerUnit: Number(kasPerBatch),
+                    tokenPerUnit: Number(tokensPerBatch),
+                    maxFeeRatePerTransaction: maxFeeRate ? Number(maxFeeRate) : undefined,
+                    minUnitsPerOrder: minBatches ? Number(minBatches) : undefined,
+                    maxUnitsPerOrder: maxBatches ? Number(maxBatches) : undefined,
+                    maxUnitsPerWallet: limitPerWallet ? Number(limitPerWallet) : undefined,
+                    useWhitelist: whitelistEnabled,
+                    whitelistWalletAddresses: recipientList,
+                },
+                {
+                    onSuccess: () => {
+                        handleTabChange({} as SyntheticEvent, '3'); // Navigate to the respective tab on success
+                    },
+                },
+            );
         }
     };
 

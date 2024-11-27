@@ -6,6 +6,7 @@ import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
 import { formatNumberWithCommas } from '../../../utils/Utils';
 import LaunchpadUsageGuide from '../guides/LaunchpadUsageGuide';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { fetchReceivingBalance } from '../../../DAL/Krc20DAL';
 
 const ExpandedView: React.FC<{
     isExpanded: boolean;
@@ -55,6 +56,7 @@ const ExpandedView: React.FC<{
     const [kasWalletBalance, setKasWalletBalance] = useState(0);
     const [raisedFunds, setRaisedFunds] = useState(0);
     const [isGuideOpen, setIsGuideOpen] = useState(false);
+    const [ableTostart, setAbleToStart] = useState(false);
 
     useEffect(() => {
         if (expandedData && expandedData.success) {
@@ -71,6 +73,25 @@ const ExpandedView: React.FC<{
             });
         }
     }, [expandedData, retrieveFundsMutation]);
+
+    useEffect(() => {
+        const checkStartConditions = async () => {
+            if (expandedData && expandedData.success) {
+                try {
+                    const krc20Balance = await fetchReceivingBalance(
+                        expandedData.lunchpad.senderWalletAddress,
+                        expandedData.lunchpad.ticker,
+                    );
+                    setAbleToStart(expandedData.lunchpad.status === 'INACTIVE' && krc20Balance > 0);
+                } catch (error) {
+                    console.error('Error fetching balance:', error);
+                }
+            }
+        };
+
+        checkStartConditions();
+    }, [expandedData]);
+
     return (
         <Modal
             open={isExpanded}
@@ -174,7 +195,11 @@ const ExpandedView: React.FC<{
                                     sx={{ fontSize: '0.75rem', minWidth: '9rem' }}
                                     variant="contained"
                                     onClick={handleStartStop}
-                                    disabled={startLaunchpadMutation.isPending || stopLaunchpadMutation.isPending}
+                                    disabled={
+                                        startLaunchpadMutation.isPending ||
+                                        stopLaunchpadMutation.isPending ||
+                                        !ableTostart
+                                    }
                                 >
                                     {startLaunchpadMutation.isPending || stopLaunchpadMutation.isPending
                                         ? expandedData.lunchpad.status === 'INACTIVE'

@@ -43,12 +43,12 @@ export const useGetOwnerLaunchpads = (
         staleTime: 70000, // Consider data fresh for 1 minute
     });
 
-export const useLaunchpadOwnerInfo = (ticker: string, walletAddress: string) =>
+export const useLaunchpadOwnerInfo = (ticker: string, walletAddress: string, expanded = false) =>
     useQuery({
         queryKey: ['launchpadOwnerInfo', ticker, walletAddress],
         queryFn: () => getLaunchpadForOwner(ticker),
         // Only run the query if ticker is provided
-        enabled: !!ticker,
+        enabled: !!ticker && expanded,
         // You can add more options here, such as:
         staleTime: 60000, // Consider data fresh for 1 minute
         refetchInterval: 300000, // Refetch every 5 minutes
