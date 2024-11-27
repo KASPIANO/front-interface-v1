@@ -964,7 +964,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                             </Button>
                         </UploadButton>
                         <Typography variant="caption" color="text.secondary">
-                            Recommended size: 350x150 pixels. Max file size: 50MB.
+                            Recommended size: 9:5 ratio. Max file size: 50MB.
                         </Typography>
                         <Button
                             sx={{ width: '1vw', height: '2vw' }}

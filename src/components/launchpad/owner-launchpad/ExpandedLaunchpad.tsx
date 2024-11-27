@@ -4,6 +4,8 @@ import CloseIcon from '@mui/icons-material/CloseRounded';
 import { useEffect, useState } from 'react';
 import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
 import { formatNumberWithCommas } from '../../../utils/Utils';
+import LaunchpadUsageGuide from '../guides/LaunchpadUsageGuide';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 const ExpandedView: React.FC<{
     isExpanded: boolean;
@@ -52,6 +54,7 @@ const ExpandedView: React.FC<{
     const [isGasFieldOpen, setIsGasFieldOpen] = useState(false);
     const [kasWalletBalance, setKasWalletBalance] = useState(0);
     const [raisedFunds, setRaisedFunds] = useState(0);
+    const [isGuideOpen, setIsGuideOpen] = useState(false);
 
     useEffect(() => {
         if (expandedData && expandedData.success) {
@@ -115,8 +118,17 @@ const ExpandedView: React.FC<{
                                 <Typography variant="h5" component="h2" sx={{ fontWeight: 700 }}>
                                     {expandedData.lunchpad.ticker}
                                 </Typography>
+                                <Button
+                                    startIcon={<HelpOutlineIcon />}
+                                    variant="outlined"
+                                    color="primary"
+                                    onClick={() => setIsGuideOpen(true)}
+                                >
+                                    How to Use Launchpad
+                                </Button>
+
                                 <Typography variant="h6" component="h2" sx={{ fontWeight: 500 }}>
-                                    Raised Amount: {formatNumberWithCommas(raisedFunds)} Kas
+                                    Raised Amount: {formatNumberWithCommas(raisedFunds)} KAS
                                 </Typography>
                             </Box>
                             {/* ... (other Typography components) */}
@@ -327,6 +339,7 @@ const ExpandedView: React.FC<{
                         </Box>
                     )}
                 </Box>
+                <LaunchpadUsageGuide open={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
             </Box>
         </Modal>
     );

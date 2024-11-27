@@ -23,6 +23,8 @@ import { createLaunchpad } from '../../../DAL/BackendLunchpadDAL';
 import { parse } from 'papaparse'; // For CSV parsing
 import FileDownloadIconRounded from '@mui/icons-material/FileDownloadRounded';
 import { isValidWalletAddress } from '../../../utils/Utils';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import CreateLaunchpadGuideDialog from '../guides/CreateLaunchpadGuide';
 
 interface CreateLaunchpadFormProps {
     walletConnected: boolean;
@@ -40,6 +42,7 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected }) 
     const [open, setOpen] = useState(false);
     const [recipientList, setRecipientList] = useState([]);
     const [csvLoading, setCsvLoading] = useState(false);
+    const [openGuideDialog, setOpenGuideDialog] = useState(false);
 
     const [errors, setErrors] = useState({
         ticker: '',
@@ -146,6 +149,8 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected }) 
                 minUnitsPerOrder: minBatches ? Number(minBatches) : undefined,
                 maxUnitsPerOrder: maxBatches ? Number(maxBatches) : undefined,
                 maxUnitsPerWallet: limitPerWallet ? Number(limitPerWallet) : undefined,
+                useWhitelist: whitelistEnabled,
+                whitelistWalletAddresses: recipientList,
             });
         }
     };
@@ -159,6 +164,8 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected }) 
         setMaxBatches('');
         setLimitPerWallet('');
         setErrors({ ticker: '', kasPerBatch: '', tokensPerBatch: '' });
+        setWhitelistEnabled(false);
+        setRecipientList([]);
     };
 
     const handleDownloadRecipientList = () => {
@@ -173,9 +180,17 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected }) 
 
     return (
         <Box sx={{ padding: '30px', width: '100%' }}>
-            <Typography variant="h5" sx={{ marginBottom: 3 }}>
-                Create Launchpad
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
+                <Typography variant="h5">Create Launchpad</Typography>
+                <Button
+                    startIcon={<HelpOutlineIcon />}
+                    onClick={() => setOpenGuideDialog(true)}
+                    variant="outlined"
+                    color="primary"
+                >
+                    Create Launchpad Guide
+                </Button>
+            </Box>
             <Grid container spacing={2}>
                 <Grid item xs={6}>
                     <TextField
@@ -197,7 +212,7 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected }) 
                             ),
                         }}
                         error={!!errors.ticker}
-                        helperText={errors.ticker}
+                        helperText={errors.ticker || 'Required'}
                     />
                 </Grid>
                 <Grid item xs={6}>
@@ -220,7 +235,7 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected }) 
                             ),
                         }}
                         error={!!errors.kasPerBatch}
-                        helperText={errors.kasPerBatch}
+                        helperText={errors.kasPerBatch || 'Required'}
                     />
                 </Grid>
                 <Grid item xs={6}>
@@ -243,7 +258,7 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected }) 
                             ),
                         }}
                         error={!!errors.tokensPerBatch}
-                        helperText={errors.tokensPerBatch}
+                        helperText={errors.tokensPerBatch || 'Required'}
                     />
                 </Grid>
                 <Grid item xs={6}>
@@ -318,24 +333,7 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected }) 
                         }}
                     />
                 </Grid>
-                <Grid item xs={6}>
-                    <TextField
-                        label="Limit Batches Per Wallet"
-                        fullWidth
-                        value={maxBatches}
-                        onChange={(e) => setMaxBatches(e.target.value)}
-                        placeholder="Limit Batches Per Wallet"
-                        InputProps={{
-                            endAdornment: (
-                                <Tooltip title="Maximum number of Mints/Batches/Purchases a single Wallet can do.">
-                                    <IconButton>
-                                        <InfoOutlinedIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
-                            ),
-                        }}
-                    />
-                </Grid>
+
                 <Grid item xs={6}>
                     <Tooltip title="Enable whitelist to restrict purchases to specific wallet addresses.">
                         <FormControlLabel
@@ -428,6 +426,7 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected }) 
                       ? 'Creating Launchpad...'
                       : 'Submit'}
             </Button>
+            <CreateLaunchpadGuideDialog open={openGuideDialog} onClose={() => setOpenGuideDialog(false)} />
             {createLaunchpadMutation.isSuccess && (
                 <Dialog open={open} onClose={() => setOpen(false)}>
                     <DialogTitle>Success!</DialogTitle>
