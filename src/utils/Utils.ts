@@ -347,3 +347,13 @@ export const ANIMAL_EMOJIS = {
     chipmunk: '🐿️',
     hedgehog: '🦔',
 };
+
+// utils/feeCalculations.ts
+
+export const KASPA_TRANSACTION_MASS = 1;
+export const KRC20_TRANSACTION_MASS = 2;
+
+export const calculateFee = (txType: 'KAS' | 'KRC20', feerate: number): number => {
+    const mass = txType === 'KAS' ? KASPA_TRANSACTION_MASS : KRC20_TRANSACTION_MASS;
+    return mass * feerate;
+};
