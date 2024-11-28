@@ -200,7 +200,11 @@ export const deployKRC20Token = async (inscribeJsonString: string): Promise<stri
 
 // Method to mint KRC20 token
 // PRIORITY FEE KAS
-export const mintKRC20Token = async (inscribeJsonString: string, ticker: string): Promise<string> => {
+export const mintKRC20Token = async (
+    inscribeJsonString: string,
+    ticker: string,
+    priorityFee?: number,
+): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
         const mintsLeft = await getTokenMintsLeft(ticker);
@@ -208,8 +212,7 @@ export const mintKRC20Token = async (inscribeJsonString: string, ticker: string)
         if (mintsLeft <= 0) {
             throw new Error(`Minting for the ${ticker} token has ended`);
         }
-        const priorityFee = await getPriorityFee('TRANSFER');
-        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
+        const kasPriorityFee = priorityFee ? priorityFee * 1e8 : null;
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, '', kasPriorityFee);
         saveMintData(ticker);
         return txid;

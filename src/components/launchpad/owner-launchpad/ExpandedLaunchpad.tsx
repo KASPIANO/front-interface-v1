@@ -156,7 +156,7 @@ const ExpandedView: React.FC<{
                                 <Button
                                     sx={{
                                         '& .MuiSvgIcon-root': {
-                                            fontSize: '0.9rem',
+                                            fontSize: '0.8rem',
                                         },
                                         fontSize: '0.75rem',
                                     }}
