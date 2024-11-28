@@ -6,7 +6,7 @@ import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
 import { formatNumberWithCommas } from '../../../utils/Utils';
 import LaunchpadUsageGuide from '../guides/LaunchpadUsageGuide';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { fetchReceivingBalance } from '../../../DAL/Krc20DAL';
+import { fetchWalletKRC20Balance } from '../../../DAL/Krc20DAL';
 
 const ExpandedView: React.FC<{
     isExpanded: boolean;
@@ -57,6 +57,8 @@ const ExpandedView: React.FC<{
     const [raisedFunds, setRaisedFunds] = useState(0);
     const [isGuideOpen, setIsGuideOpen] = useState(false);
     const [ableTostart, setAbleToStart] = useState(false);
+    const [fundedTokens, setFundedTokens] = useState(false);
+    const [krc20Balance, setKrc20Balance] = useState(expandedData.lunchpad.krc20TokensAmount || 0);
 
     useEffect(() => {
         if (expandedData && expandedData.success) {
@@ -78,19 +80,31 @@ const ExpandedView: React.FC<{
         const checkStartConditions = async () => {
             if (expandedData && expandedData.success) {
                 try {
-                    const krc20Balance = await fetchReceivingBalance(
+                    const krc20BalanceReq = await fetchWalletKRC20Balance(
                         expandedData.lunchpad.senderWalletAddress,
                         expandedData.lunchpad.ticker,
                     );
-                    setAbleToStart(expandedData.lunchpad.status === 'INACTIVE' && krc20Balance > 0);
+                    setKrc20Balance(krc20BalanceReq);
+                    setAbleToStart(expandedData.lunchpad.status === 'INACTIVE' && krc20BalanceReq > 0);
                 } catch (error) {
                     console.error('Error fetching balance:', error);
                 }
             }
         };
 
-        checkStartConditions();
-    }, [expandedData]);
+        const timeout = setTimeout(() => {
+            checkStartConditions();
+        }, 7000); // 7-second delay
+
+        return () => clearTimeout(timeout); // Cleanup timeout on component unmount or dependency change
+    }, [expandedData, fundedTokens]);
+
+    const fundHandler = async () => {
+        if (fundTokensAmount) {
+            setFundedTokens((prev) => !prev);
+            handleFund('tokens');
+        }
+    };
 
     return (
         <Modal
@@ -140,6 +154,12 @@ const ExpandedView: React.FC<{
                                     {expandedData.lunchpad.ticker}
                                 </Typography>
                                 <Button
+                                    sx={{
+                                        '& .MuiSvgIcon-root': {
+                                            fontSize: '0.9rem',
+                                        },
+                                        fontSize: '0.75rem',
+                                    }}
                                     startIcon={<HelpOutlineIcon />}
                                     variant="outlined"
                                     color="primary"
@@ -148,7 +168,7 @@ const ExpandedView: React.FC<{
                                     How to Use Launchpad
                                 </Button>
 
-                                <Typography variant="h6" component="h2" sx={{ fontWeight: 500 }}>
+                                <Typography variant="h6" component="h2" sx={{ fontWeight: 600, fontSize: '1rem' }}>
                                     Raised Amount: {formatNumberWithCommas(raisedFunds)} KAS
                                 </Typography>
                             </Box>
@@ -178,8 +198,7 @@ const ExpandedView: React.FC<{
                                 Max Units per Order: {expandedData.lunchpad.maxUnitsPerOrder || 'N/A'}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                KRC20 Tokens Amount in Launchpad:{' '}
-                                {expandedData.lunchpad.krc20TokensAmount || 'N/A'}
+                                KRC20 Tokens Amount in Launchpad: {krc20Balance}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
                                 Kas Amount in Launchpad: {kasWalletBalance.toFixed(4) || 'N/A'}
@@ -190,25 +209,42 @@ const ExpandedView: React.FC<{
                             <Typography sx={{ fontSize: '1rem' }}>
                                 Open Orders: {expandedData.lunchpad.openOrders || 'N/A'}
                             </Typography>
+                            <Typography sx={{ fontSize: '1rem' }}>
+                                Whitelist Status: {expandedData.lunchpad.useWhitelist ? 'Enabled' : 'Disabled'}
+                            </Typography>
                             <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                                <Button
-                                    sx={{ fontSize: '0.75rem', minWidth: '9rem' }}
-                                    variant="contained"
-                                    onClick={handleStartStop}
-                                    disabled={
-                                        startLaunchpadMutation.isPending ||
-                                        stopLaunchpadMutation.isPending ||
-                                        !ableTostart
+                                <Tooltip
+                                    title={
+                                        krc20Balance === 0
+                                            ? 'You need to have KRC20 tokens in the launchpad to start it.'
+                                            : kasWalletBalance === 0
+                                              ? 'You need to send gas fees (Kas) to start the launchpad.'
+                                              : ''
                                     }
+                                    arrow
                                 >
-                                    {startLaunchpadMutation.isPending || stopLaunchpadMutation.isPending
-                                        ? expandedData.lunchpad.status === 'INACTIVE'
-                                            ? 'Starting...'
-                                            : 'Stopping...'
-                                        : expandedData.lunchpad.status === 'INACTIVE'
-                                          ? 'Start Launchpad'
-                                          : 'Stop Launchpad'}
-                                </Button>
+                                    <span>
+                                        <Button
+                                            sx={{ fontSize: '0.75rem', minWidth: '9rem' }}
+                                            variant="contained"
+                                            onClick={handleStartStop}
+                                            disabled={
+                                                startLaunchpadMutation.isPending ||
+                                                stopLaunchpadMutation.isPending ||
+                                                !ableTostart
+                                            }
+                                        >
+                                            {startLaunchpadMutation.isPending || stopLaunchpadMutation.isPending
+                                                ? expandedData.lunchpad.status === 'INACTIVE'
+                                                    ? 'Starting...'
+                                                    : 'Stopping...'
+                                                : expandedData.lunchpad.status === 'INACTIVE'
+                                                  ? 'Start Launchpad'
+                                                  : 'Stop Launchpad'}
+                                        </Button>
+                                    </span>
+                                </Tooltip>
+
                                 <Tooltip
                                     title={
                                         expandedData.lunchpad.status === 'ACTIVE'
@@ -276,7 +312,12 @@ const ExpandedView: React.FC<{
                     }}
                 >
                     {!isTokensFieldOpen ? (
-                        <Button variant="contained" fullWidth onClick={() => setIsTokensFieldOpen(true)}>
+                        <Button
+                            sx={{ fontSize: '0.7rem', padding: '5px' }}
+                            variant="contained"
+                            fullWidth
+                            onClick={() => setIsTokensFieldOpen(true)}
+                        >
                             Fund Tokens
                         </Button>
                     ) : (
@@ -289,6 +330,7 @@ const ExpandedView: React.FC<{
                                 boxShadow: 1,
                                 display: 'flex',
                                 flexDirection: 'column',
+                                maxHeight: '10rem',
                             }}
                         >
                             <Box
@@ -324,7 +366,7 @@ const ExpandedView: React.FC<{
                                 <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end' }}>
                                     <Button
                                         sx={{ padding: 0.2 }}
-                                        onClick={() => handleFund('tokens')}
+                                        onClick={fundHandler}
                                         variant="contained"
                                         disabled={isTokensFunding || expandedData.lunchpad.status === 'ACTIVE'}
                                     >
@@ -335,7 +377,12 @@ const ExpandedView: React.FC<{
                         </Box>
                     )}
                     {!isGasFieldOpen ? (
-                        <Button variant="contained" fullWidth onClick={() => setIsGasFieldOpen(true)}>
+                        <Button
+                            variant="contained"
+                            fullWidth
+                            onClick={() => setIsGasFieldOpen(true)}
+                            sx={{ fontSize: '0.7rem', padding: '5px' }}
+                        >
                             Fund Gas Fees
                         </Button>
                     ) : (
@@ -348,6 +395,7 @@ const ExpandedView: React.FC<{
                                 boxShadow: 1,
                                 display: 'flex',
                                 flexDirection: 'column',
+                                maxHeight: '10rem',
                             }}
                         >
                             <Box

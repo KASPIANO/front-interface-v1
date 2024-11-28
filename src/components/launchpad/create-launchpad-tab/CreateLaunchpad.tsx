@@ -25,13 +25,19 @@ import FileDownloadIconRounded from '@mui/icons-material/FileDownloadRounded';
 import { isValidWalletAddress } from '../../../utils/Utils';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import CreateLaunchpadGuideDialog from '../guides/CreateLaunchpadGuide';
+import { fetchWalletKRC20Balance } from '../../../DAL/Krc20DAL';
 
 interface CreateLaunchpadFormProps {
     walletConnected: boolean;
     handleTabChange: (_event: SyntheticEvent, index: string) => void;
+    walletAddress: string;
 }
 
-const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected, handleTabChange }) => {
+const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({
+    walletConnected,
+    handleTabChange,
+    walletAddress,
+}) => {
     const [ticker, setTicker] = useState('');
     const [kasPerBatch, setKasPerBatch] = useState('');
     const [tokensPerBatch, setTokensPerBatch] = useState('');
@@ -134,13 +140,20 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({ walletConnected, ha
         document.body.removeChild(link);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const errors = {
             ticker: validateField('ticker', ticker),
             kasPerBatch: validateField('kasPerBatch', kasPerBatch),
             tokensPerBatch: validateField('tokensPerBatch', tokensPerBatch),
         };
-
+        const balance = await fetchWalletKRC20Balance(walletAddress, ticker);
+        if (balance === 0) {
+            showGlobalSnackbar({
+                message: 'Insufficient balance of tokens to create launchpad',
+                severity: 'error',
+            });
+            return;
+        }
         if (Object.values(errors).every((error) => !error)) {
             createLaunchpadMutation.mutate(
                 {
