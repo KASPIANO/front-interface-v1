@@ -499,6 +499,8 @@ export type ClientSideLunchpad = {
     krc20TokensAmount?: number;
     requiredKaspa?: number;
     openOrders?: number;
+    useWhitelist?: boolean;
+    whitelistWalletAddresses?: string[];
 };
 
 export enum ErrorCodes {

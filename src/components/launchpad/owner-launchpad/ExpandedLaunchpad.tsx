@@ -57,6 +57,8 @@ const ExpandedView: React.FC<{
     const [raisedFunds, setRaisedFunds] = useState(0);
     const [isGuideOpen, setIsGuideOpen] = useState(false);
     const [ableTostart, setAbleToStart] = useState(false);
+    const [fundedTokens, setFundedTokens] = useState(false);
+    const [krc20Balance, setKrc20Balance] = useState(expandedData.lunchpad.krc20TokensAmount || 0);
 
     useEffect(() => {
         if (expandedData && expandedData.success) {
@@ -78,19 +80,31 @@ const ExpandedView: React.FC<{
         const checkStartConditions = async () => {
             if (expandedData && expandedData.success) {
                 try {
-                    const krc20Balance = await fetchReceivingBalance(
+                    const krc20BalanceReq = await fetchReceivingBalance(
                         expandedData.lunchpad.senderWalletAddress,
                         expandedData.lunchpad.ticker,
                     );
-                    setAbleToStart(expandedData.lunchpad.status === 'INACTIVE' && krc20Balance > 0);
+                    setKrc20Balance(krc20BalanceReq);
+                    setAbleToStart(expandedData.lunchpad.status === 'INACTIVE' && krc20BalanceReq > 0);
                 } catch (error) {
                     console.error('Error fetching balance:', error);
                 }
             }
         };
 
-        checkStartConditions();
-    }, [expandedData]);
+        const timeout = setTimeout(() => {
+            checkStartConditions();
+        }, 7000); // 7-second delay
+
+        return () => clearTimeout(timeout); // Cleanup timeout on component unmount or dependency change
+    }, [expandedData, fundedTokens]);
+
+    const fundHandler = async () => {
+        if (fundTokensAmount) {
+            setFundedTokens((prev) => !prev);
+            handleFund('tokens');
+        }
+    };
 
     return (
         <Modal
@@ -140,6 +154,12 @@ const ExpandedView: React.FC<{
                                     {expandedData.lunchpad.ticker}
                                 </Typography>
                                 <Button
+                                    sx={{
+                                        '& .MuiSvgIcon-root': {
+                                            fontSize: '0.9rem',
+                                        },
+                                        fontSize: '0.75rem',
+                                    }}
                                     startIcon={<HelpOutlineIcon />}
                                     variant="outlined"
                                     color="primary"
@@ -148,7 +168,7 @@ const ExpandedView: React.FC<{
                                     How to Use Launchpad
                                 </Button>
 
-                                <Typography variant="h6" component="h2" sx={{ fontWeight: 500 }}>
+                                <Typography variant="h6" component="h2" sx={{ fontWeight: 600, fontSize: '1rem' }}>
                                     Raised Amount: {formatNumberWithCommas(raisedFunds)} KAS
                                 </Typography>
                             </Box>
@@ -178,8 +198,7 @@ const ExpandedView: React.FC<{
                                 Max Units per Order: {expandedData.lunchpad.maxUnitsPerOrder || 'N/A'}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                KRC20 Tokens Amount in Launchpad:{' '}
-                                {expandedData.lunchpad.krc20TokensAmount || 'N/A'}
+                                KRC20 Tokens Amount in Launchpad: {krc20Balance || 0}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
                                 Kas Amount in Launchpad: {kasWalletBalance.toFixed(4) || 'N/A'}
@@ -189,6 +208,9 @@ const ExpandedView: React.FC<{
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
                                 Open Orders: {expandedData.lunchpad.openOrders || 'N/A'}
+                            </Typography>
+                            <Typography sx={{ fontSize: '1rem' }}>
+                                Whitelist Status: {expandedData.lunchpad.useWhitelist ? 'Enabled' : 'Disabled'}
                             </Typography>
                             <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
                                 <Button
@@ -289,6 +311,7 @@ const ExpandedView: React.FC<{
                                 boxShadow: 1,
                                 display: 'flex',
                                 flexDirection: 'column',
+                                maxHeight: '10rem',
                             }}
                         >
                             <Box
@@ -324,7 +347,7 @@ const ExpandedView: React.FC<{
                                 <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end' }}>
                                     <Button
                                         sx={{ padding: 0.2 }}
-                                        onClick={() => handleFund('tokens')}
+                                        onClick={fundHandler}
                                         variant="contained"
                                         disabled={isTokensFunding || expandedData.lunchpad.status === 'ACTIVE'}
                                     >
@@ -348,6 +371,7 @@ const ExpandedView: React.FC<{
                                 boxShadow: 1,
                                 display: 'flex',
                                 flexDirection: 'column',
+                                maxHeight: '10rem',
                             }}
                         >
                             <Box
