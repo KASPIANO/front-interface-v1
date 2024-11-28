@@ -6,15 +6,6 @@ import {
 } from '../types/Types';
 import { KRC20InfoService } from './AxiosInstaces';
 
-export const fetchReceivingBalance = async (address: string, tokenSymbol: string): Promise<number> => {
-    try {
-        const response = await KRC20InfoService.get<any>(`krc20/address/${address}/token/${tokenSymbol}`);
-        return response.data.balance / 1e8;
-    } catch (error) {
-        console.error('Error fetching receiving balance:', error);
-        return 0;
-    }
-};
 export const checkOrderExists = async (tokenSymbol: string, address: string, txId?: string): Promise<any> => {
     const txidString = txId ? `&txid=${txId}` : '';
     try {

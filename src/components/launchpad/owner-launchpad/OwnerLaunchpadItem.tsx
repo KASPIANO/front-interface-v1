@@ -115,7 +115,7 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
             showGlobalSnackbar({ message: 'Tokens funded successfully', severity: 'success' });
             setTimeout(() => {
                 queryClient.invalidateQueries({ queryKey: ['launchpadOwnerInfo', ticker] });
-            }, 5000); // 5000 milliseconds = 5 seconds
+            }, 7000); // 5000 milliseconds = 5 seconds
         } catch (error) {
             console.error('Error funding tokens:', error);
             // Handle error (e.g., show an error message)

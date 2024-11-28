@@ -6,7 +6,7 @@ import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
 import { formatNumberWithCommas } from '../../../utils/Utils';
 import LaunchpadUsageGuide from '../guides/LaunchpadUsageGuide';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { fetchReceivingBalance } from '../../../DAL/Krc20DAL';
+import { fetchWalletKRC20Balance } from '../../../DAL/Krc20DAL';
 
 const ExpandedView: React.FC<{
     isExpanded: boolean;
@@ -80,7 +80,7 @@ const ExpandedView: React.FC<{
         const checkStartConditions = async () => {
             if (expandedData && expandedData.success) {
                 try {
-                    const krc20BalanceReq = await fetchReceivingBalance(
+                    const krc20BalanceReq = await fetchWalletKRC20Balance(
                         expandedData.lunchpad.senderWalletAddress,
                         expandedData.lunchpad.ticker,
                     );
@@ -198,7 +198,7 @@ const ExpandedView: React.FC<{
                                 Max Units per Order: {expandedData.lunchpad.maxUnitsPerOrder || 'N/A'}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                KRC20 Tokens Amount in Launchpad: {krc20Balance || 0}
+                                KRC20 Tokens Amount in Launchpad: {krc20Balance}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
                                 Kas Amount in Launchpad: {kasWalletBalance.toFixed(4) || 'N/A'}
@@ -213,24 +213,38 @@ const ExpandedView: React.FC<{
                                 Whitelist Status: {expandedData.lunchpad.useWhitelist ? 'Enabled' : 'Disabled'}
                             </Typography>
                             <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                                <Button
-                                    sx={{ fontSize: '0.75rem', minWidth: '9rem' }}
-                                    variant="contained"
-                                    onClick={handleStartStop}
-                                    disabled={
-                                        startLaunchpadMutation.isPending ||
-                                        stopLaunchpadMutation.isPending ||
-                                        !ableTostart
+                                <Tooltip
+                                    title={
+                                        krc20Balance === 0
+                                            ? 'You need to have KRC20 tokens in the launchpad to start it.'
+                                            : kasWalletBalance === 0
+                                              ? 'You need to send gas fees (Kas) to start the launchpad.'
+                                              : ''
                                     }
+                                    arrow
                                 >
-                                    {startLaunchpadMutation.isPending || stopLaunchpadMutation.isPending
-                                        ? expandedData.lunchpad.status === 'INACTIVE'
-                                            ? 'Starting...'
-                                            : 'Stopping...'
-                                        : expandedData.lunchpad.status === 'INACTIVE'
-                                          ? 'Start Launchpad'
-                                          : 'Stop Launchpad'}
-                                </Button>
+                                    <span>
+                                        <Button
+                                            sx={{ fontSize: '0.75rem', minWidth: '9rem' }}
+                                            variant="contained"
+                                            onClick={handleStartStop}
+                                            disabled={
+                                                startLaunchpadMutation.isPending ||
+                                                stopLaunchpadMutation.isPending ||
+                                                !ableTostart
+                                            }
+                                        >
+                                            {startLaunchpadMutation.isPending || stopLaunchpadMutation.isPending
+                                                ? expandedData.lunchpad.status === 'INACTIVE'
+                                                    ? 'Starting...'
+                                                    : 'Stopping...'
+                                                : expandedData.lunchpad.status === 'INACTIVE'
+                                                  ? 'Start Launchpad'
+                                                  : 'Stop Launchpad'}
+                                        </Button>
+                                    </span>
+                                </Tooltip>
+
                                 <Tooltip
                                     title={
                                         expandedData.lunchpad.status === 'ACTIVE'
@@ -298,7 +312,12 @@ const ExpandedView: React.FC<{
                     }}
                 >
                     {!isTokensFieldOpen ? (
-                        <Button variant="contained" fullWidth onClick={() => setIsTokensFieldOpen(true)}>
+                        <Button
+                            sx={{ fontSize: '0.7rem', padding: '5px' }}
+                            variant="contained"
+                            fullWidth
+                            onClick={() => setIsTokensFieldOpen(true)}
+                        >
                             Fund Tokens
                         </Button>
                     ) : (
@@ -358,7 +377,12 @@ const ExpandedView: React.FC<{
                         </Box>
                     )}
                     {!isGasFieldOpen ? (
-                        <Button variant="contained" fullWidth onClick={() => setIsGasFieldOpen(true)}>
+                        <Button
+                            variant="contained"
+                            fullWidth
+                            onClick={() => setIsGasFieldOpen(true)}
+                            sx={{ fontSize: '0.7rem', padding: '5px' }}
+                        >
                             Fund Gas Fees
                         </Button>
                     ) : (
