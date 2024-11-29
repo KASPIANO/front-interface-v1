@@ -35,7 +35,6 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [priceCurrency, setPriceCurrency] = useState<'KAS' | 'USD'>('KAS');
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false); // Dialog state
     const [walletConfirmation, setWalletConfirmation] = useState<boolean>(false);
-    const [creatingSellOrder, setCreatingSellOrder] = useState<boolean>(false);
     const [disableSellButton, setDisableSellButton] = useState<boolean>(false);
     const [finishedSellOrder, setFinishedSellOrder] = useState<boolean>(false);
     const [amountError, setAmountError] = useState<string>('');
@@ -445,7 +444,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     cleanFields();
                     setTimeout(() => {
                         setFinishedSellOrder((prev) => !prev);
-                        setCreatingSellOrder(false); // Ensures it closes after a slight delay
+                        setWalletConfirmation(false); // Ensures it closes after a slight delay
                     }, 500);
                     showGlobalSnackbar({
                         message: 'Sell order Failed, it will be created in the background',
@@ -666,7 +665,6 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 </Tooltip>
             </StyledSellPanel>
             <ConfirmSellDialog
-                creatingSellOrder={creatingSellOrder}
                 waitingForWalletConfirmation={walletConfirmation}
                 open={isDialogOpen}
                 onClose={handleCloseDialog}

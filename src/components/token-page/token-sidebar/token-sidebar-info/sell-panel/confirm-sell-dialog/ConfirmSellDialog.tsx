@@ -25,7 +25,6 @@ interface ConfirmSellDialogProps {
     pricePerToken: string;
     priceCurrency: 'KAS' | 'USD';
     waitingForWalletConfirmation: boolean;
-    creatingSellOrder: boolean;
 }
 
 const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
@@ -39,13 +38,12 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
         totalPrice,
         pricePerToken,
         priceCurrency,
-        creatingSellOrder,
     } = props;
     const [onClickConfirm, setOnClickConfirm] = useState(false);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
     const handleClose = () => {
-        if (waitingForWalletConfirmation || creatingSellOrder || onClickConfirm) {
+        if (waitingForWalletConfirmation || onClickConfirm) {
             return; // Prevent closing if waiting
         }
         onClose();
@@ -82,8 +80,6 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                         size={60}
                         boxStyle={{ marginBottom: '1rem' }}
                     />
-                ) : creatingSellOrder ? (
-                    <LoadingSpinner title="Creating sell order..." size={60} boxStyle={{ marginBottom: '1rem' }} />
                 ) : (
                     <>
                         <Box sx={{ mt: 1 }}>
@@ -121,7 +117,7 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                     </>
                 )}
             </DialogContent>
-            {waitingForWalletConfirmation || creatingSellOrder ? null : (
+            {waitingForWalletConfirmation ? null : (
                 <DialogActions>
                     <Button onClick={onClose} disabled={onClickConfirm}>
                         Cancel
@@ -131,7 +127,7 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                         onClick={() => gasHandlerPurchase()}
                         variant="contained"
                         color="primary"
-                        disabled={waitingForWalletConfirmation || creatingSellOrder || onClickConfirm}
+                        disabled={waitingForWalletConfirmation || onClickConfirm}
                     >
                         {onClickConfirm ? 'Creating...' : 'Confirm'}
                     </Button>
