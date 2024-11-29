@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography, Button, IconButton, Tooltip, FormControlLabel, Checkbox, Link } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { DecentralizedOrder, MixedOrder, Order } from '../../../../../../types/Types';
 import { OrderDetailsItem, OrderItemPrimary } from './OrderDetails.s';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
-import { highGasLimitExceeded, highGasWarning } from '../../../../../../DAL/KaspaApiDal';
+import { highGasLimitExceeded, highGasWarning, kaspaFeeEstimate } from '../../../../../../DAL/KaspaApiDal';
 import { GasLimitExceeded } from '../../../../../common/HighGasLimitExceeded';
 import { HighGasWarning } from '../../../../../common/HighGasWarning';
 import { fetchTickerFloorPrice } from '../../../../../../DAL/BackendDAL';
 import { HighPriceWarning } from '../../../../../common/HighPriceWarning';
+import GasFeeSelector from '../../../../../common/GasFeeSelector';
 
 interface OrderDetailsProps {
     order: MixedOrder;
@@ -18,10 +19,10 @@ interface OrderDetailsProps {
     kasPrice: number;
     onClose: (orderId: string, isDecentralized: boolean) => void;
     timeLeft: number;
-    handlePurchase: (order: Order, finalTotal: number) => void;
+    handlePurchase: (order: Order, finalTotal: number, priorityFee?: number) => void;
     waitingForWalletConfirmation: boolean;
     isProcessingBuyOrder: boolean;
-    handlePurchaseV2: (order: DecentralizedOrder, finalTotal: number) => void;
+    handlePurchaseV2: (order: DecentralizedOrder, finalTotal: number, priorityFee?: number) => void;
 }
 
 const KASPIANO_TRADE_COMMISSION = import.meta.env.VITE_TRADE_COMMISSION;
@@ -43,6 +44,8 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     const [showGasLimitExceeded, setShowGasLimitExceeded] = useState(false);
     const [floorPriceDifference, setFloorPriceDifference] = useState(false);
     const [floorPrice, setFloorPrice] = useState<number>(0);
+    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+    const buyButtonRef = useRef<HTMLButtonElement | null>(null);
 
     useEffect(() => {
         const checkPriceDifference = async () => {
@@ -91,11 +94,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
         checkGasLimits();
     }, []);
 
-    const handleOrderPurchase = async (order: Order | DecentralizedOrder, finalTotal: number) => {
+    const handleOrderPurchase = async (
+        order: Order | DecentralizedOrder,
+        finalTotal: number,
+        priorityFee?: number,
+    ) => {
         if (order.isDecentralized) {
-            await handlePurchaseV2(order as DecentralizedOrder, finalTotalWithCommission);
+            await handlePurchaseV2(order as DecentralizedOrder, finalTotalWithCommission, priorityFee);
         } else {
-            await handlePurchase(order as Order, finalTotal);
+            await handlePurchase(order as Order, finalTotal, priorityFee);
         }
     };
 
@@ -118,6 +125,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
             return 'You must agree to the terms and conditions';
         }
         return 'Confirm Purchase'; // Default message when everything is valid
+    };
+
+    const gasHandlerMint = async () => {
+        const fee = await kaspaFeeEstimate();
+        if (fee === 1) {
+            handleOrderPurchase(order, finalTotal);
+        } else {
+            setAnchorEl(buyButtonRef.current);
+        }
     };
 
     return (
@@ -286,9 +302,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                     <Tooltip title={getTooltipMessage()}>
                         <span>
                             <Button
+                                ref={buyButtonRef}
                                 variant="contained"
                                 color="primary"
-                                onClick={() => handleOrderPurchase(order, finalTotal)}
+                                onClick={gasHandlerMint}
                                 disabled={!walletConnected || walletBalance < finalTotal || !agreedToTerms}
                                 sx={{ width: '100%' }}
                             >
@@ -298,6 +315,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                     </Tooltip>
                 </>
             )}
+            <GasFeeSelector
+                gasType="KRC20"
+                onSelectFee={(selectedFee) => {
+                    handleOrderPurchase(order, finalTotal, selectedFee);
+                    setAnchorEl(null);
+                }}
+                anchorEl={anchorEl}
+                onClose={() => setAnchorEl(null)}
+            />
         </Box>
     );
 };

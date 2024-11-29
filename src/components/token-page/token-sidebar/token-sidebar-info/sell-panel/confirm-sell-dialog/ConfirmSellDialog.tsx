@@ -1,5 +1,5 @@
 // ConfirmSellDialog.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -11,21 +11,20 @@ import {
     Divider,
 } from '@mui/material';
 import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
-import { HighGasWarning } from '../../../../../common/HighGasWarning';
-import { highGasWarning } from '../../../../../../DAL/KaspaApiDal';
+import { kaspaFeeEstimate } from '../../../../../../DAL/KaspaApiDal';
 import { formatNumberWithCommas } from '../../../../../../utils/Utils';
+import GasFeeSelector from '../../../../../common/GasFeeSelector';
 
 interface ConfirmSellDialogProps {
     open: boolean;
     onClose: () => void;
-    onConfirm: () => void;
+    onConfirm: (priorityFee?: number) => void;
     ticker: string;
     tokenAmount: string;
     totalPrice: string;
     pricePerToken: string;
     priceCurrency: 'KAS' | 'USD';
     waitingForWalletConfirmation: boolean;
-    creatingSellOrder: boolean;
 }
 
 const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
@@ -39,38 +38,39 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
         totalPrice,
         pricePerToken,
         priceCurrency,
-        creatingSellOrder,
     } = props;
-    const [showHighGasWarning, setShowHighGasWarning] = useState(false);
     const [onClickConfirm, setOnClickConfirm] = useState(false);
-    useEffect(() => {
-        const checkGasLimits = async () => {
-            const isHighGasWarning = await highGasWarning('TRANSFER');
-
-            setShowHighGasWarning(isHighGasWarning);
-        };
-
-        checkGasLimits();
-    }, []);
+    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
     const handleClose = () => {
-        if (waitingForWalletConfirmation || creatingSellOrder || onClickConfirm) {
+        if (waitingForWalletConfirmation || onClickConfirm) {
             return; // Prevent closing if waiting
         }
         onClose();
     };
 
-    const handleConfirm = async () => {
+    const handleConfirm = async (priorityFee?: number) => {
         setOnClickConfirm(true);
-        await onConfirm();
+        await onConfirm(priorityFee);
         setOnClickConfirm(false);
     };
+
+    const purchaseButtonRef = useRef<HTMLButtonElement | null>(null);
+
+    const gasHandlerPurchase = async () => {
+        const fee = await kaspaFeeEstimate();
+        if (fee === 1) {
+            handleConfirm();
+        } else {
+            setAnchorEl(purchaseButtonRef.current);
+        }
+    };
+
     return (
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle sx={{ fontWeight: 'bold' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     Confirm Sell Order
-                    {showHighGasWarning && <HighGasWarning />}
                 </Box>
             </DialogTitle>
             <DialogContent>
@@ -80,8 +80,6 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                         size={60}
                         boxStyle={{ marginBottom: '1rem' }}
                     />
-                ) : creatingSellOrder ? (
-                    <LoadingSpinner title="Creating sell order..." size={60} boxStyle={{ marginBottom: '1rem' }} />
                 ) : (
                     <>
                         <Box sx={{ mt: 1 }}>
@@ -107,19 +105,29 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                                 • You will receive {totalPrice} KAS <strong /> when the token is sold.
                             </Typography>
                         </Box>
+                        <GasFeeSelector
+                            gasType="KRC20"
+                            onSelectFee={(selectedFee) => {
+                                handleConfirm(selectedFee);
+                                setAnchorEl(null);
+                            }}
+                            anchorEl={anchorEl}
+                            onClose={() => setAnchorEl(null)}
+                        />
                     </>
                 )}
             </DialogContent>
-            {waitingForWalletConfirmation || creatingSellOrder ? null : (
+            {waitingForWalletConfirmation ? null : (
                 <DialogActions>
                     <Button onClick={onClose} disabled={onClickConfirm}>
                         Cancel
                     </Button>
                     <Button
-                        onClick={() => handleConfirm()}
+                        ref={purchaseButtonRef}
+                        onClick={() => gasHandlerPurchase()}
                         variant="contained"
                         color="primary"
-                        disabled={waitingForWalletConfirmation || creatingSellOrder || onClickConfirm}
+                        disabled={waitingForWalletConfirmation || onClickConfirm}
                     >
                         {onClickConfirm ? 'Creating...' : 'Confirm'}
                     </Button>

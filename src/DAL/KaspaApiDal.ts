@@ -53,8 +53,31 @@ export const kaspaTradeFeeEstimate = async (): Promise<number> => {
 
         // Extract the feerate from the priorityBucket
         const feeRate = response.data.priorityBucket.feerate;
-
         return feeRate;
+    } catch (error) {
+        console.error('Error fetching kaspa fee estimate:', error);
+        return 0;
+    }
+};
+export const feeEstimate = async (): Promise<any> => {
+    try {
+        const response = await kasInfoMainnetService.get<{
+            priorityBucket: {
+                feerate: number;
+                estimatedSeconds: number;
+            };
+            normalBuckets: Array<{
+                feerate: number;
+                estimatedSeconds: number;
+            }>;
+            lowBuckets: Array<{
+                feerate: number;
+                estimatedSeconds: number;
+            }>;
+        }>('info/fee-estimate');
+
+        // Extract the feerate from the priorityBucket
+        return response.data;
     } catch (error) {
         console.error('Error fetching kaspa fee estimate:', error);
         return 0;
