@@ -21,6 +21,8 @@ import {
 import { showGlobalSnackbar } from '../alert-context/AlertContext';
 import { sendKaspa } from '../../utils/KaswareUtils';
 import { handleLaunchpadError } from '../../utils/ErrorHandling';
+import GasFeeSelector from '../common/GasFeeSelector';
+import { kaspaFeeEstimate } from '../../DAL/KaspaApiDal';
 
 type LaunchpadProps = {
     walletBalance: number;
@@ -46,8 +48,9 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
     const [kaspaNeeded, setKaspaNeeded] = useState(0);
     const [tokensReceived, setTokensReceived] = useState(0);
     const [orderId, setOrderId] = useState<string | null>(null);
+    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
     const theme = useTheme();
-
+    const purchaseButtonRef = useRef<HTMLButtonElement | null>(null);
     const handleCancelOrder = useCallback(
         async (orderIdToCancel: string) => {
             await cancelOrderMutation.mutateAsync(orderIdToCancel);
@@ -132,7 +135,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
         }
     }, [launchpad, whitelistLoading, allowed]);
 
-    const handlePurchase = async () => {
+    const handlePurchase = async (priorityFee?: number) => {
         if (walletBalance < kaspaNeeded) {
             showGlobalSnackbar({
                 message: 'Insufficient balance',
@@ -143,7 +146,6 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
 
         try {
             const orderResult = await createOrderMutation.mutateAsync(selectedUnits);
-
             if (orderResult.success) {
                 setOrderId(orderResult.lunchpadOrder.id);
                 const updatedKaspaNeeded =
@@ -158,7 +160,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                 setKaspaNeeded(updatedKaspaNeeded);
                 setTokensReceived(orderResult.lunchpadOrder.totalUnits * orderResult.lunchpadOrder.tokenPerUnit);
                 try {
-                    const txData = await sendKaspa(launchpad.walletAddress, kaspaToSompi);
+                    const txData = await sendKaspa(launchpad.walletAddress, kaspaToSompi, priorityFee);
                     const parsedTxData = JSON.parse(txData);
                     const txId = parsedTxData.id;
                     try {
@@ -173,9 +175,10 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                     showGlobalSnackbar({
                         message: 'Failed to send Kaspa. Please try again.',
                         severity: 'error',
+                        details: error.message,
                     });
                     // Optionally, you might want to cancel the order here
-                    await handleCancelOrder(orderResult.lunchpadOrder.id);
+                    handleCancelOrder(orderResult.lunchpadOrder.id);
                 }
                 handleCleanFields();
             } else {
@@ -242,6 +245,15 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
             } else {
                 setSelectedUnits(numericValue);
             }
+        }
+    };
+
+    const gasHandlerPurchase = async () => {
+        const fee = await kaspaFeeEstimate();
+        if (fee === 1) {
+            handlePurchase();
+        } else {
+            setAnchorEl(purchaseButtonRef.current);
         }
     };
 
@@ -364,10 +376,11 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                         >
                             <span>
                                 <Button
+                                    ref={purchaseButtonRef}
                                     variant="contained"
                                     color="primary"
                                     sx={{ width: '100%' }}
-                                    onClick={handlePurchase}
+                                    onClick={gasHandlerPurchase}
                                     disabled={
                                         selectedUnits > effectiveMaxUnits ||
                                         selectedUnits < launchpad.minUnitsPerOrder ||
@@ -400,6 +413,15 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                     </Typography>
                 )}
             </Box>
+            <GasFeeSelector
+                gasType="KAS"
+                onSelectFee={(selectedFee) => {
+                    handlePurchase(selectedFee);
+                    setAnchorEl(null);
+                }}
+                anchorEl={anchorEl}
+                onClose={() => setAnchorEl(null)}
+            />
         </div>
     );
 };

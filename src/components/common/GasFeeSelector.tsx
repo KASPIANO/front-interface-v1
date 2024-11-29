@@ -18,20 +18,22 @@ const GasFeeSelector: React.FC<GasFeeComponentProps> = (props) => {
         average: number;
         priority: number;
     }>({ low: 0, average: 0, priority: 0 });
+
     const open = Boolean(anchorEl);
 
     useEffect(() => {
         const fetchFees = async () => {
-            const { lowBuckets, normalBuckets, priorityBucket } = await feeEstimate();
-            setFees({
-                low: calculateFee(gasType, lowBuckets[0]?.feerate || 0),
-                average: calculateFee(gasType, normalBuckets[0]?.feerate || 0),
-                priority: calculateFee(gasType, priorityBucket?.feerate || 0),
-            });
-            console.log('fetching fees', lowBuckets);
+            if (open) {
+                const { lowBuckets, normalBuckets, priorityBucket } = await feeEstimate();
+                setFees({
+                    low: calculateFee(gasType, lowBuckets[0]?.feerate || 0),
+                    average: calculateFee(gasType, normalBuckets[0]?.feerate || 0),
+                    priority: calculateFee(gasType, priorityBucket?.feerate || 0),
+                });
+            }
         };
         fetchFees();
-    }, [gasType]);
+    }, [gasType, open]);
 
     const handleFeeSelect = (fee: number) => {
         onSelectFee(fee);

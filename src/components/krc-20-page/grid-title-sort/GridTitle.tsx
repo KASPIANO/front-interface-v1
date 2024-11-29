@@ -1,4 +1,4 @@
-import { Typography, IconButton, Box, Tooltip, Button } from '@mui/material';
+import { Typography, Box, Tooltip, Button } from '@mui/material';
 import { FC } from 'react';
 import {
     HeaderContainer,
@@ -187,15 +187,20 @@ const GridTitle: FC<TokenGridTitleProps> = (props) => {
                 </Button>
             </Tooltip>
             <Tooltip title="Sort by the pace and change of minting activity. Mint heat-map.">
-                <IconButton
+                <Button
+                    variant="outlined"
                     onClick={handleMintingRateSort}
                     sx={{
                         marginLeft: '0.2rem',
+                        padding: '2px 5px',
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
                     }}
                     aria-label="sort by minting rate"
+                    endIcon={<FireIcon selected={!changeTotalMintsDisabled} />}
                 >
-                    <FireIcon selected={!changeTotalMintsDisabled} />{' '}
-                </IconButton>
+                    Minting
+                </Button>
             </Tooltip>
 
             <SortButtonGroup variant="contained" sx={{ marginLeft: '1vw' }}>

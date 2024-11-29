@@ -225,12 +225,12 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         }
     };
 
-    const handlePurchase = async (order: Order, finalTotal: number) => {
+    const handlePurchase = async (order: Order, finalTotal: number, priorityFee?: number) => {
         const sompiAmount = finalTotal * KASPA_TO_SOMPI;
         let paymentTxn = '';
         try {
             setWaitingForWalletConfirmation(true);
-            paymentTxn = await sendKaspa(tempWalletAddress, sompiAmount);
+            paymentTxn = await sendKaspa(tempWalletAddress, sompiAmount, priorityFee);
 
             if (isEmptyString(paymentTxn)) {
                 throw new Error('paymentTxn is empty');
@@ -306,7 +306,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         }
     };
 
-    const handlePurchaseV2 = async (order: DecentralizedOrder, finalTotal: number) => {
+    const handlePurchaseV2 = async (order: DecentralizedOrder, finalTotal: number, priorityFee?: number) => {
         let txId;
         if (walletBalance < finalTotal) {
             showGlobalSnackbar({
@@ -321,7 +321,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         try {
             setWaitingForWalletConfirmation(true);
 
-            txId = await buyOrderKRC20(psktSeller);
+            txId = await buyOrderKRC20(psktSeller, priorityFee);
 
             if (isEmptyString(txId)) {
                 throw new Error('paymentTxn is empty');

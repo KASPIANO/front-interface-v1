@@ -28,7 +28,7 @@ const FireIconWrapper = styled.div<FireIconWrapperProps>`
     }
 
     .fire-icon {
-        font-size: 1.3rem;
+        font-size: 0.9rem;
         color: ${(props) => (props.selected ? fireColors.glow : fireColors.primary)};
         filter: drop-shadow(0 0 2px ${fireColors.glow});
         transition: all 0.3s ease;

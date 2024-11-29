@@ -391,7 +391,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         return startPolling();
     };
 
-    const handleTransferV2 = async () => {
+    const handleTransferV2 = async (priorityFee?: number) => {
         setWalletConfirmation(true);
         try {
             const fee =
@@ -402,7 +402,9 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 parseInt(tokenAmount),
                 parseInt(totalPrice),
                 psktExtraOutput,
+                priorityFee,
             );
+
             if (txJsonString || sendCommitTxId) {
                 try {
                     await createSellOrderV2(

@@ -13,7 +13,7 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { TokenListItemResponse } from '../../../types/Types';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import {
@@ -29,7 +29,6 @@ import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { DEFAULT_TOKEN_LOGO_URL } from '../../../utils/Constants';
 import { getFyiLogo, kaspaFeeEstimate, kaspaLivePrice } from '../../../DAL/KaspaApiDal';
 import GasFeeSelector from '../../common/GasFeeSelector';
-import { event } from 'react-ga';
 
 interface TokenRowProps {
     token: TokenListItemResponse;
@@ -61,8 +60,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
         return () => clearInterval(interval);
     }, []);
 
-    const handleMint = async (event, ticker: string, priorityFee?: number) => {
-        event.stopPropagation();
+    const handleMint = async (ticker: string, priorityFee?: number) => {
         if (!walletConnected) {
             showGlobalSnackbar({
                 message: 'Please connect your wallet to mint a token',
@@ -103,16 +101,17 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
         }
     };
 
-    const gasHandlerMint = async (event, ticker) => {
+    const gasHandlerMint = async (event: React.MouseEvent<HTMLElement>, ticker) => {
         event.stopPropagation();
         const fee = await kaspaFeeEstimate();
-        console.log('fee', fee);
-        if (fee !== 1) {
-            handleMint(event, ticker);
+        if (fee === 1) {
+            handleMint(ticker);
         } else {
-            setAnchorEl(event.currentTarget);
+            setAnchorEl(mintButtonRef.current);
         }
     };
+
+    const mintButtonRef = useRef<HTMLButtonElement | null>(null);
 
     useEffect(() => {
         if (!token.logoUrl) {
@@ -375,6 +374,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             sx={{ width: '1.1vw' }}
                             primary={
                                 <Button
+                                    ref={mintButtonRef}
                                     onClick={(event) => gasHandlerMint(event, token.ticker)}
                                     variant="contained"
                                     color="primary"
@@ -398,7 +398,8 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
             <GasFeeSelector
                 gasType="KRC20"
                 onSelectFee={(selectedFee) => {
-                    handleMint(event, token.ticker, selectedFee);
+                    handleMint(token.ticker, selectedFee);
+                    setAnchorEl(null);
                 }}
                 anchorEl={anchorEl}
                 onClose={() => setAnchorEl(null)}
