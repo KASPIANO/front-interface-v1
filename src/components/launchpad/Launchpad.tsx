@@ -148,6 +148,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
             const orderResult = await createOrderMutation.mutateAsync(selectedUnits);
             if (orderResult.success) {
                 setOrderId(orderResult.lunchpadOrder.id);
+                localStorage.setItem('launchpadOrderId', orderResult.lunchpadOrder.id);
                 const updatedKaspaNeeded =
                     orderResult.lunchpadOrder.kasPerUnit * orderResult.lunchpadOrder.totalUnits;
                 const kaspaToSompi = updatedKaspaNeeded * KASPA_TO_SOMPI;
@@ -168,6 +169,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                             orderId: orderResult.lunchpadOrder.id,
                             transactionId: txId,
                         });
+                        localStorage.removeItem('launchpadOrderId');
                     } catch (error) {
                         handleCleanFields();
                     }
@@ -179,6 +181,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                     });
                     // Optionally, you might want to cancel the order here
                     handleCancelOrder(orderResult.lunchpadOrder.id);
+                    localStorage.removeItem('launchpadOrderId');
                 }
                 handleCleanFields();
             } else {
@@ -296,7 +299,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                         Available Tokens: {launchpad.availabeUnits}
                     </Typography>
                     <Typography sx={{ fontSize: '1rerm' }} gutterBottom>
-                        Progress: {soldPercentage.toFixed(2)}% Sold
+                        Progress: {soldPercentage.toFixed(5)}% Sold
                     </Typography>
                     <LinearProgress
                         variant="determinate"

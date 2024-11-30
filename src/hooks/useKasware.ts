@@ -16,6 +16,7 @@ import {
 } from '../DAL/BackendDAL';
 import { useQueryClient } from '@tanstack/react-query';
 import { releaseBuyLock } from '../DAL/BackendP2PDAL';
+import { cancelOrder } from '../DAL/BackendLunchpadDAL';
 
 const COOKIE_TTL = 4 * 60 * 60 * 1000;
 let walletAddressBeforeVerification = null;
@@ -145,12 +146,17 @@ export const useKasware = () => {
             self.accounts = _accounts;
             if (_accounts.length > 0) {
                 const orderId = localStorage.getItem('orderId');
+                const launchpadOrder = localStorage.getItem('launchpadOrderId');
                 if (orderId) {
                     releaseBuyLock(orderId);
+                }
+                if (launchpadOrder) {
+                    cancelOrder(launchpadOrder);
                 }
                 queryClient.invalidateQueries({ queryKey: ['userListings'] });
                 queryClient.invalidateQueries({ queryKey: ['ordersHistory'] });
                 localStorage.removeItem('orderId');
+                localStorage.removeItem('launchpadOrderId');
 
                 // setConnected(true);
 
@@ -215,10 +221,15 @@ export const useKasware = () => {
         await window.kasware.disconnect(origin);
         clearConnectionData();
         const orderId = localStorage.getItem('orderId');
+        const launchpadOrder = localStorage.getItem('launchpadOrderId');
         if (orderId) {
             releaseBuyLock(orderId);
         }
+        if (launchpadOrder) {
+            cancelOrder(launchpadOrder);
+        }
         localStorage.removeItem('orderId');
+        localStorage.removeItem('launchpadOrderId');
 
         if (!ignoreMessage) {
             showGlobalSnackbar({ message: 'Wallet disconnected successfully', severity: 'success' });
