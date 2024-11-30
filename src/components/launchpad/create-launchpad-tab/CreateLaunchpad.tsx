@@ -340,8 +340,8 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({
                     <TextField
                         label="Limit Batches Per Wallet"
                         fullWidth
-                        value={maxBatches}
-                        onChange={(e) => setMaxBatches(e.target.value)}
+                        value={limitPerWallet}
+                        onChange={(e) => setLimitPerWallet(e.target.value)}
                         placeholder="Limit Batches Per Wallet"
                         InputProps={{
                             endAdornment: (

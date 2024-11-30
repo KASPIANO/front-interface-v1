@@ -1,5 +1,5 @@
 import { Modal, Box, IconButton, Typography, TextField, Button, Collapse, Tooltip } from '@mui/material';
-import { ClientSideLunchpadWithStatus, LunchpadWalletType } from '../../../types/Types';
+import { ClientSideLunchpadWithStatus, LunchpadStatusMapper, LunchpadWalletType } from '../../../types/Types';
 import CloseIcon from '@mui/icons-material/CloseRounded';
 import { useEffect, useState } from 'react';
 import { fetchWalletBalance } from '../../../DAL/KaspaApiDal';
@@ -57,16 +57,7 @@ const ExpandedView: React.FC<{
     const [raisedFunds, setRaisedFunds] = useState(0);
     const [isGuideOpen, setIsGuideOpen] = useState(false);
     const [ableTostart, setAbleToStart] = useState(false);
-    const [fundedTokens, setFundedTokens] = useState(false);
     const [krc20Balance, setKrc20Balance] = useState(expandedData.lunchpad.krc20TokensAmount || 0);
-
-    useEffect(() => {
-        if (expandedData && expandedData.success) {
-            fetchWalletBalance(expandedData.lunchpad.senderWalletAddress, false).then((balance) => {
-                setKasWalletBalance(balance);
-            });
-        }
-    }, [expandedData, isGasFunding]);
 
     useEffect(() => {
         if (expandedData && expandedData.success) {
@@ -80,12 +71,14 @@ const ExpandedView: React.FC<{
         const checkStartConditions = async () => {
             if (expandedData && expandedData.success) {
                 try {
+                    const balalance = await fetchWalletBalance(expandedData.lunchpad.senderWalletAddress, false);
+                    setKasWalletBalance(balalance);
                     const krc20BalanceReq = await fetchWalletKRC20Balance(
                         expandedData.lunchpad.senderWalletAddress,
                         expandedData.lunchpad.ticker,
                     );
                     setKrc20Balance(krc20BalanceReq);
-                    setAbleToStart(expandedData.lunchpad.status === 'INACTIVE' && krc20BalanceReq > 0);
+                    setAbleToStart(krc20BalanceReq > 0 && balalance > 0);
                 } catch (error) {
                     console.error('Error fetching balance:', error);
                 }
@@ -94,17 +87,10 @@ const ExpandedView: React.FC<{
 
         const timeout = setTimeout(() => {
             checkStartConditions();
-        }, 7000); // 7-second delay
+        }, 5000); // 7-second delay
 
         return () => clearTimeout(timeout); // Cleanup timeout on component unmount or dependency change
-    }, [expandedData, fundedTokens]);
-
-    const fundHandler = async () => {
-        if (fundTokensAmount) {
-            setFundedTokens((prev) => !prev);
-            handleFund('tokens');
-        }
-    };
+    }, [expandedData, fundTokensAmount, fundGasAmount]);
 
     return (
         <Modal
@@ -189,7 +175,7 @@ const ExpandedView: React.FC<{
                                 Tokens per Unit: {expandedData.lunchpad.tokenPerUnit}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                Status: {expandedData.lunchpad.status}
+                                Status: {LunchpadStatusMapper[expandedData.lunchpad.status]}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
                                 Min Units per Order: {expandedData.lunchpad.minUnitsPerOrder || 'N/A'}
@@ -231,7 +217,7 @@ const ExpandedView: React.FC<{
                                             disabled={
                                                 startLaunchpadMutation.isPending ||
                                                 stopLaunchpadMutation.isPending ||
-                                                !ableTostart
+                                                (!ableTostart && expandedData.lunchpad.status === 'INACTIVE')
                                             }
                                         >
                                             {startLaunchpadMutation.isPending || stopLaunchpadMutation.isPending
@@ -366,7 +352,7 @@ const ExpandedView: React.FC<{
                                 <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end' }}>
                                     <Button
                                         sx={{ padding: 0.2 }}
-                                        onClick={fundHandler}
+                                        onClick={() => handleFund('tokens')}
                                         variant="contained"
                                         disabled={isTokensFunding || expandedData.lunchpad.status === 'ACTIVE'}
                                     >

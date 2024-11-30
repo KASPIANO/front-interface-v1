@@ -232,7 +232,7 @@ export const createSellOrderV2 = async (
     psktTransactionId: string,
 ): Promise<{ id: string; status: string }> => {
     const capitalTicker = ticker.toUpperCase();
-    const response = await backendService.post<{ id: string; status: string }>(`/${P2PV2CONTROLLER}/`, {
+    const response = await backendService.post<{ id: string; status: string }>(`/${P2PV2CONTROLLER}`, {
         ticker: capitalTicker,
         quantity,
         totalPrice,
