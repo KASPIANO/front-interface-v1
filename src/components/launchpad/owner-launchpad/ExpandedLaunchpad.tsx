@@ -80,7 +80,6 @@ const ExpandedView: React.FC<{
             if (expandedData && expandedData.success) {
                 try {
                     const balalance = await fetchWalletBalance(expandedData.lunchpad.senderWalletAddress, false);
-                    console.log('Balance:', balalance);
                     setKasWalletBalance(balalance);
                     const krc20BalanceReq = await fetchWalletKRC20Balance(
                         expandedData.lunchpad.senderWalletAddress,

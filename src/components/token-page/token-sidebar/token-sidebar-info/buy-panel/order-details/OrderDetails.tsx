@@ -68,7 +68,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
 
     // Fee Calculations
     const kaspianoCommissionInt = parseFloat(KASPIANO_TRADE_COMMISSION);
-    const networkFee = order.isDecentralized ? 2 : 5;
+    const networkFee = order.isDecentralized ? 1.05 : 5;
     const finalTotal = order.totalPrice + networkFee;
     const platformFee = kaspianoCommissionInt > 0 ? Math.max(order.totalPrice * kaspianoCommissionInt, 0.5) : 0;
     const finalTotalWithCommission = order.isDecentralized ? finalTotal + platformFee : finalTotal;
