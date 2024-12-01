@@ -458,7 +458,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     }
                 },
                 // End condition: Stop polling if the HTTP status is 200
-                (result) => result?.state === 'deployed', // Replace with actual success condition based on your API response
+                (result) => result?.state === 'deployed' || result?.state === 'finished', // Replace with actual success condition based on your API response
                 3000, // Polling interval: 3 seconds
                 10, // Max retries: Poll up to 10 times
             );

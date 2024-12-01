@@ -236,6 +236,7 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
                     retrieveFundsMutation={retrieveFundsMutation}
                     theme={theme}
                     retrieveFundType={retrieveFundType}
+                    walletAddress={walletAddress}
                 />
             )}
         </>

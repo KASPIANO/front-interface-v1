@@ -129,7 +129,7 @@ export const getBalance = async (): Promise<{ confirmed: number; unconfirmed: nu
 export const sendKaspa = async (toAddress: string, sompi: number, priorityFee?: number): Promise<string> => {
     try {
         const kasPriorityFee = priorityFee ? priorityFee : undefined;
-        const options = { priorityFee: kasPriorityFee };
+        const options = kasPriorityFee ? { priorityFee: kasPriorityFee } : undefined;
         const txData = await window.kasware.sendKaspa(toAddress, sompi, options);
         return txData;
     } catch (error) {

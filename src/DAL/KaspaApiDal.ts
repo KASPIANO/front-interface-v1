@@ -36,7 +36,7 @@ export const kaspaLivePrice = async (): Promise<number> => {
 };
 export const kaspaTradeFeeEstimate = async (): Promise<number> => {
     try {
-        const response = await kasInfoMainnetService.get<{
+        const response = await kasInfoService.get<{
             priorityBucket: {
                 feerate: number;
                 estimatedSeconds: number;
@@ -61,7 +61,7 @@ export const kaspaTradeFeeEstimate = async (): Promise<number> => {
 };
 export const feeEstimate = async (): Promise<any> => {
     try {
-        const response = await kasInfoMainnetService.get<{
+        const response = await kasInfoService.get<{
             priorityBucket: {
                 feerate: number;
                 estimatedSeconds: number;
@@ -85,7 +85,7 @@ export const feeEstimate = async (): Promise<any> => {
 };
 export const kaspaFeeEstimate = async (): Promise<number> => {
     try {
-        const response = await kasInfoMainnetService.get<{
+        const response = await kasInfoService.get<{
             priorityBucket: {
                 feerate: number;
                 estimatedSeconds: number;
