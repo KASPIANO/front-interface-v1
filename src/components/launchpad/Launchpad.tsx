@@ -164,7 +164,6 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                 setKaspaNeeded(updatedKaspaNeeded);
                 setTokensReceived(orderResult.lunchpadOrder.totalUnits * orderResult.lunchpadOrder.tokenPerUnit);
                 try {
-                    debugger;
                     const txData = await sendKaspa(launchpad.walletAddress, kaspaToSompi, priorityFee);
                     const parsedTxData = JSON.parse(txData);
                     const txId = parsedTxData.id;
