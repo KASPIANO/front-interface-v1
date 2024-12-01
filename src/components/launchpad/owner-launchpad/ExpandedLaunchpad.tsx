@@ -58,6 +58,7 @@ const ExpandedView: React.FC<{
     const [isGuideOpen, setIsGuideOpen] = useState(false);
     const [ableTostart, setAbleToStart] = useState(false);
     const [krc20Balance, setKrc20Balance] = useState(expandedData.lunchpad.krc20TokensAmount || 0);
+    const [availabeUnits, setAvailableUnits] = useState(expandedData.lunchpad.availabeUnits);
 
     useEffect(() => {
         if (expandedData && expandedData.success) {
@@ -79,17 +80,21 @@ const ExpandedView: React.FC<{
                     );
                     setKrc20Balance(krc20BalanceReq);
                     setAbleToStart(krc20BalanceReq > 0 && balalance > 0);
+                    const availablleNewUnits = krc20Balance / expandedData.lunchpad.tokenPerUnit;
+                    setAvailableUnits(availablleNewUnits);
                 } catch (error) {
                     console.error('Error fetching balance:', error);
                 }
             }
         };
+        checkStartConditions();
 
         const timeout = setTimeout(() => {
             checkStartConditions();
         }, 5000); // 7-second delay
 
         return () => clearTimeout(timeout); // Cleanup timeout on component unmount or dependency change
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [expandedData, fundTokensAmount, fundGasAmount]);
 
     return (
@@ -166,7 +171,7 @@ const ExpandedView: React.FC<{
                                 Total Units: {expandedData.lunchpad.totalUnits}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                Available Units to sale: {expandedData.lunchpad.availabeUnits}
+                                Available Units to sale: {availabeUnits}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
                                 Kas per Unit: {expandedData.lunchpad.kasPerUnit}
