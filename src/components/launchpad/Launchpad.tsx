@@ -125,7 +125,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
     }, [selectedUnits, launchpad]);
 
     useEffect(() => {
-        if (launchpad && !whitelistLoading && !allowed?.success) {
+        if (launchpad && !whitelistLoading && !allowed?.success && allowed?.errorCode) {
             const simulatedError = {
                 response: {
                     data: {
