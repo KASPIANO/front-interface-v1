@@ -179,10 +179,9 @@ export const pushTx = async (options: { rawtx: string }): Promise<string> => {
 
 // Method to sign KRC20 transaction
 // PRIORITY FEE KAS
-export const deployKRC20Token = async (inscribeJsonString: string): Promise<string> => {
+export const deployKRC20Token = async (inscribeJsonString: string, priorityFee?: number): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        const priorityFee = await getPriorityFee('TRANSFER');
         const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, '', kasPriorityFee);
         return txid;

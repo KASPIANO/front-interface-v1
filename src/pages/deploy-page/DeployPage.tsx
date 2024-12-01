@@ -18,12 +18,7 @@ import {
     hasErrors,
     setErrorToField,
 } from '../../utils/BackendValidationErrorsHandler';
-import {
-    checkTokenDeployment,
-    convertToProtocolFormat,
-    isEmptyString,
-    isEmptyStringOrArray,
-} from '../../utils/Utils';
+import { convertToProtocolFormat, doPolling, isEmptyString, isEmptyStringOrArray } from '../../utils/Utils';
 import {
     DeployForm,
     ImagePreview,
@@ -448,7 +443,35 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         setShowSuccessModal(false);
     };
 
-    const handleDeploy = async () => {
+    const pollFetchTokenByTicker = async (ticker: string, walletAddress?: string) => {
+        try {
+            const result = await doPolling(
+                // The function to fetch the token
+                async () => {
+                    try {
+                        const response = await fetchTokenByTicker(ticker, walletAddress, true);
+                        return response; // Return the response object
+                    } catch (error: any) {
+                        // Handle errors from the fetchTokenByTicker
+                        console.error('Error fetching token:', error);
+                        return { httpStatus: error?.response?.status || 500 }; // Simulate a failed response
+                    }
+                },
+                // End condition: Stop polling if the HTTP status is 200
+                (result) => result?.state === 'deployed', // Replace with actual success condition based on your API response
+                3000, // Polling interval: 3 seconds
+                10, // Max retries: Poll up to 10 times
+            );
+
+            console.log('Polling completed successfully:', result);
+            return result;
+        } catch (error) {
+            console.error('Polling failed after retries:', error);
+            throw error;
+        }
+    };
+
+    const handleDeploy = async (priorityFee?: number) => {
         if (!tokenKRC20Details) return;
 
         if (walletBalance < 1000) {
@@ -476,40 +499,26 @@ const DeployPage: FC<DeployPageProps> = (props) => {
 
         try {
             setIsDeploying(true);
-            const txid = await deployKRC20Token(inscribeJsonString);
+            const txid = await deployKRC20Token(inscribeJsonString, priorityFee);
 
             if (txid) {
                 saveDeployData(tokenKRC20Details.ticker, walletAddress);
                 setIsDeploying(false);
                 setWaitingForTokenConfirmation(true);
-                const token = await checkTokenDeployment(tokenKRC20Details.ticker);
 
-                if (token) {
-                    try {
-                        await fetchTokenByTicker(tokenKRC20Details.ticker, walletAddress, true);
-                    } catch (error) {
-                        console.error('Failed to refresh token data:', error);
-                    }
-                    setWaitingForTokenConfirmation(false);
-                    setShowDeployDialog(false);
-                    setIsDeploying(false);
-                    setIsTokenDeployed(true);
-                    showGlobalSnackbar({
-                        message: 'Token deployed successfully',
-                        severity: 'success',
-                    });
+                pollFetchTokenByTicker(tokenKRC20Details.ticker, walletAddress);
 
-                    console.log(inscribeJsonString);
-                    console.log('Deployment successful, txid:', txid);
-                } else {
-                    showGlobalSnackbar({
-                        message: "We couldn't verify the token deployment, please check the token page later",
-                        severity: 'error',
-                    });
-                    setShowDeployDialog(false);
-                    setIsDeploying(false);
-                    setWaitingForTokenConfirmation(false);
-                }
+                setWaitingForTokenConfirmation(false);
+                setShowDeployDialog(false);
+                setIsDeploying(false);
+                setIsTokenDeployed(true);
+                showGlobalSnackbar({
+                    message: 'Token deployed successfully',
+                    severity: 'success',
+                });
+
+                console.log(inscribeJsonString);
+                console.log('Deployment successful, txid:', txid);
             }
         } catch (error) {
             console.error('Failed to deploy KRC20 token:', error);
@@ -1025,7 +1034,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 <DeployDialog
                     open={showDeployDialog}
                     onClose={() => setShowDeployDialog(false)}
-                    onDeploy={() => handleDeploy()}
+                    onDeploy={handleDeploy}
                     tokenData={reviewTokenData}
                     isDeploying={isDeploying}
                     waitingForTokenConfirmation={waitingForTokenConfirmation}
