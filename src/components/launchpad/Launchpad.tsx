@@ -375,7 +375,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                             title={
                                 !walletConnected
                                     ? 'Please connect your wallet to proceed with the purchase.'
-                                    : !allowed.success
+                                    : !allowed?.success
                                       ? 'You are not whitelisted to participate in this launchpad.'
                                       : ''
                             }
