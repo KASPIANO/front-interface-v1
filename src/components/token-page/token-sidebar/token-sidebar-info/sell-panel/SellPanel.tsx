@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, IconButton, InputAdornment, Tooltip, Typography } from '@mui/material';
-import { BackendTokenResponse } from '../../../../../types/Types';
+import { BackendTokenResponse, SellOrderStatusV2 } from '../../../../../types/Types';
 import { StyledButton, StyledSellPanel, StyledTextField } from './SellPanel.s';
 import { fetchWalletKRC20Balance } from '../../../../../DAL/Krc20DAL';
 import { SwapHoriz } from '@mui/icons-material'; // MUI icon for swap
@@ -403,10 +403,11 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 psktExtraOutput,
                 priorityFee,
             );
-
+            const parse = JSON.parse(txJsonString);
+            console.log(parse);
             if (txJsonString || sendCommitTxId) {
                 try {
-                    await createSellOrderV2(
+                    const res = await createSellOrderV2(
                         tokenInfo.ticker,
                         parseInt(tokenAmount),
                         parseInt(totalPrice),
@@ -414,11 +415,19 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                         txJsonString,
                         sendCommitTxId,
                     );
-                    showGlobalSnackbar({
-                        message: 'Sell order created successfully',
-                        severity: 'success',
-                        commitId: sendCommitTxId,
-                    });
+                    if (res.status === SellOrderStatusV2.LISTED_FOR_SALE) {
+                        showGlobalSnackbar({
+                            message: 'Sell order created successfully',
+                            severity: 'success',
+                            commitId: sendCommitTxId,
+                        });
+                    }
+                    if (res.status === SellOrderStatusV2.PSKT_VERIFICATION_ERROR) {
+                        showGlobalSnackbar({
+                            message: 'Order not created, PSKT verification failed',
+                            severity: 'error',
+                        });
+                    }
                     // add kasplex valdiation of utxo creation sendcommit
                     setIsDialogOpen(false);
                     setDisableSellButton(false);

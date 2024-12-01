@@ -349,6 +349,7 @@ export enum SellOrderStatusV2 {
     LISTED_FOR_SALE = 'LISTED_FOR_SALE',
     VERIFYING = 'VERIFYING',
     COMPLETED = 'COMPLETED',
+    PSKT_VERIFICATION_ERROR = 'PSKT_VERIFICATION_ERROR',
     CANCELED = 'CANCELED',
 }
 
@@ -562,6 +563,14 @@ export enum LunchpadStatus {
     SOLD_OUT = 'SOLD_OUT',
     STOPPING = 'STOPPING',
 }
+
+export const LunchpadStatusMapper: Record<LunchpadStatus, string> = {
+    [LunchpadStatus.INACTIVE]: 'Inactive',
+    [LunchpadStatus.ACTIVE]: 'Active',
+    [LunchpadStatus.NO_UNITS_LEFT]: 'No units left',
+    [LunchpadStatus.SOLD_OUT]: 'Sold out',
+    [LunchpadStatus.STOPPING]: 'Stopping',
+};
 
 export enum LunchpadOrderStatus {
     WAITING_FOR_KAS = 'WAITING_FOR_KAS',

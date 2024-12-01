@@ -228,12 +228,11 @@ export const useEstimateKasRequirement = (id: string) =>
         staleTime: 60000, // Data is considered fresh for 1 minute
         refetchOnWindowFocus: false, // Avoid refetching on window focus
     });
-
-export const useIsWhitelisted = (ticker: string) =>
+export const useIsWhitelisted = (ticker: string, walletConnected: boolean) =>
     useQuery({
         queryKey: ['isWhitelisted', ticker],
         queryFn: () => isWhitelisted(ticker),
-        enabled: !!ticker, // Only run the query if ticker is provided
+        enabled: !!ticker && walletConnected, // Run the query only if ticker is provided and wallet is connected
         staleTime: 60000, // Data is considered fresh for 1 minute
         refetchOnWindowFocus: false, // Avoid refetching on window focus
     });

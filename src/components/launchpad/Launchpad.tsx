@@ -37,13 +37,14 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
     const { ticker } = useParams();
     const { walletBalance, backgroundBlur, walletConnected } = props;
     const { data: launchpad, isLoading, error } = useLaunchpad(ticker);
-    const { data: allowed, isLoading: whitelistLoading } = useIsWhitelisted(ticker);
+    const { data: allowed, isLoading: whitelistLoading } = useIsWhitelisted(ticker, walletConnected);
     const createOrderMutation = useCreateLaunchpadOrder(ticker);
     const verifyAndProcessMutation = useVerifyAndProcessOrder(ticker);
     const cancelOrderMutation = useCancelOrder(ticker);
 
     const [selectedUnits, setSelectedUnits] = useState(1);
     const [effectiveMaxUnits, setEffectiveMaxUnits] = useState(1);
+    const [effectiveMinUnits, setEffectiveMinUnits] = useState(1);
     const [soldPercentage, setSoldPercentage] = useState(0);
     const [kaspaNeeded, setKaspaNeeded] = useState(0);
     const [tokensReceived, setTokensReceived] = useState(0);
@@ -93,6 +94,8 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
             // Calculate effective max units based on availability
             const maxUnits = Math.min(maxUnitsPerOrder, availabeUnits);
             setEffectiveMaxUnits(maxUnits);
+            const minUnits = Math.min(minUnitsPerOrder, maxUnits);
+            setEffectiveMinUnits(minUnits);
 
             // Calculate sold percentage
             const soldPercent = totalUnits > 0 ? ((totalUnits - availabeUnits) / totalUnits) * 100 : 0;
@@ -122,12 +125,12 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
     }, [selectedUnits, launchpad]);
 
     useEffect(() => {
-        if (launchpad && !whitelistLoading && !allowed.success) {
+        if (launchpad && !whitelistLoading && !allowed?.success) {
             const simulatedError = {
                 response: {
                     data: {
                         success: false, // Explicitly indicate failure
-                        errorCode: allowed.errorCode, // Default to the whitelist error code
+                        errorCode: allowed?.errorCode, // Default to the whitelist error code
                     },
                 },
             };
@@ -148,6 +151,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
             const orderResult = await createOrderMutation.mutateAsync(selectedUnits);
             if (orderResult.success) {
                 setOrderId(orderResult.lunchpadOrder.id);
+                localStorage.setItem('launchpadOrderId', orderResult.lunchpadOrder.id);
                 const updatedKaspaNeeded =
                     orderResult.lunchpadOrder.kasPerUnit * orderResult.lunchpadOrder.totalUnits;
                 const kaspaToSompi = updatedKaspaNeeded * KASPA_TO_SOMPI;
@@ -168,6 +172,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                             orderId: orderResult.lunchpadOrder.id,
                             transactionId: txId,
                         });
+                        localStorage.removeItem('launchpadOrderId');
                     } catch (error) {
                         handleCleanFields();
                     }
@@ -179,6 +184,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                     });
                     // Optionally, you might want to cancel the order here
                     handleCancelOrder(orderResult.lunchpadOrder.id);
+                    localStorage.removeItem('launchpadOrderId');
                 }
                 handleCleanFields();
             } else {
@@ -293,10 +299,10 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                 </Typography>
                 <Box sx={{ width: '100%' }}>
                     <Typography sx={{ fontSize: '1rerm' }} gutterBottom>
-                        Available Tokens: {launchpad.availabeUnits}
+                        Available Units for Sale: {launchpad.availabeUnits}
                     </Typography>
                     <Typography sx={{ fontSize: '1rerm' }} gutterBottom>
-                        Progress: {soldPercentage.toFixed(2)}% Sold
+                        Progress: {soldPercentage.toFixed(5)}% Sold
                     </Typography>
                     <LinearProgress
                         variant="determinate"
@@ -310,12 +316,12 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                         {/* Slider */}
                         <Box sx={{ width: '100%' }}>
                             <Typography gutterBottom sx={{ fontSize: '1rerm' }}>
-                                Select Units (Min: {launchpad.minUnitsPerOrder}, Max: {effectiveMaxUnits})
+                                Select Units (Min: {effectiveMinUnits}, Max: {effectiveMaxUnits})
                             </Typography>
                             <Slider
                                 value={selectedUnits}
                                 onChange={(_event, value) => setSelectedUnits(value as number)}
-                                min={launchpad.minUnitsPerOrder}
+                                min={effectiveMinUnits}
                                 max={effectiveMaxUnits}
                                 step={1}
                                 marks
@@ -340,7 +346,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                                     value={selectedUnits}
                                     onChange={handleUnitInputChange}
                                     inputProps={{
-                                        min: launchpad.minUnitsPerOrder,
+                                        min: effectiveMaxUnits,
                                         max: effectiveMaxUnits,
                                         step: 1,
                                     }}
@@ -389,18 +395,20 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                                         createOrderMutation.isPending ||
                                         verifyAndProcessMutation.isPending ||
                                         !!orderId ||
-                                        !allowed.success
+                                        !allowed?.success
                                     }
                                 >
-                                    {!allowed.success
-                                        ? 'User not in Whitelist'
-                                        : createOrderMutation.isPending
-                                          ? 'Creating Order...'
-                                          : verifyAndProcessMutation.isPending
-                                            ? 'Processing...'
-                                            : orderId
-                                              ? 'Order Pending'
-                                              : 'Purchase'}
+                                    {!walletConnected
+                                        ? 'Connect Wallet'
+                                        : !allowed?.success
+                                          ? 'User not in Whitelist'
+                                          : createOrderMutation.isPending
+                                            ? 'Creating Order...'
+                                            : verifyAndProcessMutation.isPending
+                                              ? 'Processing...'
+                                              : orderId
+                                                ? 'Order Pending'
+                                                : 'Purchase'}
                                 </Button>
                             </span>
                         </Tooltip>

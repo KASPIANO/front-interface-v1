@@ -22,7 +22,7 @@ const ProgressBar = ({ value, total }: { value: number; total: number }) => {
 };
 
 const columns: GridColDef[] = [
-    { field: 'ticker', headerName: 'Ticker', filterable: false, width: 100 },
+    { field: 'ticker', headerName: 'Ticker', filterable: false, width: 150 },
     {
         field: 'progress',
         headerName: 'Progress',
@@ -33,9 +33,9 @@ const columns: GridColDef[] = [
             <ProgressBar value={params.row.availabeUnits || 0} total={params.row.totalUnits || 1} />
         ),
     },
-    { field: 'kasPerUnit', headerName: 'Kas per Unit', filterable: false, width: 120 },
-    { field: 'tokenPerUnit', headerName: 'Tokens per Unit', filterable: false, width: 120 },
-    { field: 'roundNumber', headerName: 'Round', filterable: false, width: 100 },
+    { field: 'kasPerUnit', headerName: 'Kas per Unit', filterable: false, width: 150 },
+    { field: 'tokenPerUnit', headerName: 'Tokens per Unit', filterable: false, width: 150 },
+    { field: 'roundNumber', headerName: 'Round', filterable: false, width: 150 },
     {
         field: 'maxUnitsPerWallet',
         headerName: 'Limit per wallet',
@@ -47,7 +47,7 @@ const columns: GridColDef[] = [
         field: 'useWhitelist',
         headerName: 'Whitelist',
         filterable: false,
-        width: 100,
+        width: 150,
 
         valueGetter: (params: any) => (params ? 'Yes' : 'No'),
     },
