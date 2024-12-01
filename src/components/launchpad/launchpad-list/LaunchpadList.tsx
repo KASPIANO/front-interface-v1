@@ -17,7 +17,7 @@ const ProgressBar = ({ value, total }: { value: number; total: number }) => {
             <Box sx={{ minWidth: 35, mt: '1rem' }}>
                 <Typography variant="body2" color="text.secondary">
                     {' '}
-                    {`${progress.toFixed(3)}%`}
+                    {`${progress.toFixed(2)}%`}
                 </Typography>
             </Box>
         </Box>
@@ -36,8 +36,9 @@ const columns: GridColDef[] = [
             <ProgressBar value={params.row.availabeUnits || 0} total={params.row.totalUnits || 1} />
         ),
     },
-    { field: 'kasPerUnit', headerName: 'Kas per Unit', filterable: false, width: 150 },
-    { field: 'tokenPerUnit', headerName: 'Tokens per Unit', filterable: false, width: 150 },
+    { field: '__spacer', headerName: '', filterable: false, width: 20 },
+    { field: 'kasPerUnit', headerName: 'Kas per Batch', filterable: false, width: 150 },
+    { field: 'tokenPerUnit', headerName: 'Tokens per Batch', filterable: false, width: 150 },
     { field: 'roundNumber', headerName: 'Round', filterable: false, width: 150 },
     {
         field: 'maxUnitsPerWallet',
