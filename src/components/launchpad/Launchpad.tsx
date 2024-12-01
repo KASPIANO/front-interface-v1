@@ -7,7 +7,6 @@ import {
     LinearProgress,
     CircularProgress,
     useTheme,
-    TextField,
     Tooltip,
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
@@ -126,7 +125,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
     }, [selectedUnits, launchpad]);
 
     useEffect(() => {
-        if (launchpad && !whitelistLoading && !allowed?.success) {
+        if (launchpad && !whitelistLoading && !allowed?.success && allowed?.errorCode) {
             const simulatedError = {
                 response: {
                     data: {
@@ -240,20 +239,20 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
         setOrderId(null);
     };
     // Destructure launchpad data for rendering
-    const handleUnitInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const inputValue = event.target.value;
-        const numericValue = parseInt(inputValue, 10);
+    // const handleUnitInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     const inputValue = event.target.value;
+    //     const numericValue = parseInt(inputValue, 10);
 
-        if (!isNaN(numericValue)) {
-            if (numericValue < launchpad.minUnitsPerOrder) {
-                setSelectedUnits(launchpad.minUnitsPerOrder);
-            } else if (numericValue > effectiveMaxUnits) {
-                setSelectedUnits(effectiveMaxUnits);
-            } else {
-                setSelectedUnits(numericValue);
-            }
-        }
-    };
+    //     if (!isNaN(numericValue)) {
+    //         if (numericValue < launchpad.minUnitsPerOrder) {
+    //             setSelectedUnits(launchpad.minUnitsPerOrder);
+    //         } else if (numericValue > effectiveMaxUnits) {
+    //             setSelectedUnits(effectiveMaxUnits);
+    //         } else {
+    //             setSelectedUnits(numericValue);
+    //         }
+    //     }
+    // };
 
     const gasHandlerPurchase = async () => {
         const fee = await kaspaFeeEstimate();
@@ -341,6 +340,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                                 }}
                             >
                                 <Typography variant="body2">Selected Units: {selectedUnits}</Typography>
+                                {/* 
                                 <TextField
                                     type="number"
                                     label="Enter Units"
@@ -357,8 +357,11 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                                         verifyAndProcessMutation.isPending
                                     }
                                     sx={{ width: '120px' }}
-                                />
+                                /> */}
                             </Box>
+                            <Typography variant="body2">
+                                Limit per Wallet: {launchpad.maxUnitsPerWallet}
+                            </Typography>
                         </Box>
 
                         {/* Summary */}

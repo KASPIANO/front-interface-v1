@@ -15,7 +15,10 @@ const ProgressBar = ({ value, total }: { value: number; total: number }) => {
                 <LinearProgress variant="determinate" value={progress} />
             </Box>
             <Box sx={{ minWidth: 35, mt: '1rem' }}>
-                <Typography variant="body2" color="text.secondary">{`${Math.round(progress)}%`}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                    {' '}
+                    {`${progress.toFixed(3)}%`}
+                </Typography>
             </Box>
         </Box>
     );
@@ -27,7 +30,7 @@ const columns: GridColDef[] = [
         field: 'progress',
         headerName: 'Progress',
         filterable: false,
-        width: 200,
+        width: 250,
 
         renderCell: (params) => (
             <ProgressBar value={params.row.availabeUnits || 0} total={params.row.totalUnits || 1} />
