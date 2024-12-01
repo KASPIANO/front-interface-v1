@@ -7,6 +7,8 @@ import { formatNumberWithCommas } from '../../../utils/Utils';
 import LaunchpadUsageGuide from '../guides/LaunchpadUsageGuide';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { fetchWalletKRC20Balance } from '../../../DAL/Krc20DAL';
+import { useEstimateKasRequirement } from '../../../DAL/LaunchPadQueries';
+import { useQueryClient } from '@tanstack/react-query';
 
 const ExpandedView: React.FC<{
     isExpanded: boolean;
@@ -29,6 +31,7 @@ const ExpandedView: React.FC<{
     retrieveFundsMutation: any;
     retrieveFundType: string;
     theme: any;
+    walletAddress: string;
 }> = ({
     isExpanded,
     onClose,
@@ -50,6 +53,7 @@ const ExpandedView: React.FC<{
     retrieveFundsMutation,
     retrieveFundType,
     theme,
+    walletAddress,
 }) => {
     const [isTokensFieldOpen, setIsTokensFieldOpen] = useState(false);
     const [isGasFieldOpen, setIsGasFieldOpen] = useState(false);
@@ -59,6 +63,9 @@ const ExpandedView: React.FC<{
     const [ableTostart, setAbleToStart] = useState(false);
     const [krc20Balance, setKrc20Balance] = useState(expandedData.lunchpad.krc20TokensAmount || 0);
     const [availabeUnits, setAvailableUnits] = useState(expandedData.lunchpad.availabeUnits);
+
+    const queryClient = useQueryClient();
+    const estimateKasQuery = useEstimateKasRequirement(expandedData?.lunchpad?.id);
 
     useEffect(() => {
         if (expandedData && expandedData.success) {
@@ -73,6 +80,7 @@ const ExpandedView: React.FC<{
             if (expandedData && expandedData.success) {
                 try {
                     const balalance = await fetchWalletBalance(expandedData.lunchpad.senderWalletAddress, false);
+                    console.log('Balance:', balalance);
                     setKasWalletBalance(balalance);
                     const krc20BalanceReq = await fetchWalletKRC20Balance(
                         expandedData.lunchpad.senderWalletAddress,
@@ -82,6 +90,10 @@ const ExpandedView: React.FC<{
                     setAbleToStart(krc20BalanceReq > 0 && balalance > 0);
                     const availablleNewUnits = krc20Balance / expandedData.lunchpad.tokenPerUnit;
                     setAvailableUnits(availablleNewUnits);
+                    estimateKasQuery.refetch();
+                    queryClient.invalidateQueries({
+                        queryKey: ['launchpadOwnerInfo', expandedData.lunchpad.ticker, walletAddress],
+                    });
                 } catch (error) {
                     console.error('Error fetching balance:', error);
                 }
@@ -91,7 +103,7 @@ const ExpandedView: React.FC<{
 
         const timeout = setTimeout(() => {
             checkStartConditions();
-        }, 5000); // 7-second delay
+        }, 7000); // 7-second delay
 
         return () => clearTimeout(timeout); // Cleanup timeout on component unmount or dependency change
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -195,7 +207,7 @@ const ExpandedView: React.FC<{
                                 Kas Amount in Launchpad: {kasWalletBalance.toFixed(4) || 'N/A'}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                Required Kaspa: {expandedData.lunchpad.requiredKaspa || 'N/A'}
+                                Required Kaspa: {expandedData.lunchpad.requiredKaspa}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
                                 Open Orders: {expandedData.lunchpad.openOrders || 'N/A'}

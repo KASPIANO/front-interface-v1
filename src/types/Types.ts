@@ -502,6 +502,7 @@ export type ClientSideLunchpad = {
     openOrders?: number;
     useWhitelist?: boolean;
     whitelistWalletAddresses?: string[];
+    maxUnitsPerWallet?: number;
 };
 
 export enum ErrorCodes {

@@ -129,7 +129,7 @@ export const getBalance = async (): Promise<{ confirmed: number; unconfirmed: nu
 export const sendKaspa = async (toAddress: string, sompi: number, priorityFee?: number): Promise<string> => {
     try {
         const kasPriorityFee = priorityFee ? priorityFee : undefined;
-        const options = { priorityFee: kasPriorityFee };
+        const options = kasPriorityFee ? { priorityFee: kasPriorityFee } : undefined;
         const txData = await window.kasware.sendKaspa(toAddress, sompi, options);
         return txData;
     } catch (error) {
@@ -182,7 +182,7 @@ export const pushTx = async (options: { rawtx: string }): Promise<string> => {
 export const deployKRC20Token = async (inscribeJsonString: string, priorityFee?: number): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
+        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : undefined;
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, '', kasPriorityFee);
         return txid;
     } catch (error) {

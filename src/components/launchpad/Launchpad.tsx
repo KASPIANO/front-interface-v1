@@ -93,7 +93,8 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
 
             // Calculate effective max units based on availability
             const maxUnits = Math.min(maxUnitsPerOrder, availabeUnits);
-            setEffectiveMaxUnits(maxUnits);
+            const maxUnitsAfterWalletLimit = Math.min(maxUnits, launchpad.maxUnitsPerWallet);
+            setEffectiveMaxUnits(maxUnitsAfterWalletLimit);
             const minUnits = Math.min(minUnitsPerOrder, maxUnits);
             setEffectiveMinUnits(minUnits);
 
@@ -408,7 +409,9 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                                               ? 'Processing...'
                                               : orderId
                                                 ? 'Order Pending'
-                                                : 'Purchase'}
+                                                : walletBalance < kaspaNeeded
+                                                  ? 'Insufficient Balance'
+                                                  : 'Purchase'}
                                 </Button>
                             </span>
                         </Tooltip>

@@ -225,7 +225,7 @@ export const useEstimateKasRequirement = (id: string) =>
         queryKey: ['estimateKasRequirement', id],
         queryFn: () => estimateKasRequirement(id),
         enabled: !!id, // Only run the query if id is provided
-        staleTime: 60000, // Data is considered fresh for 1 minute
+        staleTime: 20000, // Data is considered fresh for 1 minute
         refetchOnWindowFocus: false, // Avoid refetching on window focus
     });
 export const useIsWhitelisted = (ticker: string, walletConnected: boolean) =>
