@@ -23,6 +23,7 @@ import { verifyDecentralizedOrder, getDecentralizedOrder } from '../../../../DAL
 import { cancelOrderKRC20 } from '../../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../../alert-context/AlertContext';
 import { fetchTokenPrice } from '../../../../DAL/BackendDAL';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 interface UserOrdersRowProps {
     order: Order | DecentralizedOrder;
@@ -283,12 +284,29 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                 <ListItemText
                     sx={{ width: '3vw', marginLeft: '1rem' }}
                     primary={
-                        <Typography variant="body1" sx={{ fontSize: '0.75rem', fontWeight: 'bold' }}>
+                        <Typography
+                            variant="body1"
+                            sx={{ fontSize: '0.75rem', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}
+                        >
                             {order.ticker}
+                            {!order.isDecentralized && (
+                                <Tooltip
+                                    title="This is an old order created before the PSKT protocol was introduced. Please delist and list it again to comply with the latest standards."
+                                    arrow
+                                >
+                                    <WarningAmberIcon
+                                        sx={{
+                                            fontSize: '1rem',
+                                            color: 'yellow',
+                                            marginLeft: '0.5rem',
+                                            cursor: 'pointer',
+                                        }}
+                                    />
+                                </Tooltip>
+                            )}
                         </Typography>
                     }
                 />
-
                 {/* Created At */}
                 <ListItemText
                     sx={{ width: '12vw' }}
@@ -301,7 +319,6 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                         </Typography>
                     }
                 />
-
                 {/* Quantity */}
                 <ListItemText
                     sx={{ width: '2vw' }}
@@ -311,7 +328,6 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                         </Typography>
                     }
                 />
-
                 {/* Price Per Token */}
                 <ListItemText
                     sx={{ width: '5vw' }}
@@ -331,7 +347,6 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                         </Tooltip>
                     }
                 />
-
                 {/* Total Price */}
                 <ListItemText
                     sx={{ width: '6vw' }}
@@ -454,7 +469,6 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                             ))}
                     </Box>
                 )}
-
                 {order.isDecentralized && (
                     <Box
                         sx={{
@@ -484,7 +498,8 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                                 </Button>
                             ))}
                     </Box>
-                )}
+                )}{' '}
+                {/* Price Per Token */}
             </ListItem>
             <Divider />
             <Dialog
