@@ -9,7 +9,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { fetchWalletKRC20Balance } from '../../../DAL/Krc20DAL';
 import { useEstimateKasRequirement } from '../../../DAL/LaunchPadQueries';
 import { useQueryClient } from '@tanstack/react-query';
-import EditIcon from '@mui/icons-material/Edit';
+// import EditIcon from '@mui/icons-material/Edit';
 
 const ExpandedView: React.FC<{
     isExpanded: boolean;
@@ -156,7 +156,7 @@ const ExpandedView: React.FC<{
                                 <Typography variant="h5" component="h2" sx={{ fontWeight: 700 }}>
                                     {expandedData.lunchpad.ticker}
                                 </Typography>
-                                <Button
+                                {/* <Button
                                     sx={{
                                         fontSize: '0.75rem',
                                         '& .MuiSvgIcon-root': {
@@ -171,7 +171,7 @@ const ExpandedView: React.FC<{
                                     }}
                                 >
                                     Edit Launchpad
-                                </Button>
+                                </Button> */}
                                 <Button
                                     sx={{
                                         '& .MuiSvgIcon-root': {
@@ -248,6 +248,7 @@ const ExpandedView: React.FC<{
                                             variant="contained"
                                             onClick={handleStartStop}
                                             disabled={
+                                                expandedData.lunchpad.status === 'STOPPING' ||
                                                 startLaunchpadMutation.isPending ||
                                                 stopLaunchpadMutation.isPending ||
                                                 (!ableTostart && expandedData.lunchpad.status === 'INACTIVE')
