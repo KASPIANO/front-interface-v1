@@ -6,7 +6,7 @@ export const handleLaunchpadError = (error: any) => {
         const { errorCode } = error.response.data;
         const errorMessage = ERROR_MESSAGES[errorCode as ErrorCodes] || ERROR_MESSAGES[ErrorCodes.UNKNOWN_ERROR];
         if (errorCode === ErrorCodes.TRANSACTION_VERIFICATION_FAILED) {
-            showGlobalSnackbar({ message: errorMessage, severity: 'warning' });
+            showGlobalSnackbar({ message: errorMessage, severity: 'info' });
         } else {
             showGlobalSnackbar({ message: errorMessage, severity: 'error' });
         }

@@ -56,7 +56,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
         }
         if (walletBalance < 1) {
             showGlobalSnackbar({
-                message: 'You need at least 1 KAS to mint a token',
+                message: 'You need at least 3 KAS to mint a token',
                 severity: 'error',
             });
             return;
