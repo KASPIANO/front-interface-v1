@@ -179,25 +179,25 @@ const ExpandedView: React.FC<{
                                 Round Number: {expandedData.lunchpad.roundNumber}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                Total Units: {expandedData.lunchpad.totalUnits}
+                                Total Batches: {expandedData.lunchpad.totalUnits}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                Available Units to sale: {availabeUnits}
+                                Available Batches to sale: {availabeUnits}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                Kas per Unit: {expandedData.lunchpad.kasPerUnit}
+                                Kas per Batch: {expandedData.lunchpad.kasPerUnit}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                Tokens per Unit: {expandedData.lunchpad.tokenPerUnit}
+                                Tokens per Batch: {expandedData.lunchpad.tokenPerUnit}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
                                 Status: {LunchpadStatusMapper[expandedData.lunchpad.status]}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                Min Units per Order: {expandedData.lunchpad.minUnitsPerOrder || 'N/A'}
+                                Min Batches per Order: {expandedData.lunchpad.minUnitsPerOrder || 'N/A'}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
-                                Max Units per Order: {expandedData.lunchpad.maxUnitsPerOrder || 'N/A'}
+                                Max Batches per Order: {expandedData.lunchpad.maxUnitsPerOrder || 'N/A'}
                             </Typography>
                             <Typography sx={{ fontSize: '1rem' }}>
                                 KRC20 Tokens Amount in Launchpad: {krc20Balance}

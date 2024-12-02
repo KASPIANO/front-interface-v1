@@ -201,13 +201,13 @@ const LaunchpadCard: React.FC<LaunchpadCardProps> = ({
                     </Box>
 
                     <Typography variant="body2" color="text.secondary">
-                        Available Units: {availabeUnits}
+                        Available Batches: {availabeUnits}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        KAS per Unit: {kasPerUnit}
+                        Kaspa per Batch: {kasPerUnit}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        Tokens per Unit: {tokenPerUnit}
+                        Tokens per Batch: {tokenPerUnit}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                         Status: {status}

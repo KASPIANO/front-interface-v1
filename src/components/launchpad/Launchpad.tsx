@@ -22,6 +22,8 @@ import { sendKaspa } from '../../utils/KaswareUtils';
 import { handleLaunchpadError } from '../../utils/ErrorHandling';
 import GasFeeSelector from '../common/GasFeeSelector';
 import { kaspaFeeEstimate } from '../../DAL/KaspaApiDal';
+import { TextInfo } from '../../pages/deploy-page/DeployPage.s';
+import { debounce } from 'lodash';
 
 type LaunchpadProps = {
     walletBalance: number;
@@ -40,7 +42,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
     const createOrderMutation = useCreateLaunchpadOrder(ticker);
     const verifyAndProcessMutation = useVerifyAndProcessOrder(ticker);
     const cancelOrderMutation = useCancelOrder(ticker);
-
+    const [inputValue, setInputValue] = useState(launchpad?.minUnitsPerOrder.toString());
     const [selectedUnits, setSelectedUnits] = useState(1);
     const [effectiveMaxUnits, setEffectiveMaxUnits] = useState(1);
     const [effectiveMinUnits, setEffectiveMinUnits] = useState(1);
@@ -56,8 +58,25 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
             await cancelOrderMutation.mutateAsync(orderIdToCancel);
             setOrderId(null);
             setSelectedUnits(1);
+            setInputValue('');
         },
         [cancelOrderMutation],
+    );
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const debouncedSetSelectedUnits = useCallback(
+        debounce((value: number) => {
+            if (!isNaN(value)) {
+                if (value < launchpad.minUnitsPerOrder) {
+                    setSelectedUnits(launchpad.minUnitsPerOrder);
+                } else if (value > effectiveMaxUnits) {
+                    setSelectedUnits(effectiveMaxUnits);
+                } else {
+                    setSelectedUnits(value);
+                }
+            }
+        }, 500),
+        [launchpad?.minUnitsPerOrder, effectiveMaxUnits],
     );
 
     const orderIdRef = useRef(orderId);
@@ -104,7 +123,10 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
             // Adjust selectedUnits if it's out of bounds
             setSelectedUnits((prevUnits) => {
                 const adjustedUnits = Math.min(Math.max(prevUnits, minUnitsPerOrder), maxUnits);
-                return isNaN(adjustedUnits) || adjustedUnits < minUnitsPerOrder ? minUnitsPerOrder : adjustedUnits;
+                const finalUnits =
+                    isNaN(adjustedUnits) || adjustedUnits < minUnitsPerOrder ? minUnitsPerOrder : adjustedUnits;
+
+                return finalUnits;
             });
 
             // Determine if purchasing is possible
@@ -184,7 +206,6 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                     });
                     // Optionally, you might want to cancel the order here
                     handleCancelOrder(orderResult.lunchpadOrder.id);
-                    localStorage.removeItem('launchpadOrderId');
                 }
                 handleCleanFields();
             } else {
@@ -197,6 +218,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
             });
             handleCleanFields();
         }
+        handleCleanFields();
     };
 
     if (isLoading) {
@@ -235,25 +257,21 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
     }
 
     const handleCleanFields = () => {
+        localStorage.removeItem('launchpadOrderId');
         setSelectedUnits(1);
+        setInputValue('');
         setOrderId(null);
     };
-    // Destructure launchpad data for rendering
-    // const handleUnitInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     const inputValue = event.target.value;
-    //     const numericValue = parseInt(inputValue, 10);
 
-    //     if (!isNaN(numericValue)) {
-    //         if (numericValue < launchpad.minUnitsPerOrder) {
-    //             setSelectedUnits(launchpad.minUnitsPerOrder);
-    //         } else if (numericValue > effectiveMaxUnits) {
-    //             setSelectedUnits(effectiveMaxUnits);
-    //         } else {
-    //             setSelectedUnits(numericValue);
-    //         }
-    //     }
-    // };
+    const handleUnitInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = event.target.value;
+        setInputValue(newValue);
 
+        const numericValue = parseInt(newValue);
+        if (!isNaN(numericValue)) {
+            debouncedSetSelectedUnits(numericValue);
+        }
+    };
     const gasHandlerPurchase = async () => {
         const fee = await kaspaFeeEstimate();
         if (fee === 1) {
@@ -290,7 +308,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                     border: `1px solid ${theme.palette.primary.main}`,
                     borderRadius: 2,
                     boxShadow: 3,
-                    width: 500,
+                    width: 600,
                 }}
             >
                 {/* Ticker and Progress */}
@@ -299,7 +317,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                 </Typography>
                 <Box sx={{ width: '100%' }}>
                     <Typography sx={{ fontSize: '1rerm' }} gutterBottom>
-                        Available Units for Sale: {launchpad.availabeUnits}
+                        Available Batches for Sale: {launchpad.availabeUnits}
                     </Typography>
                     <Typography sx={{ fontSize: '1rerm' }} gutterBottom>
                         Progress: {soldPercentage.toFixed(5)}% Sold
@@ -316,7 +334,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                         {/* Slider */}
                         <Box sx={{ width: '100%' }}>
                             <Typography gutterBottom sx={{ fontSize: '1rerm' }}>
-                                Select Units (Min: {effectiveMinUnits}, Max: {effectiveMaxUnits})
+                                Select Batches (Min: {effectiveMinUnits}, Max: {effectiveMaxUnits})
                             </Typography>
                             <Slider
                                 value={selectedUnits}
@@ -339,28 +357,25 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                                     mt: 2,
                                 }}
                             >
-                                <Typography variant="body2">Selected Units: {selectedUnits}</Typography>
-                                {/* 
-                                <TextField
-                                    type="number"
-                                    label="Enter Units"
-                                    value={selectedUnits}
+                                <Typography variant="body1">Selected Batches: {selectedUnits}</Typography>
+
+                                <TextInfo
+                                    label="Batch Amount"
+                                    variant="outlined"
+                                    fullWidth
+                                    value={inputValue}
                                     onChange={handleUnitInputChange}
-                                    inputProps={{
-                                        min: effectiveMaxUnits,
-                                        max: effectiveMaxUnits,
-                                        step: 1,
+                                    sx={{
+                                        width: '120px',
+                                        '& .MuiInputLabel-root': {
+                                            fontSize: '0.875rem',
+                                            top: 3,
+                                        },
                                     }}
-                                    disabled={
-                                        !walletConnected ||
-                                        createOrderMutation.isPending ||
-                                        verifyAndProcessMutation.isPending
-                                    }
-                                    sx={{ width: '120px' }}
-                                /> */}
+                                />
                             </Box>
-                            <Typography variant="body2">
-                                Limit per Wallet: {launchpad.maxUnitsPerWallet}
+                            <Typography variant="body1">
+                                Limit per Wallet: {launchpad.maxUnitsPerWallet} Batches
                             </Typography>
                         </Box>
 
