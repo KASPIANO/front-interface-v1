@@ -1,17 +1,5 @@
 import { FC, useEffect, useRef, useState } from 'react';
-import {
-    Box,
-    Avatar,
-    Typography,
-    Button,
-    useTheme,
-    TextField,
-    alpha,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-} from '@mui/material';
+import { Box, Avatar, Typography, Button, useTheme, TextField, alpha } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { ProfileContainer, ProfileDetails } from './UserProfile.s';
 import { isEmptyString, isValidWalletAddress, shortenAddress } from '../../../utils/Utils';
@@ -21,10 +9,10 @@ import { ContentCopyRounded as ContentCopyRoundedIcon } from '@mui/icons-materia
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { debounce } from 'lodash';
 import { UserReferral } from '../../../types/Types';
-import SearchIcon from '@mui/icons-material/Search'; // Import the icon
-import { checkOrderExists } from '../../../DAL/Krc20DAL';
-import { cancelOrderKRC20 } from '../../../utils/KaswareUtils';
-import { getUserUnlistedTransactions } from '../../../DAL/BackendP2PDAL';
+// import SearchIcon from '@mui/icons-material/Search'; // Import the icon
+// import { checkOrderExists } from '../../../DAL/Krc20DAL';
+// import { cancelOrderKRC20 } from '../../../utils/KaswareUtils';
+// import { getUserUnlistedTransactions } from '../../../DAL/BackendP2PDAL';
 
 interface UserProfileProps {
     walletAddress: string;
@@ -54,12 +42,12 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     const [, setCopied] = useState(false);
     const [walletAddressError, setWalletAddressError] = useState<string | null>(null);
     const [walletInputValue, setWalletInputValue] = useState<string>(walletAddress);
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [ticker, setTicker] = useState('');
-    const [orders, setOrders] = useState([]);
-    const [psktTxId, setPsktTxId] = useState(null);
-    const [fetchingLostOrders, setFetchingLostORders] = useState(false);
-    const [recovering, setRecovering] = useState(false);
+    // const [dialogOpen, setDialogOpen] = useState(false);
+    // const [ticker, setTicker] = useState('');
+    // const [orders, setOrders] = useState([]);
+    // const [psktTxId, setPsktTxId] = useState(null);
+    // const [fetchingLostOrders, setFetchingLostORders] = useState(false);
+    // const [recovering, setRecovering] = useState(false);
     // const [openXDialog, setOpenXDialog] = useState(false);
     // const [xUrl, setXUrl] = useState('');
     const debouncedSetCurrentWalletRef = useRef(null);
@@ -149,72 +137,72 @@ const UserProfile: FC<UserProfileProps> = (props) => {
         'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-Icon-Dark-Green-on-White.png';
     const kaspaIcon = theme.palette.mode === 'dark' ? lightKaspaIcon : darkKaspaIcon;
 
-    const handlePsktRecovery = async () => {
-        try {
-            setFetchingLostORders(true); // Indicate fetching started
+    // const handlePsktRecovery = async () => {
+    //     try {
+    //         setFetchingLostORders(true); // Indicate fetching started
 
-            // Fetch orders
-            const result = await checkOrderExists(ticker, walletAddress);
+    //         // Fetch orders
+    //         const result = await checkOrderExists(ticker, walletAddress);
 
-            // Extract uTxid array
-            const uTxidArray = result.map((item) => item.uTxid);
-            // Fetch lost orders
-            const lostOrders = await getUserUnlistedTransactions(uTxidArray);
-            if (lostOrders.length === 0) {
-                showGlobalSnackbar({ message: 'No Lost Orders', severity: 'warning' });
-            }
-            const matchingOrders = result.filter((item) => lostOrders.includes(item.uTxid));
-            setOrders(matchingOrders || []); // Update state with lost orders
-        } catch (error) {
-            console.error('Error during PSKT recovery:', error); // Log any error
-        } finally {
-            setFetchingLostORders(false); // Indicate fetching ended
-        }
-    };
+    //         // Extract uTxid array
+    //         const uTxidArray = result.map((item) => item.uTxid);
+    //         // Fetch lost orders
+    //         const lostOrders = await getUserUnlistedTransactions(uTxidArray);
+    //         if (lostOrders.length === 0) {
+    //             showGlobalSnackbar({ message: 'No Lost Orders', severity: 'warning' });
+    //         }
+    //         const matchingOrders = result.filter((item) => lostOrders.includes(item.uTxid));
+    //         setOrders(matchingOrders || []); // Update state with lost orders
+    //     } catch (error) {
+    //         console.error('Error during PSKT recovery:', error); // Log any error
+    //     } finally {
+    //         setFetchingLostORders(false); // Indicate fetching ended
+    //     }
+    // };
 
-    const handleRecovery = async () => {
-        if (psktTxId) {
-            try {
-                setRecovering(true);
-                const result = await cancelOrderKRC20(ticker, psktTxId);
+    // const handleRecovery = async () => {
+    //     if (psktTxId) {
+    //         try {
+    //             setRecovering(true);
+    //             const result = await cancelOrderKRC20(ticker, psktTxId);
 
-                if (result) {
-                    showGlobalSnackbar({
-                        message: 'Order recovered successfully',
-                        severity: 'success',
-                    });
-                } else {
-                    showGlobalSnackbar({
-                        message: 'Failed to recover order',
-                        severity: 'error',
-                    });
-                }
-            } catch (error) {
-                showGlobalSnackbar({
-                    message: 'An error occurred while recovering the order. Please try again.',
-                    severity: 'error',
-                });
-                console.error('Recovery Error:', error); // Log error for debugging
-            } finally {
-                // Always close the dialog, even if there's an error
-                handleCloseDialog();
-            }
-        } else {
-            showGlobalSnackbar({
-                message: 'No transaction ID provided for recovery.',
-                severity: 'warning',
-            });
-            handleCloseDialog(); // Close the dialog even if no transaction ID is provided
-        }
-    };
+    //             if (result) {
+    //                 showGlobalSnackbar({
+    //                     message: 'Order recovered successfully',
+    //                     severity: 'success',
+    //                 });
+    //             } else {
+    //                 showGlobalSnackbar({
+    //                     message: 'Failed to recover order',
+    //                     severity: 'error',
+    //                 });
+    //             }
+    //         } catch (error) {
+    //             showGlobalSnackbar({
+    //                 message: 'An error occurred while recovering the order. Please try again.',
+    //                 severity: 'error',
+    //             });
+    //             console.error('Recovery Error:', error); // Log error for debugging
+    //         } finally {
+    //             // Always close the dialog, even if there's an error
+    //             handleCloseDialog();
+    //         }
+    //     } else {
+    //         showGlobalSnackbar({
+    //             message: 'No transaction ID provided for recovery.',
+    //             severity: 'warning',
+    //         });
+    //         handleCloseDialog(); // Close the dialog even if no transaction ID is provided
+    //     }
+    // };
 
-    const handleCloseDialog = () => {
-        setDialogOpen(false);
-        setRecovering(false);
-        setFetchingLostORders(false);
-        setTicker('');
-        setPsktTxId('');
-    };
+    // const handleCloseDialog = () => {
+    //     setDialogOpen(false);
+    //     setRecovering(false);
+    //     setFetchingLostORders(false);
+    //     setTicker('');
+    //     setPsktTxId('');
+    // };
 
     return (
         <ProfileContainer>
@@ -321,7 +309,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                                 </Button>
                             )}
 
-                        <Button
+                        {/* <Button
                             sx={{ fontSize: '0.75rem' }}
                             variant="outlined"
                             size="medium"
@@ -329,7 +317,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                             startIcon={<SearchIcon />} // Add the icon
                         >
                             Get Lost Orders
-                        </Button>
+                        </Button> */}
                     </Box>
                 </ProfileDetails>
             </Box>
@@ -350,7 +338,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                     {portfolioValue.change}% */}
                 </StatHelpText>
             </Stat>
-            <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth>
+            {/* <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth>
                 <DialogTitle
                     sx={{
                         paddingBottom: '0.5rem',
@@ -409,7 +397,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         {recovering ? 'Recovering..' : 'Recover'}
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog> */}
         </ProfileContainer>
     );
 };
