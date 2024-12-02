@@ -71,7 +71,8 @@ export const getFormattedDateDifference = (creationDate: number): string => {
     return formatDistanceStrict(date, new Date());
 };
 
-export const convertToProtocolFormat = (value: string): string => (parseFloat(value) * 1e8).toFixed(0);
+export const convertToProtocolFormat = (value: string): string =>
+    (parseFloat(value) * 1e8).toLocaleString('fullwide', { useGrouping: false });
 
 export function generateNonce() {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -127,7 +128,7 @@ export const verifyPaymentTransaction = async (
 };
 
 export const isValidWalletAddress = (address: string): boolean => {
-    const regex = /^(kaspa|kaspatest):q[a-z0-9]{54,90}$/;
+    const regex = /^(kaspa|kaspatest):(q|p)[a-z0-9]{54,90}$/;
     return regex.test(address);
 };
 
@@ -345,4 +346,14 @@ export const ANIMAL_EMOJIS = {
     rat: '🐀',
     chipmunk: '🐿️',
     hedgehog: '🦔',
+};
+
+// utils/feeCalculations.ts
+
+export const KASPA_TRANSACTION_MASS = 3000;
+export const KRC20_TRANSACTION_MASS = 3370;
+
+export const calculateFee = (txType: 'KAS' | 'KRC20', feerate: number): number => {
+    const mass = txType === 'KAS' ? KASPA_TRANSACTION_MASS : KRC20_TRANSACTION_MASS;
+    return mass * feerate;
 };

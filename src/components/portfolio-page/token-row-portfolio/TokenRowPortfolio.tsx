@@ -19,7 +19,7 @@ import { FC, useState } from 'react';
 import { mintKRC20Token, transferKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { TokenRowPortfolioItem, TransferObj } from '../../../types/Types';
-import { capitalizeFirstLetter, isEmptyString } from '../../../utils/Utils';
+import { capitalizeFirstLetter, convertToProtocolFormat, isEmptyString } from '../../../utils/Utils';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_TOKEN_LOGO_URL } from '../../../utils/Constants';
@@ -44,10 +44,11 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
     const navigate = useNavigate();
 
     const validatePositiveNumber = (value) => {
-        // This regex allows positive numbers, including decimals, but not zero
-        const regex = /^(?!0+\.?0*$)(\d+\.?\d*|\.\d+)$/;
+        // This regex allows positive numbers, including decimals, and leading "0."
+        const regex = /^(0|[1-9]\d*)?(\.\d*)?$/;
         return regex.test(value);
     };
+
     const handleTransferDialogClose = () => {
         setOpenTransferDialog(false);
         setDestAddress('');
@@ -81,7 +82,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
             p: 'KRC-20',
             op: 'transfer',
             tick: currentTicker,
-            amt: (parseInt(amount) * 100000000).toString(),
+            amt: convertToProtocolFormat(amount),
             to: destAddress,
         };
         const jsonStringified = JSON.stringify(inscribeJsonString);
@@ -165,20 +166,19 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
             setError('');
             return;
         }
-        if (parseInt(value) > parseInt(token.balance)) {
+
+        // Check if the value exceeds the token balance
+        if (parseFloat(value) > parseFloat(token.balance)) {
             setError('Insufficient Token Balance');
             return;
         }
 
-        // Replace comma with dot for decimal separator consistency
-
+        // Allow valid positive numbers, including decimals
         if (validatePositiveNumber(value)) {
-            setAmount(value);
-            setError('');
+            setAmount(value); // Update amount with valid input
+            setError(''); // Clear any errors
         } else {
-            setError('Please enter a valid number greater than 0 and ONLY NUMBERS');
-            // Optionally, you can choose to not update the amount when there's an error
-            // setAmount(value);
+            setError('Please enter a valid positive number (e.g., 0.0125)');
         }
     };
     const totalBalanceUsd = parseInt(token.balance) * token.price * kasPrice;

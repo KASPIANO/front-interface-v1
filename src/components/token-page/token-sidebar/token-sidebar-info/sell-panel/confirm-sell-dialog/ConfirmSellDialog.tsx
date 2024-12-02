@@ -1,5 +1,5 @@
 // ConfirmSellDialog.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -11,14 +11,14 @@ import {
     Divider,
 } from '@mui/material';
 import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
-import { HighGasWarning } from '../../../../../common/HighGasWarning';
-import { highGasWarning } from '../../../../../../DAL/KaspaApiDal';
+import { kaspaFeeEstimate } from '../../../../../../DAL/KaspaApiDal';
 import { formatNumberWithCommas } from '../../../../../../utils/Utils';
+import GasFeeSelector from '../../../../../common/GasFeeSelector';
 
 interface ConfirmSellDialogProps {
     open: boolean;
     onClose: () => void;
-    onConfirm: () => void;
+    onConfirm: (priorityFee?: number) => void;
     ticker: string;
     tokenAmount: string;
     totalPrice: string;
@@ -27,8 +27,10 @@ interface ConfirmSellDialogProps {
     waitingForWalletConfirmation: boolean;
     creatingSellOrder: boolean;
 }
+
 const MINIMUM_FEE_AMOUNT = 1;
 const MARKETLACE_FEE_PERCENTAGE = 0.025;
+
 const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
     const {
         waitingForWalletConfirmation,
@@ -42,24 +44,16 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
         priceCurrency,
         creatingSellOrder,
     } = props;
-    const [showHighGasWarning, setShowHighGasWarning] = useState(false);
     const [onClickConfirm, setOnClickConfirm] = useState(false);
-    useEffect(() => {
-        const checkGasLimits = async () => {
-            const isHighGasWarning = await highGasWarning('TRANSFER');
-
-            setShowHighGasWarning(isHighGasWarning);
-        };
-
-        checkGasLimits();
-    }, []);
+    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
     const handleClose = () => {
-        if (waitingForWalletConfirmation || creatingSellOrder || onClickConfirm) {
+        if (waitingForWalletConfirmation || onClickConfirm || creatingSellOrder) {
             return; // Prevent closing if waiting
         }
         onClose();
     };
+
     const marketplaceFeeString = `${MARKETLACE_FEE_PERCENTAGE * 100}%`;
     const calculateAmountReceived = () => {
         const total = parseFloat(totalPrice);
@@ -70,11 +64,23 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
         }
     };
 
-    const handleConfirm = async () => {
+    const handleConfirm = async (priorityFee?: number) => {
         setOnClickConfirm(true);
-        await onConfirm();
+        await onConfirm(priorityFee);
         setOnClickConfirm(false);
     };
+
+    const purchaseButtonRef = useRef<HTMLButtonElement | null>(null);
+
+    const gasHandlerPurchase = async () => {
+        const fee = await kaspaFeeEstimate();
+        if (fee === 1) {
+            handleConfirm();
+        } else {
+            setAnchorEl(purchaseButtonRef.current);
+        }
+    };
+
     return (
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle sx={{ fontWeight: 'bold' }}>
@@ -84,7 +90,6 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                         : creatingSellOrder
                           ? 'Step 2/2' // Show Step 2/2 when creating a sell order
                           : 'Confirm Sell Order'}
-                    {showHighGasWarning && <HighGasWarning />}
                 </Box>
             </DialogTitle>
             <DialogContent>
@@ -129,19 +134,37 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
                                 {MINIMUM_FEE_AMOUNT} KAS.{' '}
                             </Typography>
                         </Box>
+                        {/* <Box sx={{ bgcolor: 'info.light', p: 2, borderRadius: 1 }}>
+                            <Typography variant="body1" gutterBottom>
+                                By confirming this sell order:
+                            </Typography>
+                            <Typography variant="body2" paragraph>
+                                • You will receive {totalPrice} KAS <strong /> when the token is sold.
+                            </Typography>
+                        </Box> */}
+                        <GasFeeSelector
+                            gasType="KRC20"
+                            onSelectFee={(selectedFee) => {
+                                handleConfirm(selectedFee);
+                                setAnchorEl(null);
+                            }}
+                            anchorEl={anchorEl}
+                            onClose={() => setAnchorEl(null)}
+                        />
                     </>
                 )}
             </DialogContent>
-            {waitingForWalletConfirmation || creatingSellOrder ? null : (
+            {waitingForWalletConfirmation ? null : (
                 <DialogActions>
                     <Button onClick={onClose} disabled={onClickConfirm}>
                         Cancel
                     </Button>
                     <Button
-                        onClick={() => handleConfirm()}
+                        ref={purchaseButtonRef}
+                        onClick={() => gasHandlerPurchase()}
                         variant="contained"
                         color="primary"
-                        disabled={waitingForWalletConfirmation || creatingSellOrder || onClickConfirm}
+                        disabled={waitingForWalletConfirmation || onClickConfirm || creatingSellOrder}
                     >
                         {onClickConfirm ? 'Creating...' : 'Confirm'}
                     </Button>

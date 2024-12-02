@@ -1,28 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography, Button, IconButton, Tooltip, FormControlLabel, Checkbox, Link } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { Order } from '../../../../../../types/Types';
+import { DecentralizedOrder, MixedOrder, Order } from '../../../../../../types/Types';
 import { OrderDetailsItem, OrderItemPrimary } from './OrderDetails.s';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
-import { highGasLimitExceeded, highGasWarning } from '../../../../../../DAL/KaspaApiDal';
+import { highGasLimitExceeded, highGasWarning, kaspaFeeEstimate } from '../../../../../../DAL/KaspaApiDal';
 import { GasLimitExceeded } from '../../../../../common/HighGasLimitExceeded';
 import { HighGasWarning } from '../../../../../common/HighGasWarning';
 import { fetchTickerFloorPrice } from '../../../../../../DAL/BackendDAL';
 import { HighPriceWarning } from '../../../../../common/HighPriceWarning';
+import GasFeeSelector from '../../../../../common/GasFeeSelector';
 
 interface OrderDetailsProps {
-    order: Order;
+    order: MixedOrder;
     walletConnected: boolean;
     walletBalance: number;
     kasPrice: number;
-    onClose: (orderId: string) => void;
+    onClose: (orderId: string, isDecentralized: boolean) => void;
     timeLeft: number;
-    handlePurchase: (order: Order, finalTotal: number) => void;
+    handlePurchase: (order: Order, finalTotal: number, priorityFee?: number) => void;
     waitingForWalletConfirmation: boolean;
     isProcessingBuyOrder: boolean;
+    handlePurchaseV2: (order: DecentralizedOrder, finalTotal: number, priorityFee?: number) => void;
 }
 
+const KASPIANO_TRADE_COMMISSION = import.meta.env.VITE_TRADE_COMMISSION;
 const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     const {
         order,
@@ -34,12 +37,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
         handlePurchase,
         waitingForWalletConfirmation,
         isProcessingBuyOrder,
+        handlePurchaseV2,
     } = props;
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [showHighGasWarning, setShowHighGasWarning] = useState(false);
     const [showGasLimitExceeded, setShowGasLimitExceeded] = useState(false);
     const [floorPriceDifference, setFloorPriceDifference] = useState(false);
     const [floorPrice, setFloorPrice] = useState<number>(0);
+    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+    const buyButtonRef = useRef<HTMLButtonElement | null>(null);
 
     useEffect(() => {
         const checkPriceDifference = async () => {
@@ -61,8 +67,12 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     }, [order]);
 
     // Fee Calculations
-    const networkFee = 5; // Fixed network fee
+    const kaspianoCommissionInt = parseFloat(KASPIANO_TRADE_COMMISSION);
+    const networkFee = order.isDecentralized ? 1.05 : 5;
     const finalTotal = order.totalPrice + networkFee;
+    const platformFee = kaspianoCommissionInt > 0 ? Math.max(order.totalPrice * kaspianoCommissionInt, 0.5) : 0;
+    const finalTotalWithCommission = order.isDecentralized ? finalTotal + platformFee : finalTotal;
+    const feeText = order.isDecentralized ? 'PKST Fee' : 'Network Fee';
 
     const formatTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60)
@@ -84,6 +94,18 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
         checkGasLimits();
     }, []);
 
+    const handleOrderPurchase = async (
+        order: Order | DecentralizedOrder,
+        finalTotal: number,
+        priorityFee?: number,
+    ) => {
+        if (order.isDecentralized) {
+            await handlePurchaseV2(order as DecentralizedOrder, finalTotalWithCommission, priorityFee);
+        } else {
+            await handlePurchase(order as Order, finalTotal, priorityFee);
+        }
+    };
+
     const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setAgreedToTerms(event.target.checked);
     };
@@ -103,6 +125,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
             return 'You must agree to the terms and conditions';
         }
         return 'Confirm Purchase'; // Default message when everything is valid
+    };
+
+    const gasHandlerMint = async () => {
+        const fee = await kaspaFeeEstimate();
+        if (fee === 1) {
+            handleOrderPurchase(order, finalTotal);
+        } else {
+            setAnchorEl(buyButtonRef.current);
+        }
     };
 
     return (
@@ -142,7 +173,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                     <HighPriceWarning floorPrice={floorPrice} currentPrice={order.pricePerToken} />
                                 )}
                             </Box>
-                            <IconButton onClick={() => onClose(order.orderId)}>
+                            <IconButton onClick={() => onClose(order.orderId, order.isDecentralized)}>
                                 <CloseIcon
                                     sx={{
                                         fontSize: '1rem',
@@ -169,7 +200,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
 
                         {/* Network Fee */}
                         <OrderDetailsItem variant="body1">
-                            Network Fee:
+                            {feeText}:
                             <OrderItemPrimary
                                 sx={{
                                     display: 'flex',
@@ -178,7 +209,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                             >
                                 <Tooltip
                                     placement="left"
-                                    title="Network fee for processing the transaction, the fee unused will be refunded, usually you receive a refund of 4.9 KAS"
+                                    title={`${feeText} for processing the transaction, the fee unused will be refunded, usually you receive most of it back`}
                                 >
                                     <IconButton size="small">
                                         <InfoOutlinedIcon
@@ -200,19 +231,40 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                 </Typography>
                             </OrderItemPrimary>
                         </OrderDetailsItem>
+                        {order.isDecentralized && kaspianoCommissionInt > 0 && (
+                            <OrderDetailsItem variant="body1">
+                                Platform Fee:
+                                <OrderItemPrimary
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    {platformFee.toFixed(2)} KAS
+                                    <Typography
+                                        sx={{ ml: '0.3rem' }}
+                                        variant="body2"
+                                        color="textSecondary"
+                                        component="span"
+                                    >
+                                        (${(platformFee * kasPrice).toFixed(2)})
+                                    </Typography>
+                                </OrderItemPrimary>
+                            </OrderDetailsItem>
+                        )}
 
                         {/* Final Total */}
                         <OrderDetailsItem variant="body1" sx={{ fontWeight: 'bold' }}>
                             Final Total:
                             <OrderItemPrimary>
-                                {finalTotal.toFixed(2)} KAS
+                                {finalTotalWithCommission.toFixed(2)} KAS
                                 <Typography
                                     sx={{ ml: '0.3rem' }}
                                     variant="body2"
                                     color="textSecondary"
                                     component="span"
                                 >
-                                    (${(finalTotal * kasPrice).toFixed(2)})
+                                    (${(finalTotalWithCommission * kasPrice).toFixed(2)})
                                 </Typography>
                             </OrderItemPrimary>
                         </OrderDetailsItem>
@@ -250,9 +302,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                     <Tooltip title={getTooltipMessage()}>
                         <span>
                             <Button
+                                ref={buyButtonRef}
                                 variant="contained"
                                 color="primary"
-                                onClick={() => handlePurchase(order, finalTotal)}
+                                onClick={gasHandlerMint}
                                 disabled={!walletConnected || walletBalance < finalTotal || !agreedToTerms}
                                 sx={{ width: '100%' }}
                             >
@@ -262,6 +315,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                     </Tooltip>
                 </>
             )}
+            <GasFeeSelector
+                gasType="KRC20"
+                onSelectFee={(selectedFee) => {
+                    handleOrderPurchase(order, finalTotal, selectedFee);
+                    setAnchorEl(null);
+                }}
+                anchorEl={anchorEl}
+                onClose={() => setAnchorEl(null)}
+            />
         </Box>
     );
 };

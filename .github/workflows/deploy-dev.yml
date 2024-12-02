@@ -29,6 +29,7 @@ jobs:
         echo "VITE_KASPA_API=${{ secrets.VITE_KASPA_API_DEV }}" >> .env
         echo "VITE_WEBSERVER_API_KEY=${{ secrets.VITE_WEBSERVER_API_KEY_DEV }}" >> .env
         echo "VITE_ENV=${{ secrets.VITE_ENV_DEV }}" >> .env
+        echo "VITE_TRADE_COMMISSION=${{ secrets.VITE_TRADE_COMMISSION_DEV }}" >> .env
 
 
     - name: Build React app

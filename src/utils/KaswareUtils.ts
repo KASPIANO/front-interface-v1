@@ -4,11 +4,13 @@ import Cookies from 'js-cookie';
 import { getPriorityFee } from '../DAL/KaspaApiDal';
 import { KaswareSendKaspaResult } from '../types/Types';
 import { saveMintData } from '../DAL/BackendDAL';
+import { showGlobalSnackbar } from '../components/alert-context/AlertContext';
 import { getTokenMintsLeft } from '../DAL/Krc20DAL';
 
 export const USER_REJECTED_TRANSACTION_ERROR_CODE = 4001;
-export const MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION = 21;
-export const LASTEST_VERSION = '0.7.5.4';
+export const MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION = 3;
+export const AIRDROP_VERSION = '0.7.5.4';
+export const PKST_VERSION = '0.7.8';
 
 // Utility to detect if KasWare Wallet is installed
 export const isKasWareInstalled = (): boolean => typeof window.kasware !== 'undefined';
@@ -124,16 +126,10 @@ export const getBalance = async (): Promise<{ confirmed: number; unconfirmed: nu
 
 // Method to send KAS
 // PRIORITY FEE SOMPI//
-export const sendKaspa = async (
-    toAddress: string,
-    sompi: number,
-    options?: { priorityFee?: number },
-): Promise<string> => {
+export const sendKaspa = async (toAddress: string, sompi: number, priorityFee?: number): Promise<string> => {
     try {
-        const priorityFee = await getPriorityFee('KASPA');
-        if (priorityFee) {
-            options = { priorityFee };
-        }
+        const kasPriorityFee = priorityFee ? priorityFee : undefined;
+        const options = kasPriorityFee ? { priorityFee: kasPriorityFee } : undefined;
         const txData = await window.kasware.sendKaspa(toAddress, sompi, options);
         return txData;
     } catch (error) {
@@ -183,11 +179,10 @@ export const pushTx = async (options: { rawtx: string }): Promise<string> => {
 
 // Method to sign KRC20 transaction
 // PRIORITY FEE KAS
-export const deployKRC20Token = async (inscribeJsonString: string): Promise<string> => {
+export const deployKRC20Token = async (inscribeJsonString: string, priorityFee?: number): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        const priorityFee = await getPriorityFee('TRANSFER');
-        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
+        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : undefined;
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 2, '', kasPriorityFee);
         return txid;
     } catch (error) {
@@ -198,7 +193,11 @@ export const deployKRC20Token = async (inscribeJsonString: string): Promise<stri
 
 // Method to mint KRC20 token
 // PRIORITY FEE KAS
-export const mintKRC20Token = async (inscribeJsonString: string, ticker: string): Promise<string> => {
+export const mintKRC20Token = async (
+    inscribeJsonString: string,
+    ticker: string,
+    priorityFee?: number,
+): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
         const mintsLeft = await getTokenMintsLeft(ticker);
@@ -206,8 +205,7 @@ export const mintKRC20Token = async (inscribeJsonString: string, ticker: string)
         if (mintsLeft <= 0) {
             throw new Error(`Minting for the ${ticker} token has ended`);
         }
-        const priorityFee = await getPriorityFee('TRANSFER');
-        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
+        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : undefined;
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 3, '', kasPriorityFee);
         saveMintData(ticker);
         return txid;
@@ -219,13 +217,74 @@ export const mintKRC20Token = async (inscribeJsonString: string, ticker: string)
 
 // Method to transfer KRC20 token
 // PRIORITY FEE KAS
-export const transferKRC20Token = async (inscribeJsonString: string): Promise<string> => {
+export const transferKRC20Token = async (inscribeJsonString: string, priorityFee?: number): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
-        const priorityFee = await getPriorityFee('TRANSFER');
-        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : priorityFee;
+        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : undefined;
         const txid = await window.kasware.signKRC20Transaction(inscribeJsonString, 4, '', kasPriorityFee);
         return txid;
+    } catch (error) {
+        console.error('Failed to transfer KRC20 token:', error);
+        throw error;
+    }
+};
+
+// NEED to revise priorityfee
+export const createOrderKRC20 = async (
+    krc20Tick: string,
+    krc20Amount: number,
+    kasAmount: number,
+    psktExtraOutput?: Array<{ address: string; amount: number }>,
+    priorityFee?: number,
+): Promise<{ txJsonString: string; sendCommitTxId: string }> => {
+    if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
+    await versionCheck(PKST_VERSION);
+    try {
+        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : undefined;
+
+        const { txJsonString, sendCommitTxId } = await window.kasware.createKRC20Order({
+            krc20Tick,
+            krc20Amount,
+            kasAmount,
+            psktExtraOutput,
+            priorityFee: kasPriorityFee,
+        });
+        return { txJsonString, sendCommitTxId };
+    } catch (error) {
+        console.error('Failed to transfer KRC20 token:', error);
+        throw error;
+    }
+};
+
+export const buyOrderKRC20 = async (
+    txJsonString: string,
+    priorityFee?: number,
+    extraOutput?: Array<{ address: string; amount: number }>,
+): Promise<string> => {
+    if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
+    await versionCheck(PKST_VERSION);
+    try {
+        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : undefined;
+        const txId = await window.kasware.buyKRC20Token({
+            txJsonString,
+            extraOutput,
+            priorityFee: kasPriorityFee,
+        });
+        return txId; // txId is a string
+    } catch (error) {
+        console.error('Failed to transfer KRC20 token:', error);
+        throw error;
+    }
+};
+export const cancelOrderKRC20 = async (ticker: string, sendCommitTxId: string): Promise<string> => {
+    if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
+    await versionCheck(PKST_VERSION);
+    try {
+        const txId = await window.kasware.cancelKRC20Order({
+            krc20Tick: ticker,
+            sendCommitTxId,
+        });
+        return txId; // txId is a string
     } catch (error) {
         console.error('Failed to transfer KRC20 token:', error);
         throw error;
@@ -266,9 +325,9 @@ export const signKRC20BatchTransfer = async (
     }
 };
 
-const isVersionLatestOrGreater = (currentVersion) => {
+const isVersionLatestOrGreater = (currentVersion, versionNeeded: string) => {
     const currentParts = currentVersion.split('.').map(Number);
-    const latestParts = LASTEST_VERSION.split('.').map(Number);
+    const latestParts = versionNeeded.split('.').map(Number);
 
     for (let i = 0; i < latestParts.length; i++) {
         if (currentParts[i] > latestParts[i]) return true;
@@ -276,13 +335,15 @@ const isVersionLatestOrGreater = (currentVersion) => {
     }
     return true; // If all parts are equal, the version is up-to-date
 };
-export const versionCheck = async () => {
+export const versionCheck = async (versionNeeded: string) => {
     const currentVersion = await window.kasware.getVersion();
-    if (isVersionLatestOrGreater(currentVersion)) {
-        console.log('User has the latest version or a newer one:', currentVersion);
+    if (isVersionLatestOrGreater(currentVersion, versionNeeded)) {
         return true;
     } else {
-        console.log("User's version is outdated:", currentVersion);
+        showGlobalSnackbar({
+            message: 'Please update your KasWare Wallet to the latest version.',
+            severity: 'error',
+        });
         return false;
     }
 };

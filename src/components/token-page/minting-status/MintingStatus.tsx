@@ -1,10 +1,12 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { Box, Card, Tooltip, Typography } from '@mui/material';
 import { BackendTokenResponse } from '../../../types/Types';
 import { mintKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { fetchTokenByTicker } from '../../../DAL/BackendDAL';
 import { StyledMintButton } from './MintingStatus.s';
+import GasFeeSelector from '../../common/GasFeeSelector';
+import { kaspaFeeEstimate } from '../../../DAL/KaspaApiDal';
 
 interface MintingComponentProps {
     tokenInfo: BackendTokenResponse;
@@ -23,6 +25,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
     const mintsLeft = totalMintsPossible - tokenInfo.totalMintTimes;
     const isMintingDisabled = tokenInfo.totalMinted >= tokenInfo.totalSupply;
     const isSoldOut = tokenInfo.state === 'finished';
+    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
     useEffect(() => {
         if (mintSuccessful) {
@@ -42,7 +45,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mintSuccessful]);
 
-    const handleMint = async (ticker: string) => {
+    const handleMint = async (ticker: string, priorityFee?: number) => {
         if (!walletConnected) {
             showGlobalSnackbar({
                 message: 'Please connect your wallet to mint a token',
@@ -53,7 +56,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
         }
         if (walletBalance < 1) {
             showGlobalSnackbar({
-                message: 'You need at least 1 KAS to mint a token',
+                message: 'You need at least 3 KAS to mint a token',
                 severity: 'error',
             });
             return;
@@ -64,7 +67,7 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
             tick: ticker,
         });
         try {
-            const mint = await mintKRC20Token(inscribeJsonString, ticker);
+            const mint = await mintKRC20Token(inscribeJsonString, ticker, priorityFee);
             if (mint) {
                 const { commitId, revealId } = JSON.parse(mint);
                 showGlobalSnackbar({
@@ -81,6 +84,16 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                 severity: 'error',
                 details: error.message,
             });
+        }
+    };
+    const mintButtonRef = useRef<HTMLButtonElement | null>(null);
+
+    const gasHandlerMint = async (ticker) => {
+        const fee = await kaspaFeeEstimate();
+        if (fee === 1) {
+            handleMint(ticker);
+        } else {
+            setAnchorEl(mintButtonRef.current);
         }
     };
 
@@ -152,7 +165,8 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                 >
                     <span>
                         <StyledMintButton
-                            onClick={() => handleMint(tokenInfo.ticker)}
+                            ref={mintButtonRef}
+                            onClick={() => gasHandlerMint(tokenInfo.ticker)}
                             variant="contained"
                             color="primary"
                             style={{
@@ -166,6 +180,15 @@ const MintingComponent: FC<MintingComponentProps> = (props) => {
                         </StyledMintButton>
                     </span>
                 </Tooltip>
+                <GasFeeSelector
+                    gasType="KRC20"
+                    onSelectFee={(selectedFee) => {
+                        handleMint(tokenInfo.ticker, selectedFee);
+                        setAnchorEl(null);
+                    }}
+                    anchorEl={anchorEl}
+                    onClose={() => setAnchorEl(null)}
+                />
             </Box>
         </Card>
     );

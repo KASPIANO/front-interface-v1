@@ -18,6 +18,7 @@ const FireIconWrapper = styled.div<FireIconWrapperProps>`
     align-items: center;
     justify-content: center;
     padding: 5px;
+    padding-right: 1px;
     border-radius: 50%;
     cursor: pointer;
     background-color: ${(props) => (props.selected ? `${fireColors.secondary}40` : 'transparent')};
@@ -28,7 +29,7 @@ const FireIconWrapper = styled.div<FireIconWrapperProps>`
     }
 
     .fire-icon {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         color: ${(props) => (props.selected ? fireColors.glow : fireColors.primary)};
         filter: drop-shadow(0 0 2px ${fireColors.glow});
         transition: all 0.3s ease;

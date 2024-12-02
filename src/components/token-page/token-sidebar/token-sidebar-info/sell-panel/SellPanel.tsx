@@ -8,8 +8,9 @@ import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
 import ConfirmSellDialog from './confirm-sell-dialog/ConfirmSellDialog';
 import { MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION, transferKRC20Token } from '../../../../../utils/KaswareUtils';
 import { confirmSellOrder, createSellOrder } from '../../../../../DAL/BackendP2PDAL';
-import { doPolling } from '../../../../../utils/Utils';
+// import { doPolling } from '../../../../../utils/Utils';
 import { useQueryClient } from '@tanstack/react-query';
+import { doPolling } from '../../../../../utils/Utils';
 
 interface SellPanelProps {
     tokenInfo: BackendTokenResponse;
@@ -17,9 +18,13 @@ interface SellPanelProps {
     walletAddress: string | null;
     walletConnected;
     walletBalance: number;
+    startPolling: () => void;
 }
 
 const KASPA_TO_SOMPI = 100000000;
+// const STORAGE_KEY = 'pendingPSKT';
+// const KASPIANO_TRADE_COMMISSION = import.meta.env.VITE_TRADE_COMMISSION;
+// const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 
 const SellPanel: React.FC<SellPanelProps> = (props) => {
     const { tokenInfo, kasPrice, walletAddress, walletConnected, walletBalance } = props;
@@ -31,7 +36,6 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [priceCurrency, setPriceCurrency] = useState<'KAS' | 'USD'>('KAS');
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false); // Dialog state
     const [walletConfirmation, setWalletConfirmation] = useState<boolean>(false);
-    const [creatingSellOrder, setCreatingSellOrder] = useState<boolean>(false);
     const [disableSellButton, setDisableSellButton] = useState<boolean>(false);
     const [finishedSellOrder, setFinishedSellOrder] = useState<boolean>(false);
     const [amountError, setAmountError] = useState<string>('');
@@ -39,7 +43,9 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [isPriceFromButton, setIsPriceFromButton] = useState<boolean>(false);
     const [showButtonsTooltip, setShowButtonsTooltip] = useState<boolean>(false);
     const [showInputTooltip, setShowInputTooltip] = useState<boolean>(false);
+    const [creatingSellOrder, setCreatingSellOrder] = useState<boolean>(false);
     const queryClient = useQueryClient();
+    // const kaspianoCommissionInt = parseFloat(KASPIANO_TRADE_COMMISSION);
 
     useEffect(() => {
         const fetchBalance = () => {
@@ -271,9 +277,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             setDisableSellButton(false);
             return;
         }
-        try {
-            // Retrieve wallet temp wallert address and order id and set it
 
+        try {
             setIsDialogOpen(true);
         } catch (error) {
             console.error(error);
@@ -284,7 +289,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         }
     };
 
-    const handleTransfer = async () => {
+    const handleTransfer = async (priorityFee?: number) => {
         let idResponse = '';
         let temporaryWalletAddressResponse = '';
         try {
@@ -315,7 +320,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         const jsonStringified = JSON.stringify(inscribeJsonString);
 
         try {
-            const result = await transferKRC20Token(jsonStringified);
+            const result = await transferKRC20Token(jsonStringified, priorityFee);
             setCreatingSellOrder(true);
             setWalletConfirmation(false);
             if (result) {
@@ -365,6 +370,125 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             return false;
         }
     };
+
+    // const getStoredTransactions = () => {
+    //     try {
+    //         const stored = localStorage.getItem(STORAGE_KEY);
+    //         return stored ? JSON.parse(stored) : [];
+    //     } catch (error) {
+    //         console.error('Error reading from localStorage:', error);
+    //         return [];
+    //     }
+    // };
+
+    // const saveTransactionsToStorage = (transactions) => {
+    //     try {
+    //         localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+    //     } catch (error) {
+    //         console.error('Error saving to localStorage:', error);
+    //     }
+    // };
+
+    // const saveFailedTransaction = (txData) => {
+    //     const pendingTransactions = getStoredTransactions();
+    //     const newTransaction = {
+    //         ...txData,
+    //         retryCount: 0,
+    //         timestamp: Date.now(),
+    //     };
+
+    //     saveTransactionsToStorage([...pendingTransactions, newTransaction]);
+    //     return startPolling();
+    // };
+
+    // const handleTransferV2 = async (priorityFee?: number) => {
+    //     setWalletConfirmation(true);
+    //     try {
+    //         const fee =
+    //             kaspianoCommissionInt > 0 ? Math.max(parseInt(totalPrice) * kaspianoCommissionInt, 0.5) : 0;
+    //         const psktExtraOutput = [{ address: KASPIANO_WALLET, amount: fee }];
+    //         const { txJsonString, sendCommitTxId } = await createOrderKRC20(
+    //             tokenInfo.ticker,
+    //             parseInt(tokenAmount),
+    //             parseInt(totalPrice),
+    //             psktExtraOutput,
+    //             priorityFee,
+    //         );
+    //         const parse = JSON.parse(txJsonString);
+    //         console.log(parse);
+    //         if (txJsonString || sendCommitTxId) {
+    //             try {
+    //                 const res = await createSellOrderV2(
+    //                     tokenInfo.ticker,
+    //                     parseInt(tokenAmount),
+    //                     parseInt(totalPrice),
+    //                     parseFloat(pricePerToken),
+    //                     txJsonString,
+    //                     sendCommitTxId,
+    //                 );
+    //                 if (res.status === SellOrderStatusV2.LISTED_FOR_SALE) {
+    //                     showGlobalSnackbar({
+    //                         message: 'Sell order created successfully',
+    //                         severity: 'success',
+    //                         commitId: sendCommitTxId,
+    //                     });
+    //                 }
+    //                 if (res.status === SellOrderStatusV2.PSKT_VERIFICATION_ERROR) {
+    //                     showGlobalSnackbar({
+    //                         message: 'Order not created, PSKT verification failed',
+    //                         severity: 'error',
+    //                     });
+    //                 }
+    //                 // add kasplex valdiation of utxo creation sendcommit
+    //                 setIsDialogOpen(false);
+    //                 setDisableSellButton(false);
+    //                 cleanFields();
+    //                 queryClient.invalidateQueries({ queryKey: ['orders'] });
+    //                 setTimeout(() => {
+    //                     setFinishedSellOrder((prev) => !prev);
+    //                     setWalletConfirmation(false); // Ensures it closes after a slight delay
+    //                 }, 500);
+
+    //                 return true;
+    //             } catch (error) {
+    //                 saveFailedTransaction({
+    //                     ticker: tokenInfo.ticker,
+    //                     amount: parseInt(tokenAmount),
+    //                     totalPrice: parseInt(totalPrice),
+    //                     pricePerToken: parseFloat(pricePerToken),
+    //                     txJsonString,
+    //                     sendCommitTxId,
+    //                 });
+    //                 setIsDialogOpen(false);
+    //                 setDisableSellButton(false);
+    //                 cleanFields();
+    //                 setTimeout(() => {
+    //                     setFinishedSellOrder((prev) => !prev);
+    //                     setWalletConfirmation(false); // Ensures it closes after a slight delay
+    //                 }, 500);
+    //                 showGlobalSnackbar({
+    //                     message: 'Sell order Failed, it will be created in the background',
+    //                     severity: 'warning',
+    //                 });
+    //                 return false;
+    //             }
+    //         } else {
+    //             showGlobalSnackbar({
+    //                 message: 'Failed to create sell order',
+    //                 severity: 'error',
+    //             });
+    //             return false;
+    //         }
+    //     } catch (error) {
+    //         setWalletConfirmation(false);
+    //         showGlobalSnackbar({
+    //             message: 'Failed to Transfer Token',
+    //             severity: 'error',
+    //             details: error.message,
+    //         });
+    //         return false;
+    //     }
+    // };
 
     const handleCloseDialog = () => {
         setIsDialogOpen(false);

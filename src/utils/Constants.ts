@@ -10,3 +10,5 @@ export const LOCAL_STORAGE_KEYS = {
 };
 
 export const DEFAULT_TOKEN_LOGO_URL = 'https://krc20data.s3.amazonaws.com/Grid-Default-Icon.png';
+
+// Error codes with user-facing messages

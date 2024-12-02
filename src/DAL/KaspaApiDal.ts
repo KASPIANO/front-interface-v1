@@ -7,18 +7,17 @@ const KRC20_TRANSACTION_MASS = 3370;
 const TRADE_TRANSACTION_MASS = 11000;
 const CANCEL_LIMIT_KAS = 0.5;
 const WARNING_LIMIT_KAS = 0.2;
-export const fetchWalletBalance = async (address: string): Promise<number> => {
+export const fetchWalletBalance = async (address: string, user = true): Promise<number> => {
     try {
         let balanceInKaspa;
 
-        if (window.kasware && window.kasware.getBalance) {
+        if (window.kasware && window.kasware.getBalance && user) {
             const balance = await getBalance();
             balanceInKaspa = balance.total / 1e8;
         } else {
             const response = await kasInfoService.get<any>(`addresses/${address}/balance`);
             balanceInKaspa = response.data.balance / 1e8;
         }
-
         return balanceInKaspa;
     } catch (error) {
         console.error('Error fetching wallet balance:', error);
@@ -37,7 +36,7 @@ export const kaspaLivePrice = async (): Promise<number> => {
 };
 export const kaspaTradeFeeEstimate = async (): Promise<number> => {
     try {
-        const response = await kasInfoMainnetService.get<{
+        const response = await kasInfoService.get<{
             priorityBucket: {
                 feerate: number;
                 estimatedSeconds: number;
@@ -54,8 +53,31 @@ export const kaspaTradeFeeEstimate = async (): Promise<number> => {
 
         // Extract the feerate from the priorityBucket
         const feeRate = response.data.priorityBucket.feerate;
-
         return feeRate;
+    } catch (error) {
+        console.error('Error fetching kaspa fee estimate:', error);
+        return 0;
+    }
+};
+export const feeEstimate = async (): Promise<any> => {
+    try {
+        const response = await kasInfoService.get<{
+            priorityBucket: {
+                feerate: number;
+                estimatedSeconds: number;
+            };
+            normalBuckets: Array<{
+                feerate: number;
+                estimatedSeconds: number;
+            }>;
+            lowBuckets: Array<{
+                feerate: number;
+                estimatedSeconds: number;
+            }>;
+        }>('info/fee-estimate');
+
+        // Extract the feerate from the priorityBucket
+        return response.data;
     } catch (error) {
         console.error('Error fetching kaspa fee estimate:', error);
         return 0;
@@ -63,7 +85,7 @@ export const kaspaTradeFeeEstimate = async (): Promise<number> => {
 };
 export const kaspaFeeEstimate = async (): Promise<number> => {
     try {
-        const response = await kasInfoMainnetService.get<{
+        const response = await kasInfoService.get<{
             priorityBucket: {
                 feerate: number;
                 estimatedSeconds: number;

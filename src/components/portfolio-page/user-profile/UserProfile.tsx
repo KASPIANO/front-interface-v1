@@ -9,6 +9,10 @@ import { ContentCopyRounded as ContentCopyRoundedIcon } from '@mui/icons-materia
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { debounce } from 'lodash';
 import { UserReferral } from '../../../types/Types';
+// import SearchIcon from '@mui/icons-material/Search'; // Import the icon
+// import { checkOrderExists } from '../../../DAL/Krc20DAL';
+// import { cancelOrderKRC20 } from '../../../utils/KaswareUtils';
+// import { getUserUnlistedTransactions } from '../../../DAL/BackendP2PDAL';
 
 interface UserProfileProps {
     walletAddress: string;
@@ -38,6 +42,12 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     const [, setCopied] = useState(false);
     const [walletAddressError, setWalletAddressError] = useState<string | null>(null);
     const [walletInputValue, setWalletInputValue] = useState<string>(walletAddress);
+    // const [dialogOpen, setDialogOpen] = useState(false);
+    // const [ticker, setTicker] = useState('');
+    // const [orders, setOrders] = useState([]);
+    // const [psktTxId, setPsktTxId] = useState(null);
+    // const [fetchingLostOrders, setFetchingLostORders] = useState(false);
+    // const [recovering, setRecovering] = useState(false);
     // const [openXDialog, setOpenXDialog] = useState(false);
     // const [xUrl, setXUrl] = useState('');
     const debouncedSetCurrentWalletRef = useRef(null);
@@ -116,6 +126,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     const handleCopy = () => {
         navigator.clipboard.writeText(walletAddress);
     };
+
     const porfolioUSDValue = (portfolioValue * kasPrice).toFixed(2);
     // const arrowColor = portfolioValue.changeDirection === 'increase' ? 'green' : 'red';
 
@@ -125,6 +136,73 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     const lightKaspaIcon =
         'https://149995303.v2.pressablecdn.com/wp-content/uploads/2023/06/Kaspa-Icon-Dark-Green-on-White.png';
     const kaspaIcon = theme.palette.mode === 'dark' ? lightKaspaIcon : darkKaspaIcon;
+
+    // const handlePsktRecovery = async () => {
+    //     try {
+    //         setFetchingLostORders(true); // Indicate fetching started
+
+    //         // Fetch orders
+    //         const result = await checkOrderExists(ticker, walletAddress);
+
+    //         // Extract uTxid array
+    //         const uTxidArray = result.map((item) => item.uTxid);
+    //         // Fetch lost orders
+    //         const lostOrders = await getUserUnlistedTransactions(uTxidArray);
+    //         if (lostOrders.length === 0) {
+    //             showGlobalSnackbar({ message: 'No Lost Orders', severity: 'warning' });
+    //         }
+    //         const matchingOrders = result.filter((item) => lostOrders.includes(item.uTxid));
+    //         setOrders(matchingOrders || []); // Update state with lost orders
+    //     } catch (error) {
+    //         console.error('Error during PSKT recovery:', error); // Log any error
+    //     } finally {
+    //         setFetchingLostORders(false); // Indicate fetching ended
+    //     }
+    // };
+
+    // const handleRecovery = async () => {
+    //     if (psktTxId) {
+    //         try {
+    //             setRecovering(true);
+    //             const result = await cancelOrderKRC20(ticker, psktTxId);
+
+    //             if (result) {
+    //                 showGlobalSnackbar({
+    //                     message: 'Order recovered successfully',
+    //                     severity: 'success',
+    //                 });
+    //             } else {
+    //                 showGlobalSnackbar({
+    //                     message: 'Failed to recover order',
+    //                     severity: 'error',
+    //                 });
+    //             }
+    //         } catch (error) {
+    //             showGlobalSnackbar({
+    //                 message: 'An error occurred while recovering the order. Please try again.',
+    //                 severity: 'error',
+    //             });
+    //             console.error('Recovery Error:', error); // Log error for debugging
+    //         } finally {
+    //             // Always close the dialog, even if there's an error
+    //             handleCloseDialog();
+    //         }
+    //     } else {
+    //         showGlobalSnackbar({
+    //             message: 'No transaction ID provided for recovery.',
+    //             severity: 'warning',
+    //         });
+    //         handleCloseDialog(); // Close the dialog even if no transaction ID is provided
+    //     }
+    // };
+
+    // const handleCloseDialog = () => {
+    //     setDialogOpen(false);
+    //     setRecovering(false);
+    //     setFetchingLostORders(false);
+    //     setTicker('');
+    //     setPsktTxId('');
+    // };
 
     return (
         <ProfileContainer>
@@ -140,6 +218,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                             startIcon={<img style={{ height: '5vh', width: '5vh' }} src={kaspaIcon} alt="Kaspa" />}
                             sx={{
                                 color: theme.palette.text.secondary,
+                                fontSize: '0.75rem',
                             }}
                         >
                             {walletAddress ? shortenAddress(walletAddress) : 'Connect Wallet'}
@@ -155,7 +234,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                                 helperText={walletAddressError}
                                 sx={{
                                     minWidth: '3rem',
-                                    fontSize: '0.8rem',
+                                    fontSize: '0.75rem',
                                     position: 'relative',
 
                                     '& .MuiOutlinedInput-root': {
@@ -197,6 +276,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         </Button> */}
                         {!isEmptyString(userReferral?.code) && (
                             <Button
+                                sx={{ fontSize: '0.75rem' }}
                                 variant="outlined"
                                 size="medium"
                                 endIcon={<ContentCopyRoundedIcon fontSize="small" />}
@@ -207,6 +287,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         )}
                         {!isEmptyString(userReferral?.code) && (
                             <Button
+                                sx={{ fontSize: '0.75rem' }}
                                 variant="outlined"
                                 size="medium"
                                 endIcon={<ContentCopyRoundedIcon fontSize="small" />}
@@ -218,10 +299,25 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         {isEmptyString(userReferral?.referredBy) &&
                             !isEmptyString(walletAddress) &&
                             isUserReferralFinishedLoading && (
-                                <Button variant="outlined" size="medium" onClick={handleOpenReferralDialog}>
+                                <Button
+                                    sx={{ fontSize: '0.75rem' }}
+                                    variant="outlined"
+                                    size="medium"
+                                    onClick={handleOpenReferralDialog}
+                                >
                                     Apply Referral Code
                                 </Button>
                             )}
+
+                        {/* <Button
+                            sx={{ fontSize: '0.75rem' }}
+                            variant="outlined"
+                            size="medium"
+                            onClick={() => setDialogOpen(true)}
+                            startIcon={<SearchIcon />} // Add the icon
+                        >
+                            Get Lost Orders
+                        </Button> */}
                     </Box>
                 </ProfileDetails>
             </Box>
@@ -242,32 +338,64 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                     {portfolioValue.change}% */}
                 </StatHelpText>
             </Stat>
-            {/* <Dialog
-                PaperProps={{
-                    sx: {
-                        width: '40vw',
-                    },
-                }}
-                open={openXDialog}
-                onClose={() => setOpenXDialog(false)}
-            >
-                <DialogTitle>Add X/Twitter URL</DialogTitle>
-                <DialogContent>
+            {/* <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth>
+                <DialogTitle
+                    sx={{
+                        paddingBottom: '0.5rem',
+                    }}
+                >
+                    Retrieve Lost Orders
+                </DialogTitle>
+                <DialogContent
+                    sx={{
+                        padding: '1rem',
+                        paddingBottom: 0,
+                    }}
+                >
                     <TextField
-                        autoFocus
-                        margin="dense"
-                        id="Url"
-                        label="X/Twitter URL"
-                        type="text"
-                        fullWidth
                         variant="outlined"
-                        value={xUrl}
-                        onChange={(e) => setXUrl(e.target.value)}
+                        placeholder="Enter Ticker to see lost orders"
+                        fullWidth
+                        value={ticker}
+                        onChange={(e) => setTicker(e.target.value)}
+                        sx={{ marginBottom: '0.7rem' }}
                     />
+                    <Button variant="contained" onClick={handlePsktRecovery}>
+                        {fetchingLostOrders ? 'Fetching..' : 'Fetch Orders'}
+                    </Button>
+                    <Box sx={{ marginTop: '1rem' }}>
+                        {orders.map((order, index) => (
+                            <Box
+                                key={index}
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    margin: '0.5rem 0',
+                                    padding: '0.5rem',
+                                    border: '1px solid #ccc',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    borderColor: psktTxId === order.uTxid ? theme.palette.primary.main : '#ccc', // Border color for selected order
+                                    transition: 'background-color 0.3s, border-color 0.3s', // Smooth transition for better UI
+                                }}
+                                onClick={() => setPsktTxId(order.uTxid)}
+                            >
+                                <Typography>Ticker: {order.tick}</Typography>
+                                <Typography>Amount: {(order.amount / 1e8).toFixed(2)}</Typography>
+                            </Box>
+                        ))}
+                    </Box>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenXDialog(false)}>Cancel</Button>
-                    <Button onClick={handleAddXUrl}>Save</Button>
+                <DialogActions
+                    sx={{
+                        paddingTop: 0,
+                    }}
+                >
+                    <Button onClick={handleCloseDialog}>Cancel</Button>
+                    <Button variant="contained" onClick={handleRecovery} disabled={!psktTxId}>
+                        {recovering ? 'Recovering..' : 'Recover'}
+                    </Button>
                 </DialogActions>
             </Dialog> */}
         </ProfileContainer>
