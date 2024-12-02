@@ -12,8 +12,6 @@ import {
     DialogTitle,
     Grid,
     Typography,
-    FormControlLabel,
-    Switch,
     Input,
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -57,10 +55,10 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({
         tokensPerBatch: '',
     });
 
-    const handleToggleWhitelist = () => {
-        setWhitelistEnabled((prev) => !prev);
-        setRecipientList([]); // Clear wallet addresses when toggling
-    };
+    // const handleToggleWhitelist = () => {
+    //     setWhitelistEnabled((prev) => !prev);
+    //     setRecipientList([]); // Clear wallet addresses when toggling
+    // };
 
     const queryClient = useQueryClient();
 
@@ -355,7 +353,7 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({
                     />
                 </Grid>
 
-                <Grid item xs={6}>
+                {/* <Grid item xs={6}>
                     <Tooltip title="Enable whitelist to restrict purchases to specific wallet addresses.">
                         <FormControlLabel
                             control={
@@ -368,8 +366,8 @@ const CreateLaunchpadForm: FC<CreateLaunchpadFormProps> = ({
                             label="Whitelist"
                             labelPlacement="start"
                         />
-                    </Tooltip>
-                </Grid>
+                    </Tooltip> */}
+                {/* </Grid> */}
                 <Grid item xs={6}>
                     {whitelistEnabled && (
                         <Box sx={{ marginTop: '20px' }}>
