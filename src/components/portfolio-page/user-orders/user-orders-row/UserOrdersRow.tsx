@@ -23,7 +23,7 @@ import { verifyDecentralizedOrder, getDecentralizedOrder } from '../../../../DAL
 import { cancelOrderKRC20 } from '../../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../../alert-context/AlertContext';
 import { fetchTokenPrice } from '../../../../DAL/BackendDAL';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+// import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 interface UserOrdersRowProps {
     order: Order | DecentralizedOrder;
