@@ -9,6 +9,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { fetchWalletKRC20Balance } from '../../../DAL/Krc20DAL';
 import { useEstimateKasRequirement } from '../../../DAL/LaunchPadQueries';
 import { useQueryClient } from '@tanstack/react-query';
+// import EditIcon from '@mui/icons-material/Edit';
 
 const ExpandedView: React.FC<{
     isExpanded: boolean;
@@ -151,10 +152,26 @@ const ExpandedView: React.FC<{
                     {error && <Typography color="error">Error loading details: {error.message}</Typography>}
                     {expandedData && expandedData.success && (
                         <>
-                            <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                            <Box display="flex" alignItems="flex-start" gap={3}>
                                 <Typography variant="h5" component="h2" sx={{ fontWeight: 700 }}>
                                     {expandedData.lunchpad.ticker}
                                 </Typography>
+                                {/* <Button
+                                    sx={{
+                                        fontSize: '0.75rem',
+                                        '& .MuiSvgIcon-root': {
+                                            fontSize: '0.8rem',
+                                        },
+                                    }}
+                                    variant="outlined"
+                                    startIcon={<EditIcon />}
+                                    onClick={() => {
+                                        // Add your edit functionality here
+                                        console.log('Edit Launchpad clicked');
+                                    }}
+                                >
+                                    Edit Launchpad
+                                </Button> */}
                                 <Button
                                     sx={{
                                         '& .MuiSvgIcon-root': {
@@ -231,6 +248,7 @@ const ExpandedView: React.FC<{
                                             variant="contained"
                                             onClick={handleStartStop}
                                             disabled={
+                                                expandedData.lunchpad.status === 'STOPPING' ||
                                                 startLaunchpadMutation.isPending ||
                                                 stopLaunchpadMutation.isPending ||
                                                 (!ableTostart && expandedData.lunchpad.status === 'INACTIVE')

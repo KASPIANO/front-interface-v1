@@ -286,7 +286,7 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
             style={{
                 filter: backgroundBlur ? 'blur(6px)' : 'none',
                 transition: 'backdrop-filter 0.3s ease',
-                height: '90vh',
+                height: '97vh',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -303,12 +303,13 @@ const Launchpad: React.FC<LaunchpadProps> = (props) => {
                     padding: 4,
                     paddingBottom: 2,
                     paddingTop: 2,
-                    gap: 4,
+                    gap: 2.8,
                     bgcolor: 'background.paper',
                     border: `1px solid ${theme.palette.primary.main}`,
                     borderRadius: 2,
                     boxShadow: 3,
                     width: 600,
+                    height: 550,
                 }}
             >
                 {/* Ticker and Progress */}
