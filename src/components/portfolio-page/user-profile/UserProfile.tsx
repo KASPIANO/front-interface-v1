@@ -366,8 +366,8 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                         onChange={(e) => setTicker(e.target.value)}
                         sx={{ marginBottom: '0.7rem' }}
                     />
-                    <Button variant="contained" onClick={handlePsktRecovery}>
-                        {fetchingLostOrders ? 'Fetching..' : 'Fetch Orders'}
+                    <Button variant="contained" onClick={handlePsktRecovery} disabled={fetchingLostOrders}>
+                        {fetchingLostOrders ? 'Fetching...' : 'Fetch Orders'}
                     </Button>
                     <Box sx={{ marginTop: '1rem' }}>
                         {orders.map((order, index) => (
