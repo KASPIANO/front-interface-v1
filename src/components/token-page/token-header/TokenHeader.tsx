@@ -1,6 +1,6 @@
 import { FC, useEffect } from 'react';
 import { BackendTokenResponse } from '../../../types/Types';
-import { Title, TitleHeaderContainer } from './TokenHeader.s';
+import { Rank, Title, TitleHeaderContainer } from './TokenHeader.s';
 import { Avatar, Box } from '@mui/material';
 import { isEmptyString } from '../../../utils/Utils';
 import { DEFAULT_TOKEN_LOGO_URL } from '../../../utils/Constants';
@@ -28,6 +28,8 @@ const TokenHeader: FC<TokenHeaderProps> = (props) => {
         }
     }, [tokenInfo]);
 
+    const rankHeader = tokenInfo?.rank ? `Rank #${tokenInfo.rank}` : '';
+
     return (
         <TitleHeaderContainer>
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem' }}>
@@ -36,8 +38,10 @@ const TokenHeader: FC<TokenHeaderProps> = (props) => {
                     src={isEmptyString(tokenInfo?.metadata?.logoUrl) ? fyiLogo : tokenInfo?.metadata?.logoUrl}
                     sx={{ height: '4rem', width: '4rem' }}
                 />
-                <Title>{tokenInfo.ticker}</Title>
-                {/* <Rank>#69 - MOCK</Rank> */}
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Title>{tokenInfo.ticker}</Title>
+                    <Rank>{rankHeader}</Rank>
+                </Box>
             </Box>
         </TitleHeaderContainer>
     );

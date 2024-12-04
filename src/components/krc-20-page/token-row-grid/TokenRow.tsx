@@ -152,15 +152,25 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
         <div key={token.ticker}>
             <ListItem onClick={() => handleItemClick(token)} disablePadding sx={{ height: '12vh' }}>
                 <ListItemButton>
+                    <ListItemText
+                        sx={{
+                            paddingLeft: 0,
+                            width: '1.3vw',
+                        }}
+                        primary={
+                            <Typography component={'span'} variant="body1" style={{ fontSize: '0.75rem' }}>
+                                # {token?.rank || 'N/A'}
+                            </Typography>
+                        }
+                    />
                     <ListItemAvatar>
                         <Avatar
                             sx={{
-                                width: '2.5rem',
-                                height: '2.5rem',
+                                width: '2rem',
+                                height: '2rem',
                                 marginRight: '1vw',
                             }}
                             style={{
-                                marginLeft: '0.1vw',
                                 borderRadius: '100%',
                             }}
                             variant="square"
