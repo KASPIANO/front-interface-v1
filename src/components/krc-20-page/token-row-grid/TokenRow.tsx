@@ -192,7 +192,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }
                         secondary={
                             <Typography component={'span'} variant="body2" style={{ fontSize: '0.75rem' }}>
-                                {formatDate(token.creationDate)}
+                                {token.creationDate ? formatDate(token.creationDate) : ''}
                             </Typography>
                         }
                     />
@@ -318,7 +318,9 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             <Tooltip title="This shows the percentage of tokens minted, along with the number of mints made in the selected time interval.">
                                 <Stat>
                                     <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
-                                        {(token.totalMintedPercent * 100).toFixed(2)}%
+                                        {token.totalMintedPercent
+                                            ? `${(token.totalMintedPercent * 100).toFixed(2)}%`
+                                            : '0%'}
                                     </StatNumber>
                                     <StatHelpText
                                         style={{
@@ -327,14 +329,16 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                                         }}
                                         margin="0"
                                     >
-                                        Mints: {token.changeTotalMints}
-                                        <StatArrow
-                                            sx={{
-                                                color: 'green',
-                                                marginLeft: '2px',
-                                            }}
-                                            type="increase"
-                                        />
+                                        {token.changeTotalMints ? `Mints: ${token.changeTotalMints}` : ''}
+                                        {token.changeTotalMints ? (
+                                            <StatArrow
+                                                sx={{
+                                                    color: 'green',
+                                                    marginLeft: '2px',
+                                                }}
+                                                type="increase"
+                                            />
+                                        ) : null}
                                     </StatHelpText>
                                 </Stat>
                             </Tooltip>
