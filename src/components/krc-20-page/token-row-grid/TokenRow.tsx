@@ -159,7 +159,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }}
                         primary={
                             <Typography component={'span'} variant="body1" style={{ fontSize: '0.75rem' }}>
-                                # {token?.rank || 'N/A'}
+                                {token?.rank ? `# ${token.rank}` : ''}
                             </Typography>
                         }
                     />
@@ -205,7 +205,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                                 variant="body2"
                                 style={{ fontSize: '0.8rem', display: 'flex', justifyContent: 'flex-start' }}
                             >
-                                {getFormattedDateDifference(token.creationDate)}
+                                {token.creationDate ? getFormattedDateDifference(token.creationDate) : ''}
                             </Typography>
                         }
                     />
