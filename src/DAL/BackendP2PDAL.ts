@@ -229,7 +229,6 @@ export const createSellOrderV2 = async (
     totalPrice: number,
     pricePerToken: number,
     psktSeller: string,
-    psktTransactionId: string,
 ): Promise<{ id: string; status: string }> => {
     const capitalTicker = ticker.toUpperCase();
     const response = await backendService.post<{ id: string; status: string }>(`/${P2PV2CONTROLLER}`, {
@@ -238,7 +237,6 @@ export const createSellOrderV2 = async (
         totalPrice,
         pricePerToken,
         psktSeller,
-        psktTransactionId,
     });
     return response.data;
 };
