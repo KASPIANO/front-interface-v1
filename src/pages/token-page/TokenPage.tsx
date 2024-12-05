@@ -89,14 +89,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         for (const tx of pendingTransactions) {
             try {
                 // Attempt to create sell order
-                await createSellOrderV2(
-                    tx.ticker,
-                    tx.amount,
-                    tx.totalPrice,
-                    tx.pricePerToken,
-                    tx.txJsonString,
-                    tx.sendCommitTxId,
-                );
+                await createSellOrderV2(tx.ticker, tx.amount, tx.totalPrice, tx.pricePerToken, tx.txJsonString);
 
                 // On success
                 removeTransaction(tx.sendCommitTxId);
