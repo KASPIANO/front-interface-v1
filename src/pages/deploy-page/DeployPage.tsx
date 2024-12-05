@@ -411,11 +411,14 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         clearFormErrors(setFormErrors);
 
         const tokenData: TokenKRC20Deploy = {
-            ticker: validatedTokenName,
+            ticker: validatedTokenName.toLowerCase(), // Convert ticker to lowercase
             totalSupply: convertToProtocolFormat(totalSupply),
             mintLimit: convertToProtocolFormat(mintLimit),
-            preAllocation: preAllocation ? convertToProtocolFormat(preAllocation) : '',
+            ...(preAllocation && preAllocation !== '0'
+                ? { preAllocation: convertToProtocolFormat(preAllocation) }
+                : {}),
         };
+        console.log('Token data:', tokenData);
         const preAllocationChecker = preAllocation ? preAllocation : '0';
         const reviewTokenData: TokenKRC20Deploy = {
             ticker: validatedTokenName,

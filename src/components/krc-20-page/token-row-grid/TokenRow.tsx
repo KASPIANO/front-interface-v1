@@ -152,15 +152,25 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
         <div key={token.ticker}>
             <ListItem onClick={() => handleItemClick(token)} disablePadding sx={{ height: '12vh' }}>
                 <ListItemButton>
+                    <ListItemText
+                        sx={{
+                            paddingLeft: 0,
+                            width: '1.3vw',
+                        }}
+                        primary={
+                            <Typography component={'span'} variant="body1" style={{ fontSize: '0.75rem' }}>
+                                {token?.rank ? `# ${token.rank}` : ''}
+                            </Typography>
+                        }
+                    />
                     <ListItemAvatar>
                         <Avatar
                             sx={{
-                                width: '2.5rem',
-                                height: '2.5rem',
+                                width: '2rem',
+                                height: '2rem',
                                 marginRight: '1vw',
                             }}
                             style={{
-                                marginLeft: '0.1vw',
                                 borderRadius: '100%',
                             }}
                             variant="square"
@@ -182,7 +192,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                         }
                         secondary={
                             <Typography component={'span'} variant="body2" style={{ fontSize: '0.75rem' }}>
-                                {formatDate(token.creationDate)}
+                                {token.creationDate ? formatDate(token.creationDate) : ''}
                             </Typography>
                         }
                     />
@@ -195,7 +205,7 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                                 variant="body2"
                                 style={{ fontSize: '0.8rem', display: 'flex', justifyContent: 'flex-start' }}
                             >
-                                {getFormattedDateDifference(token.creationDate)}
+                                {token.creationDate ? getFormattedDateDifference(token.creationDate) : ''}
                             </Typography>
                         }
                     />
@@ -308,7 +318,9 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                             <Tooltip title="This shows the percentage of tokens minted, along with the number of mints made in the selected time interval.">
                                 <Stat>
                                     <StatNumber style={{ fontSize: '0.8rem' }} margin="0">
-                                        {(token.totalMintedPercent * 100).toFixed(2)}%
+                                        {token.totalMintedPercent
+                                            ? `${(token.totalMintedPercent * 100).toFixed(2)}%`
+                                            : '0%'}
                                     </StatNumber>
                                     <StatHelpText
                                         style={{
@@ -317,14 +329,16 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                                         }}
                                         margin="0"
                                     >
-                                        Mints: {token.changeTotalMints}
-                                        <StatArrow
-                                            sx={{
-                                                color: 'green',
-                                                marginLeft: '2px',
-                                            }}
-                                            type="increase"
-                                        />
+                                        {token.changeTotalMints ? `Mints: ${token.changeTotalMints}` : ''}
+                                        {token.changeTotalMints ? (
+                                            <StatArrow
+                                                sx={{
+                                                    color: 'green',
+                                                    marginLeft: '2px',
+                                                }}
+                                                type="increase"
+                                            />
+                                        ) : null}
                                     </StatHelpText>
                                 </Stat>
                             </Tooltip>
