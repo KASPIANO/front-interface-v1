@@ -413,7 +413,6 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                         parseInt(totalPrice),
                         parseFloat(pricePerToken),
                         txJsonString,
-                        sendCommitTxId,
                     );
                     if (res.status === SellOrderStatusV2.LISTED_FOR_SALE) {
                         showGlobalSnackbar({

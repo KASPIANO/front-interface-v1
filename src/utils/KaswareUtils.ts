@@ -201,8 +201,7 @@ export const mintKRC20Token = async (
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     try {
         const mintsLeft = await getTokenMintsLeft(ticker);
-
-        if (mintsLeft <= 0) {
+        if (mintsLeft) {
             throw new Error(`Minting for the ${ticker} token has ended`);
         }
         const kasPriorityFee = priorityFee ? priorityFee / 1e8 : undefined;
