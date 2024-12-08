@@ -113,7 +113,7 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
                 // Update tokenData with logo URLs
                 const updatedTokenData = tokenData.portfolioItems.map((token) => {
                     const tokenInfo = tickersPortfolio.find((item) => item.ticker === token.ticker);
-                    const portfolioValue = parseInt(token.balance) * (tokenInfo ? tokenInfo.price : 0);
+                    const portfolioValue = parseInt(token.balance) * (tokenInfo.price ? tokenInfo?.price : 0);
                     totalPortfolioValue += portfolioValue;
                     return {
                         ...token,
