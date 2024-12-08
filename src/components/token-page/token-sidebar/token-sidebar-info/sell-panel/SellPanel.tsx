@@ -131,23 +131,27 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         }
     };
 
-    // const handlePricePerTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     const priceStr = e.target.value;
-    //     setPricePerToken(priceStr);
+    const handlePricePerTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const priceStr = e.target.value;
 
-    //     const pricePerTokenValue = parseFloat(priceStr);
-    //     const amount = parseFloat(tokenAmount);
+        // Allow empty string or valid decimal numbers including leading zeros
+        if (priceStr === '' || /^\d*\.?\d*$/.test(priceStr)) {
+            setPricePerToken(priceStr);
 
-    //     if (!isNaN(pricePerTokenValue)) {
-    //         if (!isNaN(amount) && amount > 0) {
-    //             const newTotalPrice = pricePerTokenValue * amount;
-    //             const fixedTotalPrice = handleTotalPriceDecimals(newTotalPrice.toString());
-    //             setTotalPrice(fixedTotalPrice);
-    //         }
-    //     } else {
-    //         setTotalPrice('');
-    //     }
-    // };
+            const pricePerTokenValue = parseFloat(priceStr);
+            const amount = parseFloat(tokenAmount);
+
+            if (!isNaN(pricePerTokenValue)) {
+                if (!isNaN(amount) && amount > 0) {
+                    const newTotalPrice = pricePerTokenValue * amount;
+                    const fixedTotalPrice = handleTotalPriceDecimals(newTotalPrice.toString());
+                    setTotalPrice(fixedTotalPrice);
+                }
+            } else {
+                setTotalPrice('');
+            }
+        }
+    };
 
     useEffect(() => {
         let pricePerTokenValue = parseFloat(pricePerToken);
@@ -598,8 +602,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 <StyledTextField
                     label={`Price per Token (${priceCurrency})`}
                     value={pricePerToken ? formatPrice(pricePerToken) : ''}
-                    // onChange={handlePricePerTokenChange}
-                    disabled={true}
+                    onChange={handlePricePerTokenChange}
                     fullWidth
                     InputProps={{
                         endAdornment: currencyAdornment,
