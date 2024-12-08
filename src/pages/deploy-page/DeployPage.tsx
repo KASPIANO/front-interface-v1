@@ -491,9 +491,8 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             tick: tokenKRC20Details.ticker,
             max: tokenKRC20Details.totalSupply,
             lim: tokenKRC20Details.mintLimit,
-            pre: tokenKRC20Details.preAllocation,
+            ...(tokenKRC20Details.preAllocation ? { pre: tokenKRC20Details.preAllocation } : {}),
         });
-
         // const tokenDetailsForm = new FormData();
 
         // for (const [key, value] of Object.entries(tokenKRC20Details)) {
