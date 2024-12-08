@@ -418,7 +418,7 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                 ? { preAllocation: convertToProtocolFormat(preAllocation) }
                 : {}),
         };
-        console.log('Token data:', tokenData);
+
         const preAllocationChecker = preAllocation ? preAllocation : '0';
         const reviewTokenData: TokenKRC20Deploy = {
             ticker: validatedTokenName,
