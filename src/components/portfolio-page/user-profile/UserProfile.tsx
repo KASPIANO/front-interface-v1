@@ -42,6 +42,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     const [, setCopied] = useState(false);
     const [walletAddressError, setWalletAddressError] = useState<string | null>(null);
     const [walletInputValue, setWalletInputValue] = useState<string>(walletAddress);
+    const [porfolioUSDValue, setPorfolioUSDValue] = useState<number>(0);
     // const [dialogOpen, setDialogOpen] = useState(false);
     // const [ticker, setTicker] = useState('');
     // const [orders, setOrders] = useState([]);
@@ -70,6 +71,10 @@ const UserProfile: FC<UserProfileProps> = (props) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentWalletToCheck]);
+
+    useEffect(() => {
+        setPorfolioUSDValue(portfolioValue * kasPrice);
+    }, [portfolioValue, kasPrice]);
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard
@@ -127,7 +132,6 @@ const UserProfile: FC<UserProfileProps> = (props) => {
         navigator.clipboard.writeText(walletAddress);
     };
 
-    const porfolioUSDValue = (portfolioValue * kasPrice).toFixed(2);
     // const arrowColor = portfolioValue.changeDirection === 'increase' ? 'green' : 'red';
 
     const profileSourceLink = `https://api.dicebear.com/9.x/pixel-art/svg?seed=${walletAddress}`;
