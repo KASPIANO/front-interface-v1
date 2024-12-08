@@ -60,6 +60,15 @@ const UserProfile: FC<UserProfileProps> = (props) => {
     const [psktTxId, setPsktTxId] = useState(null);
     const [fetchingLostOrders, setFetchingLostORders] = useState(false);
     const [recovering, setRecovering] = useState(false);
+    const [porfolioUSDValue, setPorfolioUSDValue] = useState<number>(0);
+    // const [dialogOpen, setDialogOpen] = useState(false);
+    // const [ticker, setTicker] = useState('');
+    // const [orders, setOrders] = useState([]);
+    // const [psktTxId, setPsktTxId] = useState(null);
+    // const [fetchingLostOrders, setFetchingLostORders] = useState(false);
+    // const [recovering, setRecovering] = useState(false);
+    // const [openXDialog, setOpenXDialog] = useState(false);
+    // const [xUrl, setXUrl] = useState('');
     const debouncedSetCurrentWalletRef = useRef(null);
 
     useEffect(() => {
@@ -80,6 +89,10 @@ const UserProfile: FC<UserProfileProps> = (props) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentWalletToCheck]);
+
+    useEffect(() => {
+        setPorfolioUSDValue(portfolioValue * kasPrice);
+    }, [portfolioValue, kasPrice]);
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard
@@ -133,7 +146,6 @@ const UserProfile: FC<UserProfileProps> = (props) => {
         navigator.clipboard.writeText(walletAddress);
     };
 
-    const porfolioUSDValue = (portfolioValue * kasPrice).toFixed(2);
     // const arrowColor = portfolioValue.changeDirection === 'increase' ? 'green' : 'red';
 
     const profileSourceLink = `https://api.dicebear.com/9.x/pixel-art/svg?seed=${walletAddress}`;
