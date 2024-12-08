@@ -348,7 +348,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
                     </Typography>
                 </StatNumber>
                 <StatHelpText sx={{ fontSize: '1rem' }}>
-                    ${porfolioUSDValue}
+                    ${porfolioUSDValue.toFixed(2)}
                     {/* <StatArrow
                         sx={{ color: arrowColor, marginLeft: '4px' }}
                         type={portfolioValue.changeDirection}
