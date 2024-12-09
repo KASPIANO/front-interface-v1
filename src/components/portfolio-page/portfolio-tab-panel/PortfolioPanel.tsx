@@ -42,7 +42,6 @@ const PortfolioPanel: FC<PortfolioPanelProps> = (props) => {
     } = props;
     const [value, setValue] = useState('1');
     // const [paidUser] = useState(false);
-
     const handleValueChange = (_event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
     };

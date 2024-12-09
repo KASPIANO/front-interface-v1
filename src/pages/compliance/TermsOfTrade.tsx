@@ -7,7 +7,7 @@ const TermsOfTrade: React.FC = () => (
             Terms of Trade
         </Typography>
         <Typography variant="body1" paragraph>
-            Last Updated: 09/30/2024
+            Last Updated: 12/09/2024
         </Typography>
         <Typography variant="body1" paragraph>
             Please read these Terms of Trade ("Terms") carefully, as they govern your interactions with our
@@ -18,16 +18,15 @@ const TermsOfTrade: React.FC = () => (
             1. Trade Process and Wallet Management
         </Typography>
         <Typography variant="body1" paragraph>
-            All transactions conducted on our platform are managed by a third-party wallet under our secure
-            management. This wallet handles each trade in distinct stages to ensure smooth processing. In the event
-            that one of these stages encounters an issue—such as a spike in gas fees or a delay in transaction
-            confirmation—the trade will not go through immediately.
+            Old orders on our platform are managed by a third-party wallet that handles each transaction in
+            distinct stages. While this ensures smooth processing under most conditions, it is more susceptible to
+            delays due to external factors such as network congestion, spikes in gas fees, or transaction
+            confirmation delays.
         </Typography>
         <Typography variant="body1" paragraph>
-            However, we have implemented an automated system designed to monitor and resolve any stalled
-            transactions. Once the external conditions (e.g., gas fees) become more favorable, the system will
-            resume and complete the transaction. This ensures that no trade is left incomplete due to temporary
-            technical issues.
+            To address these challenges and provide a better trading experience, we have introduced the new Partial
+            Sign Kaspa Transaction (PSKT) protocol for modern orders. This protocol replaces the third-party wallet
+            system with a trust-minimized and decentralized approach, offering greater security and flexibility.
         </Typography>
 
         <Typography variant="h6" gutterBottom>
@@ -35,8 +34,9 @@ const TermsOfTrade: React.FC = () => (
         </Typography>
         <Typography variant="body1" paragraph>
             Every stage of your transaction is securely tracked and recorded within our system to ensure
-            transparency and the safety of your assets. We store all relevant trade data, allowing us to monitor
-            the process and safeguard your funds and tokens throughout the transaction lifecycle.
+            transparency and the safety of your assets. This applies to both old orders and PSKT-based
+            transactions. For PSKT transactions, additional protections are in place to safeguard your assets
+            during the signing process.
         </Typography>
 
         <Typography variant="h6" gutterBottom>
@@ -47,10 +47,13 @@ const TermsOfTrade: React.FC = () => (
             situations where a transaction is temporarily halted if gas fees rise sharply during the process.
         </Typography>
         <Typography variant="body1" paragraph>
-            To mitigate this, we charge a fixed network gas fee of 5 KAS per transaction. This fee acts as an upper
-            bound and safety net to cover potential increases in gas prices. Typically, only a small portion of
-            this fee (approximately 0.01 KAS) is used for the actual transaction, and the remainder will be
-            automatically refunded to your wallet after the trade is completed.
+            For old orders managed by a third-party wallet, the system may automatically retry the transaction when
+            conditions are favorable. For PSKT orders, users retain control over the signing process and can adjust
+            parameters such as gas fees before finalizing the transaction.
+        </Typography>
+        <Typography variant="body1" paragraph>
+            To mitigate issues, we charge a fixed network gas fee of 5 KAS per transaction. For PSKT orders, any
+            unused portion of this fee is automatically refunded to your wallet after the trade is completed.
         </Typography>
 
         <Typography variant="h6" gutterBottom>
@@ -58,12 +61,41 @@ const TermsOfTrade: React.FC = () => (
         </Typography>
         <Typography variant="body1" paragraph>
             It is your responsibility to ensure that your wallet is properly funded to cover the gas fees for each
-            transaction. Our system will notify you in case additional actions are needed, such as adding funds or
-            adjusting your transaction settings.
+            transaction. For old orders, the platform will notify you if additional funds are required. For PSKT
+            orders, you may need to actively participate in signing and finalizing the transaction.
         </Typography>
 
         <Typography variant="h6" gutterBottom>
-            5. Limitation of Liability
+            5. Partial Sign Kaspa Transaction (PSKT) Protocol
+        </Typography>
+        <Typography variant="body1" paragraph>
+            The PSKT protocol introduces a modern approach to handling transactions, designed to overcome
+            limitations of the old third-party wallet system. PSKT enables secure, efficient, and decentralized
+            transactions between buyers and sellers by partially signing transactions at different stages.
+        </Typography>
+        <Typography variant="body1" paragraph>
+            <strong>Key Concepts:</strong> PSKT allows buyers and sellers to interact without full trust in each
+            other. The protocol ensures that: - Sellers can commit to a transaction without immediately finalizing
+            it, retaining control over their assets. - Buyers can proceed with payment while ensuring the
+            transaction is directed correctly to the seller. - The platform combines and verifies both parties’
+            inputs, ensuring a seamless transaction experience.
+        </Typography>
+        <Typography variant="body1" paragraph>
+            <strong>Benefits:</strong> The PSKT protocol provides: - Security: Ensures the safety of both parties’
+            assets throughout the transaction process. - Flexibility: Allows adjustments or cancellations if
+            conditions change before finalization. - Efficiency: Reduces the likelihood of failed transactions due
+            to network conditions. - Trust Minimization: Both parties rely on the protocol rather than direct trust
+            in each other.
+        </Typography>
+        <Typography variant="body1" paragraph>
+            <strong>How It Works:</strong> The transaction starts with the seller partially signing it, allowing
+            the buyer to review and complete their part. Once both sides have submitted their inputs, the platform
+            combines them into a finalized transaction. The system then verifies the transaction, runs a network
+            test, and broadcasts it to the Kaspa network, ensuring smooth and timely processing.
+        </Typography>
+
+        <Typography variant="h6" gutterBottom>
+            6. Limitation of Liability
         </Typography>
         <Typography variant="body1" paragraph>
             We are not liable for any external factors that may cause a delay in processing your transaction,
@@ -73,7 +105,7 @@ const TermsOfTrade: React.FC = () => (
         </Typography>
 
         <Typography variant="h6" gutterBottom>
-            6. Contact Information
+            7. Contact Information
         </Typography>
         <Typography variant="body1" paragraph>
             If you have any questions or concerns regarding these Terms, please contact us at support@kaspiano.com.

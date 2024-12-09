@@ -518,9 +518,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     message: 'Token deployed successfully',
                     severity: 'success',
                 });
-
-                console.log(inscribeJsonString);
-                console.log('Deployment successful, txid:', txid);
             }
         } catch (error) {
             console.error('Failed to deploy KRC20 token:', error);
