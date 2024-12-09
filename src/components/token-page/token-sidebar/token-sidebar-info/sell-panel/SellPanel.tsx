@@ -106,7 +106,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         let totalRounded;
         if (priceStr.includes('.') && priceCurrency === 'KAS') {
             setTotalPrice(priceStr);
-            totalRounded = parseFloat(priceStr).toFixed(0);
+            totalRounded = parseFloat(priceStr).toFixed(4);
         } else {
             totalRounded = roundUp(priceStr, 8);
             setTotalPrice(priceStr);
@@ -154,14 +154,14 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             pricePerTokenValue = roundedPriceInKAS;
         }
 
-        if (!isNaN(pricePerTokenValue) && floorPrice.floor_price) {
+        if (!isNaN(pricePerTokenValue) && !isLoading) {
             const diff = ((pricePerTokenValue - floorPrice.floor_price) / floorPrice.floor_price) * 100;
             setPriceDifference(diff);
         } else {
             setPriceDifference(0);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pricePerToken, totalPrice, floorPrice.floor_price]);
+    }, [pricePerToken, totalPrice, isLoading]);
 
     const handleSetPricePerToken = (multiplier: number) => {
         if (!floorPrice) {
@@ -262,6 +262,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         }
 
         try {
+            setTotalPrice(parseFloat(totalPrice).toFixed(2));
             setIsDialogOpen(true);
         } catch (error) {
             console.error(error);
@@ -388,7 +389,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         setWalletConfirmation(true);
         try {
             const fee =
-                kaspianoCommissionInt > 0 ? Math.max(parseInt(totalPrice) * kaspianoCommissionInt, 0.5) : 0;
+                kaspianoCommissionInt > 0 ? Math.max(parseFloat(totalPrice) * kaspianoCommissionInt, 0.5) : 0;
             const psktExtraOutput = [{ address: KASPIANO_WALLET, amount: fee }];
             const { txJsonString, sendCommitTxId } = await createOrderKRC20(
                 tokenInfo.ticker,
