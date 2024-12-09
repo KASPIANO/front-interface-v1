@@ -43,17 +43,17 @@ const BuyHeader: React.FC<BuyHeaderProps> = ({ sortBy, onSortChange, ticker, isL
                 </Typography>
                 <StyledButton
                     size="small"
-                    variant={sortBy === 'totalPrice' ? 'outlined' : 'contained'}
-                    onClick={() => handleSortChange('totalPrice')}
-                >
-                    Total Price
-                </StyledButton>
-                <StyledButton
-                    size="small"
                     variant={sortBy === 'pricePerToken' ? 'outlined' : 'contained'}
                     onClick={() => handleSortChange('pricePerToken')}
                 >
                     Unit Price
+                </StyledButton>
+                <StyledButton
+                    size="small"
+                    variant={sortBy === 'totalPrice' ? 'outlined' : 'contained'}
+                    onClick={() => handleSortChange('totalPrice')}
+                >
+                    Total
                 </StyledButton>
                 <Box sx={{ marginLeft: 'auto' }}>
                     {isLoading ? (
@@ -83,17 +83,17 @@ const BuyHeader: React.FC<BuyHeaderProps> = ({ sortBy, onSortChange, ticker, isL
                         Amount
                     </Typography>
                 </Tooltip>
-                <Tooltip title="Total KAS requested for the tokens">
-                    <Typography variant="subtitle2" sx={{ width: '22%', fontWeight: 'bold' }}>
-                        Total Price
-                    </Typography>
-                </Tooltip>
                 <Tooltip title="Price per token">
-                    <Typography variant="subtitle2" sx={{ width: '25%', fontWeight: 'bold' }}>
+                    <Typography variant="subtitle2" sx={{ width: '23%', fontWeight: 'bold' }}>
                         Unit Price
                     </Typography>
                 </Tooltip>
-                <Typography variant="subtitle2" sx={{ width: '10%' }} /> {/* Empty space for the button */}
+                <Tooltip title="Total KAS requested for the tokens">
+                    <Typography variant="subtitle2" sx={{ width: '22%', fontWeight: 'bold' }}>
+                        Total
+                    </Typography>
+                </Tooltip>
+                <Typography variant="subtitle2" sx={{ width: '5%' }} /> {/* Empty space for the button */}
             </Box>
         </Box>
     );

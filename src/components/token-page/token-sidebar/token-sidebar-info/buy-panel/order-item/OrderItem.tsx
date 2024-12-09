@@ -68,18 +68,6 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                     </OrderItemPrimary>
                 </Box>
                 {/* Price per Token */}
-                <Box sx={{ width: '15%' }}>
-                    <OrderItemPrimary variant="body2">
-                        {formatNumberWithCommas(order.totalPrice.toFixed(2))}{' '}
-                        <Box component="span" sx={{ fontSize: '0.5rem', display: 'inline' }}>
-                            {/* Adjust fontSize as needed */}
-                            KAS
-                        </Box>
-                    </OrderItemPrimary>
-                    <OrderItemSecondary variant="caption" color="textSecondary">
-                        (${formatNumberWithCommas((order.totalPrice * kasPrice).toFixed(2))})
-                    </OrderItemSecondary>
-                </Box>
                 <Box sx={{ width: '20%' }}>
                     <Tooltip title={`${order.pricePerToken} KAS`}>
                         <OrderItemPrimary variant="body2">
@@ -92,6 +80,18 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                     </Tooltip>
                     <OrderItemSecondary variant="caption" color="textSecondary">
                         (${(order.pricePerToken * kasPrice).toFixed(5)})
+                    </OrderItemSecondary>
+                </Box>
+                <Box sx={{ width: '15%' }}>
+                    <OrderItemPrimary variant="body2">
+                        {formatNumberWithCommas(order.totalPrice.toFixed(2))}{' '}
+                        <Box component="span" sx={{ fontSize: '0.5rem', display: 'inline' }}>
+                            {/* Adjust fontSize as needed */}
+                            KAS
+                        </Box>
+                    </OrderItemPrimary>
+                    <OrderItemSecondary variant="caption" color="textSecondary">
+                        (${formatNumberWithCommas((order.totalPrice * kasPrice).toFixed(2))})
                     </OrderItemSecondary>
                 </Box>
                 {/* Total Price */}
