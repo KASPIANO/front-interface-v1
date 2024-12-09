@@ -41,7 +41,6 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [amountError, setAmountError] = useState<string>('');
     const [pricePerTokenError, setPricePerTokenError] = useState<string>('');
     const [showButtonsTooltip, setShowButtonsTooltip] = useState<boolean>(false);
-    const [showInputTooltip, setShowInputTooltip] = useState<boolean>(false);
     const queryClient = useQueryClient();
     const kaspianoCommissionInt = parseFloat(KASPIANO_TRADE_COMMISSION);
     const { data: floorPrice, isLoading } = useFetchFloorPrice(tokenInfo.ticker);
@@ -98,11 +97,16 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     // Handle changes in total price
     const handleTotalPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const priceStr = e.target.value;
+        if (priceStr === '.' || priceStr === '0.') {
+            setTotalPrice(priceStr); // Allow the user to continue entering fractional numbers
+            setPricePerToken('');
+            setPricePerTokenError('');
+            return;
+        }
         let totalRounded;
         if (priceStr.includes('.') && priceCurrency === 'KAS') {
-            setTotalPrice(parseFloat(priceStr).toFixed(0));
+            setTotalPrice(priceStr);
             totalRounded = parseFloat(priceStr).toFixed(0);
-            setPricePerTokenError('Please enter a rounded number without decimals.');
         } else {
             totalRounded = roundUp(priceStr, 8);
             setTotalPrice(priceStr);
@@ -389,7 +393,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             const { txJsonString, sendCommitTxId } = await createOrderKRC20(
                 tokenInfo.ticker,
                 parseInt(tokenAmount),
-                parseInt(totalPrice),
+                parseFloat(totalPrice),
                 psktExtraOutput,
                 priorityFee,
             );
@@ -406,7 +410,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     const res = await createSellOrderV2(
                         tokenInfo.ticker,
                         parseInt(tokenAmount),
-                        parseInt(totalPrice),
+                        parseFloat(totalPrice),
                         parseFloat(pricePerToken),
                         txJsonString,
                     );
@@ -561,31 +565,6 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     error={!!amountError}
                     helperText={amountError}
                 />
-
-                <Tooltip
-                    title={
-                        priceCurrency === 'KAS'
-                            ? 'Must be a whole number'
-                            : 'The USD price will be rounded to the nearest whole Kaspa (KAS) number'
-                    }
-                    placement="top"
-                    open={showInputTooltip}
-                    disableHoverListener
-                    onMouseEnter={() => setShowInputTooltip(true)}
-                    onMouseLeave={() => setShowInputTooltip(false)}
-                >
-                    <StyledTextField
-                        label={`Total Price (${priceCurrency})`}
-                        value={totalPrice}
-                        onChange={handleTotalPriceChange}
-                        fullWidth
-                        InputProps={{
-                            endAdornment: currencyAdornment,
-                        }}
-                        error={!!pricePerTokenError}
-                        helperText={pricePerTokenError}
-                    />
-                </Tooltip>
                 <StyledTextField
                     label={`Price per Token (${priceCurrency})`}
                     value={pricePerToken || ''} // Use the raw string value
@@ -595,6 +574,18 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                         endAdornment: currencyAdornment, // Optional currency adornment
                     }}
                 />
+                <StyledTextField
+                    label={`Total Price (${priceCurrency})`}
+                    value={totalPrice}
+                    onChange={handleTotalPriceChange}
+                    fullWidth
+                    InputProps={{
+                        endAdornment: currencyAdornment,
+                    }}
+                    error={!!pricePerTokenError}
+                    helperText={pricePerTokenError}
+                />
+
                 {pricePerToken !== '' && floorPrice.floor_price !== 0 && (
                     <Typography variant="body2" sx={{ ml: '0.15rem' }}>
                         {'Price per token is '}
