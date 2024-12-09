@@ -10,6 +10,7 @@ import { createOrderKRC20, MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION } from '../../..
 import { createSellOrderV2 } from '../../../../../DAL/BackendP2PDAL';
 // import { doPolling } from '../../../../../utils/Utils';
 import { useQueryClient } from '@tanstack/react-query';
+import { useFetchFloorPrice } from '../../../../../DAL/UseQueriesBackend';
 
 interface SellPanelProps {
     tokenInfo: BackendTokenResponse;
@@ -39,11 +40,11 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [finishedSellOrder, setFinishedSellOrder] = useState<boolean>(false);
     const [amountError, setAmountError] = useState<string>('');
     const [pricePerTokenError, setPricePerTokenError] = useState<string>('');
-    const [isPriceFromButton, setIsPriceFromButton] = useState<boolean>(false);
     const [showButtonsTooltip, setShowButtonsTooltip] = useState<boolean>(false);
     const [showInputTooltip, setShowInputTooltip] = useState<boolean>(false);
     const queryClient = useQueryClient();
     const kaspianoCommissionInt = parseFloat(KASPIANO_TRADE_COMMISSION);
+    const { data: floorPrice, isLoading } = useFetchFloorPrice(tokenInfo.ticker);
 
     useEffect(() => {
         const fetchBalance = () => {
@@ -67,7 +68,6 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     }, [walletAddress, tokenInfo.ticker, finishedSellOrder]);
 
     const handleTokenAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setIsPriceFromButton(false);
         const amountStr = e.target.value;
         if (amountStr.includes('.')) {
             setAmountError('Please enter a rounded number without decimals.');
@@ -86,8 +86,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 setPricePerToken(newPricePerToken.toString());
             } else if (!isNaN(pricePerTokenValue)) {
                 const newTotalPrice = pricePerTokenValue * amount;
-                const fixedTotalPrice = handleTotalPriceDecimals(newTotalPrice.toString());
-                setTotalPrice(fixedTotalPrice);
+                setTotalPrice(newTotalPrice.toString());
             }
         } else {
             setTokenAmount('');
@@ -98,7 +97,6 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
 
     // Handle changes in total price
     const handleTotalPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setIsPriceFromButton(false);
         const priceStr = e.target.value;
         let totalRounded;
         if (priceStr.includes('.') && priceCurrency === 'KAS') {
@@ -122,32 +120,25 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             setPricePerToken('');
         }
     };
-    const handleTotalPriceDecimals = (totalPrice) => {
-        if (totalPrice.includes('.')) {
-            setTotalPrice(parseFloat(totalPrice).toFixed(0));
-            return parseFloat(totalPrice).toFixed(0);
-        } else {
-            return totalPrice;
+
+    const handlePricePerTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const priceStr = e.target.value;
+
+        // Allow empty input, "0", "0.", and valid decimal formats
+        if (priceStr === '' || priceStr === '0' || priceStr === '0.' || /^\d*\.?\d*$/.test(priceStr)) {
+            setPricePerToken(priceStr); // Update the price as string
+
+            const pricePerTokenValue = parseFloat(priceStr); // Parse the input to a number
+            const amount = parseFloat(tokenAmount); // Parse token amount
+
+            if (!isNaN(pricePerTokenValue) && amount > 0 && !isNaN(amount)) {
+                const newTotalPrice = pricePerTokenValue * amount; // Calculate total price
+                setTotalPrice(newTotalPrice.toString()); // Update total price
+            } else {
+                setTotalPrice(''); // Clear total price if input is invalid
+            }
         }
     };
-
-    // const handlePricePerTokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     const priceStr = e.target.value;
-    //     setPricePerToken(priceStr);
-
-    //     const pricePerTokenValue = parseFloat(priceStr);
-    //     const amount = parseFloat(tokenAmount);
-
-    //     if (!isNaN(pricePerTokenValue)) {
-    //         if (!isNaN(amount) && amount > 0) {
-    //             const newTotalPrice = pricePerTokenValue * amount;
-    //             const fixedTotalPrice = handleTotalPriceDecimals(newTotalPrice.toString());
-    //             setTotalPrice(fixedTotalPrice);
-    //         }
-    //     } else {
-    //         setTotalPrice('');
-    //     }
-    // };
 
     useEffect(() => {
         let pricePerTokenValue = parseFloat(pricePerToken);
@@ -159,17 +150,17 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             pricePerTokenValue = roundedPriceInKAS;
         }
 
-        if (!isNaN(pricePerTokenValue) && tokenInfo.price) {
-            const diff = ((pricePerTokenValue - tokenInfo.price) / tokenInfo.price) * 100;
+        if (!isNaN(pricePerTokenValue) && floorPrice.floor_price) {
+            const diff = ((pricePerTokenValue - floorPrice.floor_price) / floorPrice.floor_price) * 100;
             setPriceDifference(diff);
         } else {
             setPriceDifference(0);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pricePerToken, totalPrice, tokenInfo.price]);
+    }, [pricePerToken, totalPrice, floorPrice.floor_price]);
 
     const handleSetPricePerToken = (multiplier: number) => {
-        if (!tokenInfo.price) {
+        if (!floorPrice) {
             showGlobalSnackbar({ message: 'No Token Floor Price Exists', severity: 'error' });
             return;
         }
@@ -179,11 +170,10 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         }
 
         const amount = parseInt(tokenAmount);
-        const newTotalPrice = Number(handleTotalPriceDecimals((tokenInfo.price * multiplier * amount).toString()));
+        const newTotalPrice = Number((floorPrice.floor_price * multiplier * amount).toString());
         const roundedPricePerToken = roundUp(newTotalPrice / amount, 8);
         setPricePerToken(roundedPricePerToken.toString());
         setTotalPrice(String(newTotalPrice));
-        setIsPriceFromButton(true);
     };
 
     function roundUp(value, decimals) {
@@ -217,7 +207,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             if (totalPrice !== '') {
                 const totalPriceValue = parseFloat(totalPrice);
                 const totalInKAS = totalPriceValue / kasPrice;
-                const roundedTotalInKAS = handleTotalPriceDecimals(totalInKAS.toString());
+                const roundedTotalInKAS = totalInKAS.toString();
                 setTotalPrice(String(roundedTotalInKAS));
             }
         }
@@ -403,10 +393,16 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 psktExtraOutput,
                 priorityFee,
             );
-            const parse = JSON.parse(txJsonString);
-            console.log(parse);
+
             if (txJsonString || sendCommitTxId) {
                 try {
+                    setIsDialogOpen(false);
+                    setDisableSellButton(false);
+                    cleanFields();
+                    setTimeout(() => {
+                        setFinishedSellOrder((prev) => !prev);
+                        setWalletConfirmation(false); // Ensures it closes after a slight delay
+                    }, 500);
                     const res = await createSellOrderV2(
                         tokenInfo.ticker,
                         parseInt(tokenAmount),
@@ -428,14 +424,8 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                         });
                     }
                     // add kasplex valdiation of utxo creation sendcommit
-                    setIsDialogOpen(false);
-                    setDisableSellButton(false);
-                    cleanFields();
+
                     queryClient.invalidateQueries({ queryKey: ['orders'] });
-                    setTimeout(() => {
-                        setFinishedSellOrder((prev) => !prev);
-                        setWalletConfirmation(false); // Ensures it closes after a slight delay
-                    }, 500);
 
                     return true;
                 } catch (error) {
@@ -521,28 +511,28 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
         >
             <Box sx={{ display: 'flex', gap: '0.3rem', mb: '0.5rem', justifyContent: 'center' }}>
                 <StyledButton
-                    disabled={!tokenInfo.price}
+                    disabled={isLoading || !floorPrice}
                     onClick={() => handleSetPricePerToken(1)}
                     variant="contained"
                 >
                     Floor
                 </StyledButton>
                 <StyledButton
-                    disabled={!tokenInfo.price}
+                    disabled={isLoading || !floorPrice}
                     onClick={() => handleSetPricePerToken(1.01)}
                     variant="contained"
                 >
                     +1%
                 </StyledButton>
                 <StyledButton
-                    disabled={!tokenInfo.price}
+                    disabled={isLoading || !floorPrice}
                     onClick={() => handleSetPricePerToken(1.05)}
                     variant="contained"
                 >
                     +5%
                 </StyledButton>
                 <StyledButton
-                    disabled={!tokenInfo.price}
+                    disabled={isLoading || !floorPrice}
                     onClick={() => handleSetPricePerToken(1.1)}
                     variant="contained"
                 >
@@ -551,12 +541,13 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
             </Box>
         </Tooltip>
     );
-    const formatPrice = (value) => {
-        const num = parseFloat(value);
 
-        // Fix the number to 10 decimal places, then remove unnecessary trailing zeros
-        return num.toFixed(10).replace(/\.?0+$/, '');
-    };
+    // const formatPrice = (value) => {
+    //     const num = parseFloat(value);
+
+    //     // Fix the number to 10 decimal places, then remove unnecessary trailing zeros
+    //     return num.toFixed(10).replace(/\.?0+$/, '');
+    // };
 
     return (
         <>
@@ -597,37 +588,28 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                 </Tooltip>
                 <StyledTextField
                     label={`Price per Token (${priceCurrency})`}
-                    value={pricePerToken ? formatPrice(pricePerToken) : ''}
-                    // onChange={handlePricePerTokenChange}
-                    disabled={true}
+                    value={pricePerToken || ''} // Use the raw string value
+                    onChange={handlePricePerTokenChange} // Use the updated handler
                     fullWidth
                     InputProps={{
-                        endAdornment: currencyAdornment,
+                        endAdornment: currencyAdornment, // Optional currency adornment
                     }}
                 />
-                {isPriceFromButton && priceDifference < -1 && pricePerToken !== '' && tokenInfo.price !== 0 ? (
-                    <Typography variant="body2" sx={{ ml: '0.15rem', color: '#f44336' }}>
-                        The current token amount is too low. Please add more tokens to ensure accurate total price
-                        calculations.
-                    </Typography>
-                ) : (
-                    pricePerToken !== '' &&
-                    tokenInfo.price !== 0 && (
-                        <Typography variant="body2" sx={{ ml: '0.15rem' }}>
-                            {'Price per token is '}
-                            <Typography
-                                component="span"
-                                sx={{
-                                    fontWeight: 'bold',
-                                    color: priceDifference > 0 ? '#4caf50' : '#f44336',
-                                }}
-                            >
-                                {priceDifference > 0 ? '+' : ''}
-                                {priceDifference.toFixed(2)}%
-                            </Typography>
-                            {' compared to the floor price.'}
+                {pricePerToken !== '' && floorPrice.floor_price !== 0 && (
+                    <Typography variant="body2" sx={{ ml: '0.15rem' }}>
+                        {'Price per token is '}
+                        <Typography
+                            component="span"
+                            sx={{
+                                fontWeight: 'bold',
+                                color: priceDifference > 0 ? '#4caf50' : '#f44336',
+                            }}
+                        >
+                            {priceDifference > 0 ? '+' : ''}
+                            {priceDifference.toFixed(2)}%
                         </Typography>
-                    )
+                        {' compared to the floor price.'}
+                    </Typography>
                 )}
                 <Box
                     sx={{

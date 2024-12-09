@@ -411,11 +411,14 @@ const DeployPage: FC<DeployPageProps> = (props) => {
         clearFormErrors(setFormErrors);
 
         const tokenData: TokenKRC20Deploy = {
-            ticker: validatedTokenName,
+            ticker: validatedTokenName.toLowerCase(), // Convert ticker to lowercase
             totalSupply: convertToProtocolFormat(totalSupply),
             mintLimit: convertToProtocolFormat(mintLimit),
-            preAllocation: preAllocation ? convertToProtocolFormat(preAllocation) : '',
+            ...(preAllocation && preAllocation !== '0'
+                ? { preAllocation: convertToProtocolFormat(preAllocation) }
+                : {}),
         };
+
         const preAllocationChecker = preAllocation ? preAllocation : '0';
         const reviewTokenData: TokenKRC20Deploy = {
             ticker: validatedTokenName,
@@ -488,9 +491,8 @@ const DeployPage: FC<DeployPageProps> = (props) => {
             tick: tokenKRC20Details.ticker,
             max: tokenKRC20Details.totalSupply,
             lim: tokenKRC20Details.mintLimit,
-            pre: tokenKRC20Details.preAllocation,
+            ...(tokenKRC20Details.preAllocation ? { pre: tokenKRC20Details.preAllocation } : {}),
         });
-
         // const tokenDetailsForm = new FormData();
 
         // for (const [key, value] of Object.entries(tokenKRC20Details)) {
@@ -516,9 +518,6 @@ const DeployPage: FC<DeployPageProps> = (props) => {
                     message: 'Token deployed successfully',
                     severity: 'success',
                 });
-
-                console.log(inscribeJsonString);
-                console.log('Deployment successful, txid:', txid);
             }
         } catch (error) {
             console.error('Failed to deploy KRC20 token:', error);

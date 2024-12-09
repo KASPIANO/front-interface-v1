@@ -268,6 +268,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                 </Typography>
                             </OrderItemPrimary>
                         </OrderDetailsItem>
+                        {!order.isDecentralized && (
+                            <Typography
+                                variant="body2"
+                                sx={{ fontSize: '0.68rem', color: 'rgba(255, 165, 0, 0.7)', fontWeight: 500 }}
+                            >
+                                *This is an old order and will take longer to process.
+                            </Typography>
+                        )}
                     </Box>
                     <FormControlLabel
                         control={

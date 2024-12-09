@@ -43,6 +43,7 @@ export interface BackendTokenResponse {
     volumeUsd?: number;
     changeVolumeUsd?: number;
     volumeKas?: number;
+    rank?: number;
 }
 
 export interface BackendTokenMetadata {
@@ -74,6 +75,7 @@ export interface TokenListItemResponse {
     marketCap?: number;
     changeMarketCap?: number;
     changePrice?: number;
+    rank?: number;
     volumeUsd?: number;
     changeVolumeUsd?: number;
 }

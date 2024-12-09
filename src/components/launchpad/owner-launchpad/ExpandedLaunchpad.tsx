@@ -188,7 +188,7 @@ const ExpandedView: React.FC<{
                                 </Button>
 
                                 <Typography variant="h6" component="h2" sx={{ fontWeight: 600, fontSize: '1rem' }}>
-                                    Raised Amount: {formatNumberWithCommas(raisedFunds)} KAS
+                                    Raised Amount: {formatNumberWithCommas(raisedFunds.toFixed(2))} KAS
                                 </Typography>
                             </Box>
                             {/* ... (other Typography components) */}

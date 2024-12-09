@@ -21,14 +21,14 @@ const marginMapperByHeader = {
     Age: '9.5%',
     Price: '11.5%',
     'Market Cap': '14.3%',
-    Minted: '11.5%',
+    Minted: '10%',
     Holders: '9%',
     'Fair Mint': '20%',
     Volume: '10%',
 };
 
 const marginLeft = {
-    Ticker: '5%',
+    Ticker: '6%',
     Age: 0,
     Price: 0,
     'Market Cap': 0,

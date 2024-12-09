@@ -105,7 +105,6 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
                     paginationPortfolioKey,
                     paginationPortfolioDirection,
                 );
-
                 // Extract the tickers for later use in metadata fetch
                 const tickers = tokenData.portfolioItems.map((token) => token.ticker);
                 const tickersPortfolio = await fetchTokenPortfolio(tickers);
@@ -113,13 +112,13 @@ const PortfolioPage: FC<PortfolioPageProps> = (props) => {
                 // Update tokenData with logo URLs
                 const updatedTokenData = tokenData.portfolioItems.map((token) => {
                     const tokenInfo = tickersPortfolio.find((item) => item.ticker === token.ticker);
-                    const portfolioValue = parseInt(token.balance) * (tokenInfo ? tokenInfo.price : 0);
+                    const portfolioValue = parseInt(token.balance) * (tokenInfo?.price ? tokenInfo?.price : 0);
                     totalPortfolioValue += portfolioValue;
                     return {
                         ...token,
                         state: tokenInfo ? tokenInfo.state : null,
                         logoUrl: tokenInfo ? tokenInfo.logo : null,
-                        price: tokenInfo ? tokenInfo.price : 0,
+                        price: tokenInfo?.price ? tokenInfo.price : 0,
                     };
                 });
 

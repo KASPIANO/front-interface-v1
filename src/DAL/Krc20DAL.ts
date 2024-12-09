@@ -157,6 +157,12 @@ export async function fetchWalletActivity(
                     case 'deploy':
                         type = 'Deploy';
                         break;
+                    case 'list':
+                        type = 'PSKT List';
+                        break;
+                    case 'send':
+                        type = 'PSKT Send';
+                        break;
                     default:
                         type = 'Unknown';
                         break;

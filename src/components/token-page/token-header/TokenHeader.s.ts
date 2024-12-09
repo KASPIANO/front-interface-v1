@@ -30,6 +30,5 @@ export const Title = styled(Typography)({
 
 export const Rank = styled(Typography)({
     fontSize: '1rem',
-    fontWeight: 600,
-    marginLeft: '1vh',
+    fontWeight: 300,
 });
