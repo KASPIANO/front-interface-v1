@@ -575,7 +575,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     }}
                 />
                 <StyledTextField
-                    label={`Total Price (${priceCurrency})`}
+                    label={`Total (${priceCurrency})`}
                     value={totalPrice}
                     onChange={handleTotalPriceChange}
                     fullWidth
