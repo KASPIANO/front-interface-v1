@@ -134,7 +134,11 @@ export const useUserListings = (walletAddress, offset = 0) =>
                 filters: {
                     isSeller: true,
                     isBuyer: false,
-                    statuses: [SellOrderStatus.LISTED_FOR_SALE, SellOrderStatus.OFF_MARKETPLACE],
+                    statuses: [
+                        SellOrderStatus.LISTED_FOR_SALE,
+                        SellOrderStatus.OFF_MARKETPLACE,
+                        SellOrderStatusV2.PSKT_VERIFICATION_ERROR,
+                    ],
                 },
             }),
 
