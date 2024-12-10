@@ -163,7 +163,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
             ) : (
                 <>
                     {/* Close Button */}
-                    <Box>
+                    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <Typography sx={{ fontWeight: '700' }}>Order Details</Typography>
                             <Box sx={{ marginLeft: 'auto' }}>
@@ -182,137 +182,147 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                 />
                             </IconButton>
                         </Box>
-
-                        <OrderDetailsItem variant="body1">
-                            Total Token Price:
-                            <OrderItemPrimary>
-                                {order.totalPrice.toFixed(2)} KAS
-                                <Typography
-                                    sx={{ ml: '0.3rem' }}
-                                    variant="body2"
-                                    color="textSecondary"
-                                    component="span"
-                                >
-                                    (${(order.totalPrice * kasPrice).toFixed(2)})
-                                </Typography>
-                            </OrderItemPrimary>
-                        </OrderDetailsItem>
-
-                        {/* Network Fee */}
-                        <OrderDetailsItem variant="body1">
-                            {feeText}:
-                            <OrderItemPrimary
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                }}
-                            >
-                                <Tooltip
-                                    placement="left"
-                                    title={`${feeText} for processing the transaction, the fee unused will be refunded, usually you receive most of it back`}
-                                >
-                                    <IconButton size="small">
-                                        <InfoOutlinedIcon
-                                            sx={{
-                                                fontSize: '0.7rem',
-                                            }}
-                                            fontSize="small"
-                                        />
-                                    </IconButton>
-                                </Tooltip>
-                                {networkFee.toFixed(2)} KAS
-                                <Typography
-                                    sx={{ ml: '0.3rem' }}
-                                    variant="body2"
-                                    color="textSecondary"
-                                    component="span"
-                                >
-                                    (${(networkFee * kasPrice).toFixed(2)})
-                                </Typography>
-                            </OrderItemPrimary>
-                        </OrderDetailsItem>
-                        {order.isDecentralized && kaspianoCommissionInt > 0 && (
+                        <Box sx={{ flex: '1 1 auto' }}>
                             <OrderDetailsItem variant="body1">
-                                Platform Fee:
-                                <OrderItemPrimary
-                                    sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    {platformFee.toFixed(2)} KAS
+                                Total Token Price:
+                                <OrderItemPrimary>
+                                    {order.totalPrice.toFixed(2)} KAS
                                     <Typography
                                         sx={{ ml: '0.3rem' }}
                                         variant="body2"
                                         color="textSecondary"
                                         component="span"
                                     >
-                                        (${(platformFee * kasPrice).toFixed(2)})
+                                        (${(order.totalPrice * kasPrice).toFixed(2)})
                                     </Typography>
                                 </OrderItemPrimary>
                             </OrderDetailsItem>
-                        )}
 
-                        {/* Final Total */}
-                        <OrderDetailsItem variant="body1" sx={{ fontWeight: 'bold' }}>
-                            Final Total:
-                            <OrderItemPrimary>
-                                {finalTotalWithCommission.toFixed(2)} KAS
-                                <Typography
-                                    sx={{ ml: '0.3rem' }}
-                                    variant="body2"
-                                    color="textSecondary"
-                                    component="span"
+                            {/* Network Fee */}
+                            <OrderDetailsItem variant="body1">
+                                {feeText}:
+                                <OrderItemPrimary
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                    }}
                                 >
-                                    (${(finalTotalWithCommission * kasPrice).toFixed(2)})
+                                    <Tooltip
+                                        placement="left"
+                                        title={`${feeText} for processing the transaction, the fee unused will be refunded, usually you receive most of it back`}
+                                    >
+                                        <IconButton size="small">
+                                            <InfoOutlinedIcon
+                                                sx={{
+                                                    fontSize: '0.7rem',
+                                                }}
+                                                fontSize="small"
+                                            />
+                                        </IconButton>
+                                    </Tooltip>
+                                    {networkFee.toFixed(2)} KAS
+                                    <Typography
+                                        sx={{ ml: '0.3rem' }}
+                                        variant="body2"
+                                        color="textSecondary"
+                                        component="span"
+                                    >
+                                        (${(networkFee * kasPrice).toFixed(2)})
+                                    </Typography>
+                                </OrderItemPrimary>
+                            </OrderDetailsItem>
+                            {order.isDecentralized && kaspianoCommissionInt > 0 && (
+                                <OrderDetailsItem variant="body1">
+                                    Platform Fee:
+                                    <OrderItemPrimary
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        {platformFee.toFixed(2)} KAS
+                                        <Typography
+                                            sx={{ ml: '0.3rem' }}
+                                            variant="body2"
+                                            color="textSecondary"
+                                            component="span"
+                                        >
+                                            (${(platformFee * kasPrice).toFixed(2)})
+                                        </Typography>
+                                    </OrderItemPrimary>
+                                </OrderDetailsItem>
+                            )}
+
+                            {/* Final Total */}
+                            <OrderDetailsItem variant="body1" sx={{ fontWeight: 'bold' }}>
+                                Final Total:
+                                <OrderItemPrimary>
+                                    {finalTotalWithCommission.toFixed(2)} KAS
+                                    <Typography
+                                        sx={{ ml: '0.3rem' }}
+                                        variant="body2"
+                                        color="textSecondary"
+                                        component="span"
+                                    >
+                                        (${(finalTotalWithCommission * kasPrice).toFixed(2)})
+                                    </Typography>
+                                </OrderItemPrimary>
+                            </OrderDetailsItem>
+                            {!order.isDecentralized && (
+                                <Typography
+                                    variant="body2"
+                                    sx={{ fontSize: '0.68rem', color: 'rgba(255, 165, 0, 0.7)', fontWeight: 500 }}
+                                >
+                                    *This is an old order and will take longer to process.
                                 </Typography>
-                            </OrderItemPrimary>
-                        </OrderDetailsItem>
-                    </Box>
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={agreedToTerms}
-                                onChange={handleCheckboxChange}
+                            )}
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={agreedToTerms}
+                                        onChange={handleCheckboxChange}
+                                        sx={{
+                                            '& .MuiSvgIcon-root': { fontSize: '1rem' }, // Scales down the checkbox icon
+                                        }} // Scales down the checkbox
+                                    />
+                                }
+                                label={
+                                    <>
+                                        {'I agree with the '}
+                                        <Link onClick={navigateToTradeTerms} sx={{ cursor: 'pointer' }}>
+                                            terms and conditions
+                                        </Link>
+                                        {' of this trade'}
+                                    </>
+                                }
                                 sx={{
-                                    '& .MuiSvgIcon-root': { fontSize: '1rem' }, // Scales down the checkbox icon
-                                }} // Scales down the checkbox
+                                    '& .MuiFormControlLabel-label': { fontSize: '0.7rem', fontWeight: '600' }, // Adjusts the label font size
+                                }}
                             />
-                        }
-                        label={
-                            <>
-                                {'I agree with the '}
-                                <Link onClick={navigateToTradeTerms} sx={{ cursor: 'pointer' }}>
-                                    terms and conditions
-                                </Link>
-                                {' of this trade'}
-                            </>
-                        }
-                        sx={{
-                            '& .MuiFormControlLabel-label': { fontSize: '0.7rem', fontWeight: '600' }, // Adjusts the label font size
-                        }}
-                    />
+                        </Box>
+                        <Box sx={{ mt: 'auto' }}>
+                            {/* Time left */}
+                            <Typography variant="body2" color="error" sx={{ mb: '0.2rem', fontSize: '0.8rem' }}>
+                                Time left to confirm purchase: {formatTime(timeLeft)}
+                            </Typography>
 
-                    {/* Time left */}
-                    <Typography variant="body2" color="error" sx={{ mb: '0.2rem', fontSize: '0.8rem' }}>
-                        Time left to confirm purchase: {formatTime(timeLeft)}
-                    </Typography>
-
-                    {/* Confirm Button */}
-                    <Tooltip title={getTooltipMessage()}>
-                        <span>
-                            <Button
-                                ref={buyButtonRef}
-                                variant="contained"
-                                color="primary"
-                                onClick={gasHandlerMint}
-                                disabled={!walletConnected || walletBalance < finalTotal || !agreedToTerms}
-                                sx={{ width: '100%' }}
-                            >
-                                Confirm Purchase
-                            </Button>
-                        </span>
-                    </Tooltip>
+                            {/* Confirm Button */}
+                            <Tooltip title={getTooltipMessage()}>
+                                <span>
+                                    <Button
+                                        ref={buyButtonRef}
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={gasHandlerMint}
+                                        disabled={!walletConnected || walletBalance < finalTotal || !agreedToTerms}
+                                        sx={{ width: '100%' }}
+                                    >
+                                        Confirm Purchase
+                                    </Button>
+                                </span>
+                            </Tooltip>
+                        </Box>
+                    </Box>
                 </>
             )}
             <GasFeeSelector

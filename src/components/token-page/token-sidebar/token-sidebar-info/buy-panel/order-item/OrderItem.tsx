@@ -35,11 +35,11 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
 
     const formatPrice = (price: number) => {
         if (price >= 1) {
-            return price.toFixed(2);
-        } else if (price >= 0.01) {
             return price.toFixed(3);
+        } else if (price >= 0.01) {
+            return price.toFixed(4);
         } else if (price >= 0.0001) {
-            return price.toFixed(6);
+            return price.toFixed(5);
         } else {
             return price.toFixed(6); // Adjust precision as needed
         }
@@ -68,18 +68,6 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                     </OrderItemPrimary>
                 </Box>
                 {/* Price per Token */}
-                <Box sx={{ width: '15%' }}>
-                    <OrderItemPrimary variant="body2">
-                        {formatNumberWithCommas(order.totalPrice.toFixed(2))}{' '}
-                        <Box component="span" sx={{ fontSize: '0.5rem', display: 'inline' }}>
-                            {/* Adjust fontSize as needed */}
-                            KAS
-                        </Box>
-                    </OrderItemPrimary>
-                    <OrderItemSecondary variant="caption" color="textSecondary">
-                        (${formatNumberWithCommas((order.totalPrice * kasPrice).toFixed(2))})
-                    </OrderItemSecondary>
-                </Box>
                 <Box sx={{ width: '20%' }}>
                     <Tooltip title={`${order.pricePerToken} KAS`}>
                         <OrderItemPrimary variant="body2">
@@ -92,6 +80,18 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
                     </Tooltip>
                     <OrderItemSecondary variant="caption" color="textSecondary">
                         (${(order.pricePerToken * kasPrice).toFixed(5)})
+                    </OrderItemSecondary>
+                </Box>
+                <Box sx={{ width: '15%' }}>
+                    <OrderItemPrimary variant="body2">
+                        {formatNumberWithCommas(order.totalPrice.toFixed(2))}{' '}
+                        <Box component="span" sx={{ fontSize: '0.5rem', display: 'inline' }}>
+                            {/* Adjust fontSize as needed */}
+                            KAS
+                        </Box>
+                    </OrderItemPrimary>
+                    <OrderItemSecondary variant="caption" color="textSecondary">
+                        (${formatNumberWithCommas((order.totalPrice * kasPrice).toFixed(2))})
                     </OrderItemSecondary>
                 </Box>
                 {/* Total Price */}

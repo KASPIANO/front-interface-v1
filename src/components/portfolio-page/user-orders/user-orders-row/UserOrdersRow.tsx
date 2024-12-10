@@ -23,7 +23,7 @@ import { verifyDecentralizedOrder, getDecentralizedOrder } from '../../../../DAL
 import { cancelOrderKRC20 } from '../../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../../alert-context/AlertContext';
 import { fetchTokenPrice } from '../../../../DAL/BackendDAL';
-// import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 interface UserOrdersRowProps {
     order: Order | DecentralizedOrder;
@@ -158,9 +158,9 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
     // Reset the loading state
 
     const formatPrice = (price: number) => {
-        if (price >= 1) return price.toFixed(2);
-        if (price >= 0.01) return price.toFixed(3);
-        return price.toFixed(6);
+        if (price >= 1) return price.toFixed(3);
+        if (price >= 0.01) return price.toFixed(4);
+        return price.toFixed(7);
     };
 
     // Format date for display
@@ -289,7 +289,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                             sx={{ fontSize: '0.75rem', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}
                         >
                             {order.ticker}
-                            {/* {!order.isDecentralized && (
+                            {!order.isDecentralized && (
                                 <Tooltip
                                     title="This is an old order created before the PSKT protocol was introduced. Please delist and list it again to comply with the latest standards."
                                     arrow
@@ -303,7 +303,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                                         }}
                                     />
                                 </Tooltip>
-                            )} */}
+                            )}
                         </Typography>
                     }
                 />
