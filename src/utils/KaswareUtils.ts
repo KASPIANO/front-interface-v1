@@ -10,7 +10,7 @@ import { getTokenMintsLeft } from '../DAL/Krc20DAL';
 export const USER_REJECTED_TRANSACTION_ERROR_CODE = 4001;
 export const MINIMUM_KASPA_AMOUNT_FOR_TRANSACTION = 3;
 export const AIRDROP_VERSION = '0.7.5.4';
-export const PKST_VERSION = '0.7.8';
+export const PKST_VERSION = '0.7.15.5';
 
 // Utility to detect if KasWare Wallet is installed
 export const isKasWareInstalled = (): boolean => typeof window.kasware !== 'undefined';
