@@ -13,7 +13,7 @@ import {
     DialogTitle,
     TextField,
 } from '@mui/material';
-import { DecentralizedOrder, Order, SellOrderStatus } from '../../../../types/Types';
+import { DecentralizedOrder, Order, SellOrderStatus, SellOrderStatusV2 } from '../../../../types/Types';
 import LoadingSpinner from '../../../common/spinner/LoadingSpinner';
 import { useQueryClient } from '@tanstack/react-query';
 import { highGasWarning } from '../../../../DAL/KaspaApiDal';
@@ -480,7 +480,9 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                             paddingRight: '8rem',
                         }}
                     >
-                        {order.status === SellOrderStatus.LISTED_FOR_SALE &&
+                        {[SellOrderStatusV2.LISTED_FOR_SALE, SellOrderStatusV2.PSKT_VERIFICATION_ERROR].includes(
+                            order.status as SellOrderStatusV2,
+                        ) &&
                             (loadingOrderId === order.orderId ? (
                                 <LoadingSpinner size={20} />
                             ) : (
