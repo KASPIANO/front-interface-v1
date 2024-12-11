@@ -6,13 +6,14 @@ import OrderList from './order-list/OrderList';
 import BuyHeader from './buy-header/BuyHeader';
 import OrderDetails from './order-details/OrderDetails';
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
-import { buyOrderKRC20, sendKaspa, USER_REJECTED_TRANSACTION_ERROR_CODE } from '../../../../../utils/KaswareUtils';
+import { buyOrderKRC20, sendKaspa, signBuyOrderKRC20, USER_REJECTED_TRANSACTION_ERROR_CODE } from '../../../../../utils/KaswareUtils';
 import {
     startBuyOrder,
     confirmBuyOrder,
     releaseBuyLock,
     getDecentralizedOrder,
     verifyDecentralizedOrder,
+    buyDecentralizedOrder,
 } from '../../../../../DAL/BackendP2PDAL';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material'; // Import CircularProgress for the spinner
@@ -307,7 +308,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     };
 
     const handlePurchaseV2 = async (order: DecentralizedOrder, finalTotal: number, priorityFee?: number) => {
-        let txId;
+        let signedTransaction;
         if (walletBalance < finalTotal) {
             showGlobalSnackbar({
                 message: 'Insufficient balance for this order',
@@ -321,16 +322,16 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         try {
             setWaitingForWalletConfirmation(true);
 
-            txId = await buyOrderKRC20(psktSeller, priorityFee);
+            signedTransaction = await signBuyOrderKRC20(psktSeller, priorityFee);
 
-            if (isEmptyString(txId)) {
+            if (isEmptyString(signedTransaction)) {
                 throw new Error('paymentTxn is empty');
             }
         } catch (err) {
             console.error(err);
             if (err?.code !== USER_REJECTED_TRANSACTION_ERROR_CODE) {
                 showGlobalSnackbar({
-                    message: 'Payment failed. Order Taken by another user',
+                    message: 'Failed to sign the order. Please try again later.',
                     severity: 'error',
                 });
                 queryClient.setQueryData(
@@ -346,6 +347,8 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     },
                 );
             }
+
+            // This verify should happend only if you get error code 40003 or 40002
             verifyDecentralizedOrder(order.orderId);
             setSelectedOrder(null);
             setIsPanelOpen(false);
@@ -353,28 +356,55 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             return;
         }
 
-        if (txId) {
-            // wihtout await for fast finish
-            verifyDecentralizedOrder(order.orderId, txId);
-            queryClient.setQueryData(
-                ['orders', tokenInfo.ticker],
-                (oldData: { orders: MixedOrder[] } | undefined) => {
-                    if (!oldData) return oldData;
-
-                    const newOrders = oldData.orders.filter((order) => order.orderId !== selectedOrder.orderId);
-
-                    return { ...oldData, orders: newOrders };
-                },
-            );
-        }
-
         setWaitingForWalletConfirmation(false);
 
-        if (txId) {
+        if (signedTransaction) {
+            let errorMessage = 'Purchase failed in the process';
+            let buyerTransactionId: string = null;
+
+            try {
+                const result = await buyDecentralizedOrder(order.orderId, signedTransaction);
+
+                queryClient.setQueryData(
+                    ['orders', tokenInfo.ticker],
+                    (oldData: { orders: MixedOrder[] } | undefined) => {
+                        if (!oldData) return oldData;
+
+                        const newOrders = oldData.orders.filter(
+                            (order) => order.orderId !== selectedOrder.orderId,
+                        );
+
+                        return { ...oldData, orders: newOrders };
+                    },
+                );
+
+                if (!result.success) {
+                    errorMessage = result.errorMessage || errorMessage;
+                    throw new Error(`Failed to buy order: ${JSON.stringify(result)}`);
+                }
+
+                buyerTransactionId = result.transactionId!;
+            } catch (err) {
+                console.error(err);
+
+                // if (priorityFeeTooHigh) {
+                //     errorMessage =
+                //         "The network fee is currently too high, so we can't process your order. Your order will be executed when the fee returns to normal.";
+                // }
+                showGlobalSnackbar({
+                    message: errorMessage,
+                    severity: 'error',
+                });
+
+                setIsPanelOpen(false);
+                setSelectedOrder(null);
+                return;
+            }
+
             showGlobalSnackbar({
                 message: 'Purchase successful!',
                 severity: 'success',
-                txIds: [txId],
+                txIds: [buyerTransactionId],
             });
             setIsPanelOpen(false);
             setSelectedOrder(null);
