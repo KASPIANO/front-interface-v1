@@ -62,7 +62,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                 console.error('Error fetching floor price:', error);
             }
         };
-
         checkPriceDifference();
     }, [order]);
 

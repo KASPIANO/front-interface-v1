@@ -186,9 +186,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         ) : (
             <Skeleton variant="rectangular" height={height} width={width} />
         );
-    useEffect(() => {
-        console.log('priceHistoryData changed:', priceHistoryData);
-    }, [priceHistoryData]);
+
     const rugScoreParse = tokenInfo?.metadata?.rugScore === 0 ? null : tokenInfo?.metadata?.rugScore;
 
     const recalculateRugScoreAndShow = async () => {
