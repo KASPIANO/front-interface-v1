@@ -304,6 +304,7 @@ export interface Order {
     createdAt: string;
     status: SellOrderStatus;
     isDecentralized: boolean;
+    currentFee?: number;
 }
 
 export interface DecentralizedOrder {
@@ -318,6 +319,7 @@ export interface DecentralizedOrder {
     psktTransactionId: string;
     sellerWalletAddress: string;
     isDecentralized: boolean;
+    currentFee: number;
 }
 
 export type MixedOrder = Order | DecentralizedOrder;

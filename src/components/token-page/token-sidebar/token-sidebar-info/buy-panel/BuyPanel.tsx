@@ -340,8 +340,6 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 });
             }
 
-            // This verify should happend only if you get error code 40003 or 40002
-            verifyDecentralizedOrder(order.orderId);
             setSelectedOrder(null);
             setIsPanelOpen(false);
             setWaitingForWalletConfirmation(false);
@@ -371,6 +369,10 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 );
 
                 if (!result.success) {
+                    if (result.errorCode === 40003 || result.errorCode === 40002) {
+                        verifyDecentralizedOrder(order.orderId);
+                    }
+
                     errorMessage = result.errorMessage || errorMessage;
                     throw new Error(`Failed to buy order: ${JSON.stringify(result)}`);
                 }
