@@ -2,7 +2,7 @@ import { jwtDecode } from 'jwt-decode';
 import moment from 'moment';
 import { getTxnInfo } from '../DAL/KaspaApiDal';
 import { fetchTokenInfo } from '../DAL/Krc20DAL';
-import { SellOrderStatus } from '../types/Types';
+import { SellOrderStatus, SellOrderStatusV2 } from '../types/Types';
 
 export enum ThemeModes {
     DARK = 'dark',
@@ -229,8 +229,8 @@ export const cleanFilters = (filters: any) => {
     );
 };
 
-export function mapSellOrderStatusToDisplayText(status: SellOrderStatus): string {
-    const statusMap: Record<SellOrderStatus, string> = {
+export function mapSellOrderStatusToDisplayText(status: SellOrderStatus | SellOrderStatusV2): string {
+    const statusMap: Record<SellOrderStatus | SellOrderStatusV2, string> = {
         [SellOrderStatus.WAITING_FOR_TOKENS]: 'Waiting for Tokens',
         [SellOrderStatus.LISTED_FOR_SALE]: 'Listed for Sale',
         [SellOrderStatus.WAITING_FOR_KAS]: 'Waiting for KAS',
@@ -246,6 +246,10 @@ export function mapSellOrderStatusToDisplayText(status: SellOrderStatus): string
         [SellOrderStatus.DELISTING]: 'Delisting in Progress',
         [SellOrderStatus.DELIST_ERROR]: 'Delisting Error',
         [SellOrderStatus.COMPLETED_DELISTING]: 'Delisting Completed',
+        [SellOrderStatusV2.PROCESSING]: 'Processing',
+        [SellOrderStatusV2.VERIFYING]: 'Verifying',
+        [SellOrderStatusV2.PSKT_VERIFICATION_ERROR]: 'Verification Error (PSKT)',
+        [SellOrderStatusV2.FAILED_VERIFICATION]: 'Verification Error',
     };
 
     return statusMap[status] || 'Unknown Status';

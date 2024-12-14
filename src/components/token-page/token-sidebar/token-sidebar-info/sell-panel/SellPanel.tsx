@@ -23,8 +23,6 @@ interface SellPanelProps {
 
 // const KASPA_TO_SOMPI = 100000000;
 const STORAGE_KEY = 'pendingPSKT';
-const KASPIANO_TRADE_COMMISSION = import.meta.env.VITE_TRADE_COMMISSION;
-const KASPIANO_WALLET = import.meta.env.VITE_APP_KAS_WALLET_ADDRESS;
 
 const SellPanel: React.FC<SellPanelProps> = (props) => {
     const { tokenInfo, kasPrice, walletAddress, walletConnected, walletBalance, startPolling } = props;
@@ -42,7 +40,6 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const [pricePerTokenError, setPricePerTokenError] = useState<string>('');
     const [showButtonsTooltip, setShowButtonsTooltip] = useState<boolean>(false);
     const queryClient = useQueryClient();
-    const kaspianoCommissionInt = parseFloat(KASPIANO_TRADE_COMMISSION);
     const { data: floorPrice, isLoading } = useFetchFloorPrice(tokenInfo.ticker);
 
     useEffect(() => {
@@ -388,14 +385,11 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
     const handleTransferV2 = async (priorityFee?: number) => {
         setWalletConfirmation(true);
         try {
-            const fee =
-                kaspianoCommissionInt > 0 ? Math.max(parseFloat(totalPrice) * kaspianoCommissionInt, 0.5) : 0;
-            const psktExtraOutput = [{ address: KASPIANO_WALLET, amount: fee }];
             const { txJsonString, sendCommitTxId } = await createOrderKRC20(
                 tokenInfo.ticker,
                 parseInt(tokenAmount),
                 parseFloat(totalPrice),
-                psktExtraOutput,
+                undefined,
                 priorityFee,
             );
 
