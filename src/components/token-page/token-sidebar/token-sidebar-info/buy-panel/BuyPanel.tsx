@@ -6,7 +6,11 @@ import OrderList from './order-list/OrderList';
 import BuyHeader from './buy-header/BuyHeader';
 import OrderDetails from './order-details/OrderDetails';
 import { showGlobalSnackbar } from '../../../../alert-context/AlertContext';
-import { buyOrderKRC20, sendKaspa, signBuyOrderKRC20, USER_REJECTED_TRANSACTION_ERROR_CODE } from '../../../../../utils/KaswareUtils';
+import {
+    sendKaspa,
+    signBuyOrderKRC20,
+    USER_REJECTED_TRANSACTION_ERROR_CODE,
+} from '../../../../../utils/KaswareUtils';
 import {
     startBuyOrder,
     confirmBuyOrder,
@@ -334,18 +338,6 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     message: 'Failed to sign the order. Please try again later.',
                     severity: 'error',
                 });
-                queryClient.setQueryData(
-                    ['orders', tokenInfo.ticker],
-                    (oldData: { orders: MixedOrder[] } | undefined) => {
-                        if (!oldData) return oldData;
-
-                        const newOrders = oldData.orders.filter(
-                            (order) => order.orderId !== selectedOrder.orderId,
-                        );
-
-                        return { ...oldData, orders: newOrders };
-                    },
-                );
             }
 
             // This verify should happend only if you get error code 40003 or 40002
@@ -387,10 +379,6 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             } catch (err) {
                 console.error(err);
 
-                // if (priorityFeeTooHigh) {
-                //     errorMessage =
-                //         "The network fee is currently too high, so we can't process your order. Your order will be executed when the fee returns to normal.";
-                // }
                 showGlobalSnackbar({
                     message: errorMessage,
                     severity: 'error',
@@ -414,10 +402,6 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
         } else {
             const errorMessage = 'Purchase failed in the process';
 
-            // if (priorityFeeTooHigh) {
-            //     errorMessage =
-            //         "The network fee is currently too high, so we can't process your order. Your order will be executed when the fee returns to normal.";
-            // }
             showGlobalSnackbar({
                 message: errorMessage,
                 severity: 'error',
