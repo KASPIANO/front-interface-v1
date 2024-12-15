@@ -275,6 +275,27 @@ export const buyOrderKRC20 = async (
         throw error;
     }
 };
+
+export const signBuyOrderKRC20 = async (
+    txJsonString: string,
+    priorityFee?: number,
+    extraOutput?: Array<{ address: string; amount: number }>,
+): Promise<string> => {
+    if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
+    await versionCheck(PKST_VERSION);
+    try {
+        const kasPriorityFee = priorityFee ? priorityFee / 1e8 : undefined;
+        const signedTransactionJson = await window.kasware.signBuyKRC20Token({
+            txJsonString,
+            extraOutput,
+            priorityFee: kasPriorityFee,
+        });
+        return signedTransactionJson;
+    } catch (error) {
+        console.error('Failed to transfer KRC20 token:', error);
+        throw error;
+    }
+};
 export const cancelOrderKRC20 = async (ticker: string, sendCommitTxId: string): Promise<string> => {
     if (!isKasWareInstalled()) throw new Error('KasWare Wallet is not installed');
     await versionCheck(PKST_VERSION);

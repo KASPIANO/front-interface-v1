@@ -23,6 +23,7 @@ interface OrderDetailsProps {
     waitingForWalletConfirmation: boolean;
     isProcessingBuyOrder: boolean;
     handlePurchaseV2: (order: DecentralizedOrder, finalTotal: number, priorityFee?: number) => void;
+    completingOrder: boolean;
 }
 
 const KASPIANO_TRADE_COMMISSION = import.meta.env.VITE_TRADE_COMMISSION;
@@ -38,12 +39,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
         waitingForWalletConfirmation,
         isProcessingBuyOrder,
         handlePurchaseV2,
+        completingOrder,
     } = props;
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [showHighGasWarning, setShowHighGasWarning] = useState(false);
     const [showGasLimitExceeded, setShowGasLimitExceeded] = useState(false);
     const [floorPriceDifference, setFloorPriceDifference] = useState(false);
     const [floorPrice, setFloorPrice] = useState<number>(0);
+    const [isConfrimButtonDisabled, setIsConfrimButtonDisabled] = useState(false);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
     const buyButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -62,7 +65,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                 console.error('Error fetching floor price:', error);
             }
         };
-
         checkPriceDifference();
     }, [order]);
 
@@ -70,8 +72,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     const kaspianoCommissionInt = parseFloat(KASPIANO_TRADE_COMMISSION);
     const networkFee = order.isDecentralized ? 1.05 : 5;
     const finalTotal = order.totalPrice + networkFee;
-    const platformFee = kaspianoCommissionInt > 0 ? Math.max(order.totalPrice * kaspianoCommissionInt, 0.5) : 0;
-    const finalTotalWithCommission = order.isDecentralized ? finalTotal + platformFee : finalTotal;
+    const finalTotalWithCommission = order.isDecentralized ? finalTotal + order.currentFee : finalTotal;
     const feeText = order.isDecentralized ? 'PKST Fee' : 'Network Fee';
 
     const formatTime = (seconds: number) => {
@@ -104,6 +105,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
         } else {
             await handlePurchase(order as Order, finalTotal, priorityFee);
         }
+        setIsConfrimButtonDisabled(false);
     };
 
     const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,10 +126,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
         if (!agreedToTerms) {
             return 'You must agree to the terms and conditions';
         }
+        if (isConfrimButtonDisabled) {
+            return '';
+        }
         return 'Confirm Purchase'; // Default message when everything is valid
     };
 
     const gasHandlerMint = async () => {
+        setIsConfrimButtonDisabled(true);
         const fee = await kaspaFeeEstimate();
         if (fee === 1) {
             handleOrderPurchase(order, finalTotal);
@@ -153,7 +159,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                     boxStyle={{ marginTop: '2rem' }}
                     titleStyle={{ marginBottom: '2rem' }}
                 />
-            ) : isProcessingBuyOrder ? (
+            ) : isProcessingBuyOrder || completingOrder ? (
                 <LoadingSpinner
                     title="Processing your order..."
                     size={70}
@@ -240,14 +246,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                             alignItems: 'center',
                                         }}
                                     >
-                                        {platformFee.toFixed(2)} KAS
+                                        {order.currentFee} KAS
                                         <Typography
                                             sx={{ ml: '0.3rem' }}
                                             variant="body2"
                                             color="textSecondary"
                                             component="span"
                                         >
-                                            (${(platformFee * kasPrice).toFixed(2)})
+                                            (${(order.currentFee * kasPrice).toFixed(3)})
                                         </Typography>
                                     </OrderItemPrimary>
                                 </OrderDetailsItem>
@@ -314,10 +320,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                         variant="contained"
                                         color="primary"
                                         onClick={gasHandlerMint}
-                                        disabled={!walletConnected || walletBalance < finalTotal || !agreedToTerms}
+                                        disabled={
+                                            !walletConnected ||
+                                            walletBalance < finalTotal ||
+                                            !agreedToTerms ||
+                                            isConfrimButtonDisabled
+                                        }
                                         sx={{ width: '100%' }}
                                     >
-                                        Confirm Purchase
+                                        {isConfrimButtonDisabled ? 'Starting Purchase..' : 'Confirm Purchase'}
                                     </Button>
                                 </span>
                             </Tooltip>

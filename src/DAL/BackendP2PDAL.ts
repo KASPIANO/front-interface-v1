@@ -253,6 +253,28 @@ export const verifyDecentralizedOrder = async (orderId, transactionId?): Promise
     return response.data;
 };
 
+export const buyDecentralizedOrder = async (
+    orderId: string,
+    signedTransactionJson: string,
+): Promise<{
+    success: boolean;
+    errorCode?: number;
+    errorMessage?: string;
+    order?: DecentralizedOrder;
+    transactionId?: string;
+}> => {
+    const response = await backendService.post<{
+        success: boolean;
+        errorCode?: number;
+        errorMessage?: string;
+        order?: DecentralizedOrder;
+        buyerTransactionId?: string;
+    }>(`/${P2PV2CONTROLLER}/buy/${orderId}`, {
+        signedBuyerPskt: signedTransactionJson,
+    });
+    return response.data;
+};
+
 export const getUserOrders = async (
     params: UserOrdersParams,
 ): Promise<{ orders: MixedOrder[]; totalCount: number; allTickers: string[] }> => {

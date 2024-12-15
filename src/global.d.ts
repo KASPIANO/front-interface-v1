@@ -43,6 +43,11 @@ interface Kasware {
         extraOutput: Array<{ address: string; amount: number }>;
         priorityFee: number;
     }) => Promise<string>;
+    signBuyKRC20Token: (params: {
+        txJsonString: string;
+        extraOutput: Array<{ address: string; amount: number }>;
+        priorityFee: number;
+    }) => Promise<string>;
     cancelKRC20Order: ({ krc20Tick: string, sendCommitTxId: string }) => Promise<string>;
 }
 
