@@ -50,14 +50,14 @@ const ConfirmSellDialog: React.FC<ConfirmSellDialogProps> = (props) => {
     };
 
     const handleConfirm = async (priorityFee?: number) => {
-        setOnClickConfirm(true);
-        await onConfirm(priorityFee);
+        onConfirm(priorityFee);
         setOnClickConfirm(false);
     };
 
     const purchaseButtonRef = useRef<HTMLButtonElement | null>(null);
 
     const gasHandlerPurchase = async () => {
+        setOnClickConfirm(true);
         const fee = await kaspaFeeEstimate();
         if (fee === 1) {
             handleConfirm();

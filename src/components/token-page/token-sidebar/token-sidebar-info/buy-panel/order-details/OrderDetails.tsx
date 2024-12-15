@@ -44,6 +44,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     const [showGasLimitExceeded, setShowGasLimitExceeded] = useState(false);
     const [floorPriceDifference, setFloorPriceDifference] = useState(false);
     const [floorPrice, setFloorPrice] = useState<number>(0);
+    const [isConfrimButtonDisabled, setIsConfrimButtonDisabled] = useState(false);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
     const buyButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -102,6 +103,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
         } else {
             await handlePurchase(order as Order, finalTotal, priorityFee);
         }
+        setIsConfrimButtonDisabled(false);
     };
 
     const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,10 +124,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
         if (!agreedToTerms) {
             return 'You must agree to the terms and conditions';
         }
+        if (isConfrimButtonDisabled) {
+            return '';
+        }
         return 'Confirm Purchase'; // Default message when everything is valid
     };
 
     const gasHandlerMint = async () => {
+        setIsConfrimButtonDisabled(true);
         const fee = await kaspaFeeEstimate();
         if (fee === 1) {
             handleOrderPurchase(order, finalTotal);
@@ -312,10 +318,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                         variant="contained"
                                         color="primary"
                                         onClick={gasHandlerMint}
-                                        disabled={!walletConnected || walletBalance < finalTotal || !agreedToTerms}
+                                        disabled={
+                                            !walletConnected ||
+                                            walletBalance < finalTotal ||
+                                            !agreedToTerms ||
+                                            isConfrimButtonDisabled
+                                        }
                                         sx={{ width: '100%' }}
                                     >
-                                        Confirm Purchase
+                                        {isConfrimButtonDisabled ? 'Starting Purchase..' : 'Confirm Purchase'}
                                     </Button>
                                 </span>
                             </Tooltip>
