@@ -107,11 +107,7 @@ const FAQ: React.FC = () => (
                     >
                         Launchpad Tool
                     </Link>
-                    <Link
-                        href="#launchpad-tool"
-                        underline="hover"
-                        sx={{ display: 'block', marginBottom: '0.5rem' }}
-                    >
+                    <Link href="#airdrop-tool" underline="hover" sx={{ display: 'block', marginBottom: '0.5rem' }}>
                         Airdrop Tool
                     </Link>
                 </Box>
@@ -350,11 +346,7 @@ const FAQ: React.FC = () => (
             Connect your wallet, go to the Deploy page and fill out the fields needed for it, and it will cost
             1000KAS which goes to the miners.
         </Typography>
-        <Typography variant="body1" paragraph>
-            <strong>1. How do I Airdrop tokens on Kaspiano?</strong>
-            <br />
-            Connect your wallet, go to the Airdrop Page, and follow instrucions.
-        </Typography>
+
         <Typography variant="body1" paragraph>
             <strong>2. How do I create a sell order?</strong>
             <br />
@@ -365,6 +357,95 @@ const FAQ: React.FC = () => (
             <strong>3. How do I buy tokens on Kaspiano?</strong>
             <br />
             Go to the Buy section on your dashboard, select a sell order, and confirm your purchase.
+        </Typography>
+        <Typography variant="h6" id="airdrop-tool" gutterBottom sx={{ textDecoration: 'underline' }}>
+            Airdrop Tool
+        </Typography>
+        <Typography variant="body1" paragraph>
+            <strong>1. How do I use the Airdrop Tool on Kaspiano?</strong>
+            <br />
+            Follow these steps to successfully execute an airdrop:
+            <ul>
+                <li>Add the ticker for the token you wish to airdrop.</li>
+                <li>
+                    Import a CSV file containing wallet addresses and the corresponding amounts for each recipient.
+                </li>
+                <li>Review the uploaded wallet list and amounts to ensure everything is correct.</li>
+                <li>Use one credit to start the airdrop process. Ensure you have sufficient credits.</li>
+            </ul>
+            Each credit allows you to perform one airdrop.
+        </Typography>
+        <Typography variant="body1" paragraph>
+            <strong>2. How much does the Airdrop Tool cost?</strong>
+            <br />
+            The Airdrop Tool costs <strong>500 KAS</strong> for 3 credits. Each credit can be used for one airdrop.
+            Unused credits remain available for future airdrops.
+        </Typography>
+        <Typography variant="body1" paragraph>
+            <strong>3. How does Kaspiano handle duplicates in the wallet list?</strong>
+            <br />
+            The Airdrop Tool automatically removes duplicate wallet addresses, ensuring no recipient is credited
+            more than once.
+        </Typography>
+        <Typography variant="body1" paragraph>
+            <strong>4. Can I track the airdrop process?</strong>
+            <br />
+            Yes, the Airdrop Tool provides real-time updates on the status of each wallet in the list. You can
+            monitor progress directly from the platform.
+        </Typography>
+        <Typography variant="body1" paragraph>
+            <strong>5. Important Notes for Using the Airdrop Tool</strong>
+            <br />
+            While the airdrop is in progress:
+            <ul>
+                <li>Do not close your internet connection.</li>
+                <li>It is recommended to keep the Kaspiano platform open to ensure smooth processing.</li>
+            </ul>
+            Interrupting the process may cause delays or failures in the airdrop.
+        </Typography>
+
+        <Typography variant="h6" id="launchpad-tool" gutterBottom sx={{ textDecoration: 'underline' }}>
+            Launchpad Tool
+        </Typography>
+        <Typography variant="body1" paragraph>
+            <strong>1. How do I create a Launchpad on Kaspiano?</strong>
+            <br />
+            Go to the "Create Launchpad" section, and follow these steps:
+            <ul>
+                <li>Ensure your tokens are pre-minted and available in your wallet.</li>
+                <li>
+                    Fill out the fields, such as Ticker, Kas Per Batch, and Tokens Per Batch. Optional fields
+                    include min/max batches per order and batch limits per wallet.
+                </li>
+                <li>
+                    Enable the Whitelist if you want to restrict participation to specific wallet addresses. Upload
+                    a CSV file with the wallet addresses if enabled.
+                </li>
+            </ul>
+            Once completed, your Launchpad will be created. Manage it further in the "My Launchpads" section.
+        </Typography>
+        <Typography variant="body1" paragraph>
+            <strong>2. How do I fund my Launchpad?</strong>
+            <br />
+            To fund your Launchpad, deposit the tokens and gas (Kaspa) required for transactions. Ensure you have
+            enough for buyers to receive their tokens and to cover transaction fees.
+        </Typography>
+        <Typography variant="body1" paragraph>
+            <strong>3. Can I update or stop my Launchpad?</strong>
+            <br />
+            Yes, you can update settings like token price and whitelist configuration or stop your Launchpad.
+            Stopping it will finish any open orders before ceasing new purchases.
+        </Typography>
+        <Typography variant="body1" paragraph>
+            <strong>4. What are the fees associated with the Launchpad?</strong>
+            <br />
+            Kaspiano charges a <strong>2.5% fee</strong> on the total funds raised during withdrawals.
+        </Typography>
+        <Typography variant="body1" paragraph>
+            <strong>5. How do I withdraw funds from the Launchpad?</strong>
+            <br />
+            To withdraw funds (tokens or gas), first stop your Launchpad. Once all orders are processed, you can
+            withdraw the remaining funds.
         </Typography>
 
         <Typography variant="h6" id="mainnet-testnet" gutterBottom sx={{ textDecoration: 'underline' }}>
