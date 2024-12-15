@@ -401,6 +401,7 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                     setTimeout(() => {
                         setFinishedSellOrder((prev) => !prev);
                         setWalletConfirmation(false); // Ensures it closes after a slight delay
+                        showGlobalSnackbar({ message: 'Processing your order', severity: 'info' });
                     }, 500);
                     const res = await createSellOrderV2(
                         tokenInfo.ticker,
