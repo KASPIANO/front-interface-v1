@@ -48,6 +48,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
     const [psktSeller, setPsktSeller] = useState('');
     const [isProcessingBuyOrder, setIsProcessingBuyOrder] = useState(false);
     const [waitingForWalletConfirmation, setWaitingForWalletConfirmation] = useState(false);
+    const [completingOrder, setCompletingOrder] = useState(false);
     const queryClient = useQueryClient();
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isFetching } = useFetchOrders(
@@ -345,7 +346,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setWaitingForWalletConfirmation(false);
             return;
         }
-
+        setCompletingOrder(true);
         setWaitingForWalletConfirmation(false);
 
         if (signedTransaction) {
@@ -372,7 +373,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     if (result.errorCode === 40003 || result.errorCode === 40002) {
                         verifyDecentralizedOrder(order.orderId);
                     }
-
+                    setCompletingOrder(false);
                     errorMessage = result.errorMessage || errorMessage;
                     throw new Error(`Failed to buy order: ${JSON.stringify(result)}`);
                 }
@@ -385,7 +386,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                     message: errorMessage,
                     severity: 'error',
                 });
-
+                setCompletingOrder(false);
                 setIsPanelOpen(false);
                 setSelectedOrder(null);
                 return;
@@ -396,6 +397,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 severity: 'success',
                 txIds: [buyerTransactionId],
             });
+            setCompletingOrder(false);
             setIsPanelOpen(false);
             setSelectedOrder(null);
             setTimeout(() => {
@@ -408,7 +410,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 message: errorMessage,
                 severity: 'error',
             });
-
+            setCompletingOrder(false);
             setIsPanelOpen(false);
             setSelectedOrder(null);
         }
@@ -485,6 +487,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 >
                     {selectedOrder && (
                         <OrderDetails
+                            completingOrder={completingOrder}
                             isProcessingBuyOrder={isProcessingBuyOrder}
                             waitingForWalletConfirmation={waitingForWalletConfirmation}
                             handlePurchase={handlePurchase}

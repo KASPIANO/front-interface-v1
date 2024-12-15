@@ -23,6 +23,7 @@ interface OrderDetailsProps {
     waitingForWalletConfirmation: boolean;
     isProcessingBuyOrder: boolean;
     handlePurchaseV2: (order: DecentralizedOrder, finalTotal: number, priorityFee?: number) => void;
+    completingOrder: boolean;
 }
 
 const KASPIANO_TRADE_COMMISSION = import.meta.env.VITE_TRADE_COMMISSION;
@@ -38,6 +39,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
         waitingForWalletConfirmation,
         isProcessingBuyOrder,
         handlePurchaseV2,
+        completingOrder,
     } = props;
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [showHighGasWarning, setShowHighGasWarning] = useState(false);
@@ -157,7 +159,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                     boxStyle={{ marginTop: '2rem' }}
                     titleStyle={{ marginBottom: '2rem' }}
                 />
-            ) : isProcessingBuyOrder ? (
+            ) : isProcessingBuyOrder || completingOrder ? (
                 <LoadingSpinner
                     title="Processing your order..."
                     size={70}
