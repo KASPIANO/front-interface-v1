@@ -62,7 +62,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                 console.error('Error fetching floor price:', error);
             }
         };
-
         checkPriceDifference();
     }, [order]);
 
@@ -70,8 +69,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     const kaspianoCommissionInt = parseFloat(KASPIANO_TRADE_COMMISSION);
     const networkFee = order.isDecentralized ? 1.05 : 5;
     const finalTotal = order.totalPrice + networkFee;
-    const platformFee = kaspianoCommissionInt > 0 ? Math.max(order.totalPrice * kaspianoCommissionInt, 0.5) : 0;
-    const finalTotalWithCommission = order.isDecentralized ? finalTotal + platformFee : finalTotal;
+    const finalTotalWithCommission = order.isDecentralized ? finalTotal + order.currentFee : finalTotal;
     const feeText = order.isDecentralized ? 'PKST Fee' : 'Network Fee';
 
     const formatTime = (seconds: number) => {
@@ -240,14 +238,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                             alignItems: 'center',
                                         }}
                                     >
-                                        {platformFee.toFixed(2)} KAS
+                                        {order.currentFee} KAS
                                         <Typography
                                             sx={{ ml: '0.3rem' }}
                                             variant="body2"
                                             color="textSecondary"
                                             component="span"
                                         >
-                                            (${(platformFee * kasPrice).toFixed(2)})
+                                            (${(order.currentFee * kasPrice).toFixed(3)})
                                         </Typography>
                                     </OrderItemPrimary>
                                 </OrderDetailsItem>
