@@ -1,7 +1,13 @@
 // BuyPanel.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Box } from '@mui/material';
-import { BackendTokenResponse, DecentralizedOrder, MixedOrder, Order } from '../../../../../types/Types';
+import {
+    BackendTokenResponse,
+    DecentralizedOrder,
+    ERROR_MESSAGES,
+    MixedOrder,
+    Order,
+} from '../../../../../types/Types';
 import OrderList from './order-list/OrderList';
 import BuyHeader from './buy-header/BuyHeader';
 import OrderDetails from './order-details/OrderDetails';
@@ -374,7 +380,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                         verifyDecentralizedOrder(order.orderId);
                     }
                     setCompletingOrder(false);
-                    errorMessage = result.errorMessage || errorMessage;
+                    errorMessage = ERROR_MESSAGES[result.errorCode] || errorMessage;
                     throw new Error(`Failed to buy order: ${JSON.stringify(result)}`);
                 }
 

@@ -534,6 +534,10 @@ export enum ErrorCodes {
 
     INVALID_KASPA_AMOUNT = 30001,
     INVALID_BATCH_MINT_STATUS = 30002,
+
+    BUY_PSKT_VALIDATION_FAILED = 40001,
+    BUY_PSKT_TRANSACTION_FAILED = 40002,
+    ORDER_ALREADY_TAKEN = 40003,
 }
 
 export const ERROR_MESSAGES: Record<ErrorCodes, string> = {
@@ -559,6 +563,9 @@ export const ERROR_MESSAGES: Record<ErrorCodes, string> = {
 
     [ErrorCodes.INVALID_KASPA_AMOUNT]: 'Kaspa amount is invalid.',
     [ErrorCodes.INVALID_BATCH_MINT_STATUS]: 'Batch mint status is invalid.',
+    [ErrorCodes.BUY_PSKT_VALIDATION_FAILED]: 'Buy PSKT validation failed.',
+    [ErrorCodes.BUY_PSKT_TRANSACTION_FAILED]: 'Buy PSKT transaction failed.',
+    [ErrorCodes.ORDER_ALREADY_TAKEN]: 'Order already taken.',
 };
 
 // Enums for Lunchpad and Order statuses
