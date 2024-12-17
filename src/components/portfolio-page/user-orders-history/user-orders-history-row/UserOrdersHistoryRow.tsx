@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ListItem, Typography, ListItemText, Tooltip, Divider, ListItemButton } from '@mui/material';
 import { Order } from '../../../../types/Types';
-import { mapSellOrderStatusToDisplayText } from '../../../../utils/Utils';
+import { formatNumberWithCommas, mapSellOrderStatusToDisplayText } from '../../../../utils/Utils';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import { showGlobalSnackbar } from '../../../alert-context/AlertContext';
 
@@ -82,7 +82,7 @@ const OrdersHIstoryRow: React.FC<OrdersHIstoryRowProps> = (props) => {
                     sx={{ width: '7vw' }}
                     primary={
                         <Typography variant="body1" sx={{ fontSize: '0.75rem', fontWeight: 'bold' }}>
-                            {order.quantity}
+                            {formatNumberWithCommas(order.quantity.toFixed(2))}
                         </Typography>
                     }
                 />

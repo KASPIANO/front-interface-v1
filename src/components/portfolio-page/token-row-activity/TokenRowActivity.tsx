@@ -2,7 +2,7 @@ import { Divider, ListItem, ListItemText, Tooltip, Typography } from '@mui/mater
 import { FC } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { TokenRowActivityItem } from '../../../types/Types';
-import { capitalizeFirstLetter } from '../../../utils/Utils';
+import { capitalizeFirstLetter, formatNumberWithCommas } from '../../../utils/Utils';
 
 interface TokenRowActivityProps {
     token: TokenRowActivityItem;
@@ -43,7 +43,7 @@ const TokenRowActivity: FC<TokenRowActivityProps> = (props) => {
                                 justifyContent: 'start',
                             }}
                         >
-                            {token.amount}
+                            {formatNumberWithCommas(parseInt(token.amount).toFixed(2))}
                         </Typography>
                     }
                 />

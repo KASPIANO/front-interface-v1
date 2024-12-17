@@ -306,6 +306,7 @@ export interface Order {
     status: SellOrderStatus;
     isDecentralized: boolean;
     currentFee?: number;
+    isOwner?: boolean;
 }
 
 export interface DecentralizedOrder {
@@ -321,6 +322,7 @@ export interface DecentralizedOrder {
     sellerWalletAddress: string;
     isDecentralized: boolean;
     currentFee: number;
+    isOwner?: boolean;
 }
 
 export type MixedOrder = Order | DecentralizedOrder;
