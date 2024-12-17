@@ -45,7 +45,7 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
         }
     }, [adData]);
 
-    const handleMint = (event, ticker) => {
+    const handleSpecificClick = (event, ticker) => {
         event.stopPropagation();
         ReactGA.event({
             category: 'Link', // Event category (e.g., 'Link' for all external links)
@@ -55,13 +55,14 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
         navigate(`/token/${ticker}`);
     };
 
+    const handleItemClickAds = (adData: AdsListItemResponse) => {
+        const link = adData?.link ? adData.link : adData.telegram;
+        handleItemClick(link, adData.ticker);
+    };
+
     return (
         <div>
-            <ListItem
-                onClick={() => handleItemClick(adData.telegram, adData.ticker)}
-                disablePadding
-                sx={{ height: '7vh' }}
-            >
+            <ListItem onClick={() => handleItemClickAds(adData)} disablePadding sx={{ height: '7vh' }}>
                 <ListItemButton>
                     <ListItemAvatar>
                         <Avatar
@@ -126,7 +127,7 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                         }}
                         primary={
                             <Button
-                                onClick={(event) => handleMint(event, adData.ticker)}
+                                onClick={(event) => handleSpecificClick(event, adData.ticker)}
                                 color="primary"
                                 style={{
                                     fontWeight: 600,
@@ -134,7 +135,7 @@ export const AdsRow: FC<AdsRowProps> = (props) => {
                                     color: theme.palette.primary.main,
                                 }}
                             >
-                                {adData.state === 'finished' ? 'Buy Now' : 'Mint Now'}
+                                {slotPurposeDisplayMapper[adData.purpose] === 'Mint Live' ? 'Mint now' : 'Buy now'}
                             </Button>
                         }
                     />

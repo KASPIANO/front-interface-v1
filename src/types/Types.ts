@@ -96,6 +96,7 @@ export interface AdsListItemResponse {
     telegram?: string;
     website?: string;
     message?: string;
+    link?: string;
 }
 export interface TokenSearchItems {
     ticker: string;
@@ -453,6 +454,7 @@ export enum SlotPurpose {
     EVENT = 'event',
     TRADING = 'trading',
     MINT = 'mint_live',
+    LAUNCHPAD = 'launchpad',
 }
 
 export const slotPurposeDisplayMapper: { [key in SlotPurpose]: string } = {
@@ -460,6 +462,7 @@ export const slotPurposeDisplayMapper: { [key in SlotPurpose]: string } = {
     [SlotPurpose.EVENT]: 'Event',
     [SlotPurpose.TRADING]: 'Trading Competition',
     [SlotPurpose.MINT]: 'Mint Live',
+    [SlotPurpose.LAUNCHPAD]: 'Launchpad',
 };
 
 export interface SortParams {
