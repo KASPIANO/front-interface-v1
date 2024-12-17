@@ -19,7 +19,12 @@ import { FC, useState } from 'react';
 import { mintKRC20Token, transferKRC20Token } from '../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../alert-context/AlertContext';
 import { TokenRowPortfolioItem, TransferObj } from '../../../types/Types';
-import { capitalizeFirstLetter, convertToProtocolFormat, isEmptyString } from '../../../utils/Utils';
+import {
+    capitalizeFirstLetter,
+    convertToProtocolFormat,
+    formatNumberWithCommas,
+    isEmptyString,
+} from '../../../utils/Utils';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_TOKEN_LOGO_URL } from '../../../utils/Constants';
@@ -243,7 +248,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                                     justifyContent: 'center',
                                 }}
                             >
-                                {token.balance}
+                                {formatNumberWithCommas(parseInt(token.balance).toFixed(2))}
                             </Typography>
                         }
                     />
@@ -259,7 +264,7 @@ const TokenRowPortfolio: FC<TokenRowPortfolioProps> = (props) => {
                                     justifyContent: 'center',
                                 }}
                             >
-                                {totalBalanceUsd.toFixed(2)} USD
+                                {formatNumberWithCommas(totalBalanceUsd.toFixed(2))} USD
                             </Typography>
                         }
                     />

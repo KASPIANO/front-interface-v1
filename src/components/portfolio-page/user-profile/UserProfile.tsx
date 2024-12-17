@@ -220,6 +220,7 @@ const UserProfile: FC<UserProfileProps> = (props) => {
         setFetchingLostORders(false);
         setTicker('');
         setPsktTxId('');
+        setOrders([]);
     };
 
     return (

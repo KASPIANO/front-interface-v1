@@ -410,6 +410,13 @@ const SellPanel: React.FC<SellPanelProps> = (props) => {
                         parseFloat(pricePerToken),
                         txJsonString,
                     );
+                    if (!res.id) {
+                        showGlobalSnackbar({
+                            message: "Failed to create sell order, you don't have enough balance",
+                            severity: 'error',
+                        });
+                        return false;
+                    }
                     if (res.status === SellOrderStatusV2.LISTED_FOR_SALE) {
                         showGlobalSnackbar({
                             message: 'Sell order created successfully',

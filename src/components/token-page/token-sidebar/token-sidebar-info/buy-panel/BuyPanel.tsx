@@ -376,7 +376,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
                 );
 
                 if (!result.success) {
-                    if (result.errorCode === 40003 || result.errorCode === 40002) {
+                    if (result.errorCode === 40002) {
                         verifyDecentralizedOrder(order.orderId);
                     }
                     setCompletingOrder(false);
