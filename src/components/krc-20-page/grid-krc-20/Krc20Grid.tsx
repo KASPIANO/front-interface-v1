@@ -54,7 +54,7 @@ const TokenDataGrid: FC<TokenDataGridProps> = (props) => {
         ReactGA.event({
             category: 'Link', // Event category (e.g., 'Link' for all external links)
             action: 'Click', // Event action (e.g., 'Click')
-            label: `Telegram - ${ticker}`, // Event label (e.g., 'Telegram - MyAdName')
+            label: `Ad CLick - ${ticker}`, // Event label (e.g., 'Telegram - MyAdName')
         });
         // Check if the link starts with http:// or https://
         if (!link.startsWith('http://') && !link.startsWith('https://')) {
