@@ -24,6 +24,7 @@ import { cancelOrderKRC20 } from '../../../../utils/KaswareUtils';
 import { showGlobalSnackbar } from '../../../alert-context/AlertContext';
 import { fetchTokenPrice } from '../../../../DAL/BackendDAL';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { formatNumberWithCommas } from '../../../../utils/Utils';
 
 interface UserOrdersRowProps {
     order: Order | DecentralizedOrder;
@@ -324,7 +325,7 @@ const UserOrdersRow: React.FC<UserOrdersRowProps> = (props) => {
                     sx={{ width: '2vw' }}
                     primary={
                         <Typography variant="body1" sx={{ fontSize: '0.75rem', fontWeight: 'bold' }}>
-                            {order.quantity}
+                            {formatNumberWithCommas(order.quantity.toFixed(2))}
                         </Typography>
                     }
                 />

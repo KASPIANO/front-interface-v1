@@ -5,6 +5,7 @@ import { OrderItemPrimary, OrderItemSecondary } from './OrderItem.s';
 import { StyledButton } from '../../sell-panel/SellPanel.s';
 import LoadingSpinner from '../../../../../common/spinner/LoadingSpinner';
 import { formatNumberWithCommas } from '../../../../../../utils/Utils';
+import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 
 interface OrderItemProps {
     order: MixedOrder;
@@ -49,23 +50,25 @@ const OrderItem: React.FC<OrderItemProps> = (props) => {
         <Box sx={{ borderBottom: '0.5px solid  rgba(111, 199, 186, 0.5)', width: '100%', padding: '10px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 {/* Amount with Floor Difference */}
-                <Box sx={{ width: '17%' }}>
+                <Box sx={{ width: '17%', display: 'flex', alignItems: 'center' }}>
                     <OrderItemPrimary variant="body2">
                         {formatNumberWithCommas(order.quantity)}{' '}
-                        {/* <Tooltip title="Difference from floor price"> */}
-                        {/* <Typography
-                                variant="caption"
-                                component="span"
-                                sx={{ color: floorPriceDifference >= 0 ? 'green' : 'red', marginLeft: '0.5rem' }}
-                            >
-                                ({floorPriceDifference.toFixed(2)}%)
-                            </Typography> */}
-                        {/* </Tooltip> */}
                         <Box component="span" sx={{ fontSize: '0.5rem', display: 'inline' }}>
-                            {/* Adjust fontSize as needed */}
                             {ticker}
                         </Box>
                     </OrderItemPrimary>
+
+                    {/* Add Info Icon if order.isOwner is true */}
+                    {order.isOwner && (
+                        <Tooltip title="This order is yours">
+                            <InfoRoundedIcon
+                                sx={{
+                                    fontSize: '0.7rem', // Adjust icon size
+                                    color: 'rgba(111, 199, 186, 0.8)', // Adjust color if needed
+                                }}
+                            />
+                        </Tooltip>
+                    )}
                 </Box>
                 {/* Price per Token */}
                 <Box sx={{ width: '20%' }}>
