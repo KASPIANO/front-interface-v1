@@ -130,6 +130,16 @@ export async function fetchBurntRC20Balance(ticker: string): Promise<number> {
         return 0;
     }
 }
+export async function checkOperation(TxnId: string): Promise<number> {
+    try {
+        const response = await KRC20InfoService.get<any>(`krc20/op/${TxnId}`);
+        const { result } = response.data;
+        console.log(result);
+    } catch (error) {
+        console.error('Error fetching wallet balance:', error);
+        return 0;
+    }
+}
 
 export async function fetchWalletActivity(
     address: string,
