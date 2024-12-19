@@ -166,8 +166,8 @@ export const TokenRow: FC<TokenRowProps> = (props) => {
                     <ListItemAvatar>
                         <Avatar
                             sx={{
-                                width: '2rem',
-                                height: '2rem',
+                                width: '2.4rem',
+                                height: '2.4rem',
                                 marginRight: '1vw',
                             }}
                             style={{

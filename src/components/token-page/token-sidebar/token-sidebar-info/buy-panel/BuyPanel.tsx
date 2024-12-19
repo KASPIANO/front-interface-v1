@@ -86,6 +86,7 @@ const BuyPanel: React.FC<BuyPanelProps> = (props) => {
             setIsPanelOpen(false);
             setSelectedOrder(null);
         }
+        queryClient.invalidateQueries({ queryKey: ['orders', tokenInfo.ticker] });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [walletAddress]);
 
