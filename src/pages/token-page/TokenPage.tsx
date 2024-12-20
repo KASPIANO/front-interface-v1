@@ -162,7 +162,7 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         // Clean up the interval when the component unmounts
         return () => clearInterval(interval);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [ticker]);
+    }, [ticker, walletAddress]);
 
     const { data: priceHistoryData, isLoading } = useQuery({
         queryKey: ['tokenPriceHistory', ticker, tradingDataTimeFrame], // The query key
