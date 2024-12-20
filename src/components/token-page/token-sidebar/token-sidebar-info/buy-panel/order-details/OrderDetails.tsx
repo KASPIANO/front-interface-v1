@@ -26,7 +26,6 @@ interface OrderDetailsProps {
     completingOrder: boolean;
 }
 
-const KASPIANO_TRADE_COMMISSION = import.meta.env.VITE_TRADE_COMMISSION;
 const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     const {
         order,
@@ -69,7 +68,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
     }, [order]);
 
     // Fee Calculations
-    const kaspianoCommissionInt = parseFloat(KASPIANO_TRADE_COMMISSION);
     const networkFee = order.isDecentralized ? 1.05 : 5;
     const finalTotal = order.totalPrice + networkFee;
     const finalTotalWithCommission = order.isDecentralized ? finalTotal + order.currentFee : finalTotal;
@@ -237,7 +235,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                     </Typography>
                                 </OrderItemPrimary>
                             </OrderDetailsItem>
-                            {order.isDecentralized && kaspianoCommissionInt > 0 && (
+                            {order.isDecentralized && order.currentFee > 0 && (
                                 <OrderDetailsItem variant="body1">
                                     Platform Fee:
                                     <OrderItemPrimary
