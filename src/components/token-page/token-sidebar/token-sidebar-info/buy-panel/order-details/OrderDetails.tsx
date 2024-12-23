@@ -235,7 +235,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = (props) => {
                                     </Typography>
                                 </OrderItemPrimary>
                             </OrderDetailsItem>
-                            {order.isDecentralized && order.currentFee > 0 && (
+                            {order.isDecentralized && order?.currentFee > 0 && (
                                 <OrderDetailsItem variant="body1">
                                     Platform Fee:
                                     <OrderItemPrimary
