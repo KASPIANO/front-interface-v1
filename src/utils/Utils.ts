@@ -1,3 +1,4 @@
+import { formatDistanceStrict } from 'date-fns';
 import { jwtDecode } from 'jwt-decode';
 import moment from 'moment';
 import { getTxnInfo } from '../DAL/KaspaApiDal';
@@ -61,7 +62,6 @@ export const capitalizeFirstLetter = (string: string): string => {
     if (!string) return string;
     return string.charAt(0).toUpperCase() + string.slice(1);
 };
-import { formatDistanceStrict } from 'date-fns';
 
 export const getFormattedDateDifference = (creationDate: number): string => {
     // Convert timestamp to Date object directly
