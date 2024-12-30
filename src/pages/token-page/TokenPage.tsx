@@ -1,21 +1,21 @@
 import { Skeleton } from '@mui/material';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
+import MintingComponent from '../../components/token-page/minting-status/MintingStatus';
+import RugScore from '../../components/token-page/rug-score/RugScore';
+import TokenGraph from '../../components/token-page/token-graph/TokenGraph';
 import TokenHeader from '../../components/token-page/token-header/TokenHeader';
 import TokenSideBar from '../../components/token-page/token-sidebar/TokenSideBar';
 import TokenStats from '../../components/token-page/token-stats/TokenStats';
 import TopHolders from '../../components/token-page/top-holders/TopHolders';
+import { fetchTokenByTicker, getTokenPriceHistory, recalculateRugScore } from '../../DAL/BackendDAL';
+import { createSellOrderV2 } from '../../DAL/BackendP2PDAL';
+import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
 import { BackendTokenResponse } from '../../types/Types';
 import { TokenPageLayout } from './TokenPageLayout';
-import TokenGraph from '../../components/token-page/token-graph/TokenGraph';
-import RugScore from '../../components/token-page/rug-score/RugScore';
-import MintingComponent from '../../components/token-page/minting-status/MintingStatus';
-import { fetchTokenByTicker, getTokenPriceHistory, recalculateRugScore } from '../../DAL/BackendDAL';
-import { AxiosError } from 'axios';
-import { showGlobalSnackbar } from '../../components/alert-context/AlertContext';
-import { kaspaLivePrice } from '../../DAL/KaspaApiDal';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { createSellOrderV2 } from '../../DAL/BackendP2PDAL';
 
 interface TokenPageProps {
     walletAddress: string | null;
@@ -157,7 +157,8 @@ const TokenPage: FC<TokenPageProps> = (props) => {
         fetchAndUpdateTokenInfo(false);
 
         // Set up the interval to update token info every 5 minutes
-        const interval = setInterval(() => fetchAndUpdateTokenInfo(false), 300000);
+        const interval = setInterval(() => fetchAndUpdateTokenInfo(true), 200000);
+        // const interval = setInterval(() => fetchAndUpdateTokenInfo(true), 10000);
 
         // Clean up the interval when the component unmounts
         return () => clearInterval(interval);
@@ -196,7 +197,10 @@ const TokenPage: FC<TokenPageProps> = (props) => {
             const result = await recalculateRugScore(tokenInfo.ticker);
 
             if (result) {
-                setTokenInfo({ ...tokenInfo, metadata: { ...tokenInfo.metadata, rugScore: result } });
+                setTokenInfo({
+                    ...tokenInfo,
+                    metadata: { ...tokenInfo.metadata, rugScore: result },
+                });
             }
         } catch (error) {
             console.error('Error recalculating rug score:', error);
