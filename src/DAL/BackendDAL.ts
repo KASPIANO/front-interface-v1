@@ -219,9 +219,9 @@ export const getTokenPriceHistory = async (
         const timeFrame = timeInterval === 'All' ? '' : timeInterval;
         const timeQueryStr = timeFrame ? `?timeFrame=${timeFrame}` : '';
         const capitalTicker = ticker.toUpperCase();
-        const response = await backendService.get<{ data: { price: number; date: string }[] }>(
-            `/${KRC20CONTROLLER}/price-history/${capitalTicker}${timeQueryStr}`,
-        );
+        const response = await backendService.get<{
+            data: { price: number; date: string }[];
+        }>(`/${KRC20CONTROLLER}/price-history-v2/${capitalTicker}${timeQueryStr}`);
         return response.data.data;
     } catch (error) {
         console.error(`Error fetching price for ${ticker}:`, error.response ? error.response.data : error.message);
@@ -260,7 +260,10 @@ export const updateContactInfo = async (email?: string, x_url?: string): Promise
     return response.data;
 };
 
-export const getContactInfo = async (): Promise<{ email: string; x_url: string }> => {
+export const getContactInfo = async (): Promise<{
+    email: string;
+    x_url: string;
+}> => {
     const response = await backendService.get<{ email: string; x_url: string }>(
         `/${USER_REFERRALS_CONTROLLER}/contact-info`,
     );
@@ -319,7 +322,9 @@ export const saveAirdropData = async (ticker: string, paymentTxId: string): Prom
 };
 
 // Decrease credits for the authenticated wallet address
-export const decreaseAirdropCredits = async (): Promise<{ message: string }> => {
+export const decreaseAirdropCredits = async (): Promise<{
+    message: string;
+}> => {
     const response = await backendService.post<{ message: string }>(
         `/${KRC20CONTROLLER}/airdrop/decrease-credits`,
     );
